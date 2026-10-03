@@ -1,9 +1,210 @@
 /**
- * The galaxy model, CPU side: turns parameters into the small descriptions the GPU samples from.
+ * The galaxy model, CPU side: turns parameters and the per-galaxy variation into the small
+ * description the stipple kernel samples from (ADR 0003). It is shared, unchanged, by the WebGPU
+ * engine (packed into buffers for src/shaders/compute/stipple.wgsl) and the CPU engine (read
+ * directly by src/fallback/kernels/stipple.ts). Every number is rounded to f32 once, here.
  *
- * Planned (ADR 0003): component weights (bulge, halo, bar, ring, disc), arm phases and profile
- * coefficients, spurs, clumps, dust patches, warp and lopsidedness, packed into a uniform/storage
- * buffer for compute/stipple.wgsl. The reference samples everything sequentially on the CPU in
- * `generate` (app23.js:L175).
+ * Reference: the set-up at the top of `generate` (app23.js:L175–181) and the globals it reads
+ * (`P`, `VAR`, `PEN`, `RMAX`).
  */
-export {};
+import type { Params } from '../core/params';
+import type { StructLayout } from '../marks/instance';
+import { dotSprite, penWeights, type DrawingsMeta, type Variation } from './variation';
+
+const f = Math.fround;
+
+/**
+ * v21 parity: `RMAX` is declared twice in the reference, as 4.2 (app23.js:L121) and as 240
+ * (app23.js:L857); at run time it is 240, so the truncations meant for 4.2 never fire
+ * (reference notes 20.7, open question Q13). We reproduce the visible behaviour.
+ */
+export const RMAX = 240;
+
+/** The most arms a galaxy has (the control's range, 0–6). */
+export const MAX_ARMS = 6;
+/** Spurs: round(vary · (2 + 4u) · min(1, arms)) ≤ 6. */
+export const MAX_SPURS = 8;
+/** Dust patches: round(5 · vary · u) ≤ 5. */
+export const MAX_DUST = 5;
+/** Knot tiles per galaxy (makeVariation, app23.js:L114). */
+export const KNOT_POOL = 24;
+
+/** Layout of the `shape` buffer (vec4<f32> entries), shared with stipple.wgsl. */
+export const SHAPE = {
+  /** arm k: [pitch, amp, phase, rmax] at 2k, [wig, wf, wp, 0] at 2k + 1 */
+  arms: 0,
+  spurs: 2 * MAX_ARMS,
+  dust: 2 * MAX_ARMS + MAX_SPURS,
+  size: 2 * MAX_ARMS + MAX_SPURS + MAX_DUST,
+} as const;
+
+/** Galaxy flags. */
+export const GalaxyFlag = { armsOn: 1, sersic: 2 } as const;
+
+/** The `Galaxy` uniform of stipple.wgsl, scalars only. */
+export const GALAXY_LAYOUT: StructLayout = {
+  name: 'Galaxy',
+  size: 176,
+  align: 4,
+  fields: [
+    ['seed', 'u32'],
+    ['n', 'u32'],
+    ['arms', 'u32'],
+    ['n_var_arms', 'u32'],
+    ['n_spurs', 'u32'],
+    ['n_dust', 'u32'],
+    ['n_dot_pool', 'u32'],
+    ['n_knot_pool', 'u32'],
+    ['n_star_tiles', 'u32'],
+    ['flags', 'u32'],
+    ['key', 'u32'],
+    ['pad1', 'u32'],
+    ['c_bulge', 'f32'],
+    ['c_halo', 'f32'],
+    ['c_bar', 'f32'],
+    ['c_ring', 'f32'],
+    ['tot', 'f32'],
+    ['bulge_a', 'f32'],
+    ['bulge_flat', 'f32'],
+    ['bar_len', 'f32'],
+    ['ring_r', 'f32'],
+    ['thick', 'f32'],
+    ['pitch', 'f32'],
+    ['arm_strength', 'f32'],
+    ['arm_width', 'f32'],
+    ['flocc', 'f32'],
+    ['arm_r0', 'f32'],
+    ['arm_inner', 'f32'],
+    ['patchy', 'f32'],
+    ['irr', 'f32'],
+    ['sersic_n', 'f32'],
+    ['sersic_b', 'f32'],
+    ['re', 'f32'],
+    ['dust', 'f32'],
+    ['star_mix', 'f32'],
+    ['knots', 'f32'],
+    ['sparkle', 'f32'],
+    ['pen_dot', 'f32'],
+    ['lop', 'f32'],
+    ['lop_a', 'f32'],
+    ['warp', 'f32'],
+    ['warp_a', 'f32'],
+    ['rmax', 'f32'],
+    ['pad2', 'f32'],
+  ].map(([name, type], i) => ({
+    name: name as string,
+    type: type as 'u32' | 'f32',
+    offset: i * 4,
+    size: 4,
+  })),
+};
+
+/** The scalar part of the description, named as GALAXY_LAYOUT. */
+export type GalaxyScalars = Record<string, number>;
+
+export interface GalaxyDesc {
+  g: GalaxyScalars;
+  /** SHAPE.size vec4s: arms, spurs, dust patches */
+  shape: Float32Array<ArrayBuffer>;
+  /** knot pool (24) then dot pool */
+  pool: Uint32Array<ArrayBuffer>;
+  /** per dot tile: the quad size at k = 1 (dotSprite, app23.js:L81) */
+  dotBase: Float32Array<ArrayBuffer>;
+}
+
+/** Number of stipple proposals: `round(stars · stipple · (1 + 0.28 · starMix))` (app23.js:L176). */
+export function proposalCount(P: Params): number {
+  return Math.round(P.stars * P.stipple * (1 + 0.28 * (P.starMix || 0)));
+}
+
+export function describeGalaxy(P: Params, V: Variation, meta: DrawingsMeta): GalaxyDesc {
+  const wb = P.bulge;
+  const wh = P.halo * 0.25;
+  const wbar = P.bar * 0.4 * (1 - P.bulge);
+  const wring = P.ring * 0.34 * (1 - P.bulge);
+  const wd = Math.max(0, 1 - wb - wh - wbar - wring);
+  const armsOn = P.arms >= 1 && P.bulge < 0.98;
+  const sersic = P.sersicN > 0 && P.bulge >= 0.95;
+  const barred = P.bar > 0.05;
+  const penDot = penWeights(P.pen).dot;
+  const nVar = Math.min(MAX_ARMS, V.arms.length);
+
+  const g: GalaxyScalars = {
+    seed: P.seed >>> 0,
+    n: proposalCount(P),
+    arms: Math.min(MAX_ARMS, Math.max(0, Math.floor(P.arms))),
+    n_var_arms: nVar,
+    n_spurs: Math.min(MAX_SPURS, V.spurs.length),
+    n_dust: Math.min(MAX_DUST, V.dust.length),
+    n_dot_pool: V.dotPool.length,
+    n_knot_pool: KNOT_POOL,
+    n_star_tiles: meta.stars.count,
+    flags: (armsOn ? GalaxyFlag.armsOn : 0) | (sersic ? GalaxyFlag.sersic : 0),
+    key: P.seed >>> 0,
+    pad1: 0,
+    c_bulge: f(wb),
+    c_halo: f(wb + wh),
+    c_bar: f(wb + wh + wbar),
+    c_ring: f(wb + wh + wbar + wring),
+    tot: f(wb + wh + wbar + wring + wd),
+    bulge_a: f(0.22 * P.bulgeSize),
+    bulge_flat: f(P.bulgeFlat),
+    bar_len: f(P.barLen),
+    ring_r: f(P.ringR),
+    thick: f(P.thick),
+    pitch: f(P.pitch),
+    arm_strength: f(P.armStrength),
+    arm_width: f(P.armWidth),
+    flocc: f(P.flocc),
+    arm_r0: f(barred ? Math.max(0.2, P.barLen) : 0.25),
+    arm_inner: f(barred ? P.barLen : 0.3),
+    patchy: f(P.patchy),
+    irr: f(P.irr),
+    sersic_n: f(P.sersicN),
+    sersic_b: f(2 * P.sersicN - 1 / 3),
+    re: f(P.re),
+    dust: f(P.dust),
+    star_mix: f(P.starMix || 0),
+    knots: f(P.knots),
+    sparkle: f(P.sparkle),
+    pen_dot: f(penDot),
+    lop: f(V.lop),
+    lop_a: f(V.lopA),
+    warp: f(V.warp),
+    warp_a: f(V.warpA),
+    rmax: f(RMAX),
+    pad2: 0,
+  };
+
+  const shape = new Float32Array(SHAPE.size * 4);
+  V.arms.slice(0, MAX_ARMS).forEach((a, k) => {
+    shape.set([a.pitch, a.amp, a.phase, a.rmax, a.wig, a.wf, a.wp, 0], (SHAPE.arms + 2 * k) * 4);
+  });
+  V.spurs.slice(0, MAX_SPURS).forEach((s, i) => {
+    shape.set([s.k, s.R0, s.len, s.pk], (SHAPE.spurs + i) * 4);
+  });
+  V.dust.slice(0, MAX_DUST).forEach((d, i) => {
+    shape.set([d.R, d.th, d.s, 0], (SHAPE.dust + i) * 4);
+  });
+
+  const pool = new Uint32Array(KNOT_POOL + V.dotPool.length);
+  pool.set(V.knotPool.slice(0, KNOT_POOL), 0);
+  pool.set(V.dotPool, KNOT_POOL);
+
+  const dotBase = new Float32Array(meta.dots.size.map((s) => dotSprite(s, penDot, 1)));
+  return { g, shape, pool, dotBase };
+}
+
+/** The Galaxy uniform as bytes. */
+export function packGalaxy(g: GalaxyScalars): ArrayBuffer {
+  const buf = new ArrayBuffer(GALAXY_LAYOUT.size);
+  const u = new Uint32Array(buf);
+  const fl = new Float32Array(buf);
+  for (const field of GALAXY_LAYOUT.fields) {
+    const v = g[field.name];
+    if (v === undefined) throw new Error(`Galaxy.${field.name} missing`);
+    if (field.type === 'u32') u[field.offset / 4] = v;
+    else fl[field.offset / 4] = v;
+  }
+  return buf;
+}
