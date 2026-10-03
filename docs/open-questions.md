@@ -103,14 +103,14 @@ Options:
 
 docs/architecture.md proposes 60 fps orbit (< 4 ms GPU) on the reference machines, < 30 ms to first frame on a parameter change, and < 100 ms per frame for the CPU engine. Confirm, or change the targets.
 
-### Q11. Git LFS for the existing asset pack
+### Q11. Git LFS
 
-The pack (~108 MB) is in ordinary Git history. New binaries (goldens, spike screenshots) go to LFS.
+The plan was to put new binaries (goldens, spike screenshots) in Git LFS. **LFS uploads are refused from the environment this project is built in** (`POST …/verify: Forbidden` from the LFS endpoint), so the 186 golden captures (68 MB) and the spike screenshots are committed as ordinary blobs, like the asset pack (~108 MB).
+- (a) Leave everything as ordinary blobs.
+- (b) Enable LFS from a machine where it works, migrating `tests/golden/` and `spikes/` in one commit.
+- (c) Later, `git lfs migrate import` across history, with a force-push of `main`, to shrink clones.
 
-- (a) Leave the history alone.
-- (b) Later, `git lfs migrate import` with a force-push of `main`, to shrink clones.
-
-**Recommendation:** (a) until clone size bothers anyone. Rewriting `main` breaks every existing clone.
+**Recommendation:** (a) for now. The repository is about 180 MB, which is fine for GitHub. Revisit with (b) if goldens are re-captured often.
 
 ### Q12. Should the new engine also reproduce v21's known oddities?
 

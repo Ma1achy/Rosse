@@ -49,3 +49,4 @@ tests/golden/actual/
 tests/golden/diff/
 test-results/
 playwright-report/
+.claude/

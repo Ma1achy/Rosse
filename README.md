@@ -9,7 +9,6 @@ This repository is the WebGPU rebuild of Rosse v21. **Status: M0 (planning).** I
 You need Node 22 or later. To validate shaders, you also need [naga](https://crates.io/crates/naga-cli) (`cargo install naga-cli`).
 
 ```sh
-git lfs install            # goldens and screenshots are in Git LFS
 npm ci
 npm run dev                # Vite dev server (an empty plate, for now)
 npm test                   # unit tests (vitest)

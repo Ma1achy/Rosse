@@ -1,11 +1,8 @@
 # Normalise text files to LF.
 * text=auto eol=lf
 
-# The asset pack under assets/ is committed as ordinary blobs (see docs/open-questions.md).
-# New binaries go to Git LFS:
-tests/golden/**/*.png filter=lfs diff=lfs merge=lfs -text
-tests/golden/**/*.jpg filter=lfs diff=lfs merge=lfs -text
-spikes/**/*.png filter=lfs diff=lfs merge=lfs -text
+# Binaries are ordinary Git blobs. Git LFS was planned for goldens and screenshots, but LFS
+# uploads are refused from the environment this project is built in; see docs/open-questions.md Q11.
 
 # Binary types elsewhere: never diff or normalise.
 *.png binary

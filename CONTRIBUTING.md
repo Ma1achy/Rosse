@@ -25,4 +25,4 @@
 ## Tooling notes
 
 - The lockfile was generated with npm 11. npm 10.9 hits an internal error (`edgesOut`) resolving this tree from scratch, but `npm ci` from the lockfile works on either. To change dependencies, use `npx npm@11 install …`.
-- Binaries under `tests/golden/` and `spikes/` are in Git LFS. Run `git lfs install` before cloning.
+- Binaries (golden images, screenshots) are ordinary Git blobs; keep them small (JPEG for photographs, PNG only for ink layers).

@@ -21,7 +21,6 @@ The options considered for goldens were:
 
 - **On every push and pull request** (`.github/workflows/ci.yml`): `npm ci`, `npm run lint` (ESLint and Prettier check), `npm run typecheck`, `npm test` (vitest), `npm run validate:wgsl` (naga, via `cargo install naga-cli`, cached), and `npm run build`.
 - **Goldens on SwiftShader** (`.github/workflows/golden.yml`). This runs on pull requests that touch `src/`, `tests/golden/` or `tools/`, and on demand.
-  - Checkout uses LFS, so the reference images come down.
   - It installs Playwright's Chromium and runs `npm run golden` against the committed reference captures.
   - It uploads the render diffs as an artifact.
   - From M2 it is a required check. Until then the job only checks that the reference captures are present and consistent with their manifest.
