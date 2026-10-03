@@ -5,17 +5,22 @@
  * (tests/gpu/harness.ts). Exits non-zero if any page fails, times out or logs a WebGPU error.
  * Writes test-results/gpu.json.
  *
- * Usage: node tools/gpu-test/run.mjs [page …]   (default: every tests/gpu/*.html)
+ * Also runs the surface check of ./surface-css.mjs (the composite against Chromium's own
+ * rendering of the reference CSS).
+ *
+ * Usage: node tools/gpu-test/run.mjs [page …]   (default: every tests/gpu/*.html, and surface-css)
  */
 import { mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, launch, prepareAssets, startServer } from './browser.mjs';
+import { surfaceCssCheck } from './surface-css.mjs';
 
 const TIMEOUT = 180_000;
 
 const requested = process.argv.slice(2).filter((a) => !a.startsWith('-'));
+const withCss = !requested.length || requested.includes('surface-css');
 const pages = requested.length
-  ? requested.map((p) => (p.endsWith('.html') ? p : `${p}.html`))
+  ? requested.filter((p) => p !== 'surface-css').map((p) => (p.endsWith('.html') ? p : `${p}.html`))
   : readdirSync(join(ROOT, 'tests/gpu'))
       .filter((f) => f.endsWith('.html'))
       .sort();
@@ -54,6 +59,18 @@ try {
     for (const e of errors) console.log(`      error: ${e}`);
     await page.close();
   }
+  if (withCss) {
+    const t0 = Date.now();
+    try {
+      const r = await surfaceCssCheck(browser, server.url);
+      results.push({ page: 'surface-css', ...r, errors: [] });
+      console.log(`${r.pass ? 'PASS' : 'FAIL'}  ${r.name}  (${String(Date.now() - t0)} ms)`);
+      for (const l of r.lines) console.log(`      ${l}`);
+    } catch (e) {
+      results.push({ page: 'surface-css', pass: false, lines: [String(e)], errors: [] });
+      console.log(`FAIL  surface-css: ${String(e)}`);
+    }
+  }
 } finally {
   await browser.close();
   await server.close();
@@ -62,5 +79,5 @@ try {
 mkdirSync(join(ROOT, 'test-results'), { recursive: true });
 writeFileSync(join(ROOT, 'test-results/gpu.json'), JSON.stringify(results, null, 2) + '\n');
 const failed = results.filter((r) => !r.pass).length;
-console.log(`${String(results.length - failed)}/${String(results.length)} GPU test pages passed`);
+console.log(`${String(results.length - failed)}/${String(results.length)} GPU checks passed`);
 process.exit(failed ? 1 : 0);
