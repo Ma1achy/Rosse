@@ -52,6 +52,8 @@ export interface AtlasEntry {
   cols: number;
   repeatU: boolean;
   levels: LevelEntry[];
+  /** the sheet's per-drawing metadata, as in its JSON: `src`, and `size`, `kind`, `thick`… */
+  meta: Record<string, unknown[]>;
   source: string;
   sha256: string;
 }
@@ -79,6 +81,7 @@ export interface AtlasData {
   layers: number;
   repeatU: boolean;
   edge: readonly [number, number];
+  meta: Record<string, unknown[]>;
   levels: { width: number; height: number; data: Uint8Array<ArrayBuffer> }[];
 }
 
@@ -100,6 +103,7 @@ export function atlasFromBytes(
     layers: entry.layers,
     repeatU: entry.repeatU,
     edge: inkEdge(name),
+    meta: entry.meta,
     levels: entry.levels.map((l) => {
       if (l.offset + l.byteLength > bytes.length) throw new Error(`atlas ${name}: file too short`);
       return {

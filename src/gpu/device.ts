@@ -85,10 +85,7 @@ export class Gpu {
     this.watch(device);
   }
 
-  static async create(
-    nav: GpuNavigator = globalThis.navigator,
-    maxRecoveries = 3,
-  ): Promise<Gpu> {
+  static async create(nav: GpuNavigator = globalThis.navigator, maxRecoveries = 3): Promise<Gpu> {
     const { adapter, device } = await requestDevice(nav);
     return new Gpu(nav, adapter, device, maxRecoveries);
   }
@@ -122,7 +119,7 @@ export class Gpu {
       void this.recover();
     });
     device.addEventListener('uncapturederror', (e) => {
-      console.error('WebGPU error:', (e).error.message);
+      console.error('WebGPU error:', e.error.message);
     });
   }
 

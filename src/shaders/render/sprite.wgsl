@@ -3,14 +3,21 @@
 // smoothstep(edge.x, edge.y, t) on the sampled ink, times alpha and gain, premultiplied
 // (app23.js:L1092-1095). Blend ONE, ONE_MINUS_SRC_ALPHA into the rgba16float ink target, no MSAA.
 //
-// The mip level is computed per instance from its matrix, as the hardware would from screen
-// derivatives (rho = the longer of d(texel)/dx and d(texel)/dy), so the CPU rasteriser
-// (src/fallback/raster.ts) can use exactly the same level.
+// Three things are done so that the CPU rasteriser (src/fallback/raster.ts) can do exactly the
+// same arithmetic:
+// - the mip level, per instance, from its matrix, as hardware would from screen derivatives
+//   (rho = the longer of d(texel)/dx and d(texel)/dy);
+// - the texture coordinate, per fragment, from the pixel centre through the instance's inverse
+//   matrix, rather than interpolated from the vertices, so it does not depend on how the
+//   rasteriser snaps vertex positions;
+// - coverage: the quad is padded by one device pixel on every side and a pixel is inked only when
+//   its centre maps inside the cell (0 <= uv <= 1), so the edge rule is the CPU's, not the
+//   rasteriser's.
 
 // #import "common/instance.wgsl"
 
 struct Sprite {
-  // ink colour, multiplied into the premultiplied output; (1, 1, 1, 1) is the key ink, which the
+  // ink colour, multiplied into the premultiplied output; (1, 1, 1) is the key ink, which the
   // composite pass maps to the palette (src/render/composite.ts)
   ink: vec4<f32>,
   // ink target size, device pixels
@@ -35,10 +42,13 @@ struct Sprite {
 
 struct VertexOut {
   @builtin(position) position: vec4<f32>,
-  @location(0) uv: vec2<f32>,
-  @location(1) @interpolate(flat) layer: u32,
-  @location(2) @interpolate(flat) alpha: f32,
-  @location(3) @interpolate(flat) lod: f32,
+  // the instance centre, device pixels
+  @location(0) @interpolate(flat) centre: vec2<f32>,
+  // device pixels to quad-local coordinates (-0.5..0.5), column-major 2x2
+  @location(1) @interpolate(flat) inv: vec4<f32>,
+  @location(2) @interpolate(flat) layer: u32,
+  @location(3) @interpolate(flat) alpha: f32,
+  @location(4) @interpolate(flat) lod: f32,
 }
 
 // The quad corners, as the reference's strip (-.5,-.5), (.5,-.5), (-.5,.5), (.5,.5).
@@ -46,24 +56,34 @@ fn corner(v: u32) -> vec2<f32> {
   return vec2<f32>(f32(v & 1u) - 0.5, f32(v >> 1u) - 0.5);
 }
 
-// The mip level of a quad with plate matrix m: the pixel-per-texel matrix is
-// a = m * px_per_unit / cell; rho is the longer column of its inverse.
+// The inverse of a column-major 2x2.
+fn inverse2(a: vec4<f32>) -> vec4<f32> {
+  let det = a.x * a.w - a.z * a.y;
+  return vec4<f32>(a.w, -a.y, -a.z, a.x) / det;
+}
+
+// The mip level of a quad with plate matrix m: the texel-per-pixel matrix is the inverse of
+// a = m * px_per_unit / cell; rho is its longer column.
 fn sprite_lod(m: vec4<f32>) -> f32 {
-  let a = m * (sprite.px_per_unit / sprite.cell);
-  let det = abs(a.x * a.w - a.z * a.y);
-  let rho = max(length(vec2<f32>(a.w, a.y)), length(vec2<f32>(a.z, a.x))) / det;
+  let b = inverse2(m * (sprite.px_per_unit / sprite.cell));
+  let rho = max(length(b.xy), length(b.zw));
   return clamp(log2(rho), 0.0, sprite.max_lod);
 }
 
 @vertex
 fn vs(@builtin(vertex_index) v: u32, @builtin(instance_index) i: u32) -> VertexOut {
   let s = instances[i];
-  let c = corner(v);
-  let p = (s.pos + vec2<f32>(s.m.x * c.x + s.m.z * c.y, s.m.y * c.x + s.m.w * c.y)) * sprite.px_per_unit;
+  let m = s.m * sprite.px_per_unit;
+  // one device pixel of padding on each side, along each of the quad's axes
+  let axes = vec2<f32>(length(m.xy), length(m.zw));
+  let c = corner(v) * (axes + 2.0) / max(axes, vec2<f32>(1e-6));
+  let centre = s.pos * sprite.px_per_unit;
+  let p = centre + vec2<f32>(m.x * c.x + m.z * c.y, m.y * c.x + m.w * c.y);
   let d = p / sprite.target_size * 2.0 - 1.0;
   var out: VertexOut;
   out.position = vec4<f32>(d.x, -d.y, 0.0, 1.0);
-  out.uv = c + 0.5;
+  out.centre = centre;
+  out.inv = inverse2(m);
   out.layer = s.layer - sprite.layer_base;
   out.alpha = s.alpha;
   out.lod = sprite_lod(s.m);
@@ -72,7 +92,12 @@ fn vs(@builtin(vertex_index) v: u32, @builtin(instance_index) i: u32) -> VertexO
 
 @fragment
 fn fs(in: VertexOut) -> @location(0) vec4<f32> {
-  let t = textureSampleLevel(atlas, atlas_sampler, in.uv, in.layer, in.lod).r;
+  let d = in.position.xy - in.centre;
+  let uv = vec2<f32>(in.inv.x * d.x + in.inv.z * d.y, in.inv.y * d.x + in.inv.w * d.y) + 0.5;
+  if (any(uv < vec2<f32>(0.0)) || any(uv > vec2<f32>(1.0))) {
+    discard;
+  }
+  let t = textureSampleLevel(atlas, atlas_sampler, uv, in.layer, in.lod).r;
   let a = smoothstep(sprite.edge.x, sprite.edge.y, t) * in.alpha * sprite.gain;
   return vec4<f32>(sprite.ink.rgb * a, a);
 }

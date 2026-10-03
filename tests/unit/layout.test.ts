@@ -3,6 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { WgslReflect } from 'wgsl_reflect';
 import { resolveWgsl } from '../../tools/wgsl-resolve.js';
 import { INSTANCE_LAYOUT, packInstances, type StructLayout } from '../../src/marks/instance';
+import { packStruct } from '../../src/gpu/buffers';
+import { SPRITE_UNIFORMS_LAYOUT } from '../../src/render/sprites';
+import { COMPOSITE_UNIFORMS_LAYOUT } from '../../src/render/composite';
 
 /**
  * Struct layouts are written twice, in WGSL and in TypeScript (ADR 0002). These tests parse the
@@ -41,6 +44,30 @@ describe('struct layouts (WGSL = TS)', () => {
 
   it('the sprite shader sees the same Instance', () => {
     checkLayout('render/sprite.wgsl', INSTANCE_LAYOUT);
+  });
+
+  it('Sprite uniforms', () => {
+    checkLayout('render/sprite.wgsl', SPRITE_UNIFORMS_LAYOUT);
+  });
+
+  it('Composite uniforms', () => {
+    checkLayout('render/composite.wgsl', COMPOSITE_UNIFORMS_LAYOUT);
+  });
+
+  it('packs uniform structs by layout', () => {
+    const b = packStruct(SPRITE_UNIFORMS_LAYOUT, {
+      ink: [1, 1, 1, 1],
+      target_size: [800, 800],
+      edge: [0.12, 0.55],
+      px_per_unit: 1,
+      gain: 1,
+      cell: 32,
+      max_lod: 5,
+      layer_base: 256,
+    });
+    expect(new Float32Array(b)[10]).toBe(32);
+    expect(new Uint32Array(b)[12]).toBe(256);
+    expect(() => packStruct(SPRITE_UNIFORMS_LAYOUT, {})).toThrow(/missing/);
   });
 
   it('packs instances at the declared offsets', () => {

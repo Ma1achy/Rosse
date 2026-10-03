@@ -23,7 +23,7 @@ import { join, relative, resolve } from 'node:path';
 import pngjs from 'pngjs';
 import { cutCells, mipChain } from './pack-lib.js';
 
-const PACKER_VERSION = 1;
+const PACKER_VERSION = 2;
 const ROOT = resolve(import.meta.dirname, '../..');
 const SHEETS = join(ROOT, 'assets/drawings/bitmap');
 const PAPER = join(ROOT, 'assets/embedded-other/rosse_000_asset.png');
@@ -88,6 +88,10 @@ for (const name of NAMES) {
     cols: grid.cols,
     repeatU: strokes,
     levels,
+    // the sheet's per-drawing metadata (src, size, kind, thick, …), unchanged
+    meta: Object.fromEntries(
+      Object.entries(meta).filter(([k]) => !['cell', 'cols', 'n', 'w', 'h'].includes(k)),
+    ),
     source: rel(join(SHEETS, `${name}.png`)),
     sha256: sha(pngBytes),
   };

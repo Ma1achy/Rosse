@@ -82,6 +82,7 @@ describe('atlas', () => {
         { width: 2, height: 2, offset: 0, byteLength: 8 },
         { width: 1, height: 1, offset: 8, byteLength: 2 },
       ],
+      meta: {},
       source: '',
       sha256: '',
     };
