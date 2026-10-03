@@ -1,0 +1,569 @@
+[
+ {
+  "file": "rosse_000_asset.png",
+  "page": "rosse",
+  "mime": "image/png",
+  "bytes": 147437,
+  "context_before": "fter{box-sizing:inherit} body{margin:0;background-color:var(--paper);background-image:url("
+ },
+ {
+  "file": "rosse_001_polframe.jpg",
+  "page": "rosse",
+  "mime": "image/jpeg",
+  "bytes": 14992,
+  "context_before": "are prints in your blank frame; drawings stay on paper ---------- */ :root{--polframe:url("
+ },
+ {
+  "file": "rosse_002_rg-back.jpg",
+  "page": "rosse",
+  "mime": "image/jpeg",
+  "bytes": 6623,
+  "context_before": "e to its back; the chosen one stays turned ---------- */ .rg-back.b0{background-image:url("
+ },
+ {
+  "file": "rosse_003_rg-back.jpg",
+  "page": "rosse",
+  "mime": "image/jpeg",
+  "bytes": 7056,
+  "context_before": "OklWxOkRq0ltWI8KcKB4lW0QbSlaRFmJQbSiUcSjiK2mIlGlu5/9k=)} .rg-back.b1{background-image:url("
+ },
+ {
+  "file": "rosse_004_rg-back.jpg",
+  "page": "rosse",
+  "mime": "image/jpeg",
+  "bytes": 6794,
+  "context_before": "V7iM4gnBAdTBqUvUpeoCtQCUWynUpWpTqUiItslK1AYBUAbsX5n//Z)} .rg-back.b2{background-image:url("
+ },
+ {
+  "file": "rosse_005_rg-back.jpg",
+  "page": "rosse",
+  "mime": "image/jpeg",
+  "bytes": 6891,
+  "context_before": "ItK1DKJWIECJiVKKgM4gEtMGMREVqDEAuYDpESi4i9QtGlqWk//9k=)} .rg-back.b3{background-image:url("
+ },
+ {
+  "file": "rosse_006_sheet.jpg",
+  "page": "rosse",
+  "mime": "image/jpeg",
+  "bytes": 46501,
+  "context_before": "er hand, Threshold Grain */ :root{--ink3:#4a463f;--hair:#c9c2b2;--mag:#b80f5e;--sheet:url("
+ },
+ {
+  "file": "rosse_007_tab-yellow.webp",
+  "page": "rosse",
+  "mime": "image/webp",
+  "bytes": 1506,
+  "context_before": "e plate and a paper control rail, the objects from the kit ==== */ :root{--tab-yellow:url("
+ },
+ {
+  "file": "rosse_008_tab-blue.webp",
+  "page": "rosse",
+  "mime": "image/webp",
+  "bytes": 3340,
+  "context_before": "5fioibC88HgdYt0DbJ7XjAdkyjgHvKNQu6zeZxUN2rEMYO5Gbcbi6y8fhxJ5hW6wQTAi3WAAA);--tab-blue:url("
+ },
+ {
+  "file": "rosse_009_tab-orange.webp",
+  "page": "rosse",
+  "mime": "image/webp",
+  "bytes": 2006,
+  "context_before": "jYwnQp6Z0/0bItqcdRwt8lJl8VGxaNmJNHdXgpbKIchZoap3s7ys9ovC/JIoELfB6gAAA==);--tab-orange:url("
+ },
+ {
+  "file": "rosse_010_tab-green.webp",
+  "page": "rosse",
+  "mime": "image/webp",
+  "bytes": 3866,
+  "context_before": "C1LHJYjPL4801LmW5XvVKeSYwtbyXLpJXgeSECwTl1m+0QR64Js8jbrN6fg0FBXRMkF6DAA=);--tab-green:url("
+ },
+ {
+  "file": "rosse_011_tab-pink.webp",
+  "page": "rosse",
+  "mime": "image/webp",
+  "bytes": 2644,
+  "context_before": "Cm9h8ozcGx9Sz1QIv7oyfMz3Bc+oGpSpb7B9gdZC0I3xX5WxzFbF3bRKtjx3Jc69AyRPAAAA=);--tab-pink:url("
+ },
+ {
+  "file": "rosse_012_ltag.webp",
+  "page": "rosse",
+  "mime": "image/webp",
+  "bytes": 13116,
+  "context_before": "rYrmqL1yRM16oLUwqbnJTcsv7T8Z9vVYc+o0ANNP+f9ETlFX7n+iBzvf6UEz+HenP/VHz3PgAAA==);--ltag:url("
+ },
+ {
+  "file": "rosse_013_pin.webp",
+  "page": "rosse",
+  "mime": "image/webp",
+  "bytes": 1814,
+  "context_before": "qQl3nhAfE+GhZidlmf4jyShg6Guco8svFQX51/kbIVXiuLHlFQL9xlN5O2tn+2wgUgwU0ztwAAAAAA);--pin:url("
+ },
+ {
+  "file": "rosse_014_railpaper.jpg",
+  "page": "rosse",
+  "mime": "image/jpeg",
+  "bytes": 49678,
+  "context_before": "Hb7u0uPu7BOiHGIcFddDHhe0/5/naPfPGnBr0J7wx0NP8iviXtL+S+xrt/n2ClBHwoLUAAA=);--railpaper:url("
+ },
+ {
+  "file": "rosse_015_ht-choose.webp",
+  "page": "rosse",
+  "mime": "image/webp",
+  "bytes": 6170,
+  "context_before": "e v14: the recipe \u2014 component cards; the hand-lettered tabs ==== */ :root{--ht-choose:url("
+ },
+ {
+  "file": "rosse_016_ht-galaxy.webp",
+  "page": "rosse",
+  "mime": "image/webp",
+  "bytes": 5770,
+  "context_before": "wb/+htCAkwKADRES0JSEEhGwnFX86Cr3/Ixr4aTy+dK8/5GNfDSeXzpeVFSDbJomtNAAAAA=);--ht-galaxy:url("
+ },
+ {
+  "file": "rosse_017_ht-sky.webp",
+  "page": "rosse",
+  "mime": "image/webp",
+  "bytes": 7824,
+  "context_before": "Q6f/xsH9A76pW6PzVj/ib4P8P2MQox6sOihu2iw4D7V4EAlyQK+gcFIrNKHGCx8AAAAAAAAAA==);--ht-sky:url("
+ },
+ {
+  "file": "rosse_018_ht-ink.webp",
+  "page": "rosse",
+  "mime": "image/webp",
+  "bytes": 6470,
+  "context_before": "YcmR4FzBqL720/LODqVMNUxbf5Gz//2XIsA19FWwXaEa9lwFHILvqVX5q85l+AAAAAAAAAAAAAA);--ht-ink:url("
+ },
+ {
+  "file": "rosse_019_pile-img.webp",
+  "page": "rosse",
+  "mime": "image/webp",
+  "bytes": 7666,
+  "context_before": "xt-align:left;color:var(--ink)} .pile-img{width:64px;height:64px;flex:none;background:url("
+ },
+ {
+  "file": "rosse_020_ltag.webp",
+  "page": "rosse",
+  "mime": "image/webp",
+  "bytes": 16494,
+  "context_before": " the corner, tied on behind; a bigger, described print ==== */ .ltag{background-image:url("
+ },
+ {
+  "file": "almagest_021_pit-yellow.webp",
+  "page": "almagest",
+  "mime": "image/webp",
+  "bytes": 4886,
+  "context_before": "), post-its below (each drawing clipped to its note) ---------- */ :root{--pit-yellow:url("
+ },
+ {
+  "file": "almagest_022_pit-blue.webp",
+  "page": "almagest",
+  "mime": "image/webp",
+  "bytes": 5168,
+  "context_before": "zQV7jYjRbgXqm33QtNALUbub7emV1PQ7L7Ewx+gDkWp3hwWPKFBqBmtfLYtEQQv/u4Uc2AAA=);--pit-blue:url("
+ },
+ {
+  "file": "almagest_023_pit-green.webp",
+  "page": "almagest",
+  "mime": "image/webp",
+  "bytes": 4428,
+  "context_before": "XVLIHvELtT1/DQGJ26LyWV7MUY0qVUOzSOK5aZKWEiEtjVUcs+G0TbAa2jVkTMILToxIAAA=);--pit-green:url("
+ },
+ {
+  "file": "almagest_024_pit-pink.webp",
+  "page": "almagest",
+  "mime": "image/webp",
+  "bytes": 7334,
+  "context_before": "Ig+jB50rv0PaOR8P/qSY4KlLG/MOwi6cZtO5FhKww5ASkEFhFtSVCD7QDI5o2Q/JtyFvYugAA);--pit-pink:url("
+ },
+ {
+  "file": "almagest_025_pit-cblue1.webp",
+  "page": "almagest",
+  "mime": "image/webp",
+  "bytes": 7224,
+  "context_before": "ysy8aAS9ZDqPie2sbM+HaKtyoaIuRlpErZlTaI9byPsIaZWd58WtajpzYJhQ4+BNZOAAAA=);--pit-cblue1:url("
+ },
+ {
+  "file": "almagest_026_pit-cblue2.webp",
+  "page": "almagest",
+  "mime": "image/webp",
+  "bytes": 6748,
+  "context_before": "bc+H4NqWbAOthAw2BdqFXyu7XzD4F/ssX6NulZgdvbwyupfqE6zUf/E/bRim2UxncQ+QAAA);--pit-cblue2:url("
+ },
+ {
+  "file": "almagest_027_pit-cyellow2.webp",
+  "page": "almagest",
+  "mime": "image/webp",
+  "bytes": 4310,
+  "context_before": "aP1/ckyYiryMkSgbSc699jadwIh+Qq4ENcKUwc5ABJvVS+7UbvnyEzyAxDG01lLwAAA==);--pit-cyellow2:url("
+ },
+ {
+  "file": "almagest_028_pit-cgreen1.webp",
+  "page": "almagest",
+  "mime": "image/webp",
+  "bytes": 3148,
+  "context_before": "GNVvrIFyF/5Jxd1fv+Q/dBgXuiJzOgwYI5NKWYpAHX4fEdcRqIKlSZpIWL/IZtHrbBwAA=);--pit-cgreen1:url("
+ },
+ {
+  "file": "almagest_029_pit-cgreen2.webp",
+  "page": "almagest",
+  "mime": "image/webp",
+  "bytes": 5448,
+  "context_before": "bKRZumo19DJzNvgtrzbDd0xXdXRDd+41WiGO6oqsekK1rljGsM9A767iSO9W/1dYgAAA==);--pit-cgreen2:url("
+ },
+ {
+  "file": "almagest_030_pit-cpink.webp",
+  "page": "almagest",
+  "mime": "image/webp",
+  "bytes": 9704,
+  "context_before": "/rOSQO7DU98BDszOiS4rj3a9Jpi1j8xYlVFK7ZtSIhJ+kW6DCdqkkRlbmZyjCf7Vp4Xh6AAA);--pit-cpink:url("
+ },
+ {
+  "file": "almagest_031_asset.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1734,
+  "context_before": "nt:center} .xbtn::before{content:'';display:block;width:15px;height:15px;-webkit-mask:url("
+ },
+ {
+  "file": "almagest_032_dl-home.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2188,
+  "context_before": "SuQmCC) center/contain no-repeat;background-color:currentColor} .dl-home{-webkit-mask:url("
+ },
+ {
+  "file": "almagest_033_asset.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 4930,
+  "context_before": ";margin-left:-8.5px!important;top:-8px!important;border-radius:0!important;background:url("
+ },
+ {
+  "file": "almagest_034_glyph-0.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2792,
+  "context_before": "Id(id);}; /* hand-drawn galaxy doodles, used as markers on the plate */ var GLYPHS={\"0\": \""
+ },
+ {
+  "file": "almagest_035_glyph-1.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1519,
+  "context_before": "peQuCYrd/lolL3UOQVaz6O/ZpAmgiPW8k9QtSmCYyeuY4A0wfHf8FPrqZ4kjlQSkAAAAASUVORK5CYII=\", \"1\": \""
+ },
+ {
+  "file": "almagest_036_glyph-3.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 3789,
+  "context_before": "kx31IPLSO6l+jQqQBd29+HtgewZletHZh4+ZIztH+vydF7zlR7C9ebQ5XOtzwvAAAAABJRU5ErkJggg==\", \"3\": \""
+ },
+ {
+  "file": "almagest_037_glyph-4.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 3035,
+  "context_before": "x7GV2q0rgxWPyHtZm7FhVnpQpER6ISa1XQ5Zdpw224SgDbDcc68LxP8zUZIKaG18lAAAAAElFTkSuQmCC\", \"4\": \""
+ },
+ {
+  "file": "almagest_038_glyph-5.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1819,
+  "context_before": "pKMn07GRriHdWeyhaNXjtW3mZXmFKqA47OkpVulNL+4/hXrkq5fofvJZgvZ3/DaAAAAAASUVORK5CYII=\", \"5\": \""
+ },
+ {
+  "file": "almagest_039_glyph-7.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2177,
+  "context_before": "QPOhis33YTsxB9HEjzWixp+E1hDlXfRAzBgmWYe2U5L86BAtWYPsP7KLpXFf3IlYAAAAASUVORK5CYII=\", \"7\": \""
+ },
+ {
+  "file": "almagest_040_glyph-8.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1677,
+  "context_before": "uYUFB7NtNdGUClqVbJ19O+n9dPLrW39BrpVZqpVZqpVZqpVZO6fIfhLTOX57rtEYAAAAASUVORK5CYII=\", \"8\": \""
+ },
+ {
+  "file": "almagest_041_glyph-9.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2380,
+  "context_before": "X5p9gJlUjEXVqDCSbaU/GtND0k/9foUx0msVhcg7joyjtdsfBqvHxL8aIQuWXR8BKAAAAAElFTkSuQmCC\", \"9\": \""
+ },
+ {
+  "file": "almagest_042_glyph-10.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2048,
+  "context_before": "bNDP5pZUQudNaJzM5lVKV2lUrUhhILSQnfifopTSsNygGDLe/g+A8O3m+QST+wAAAABJRU5ErkJggg==\", \"10\": \""
+ },
+ {
+  "file": "almagest_043_glyph-11.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2830,
+  "context_before": "8wdEOzFWCryQWvu3LjteTHqnauNBhbY6hVqtraXpIHGEstaS1P4B3M0X/OQlJ7kAAAAASUVORK5CYII=\", \"11\": \""
+ },
+ {
+  "file": "almagest_044_glyph-12.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1982,
+  "context_before": "ZfPJpCYNOUk3dMnndGXo0PcfX1KlSHC6+aG38Jj1tdRnMz3o+B8aLQ1NE1JaBwAAAABJRU5ErkJggg==\", \"12\": \""
+ },
+ {
+  "file": "almagest_045_glyph-13.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 3161,
+  "context_before": "ZvNp2bdo/xC8mJbtL4lqdLUwA+5DBJueWnNzq9U6ogSwDbxKav8AS/uSL/JBKsYAAAAASUVORK5CYII=\", \"13\": \""
+ },
+ {
+  "file": "almagest_046_glyph-15.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2065,
+  "context_before": "iguZq1XVb+Fd+N9lupO9ob2Wd2nLs2Eq7OglREfAsXf9P23aLu1/PviHsXSU7F8AAAAASUVORK5CYII=\", \"15\": \""
+ },
+ {
+  "file": "almagest_047_glyph-16.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2872,
+  "context_before": "JGZhzj68oll1kcn5IWgnljzi+/pCOYTLhf+vOoSSQjYdSiilyr9QQJ857BUXMAAAAABJRU5ErkJggg==\", \"16\": \""
+ },
+ {
+  "file": "almagest_048_glyph-17.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2532,
+  "context_before": "Kqct5Wgq9NpAJW3UEvSF/pwkSsFmRubalnea9gSU+bWBI6WN5f+qVS/5lSKpCwAAAABJRU5ErkJggg==\", \"17\": \""
+ },
+ {
+  "file": "almagest_049_glyph-18.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2205,
+  "context_before": "luKOWklo+4Wm/JEwaE/9zywxSckkk0wyySSTTDLJJJNMMsnkqJD/AHvm8JNTQpIQAAAAAElFTkSuQmCC\", \"18\": \""
+ },
+ {
+  "file": "almagest_050_glyph-19.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2865,
+  "context_before": "KCPzDO1HdDMFoLLzSXLmFRX8bOdoKqXUVltttdVWW2211VbbzLT/AX+vz3nxGAJqAAAAAElFTkSuQmCC\", \"19\": \""
+ },
+ {
+  "file": "almagest_051_glyph-21.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2115,
+  "context_before": "9cB9aNXuJaIeSTrNdecdIubB58EBAQEBAQEBAQEBAQEBAQEBFeB/BNHn9cZxNNIAAAAASUVORK5CYII=\", \"21\": \""
+ },
+ {
+  "file": "almagest_052_glyph-22.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2620,
+  "context_before": "FCVpQpg345Rr0A4fGaH3rMz//N+qMskkk0wyySSTTDLJJJNM1lT5Cw3YQ1MVZRg5AAAAAElFTkSuQmCC\", \"22\": \""
+ },
+ {
+  "file": "almagest_053_glyph-23.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1688,
+  "context_before": "yfcG3TPsjyy9qgAiwh2XYyzW/qRX0E4+6GWuippf4D5fP7p5/A/VA/EjdpxlFgAAAABJRU5ErkJggg==\", \"23\": \""
+ },
+ {
+  "file": "almagest_054_glyph-24.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2405,
+  "context_before": "JrZITa2os4KUSwcYlHSQuGo4l1xyySWXXHLJJZdccskll1wykX8Bcu7bPiLFel0AAAAASUVORK5CYII=\", \"24\": \""
+ },
+ {
+  "file": "almagest_055_glyph-25.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1733,
+  "context_before": "nrqEryPAdAog/x6/gHuiwrP+36k6/l9m3Yxwg4w2RBnfj5fpWP4P2L1hBCyr140AAAAASUVORK5CYII=\", \"25\": \""
+ },
+ {
+  "file": "almagest_056_glyph-26.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1540,
+  "context_before": "alAaCZDrr1BFxB4kBLlRFkq00fFRpRmEggoqqKCCCiqooIIyov8A+QAeA5p71vwAAAAASUVORK5CYII=\", \"26\": \""
+ },
+ {
+  "file": "almagest_057_glyph-bold-0.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1983,
+  "context_before": "AgICAgICAgICAgICAgICAgICAgICCiMvwE8mb1vAWO1awAAAABJRU5ErkJggg==\"}; var GLYPHS_BOLD={\"0\": \""
+ },
+ {
+  "file": "almagest_058_glyph-bold-3.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2215,
+  "context_before": "Ix0YuVMUWVY0af/9zHzNSeENooEIHelLkJeAVe1/8WCXxrxwc+PgDfiLa2OcZ144AAAAASUVORK5CYII=\", \"3\": \""
+ },
+ {
+  "file": "almagest_059_glyph-4.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1811,
+  "context_before": "n5XJM31LmHS1KbqEhdaVCZifwJ+M/x+xd8NFaocCR/cVmshXG/wDep2YaJKF5RAAAAABJRU5ErkJggg==\", \"4\": \""
+ },
+ {
+  "file": "almagest_060_glyph-7.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1604,
+  "context_before": "ECV8IRn+V91NM/HlYEQDc6mJ8qjcEfKu0OoCmEi3i/xBwX83e/73+AOzPFmHSHvSQAAAAAElFTkSuQmCC\", \"7\": \""
+ },
+ {
+  "file": "almagest_061_glyph-9.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1646,
+  "context_before": "TtsPD3l3ABeVm3lIvrDQI57AtKrXrzbs6laxGirw/YIKs1P6J/xcIeaf+bpObRQAAAABJRU5ErkJggg==\", \"9\": \""
+ },
+ {
+  "file": "almagest_062_glyph-11.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1799,
+  "context_before": "Zmtxo6PyDXsEIWe7bfmVtRI++Z9iYipwPXCM+NWrwM+14EIH/fEvGrZkxZYMW8oAAAAASUVORK5CYII=\", \"11\": \""
+ },
+ {
+  "file": "almagest_063_glyph-12.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1909,
+  "context_before": "lXKiqFRotmd9XOR9rCbWFDXCAmjzZKwlNdT2uNmMayVGh9MYw/UveGmWDgGhC1UAAAAASUVORK5CYII=\", \"12\": \""
+ },
+ {
+  "file": "almagest_064_glyph-13.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2359,
+  "context_before": "FsQ0t0Kvvj7iFogTYIOyzUHao04UmRDmUX27uRDvwjo61Sjo+AdPol/jA9MRpwAAAABJRU5ErkJggg==\", \"13\": \""
+ },
+ {
+  "file": "almagest_065_glyph-16.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2143,
+  "context_before": "pGwK1Jp4YkDzLeBE/vlP4Rvm3NOVBTZ5cMK0iJMtjlCOilE63P8N7+weVryvyGwAAAAASUVORK5CYII=\", \"16\": \""
+ },
+ {
+  "file": "almagest_066_glyph-18.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1546,
+  "context_before": "9wH/VM3RUtVVoSP6PuWF4/KLTzzXC871p6W6fV5qUIMa1KBjT/8DmKPBOG+jsUIAAAAASUVORK5CYII=\", \"18\": \""
+ },
+ {
+  "file": "almagest_067_glyph-19.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1597,
+  "context_before": "Z6Im2vwtZv0qUDnSXympx+EF4NowSv8bCgzkIaQUHByD46gefwMWkZgIj4VdXwAAAABJRU5ErkJggg==\", \"19\": \""
+ },
+ {
+  "file": "almagest_068_glyph-21.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1553,
+  "context_before": "L7Bf4UtiN0uBXYseqpMrzbRbG3Vy3Z42OCMf1nvSkkoqqaSS5h79A0t9e24T8fiuAAAAAElFTkSuQmCC\", \"21\": \""
+ },
+ {
+  "file": "almagest_069_glyph-22.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1782,
+  "context_before": "+NFisO5jwMNpXJAQ5Urvw1JVXi0FFZ417l5H2QAENFqjNVqjufY30FKKpWe0tooAAAAASUVORK5CYII=\", \"22\": \""
+ },
+ {
+  "file": "almagest_070_glyph-24.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1726,
+  "context_before": "jMeSqu/+7eaFwHWyfo9icvNJ9WPCif4DR6hpS2oT1aMe9ahH3vgbh5344pAhdmIAAAAASUVORK5CYII=\", \"24\": \""
+ },
+ {
+  "file": "almagest_071_photo-stamp-atlas.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 803605,
+  "context_before": "; ATLAS.onload=function(){ATLAS_READY=true;renderLegend();renderCard();req();};ATLAS.src='"
+ },
+ {
+  "file": "almagest_072_tool-icon-pan.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1797,
+  "context_before": "ring')+' \u00b7 '+cmN}));return k;} var ICON={pan:'<span class=\"dl-ic\" style=\"-webkit-mask:url("
+ },
+ {
+  "file": "almagest_073_tool-icon-drawings.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1816,
+  "context_before": "ght:20px;display:block\"></span>', drawings:'<span class=\"dl-ic\" style=\"-webkit-mask:url("
+ },
+ {
+  "file": "almagest_074_tool-icon-vmap.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1897,
+  "context_before": ";height:20px;display:block\"></span>', vmap:'<span class=\"dl-ic\" style=\"-webkit-mask:url("
+ },
+ {
+  "file": "almagest_075_tool-icon-contours.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2575,
+  "context_before": "ght:20px;display:block\"></span>', contours:'<span class=\"dl-ic\" style=\"-webkit-mask:url("
+ },
+ {
+  "file": "almagest_076_tool-icon-stripmarks.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 2366,
+  "context_before": "t:20px;display:block\"></span>', stripmarks:'<span class=\"dl-ic\" style=\"-webkit-mask:url("
+ },
+ {
+  "file": "almagest_077_tool-icon-swap.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1622,
+  "context_before": ";height:20px;display:block\"></span>', swap:'<span class=\"dl-ic\" style=\"-webkit-mask:url("
+ },
+ {
+  "file": "almagest_078_tool-icon-resetends.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1907,
+  "context_before": "ht:20px;display:block\"></span>', resetends:'<span class=\"dl-ic\" style=\"-webkit-mask:url("
+ },
+ {
+  "file": "almagest_079_tool-icon-slicehl.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1725,
+  "context_before": "ight:20px;display:block\"></span>', slicehl:'<span class=\"dl-ic\" style=\"-webkit-mask:url("
+ },
+ {
+  "file": "almagest_080_tool-icon-probe.png",
+  "page": "almagest",
+  "mime": "image/png",
+  "bytes": 1968,
+  "context_before": "height:20px;display:block\"></span>', probe:'<span class=\"dl-ic\" style=\"-webkit-mask:url("
+ }
+]

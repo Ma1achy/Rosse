@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 1 1" width="512" height="512">
+<polyline points="0.1523,-0.2188 0.1250,-0.1914 0.1211,-0.1562" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.0039,-0.0547 0.0078,-0.0586 0.0039,-0.1172 0.0117,-0.1406" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.0156,-0.1484 0.0000,-0.1797" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.0781,-0.1250 0.1211,-0.1523" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.0195,-0.1445 0.0430,-0.1289 0.0703,-0.1250" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="-0.0039,-0.1797 -0.0312,-0.1719" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="-0.1367,0.0234 -0.1523,0.0547 -0.1797,0.0586 -0.2188,0.0977" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="-0.2422,0.0312 -0.2461,0.0352 -0.2461,0.0742 -0.2383,0.0977" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="-0.3164,0.2617 -0.2891,0.2500 -0.2617,0.2148" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="-0.0352,0.0938 -0.0625,0.1133 -0.1055,0.1133 -0.1250,0.1289 -0.1641,0.1406 -0.1836,0.1367 -0.2188,0.1016" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="-0.2578,0.2109 -0.2578,0.1406 -0.2500,0.1289 -0.2500,0.1094 -0.2383,0.0977" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.2891,0.2305 0.2930,0.2148 0.3203,0.1758 0.3203,0.1641" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.2422,0.1172 0.2734,0.1133 0.3164,0.1602" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.3203,0.1602 0.3359,0.1445 0.3359,0.1094 0.3633,0.0586" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="0.0210" cy="-0.3489" r="0.0271" fill="#1d1b19"/>
+<circle cx="-0.0763" cy="-0.3116" r="0.0424" fill="#1d1b19"/>
+<circle cx="0.0934" cy="-0.3474" r="0.0151" fill="#1d1b19"/>
+<circle cx="0.1018" cy="-0.2772" r="0.0239" fill="#1d1b19"/>
+<circle cx="-0.1603" cy="-0.2477" r="0.0221" fill="#1d1b19"/>
+<circle cx="-0.1797" cy="-0.1094" r="0.0073" fill="#1d1b19"/>
+<circle cx="-0.1562" cy="-0.1211" r="0.0078" fill="#1d1b19"/>
+<circle cx="-0.1484" cy="-0.1445" r="0.0081" fill="#1d1b19"/>
+<circle cx="-0.1367" cy="-0.1680" r="0.0077" fill="#1d1b19"/>
+<circle cx="-0.1133" cy="-0.1875" r="0.0075" fill="#1d1b19"/>
+<circle cx="-0.0898" cy="-0.1914" r="0.0094" fill="#1d1b19"/>
+<circle cx="-0.0625" cy="-0.1875" r="0.0079" fill="#1d1b19"/>
+<circle cx="-0.0391" cy="-0.1797" r="0.0072" fill="#1d1b19"/>
+<circle cx="0.2107" cy="-0.2392" r="0.0221" fill="#1d1b19"/>
+<circle cx="0.1841" cy="-0.1335" r="0.0200" fill="#1d1b19"/>
+<circle cx="-0.0718" cy="-0.0691" r="0.0290" fill="#1d1b19"/>
+<circle cx="0.1007" cy="-0.0501" r="0.0289" fill="#1d1b19"/>
+<circle cx="0.1717" cy="-0.0646" r="0.0186" fill="#1d1b19"/>
+<circle cx="-0.2977" cy="-0.0302" r="0.0214" fill="#1d1b19"/>
+<circle cx="-0.2019" cy="-0.0227" r="0.0217" fill="#1d1b19"/>
+<circle cx="-0.1274" cy="-0.0231" r="0.0136" fill="#1d1b19"/>
+<circle cx="0.0078" cy="-0.0001" r="0.0198" fill="#1d1b19"/>
+<circle cx="-0.3795" cy="0.1103" r="0.0245" fill="#1d1b19"/>
+<circle cx="0.4304" cy="0.1516" r="0.0290" fill="#1d1b19"/>
+<circle cx="-0.1177" cy="0.2068" r="0.0178" fill="#1d1b19"/>
+<circle cx="0.2155" cy="0.2469" r="0.0260" fill="#1d1b19"/>
+<circle cx="0.3998" cy="0.2824" r="0.0283" fill="#1d1b19"/>
+<circle cx="0.2875" cy="0.3206" r="0.0250" fill="#1d1b19"/>
+<ellipse cx="-0.0002" cy="-0.1829" rx="0.0934" ry="0.0798" transform="rotate(78.72 -0.0002 -0.1829)" fill="#1d1b19"/>
+<ellipse cx="-0.2344" cy="0.1146" rx="0.1263" ry="0.0891" transform="rotate(105.94 -0.2344 0.1146)" fill="#1d1b19"/>
+<ellipse cx="0.3600" cy="0.0668" rx="0.0416" ry="0.0212" transform="rotate(110.18 0.3600 0.0668)" fill="#1d1b19"/>
+<ellipse cx="0.2657" cy="0.1103" rx="0.0317" ry="0.0250" transform="rotate(150.11 0.2657 0.1103)" fill="#1d1b19"/>
+<ellipse cx="0.3124" cy="0.1885" rx="0.0715" ry="0.0373" transform="rotate(116.71 0.3124 0.1885)" fill="#1d1b19"/>
+</svg>

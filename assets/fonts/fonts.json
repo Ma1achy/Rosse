@@ -1,0 +1,40 @@
+[
+ {
+  "file": "Heros-400.otf",
+  "family": "Heros",
+  "weight": "400",
+  "from": "rosse"
+ },
+ {
+  "file": "Heros-700.otf",
+  "family": "Heros",
+  "weight": "700",
+  "from": "rosse"
+ },
+ {
+  "file": "Heros-400-italic.otf",
+  "family": "Heros",
+  "weight": "400",
+  "from": "rosse"
+ },
+ {
+  "file": "Principia_Hand.ttf",
+  "family": "Principia Hand",
+  "weight": null,
+  "from": "rosse",
+  "note": "The original Principia Hand (pre-design-pass handwriting)."
+ },
+ {
+  "file": "ThresholdGrain_loaded-as-Principia-Hand.woff2",
+  "family": "Principia Hand",
+  "weight": null,
+  "from": "rosse",
+  "note": "The design pass loads Threshold Grain under the family name \"Principia Hand\", so pages did not need changing."
+ },
+ {
+  "file": "Threshold_Mark.woff2",
+  "family": "Threshold Mark",
+  "weight": null,
+  "from": "almagest"
+ }
+]

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 1 1" width="512" height="512">
+<polyline points="-0.4574,-0.0057 -0.4545,-0.0085 -0.4006,-0.0085 -0.3665,0.0000 -0.2869,-0.0028 -0.2301,0.0028 -0.1591,0.0028 -0.1364,0.0142 -0.1222,0.0142 -0.1023,0.0000 0.0852,0.0000 0.0938,0.0028" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.1449,-0.0767 0.1392,-0.0682 0.1364,-0.0511 0.1108,-0.0085" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.1080,-0.0057 0.1023,-0.0057 0.0938,0.0028" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="0.3807" cy="0.0057" r="0.0093" fill="#1d1b19"/>
+<circle cx="0.3551" cy="0.0028" r="0.0076" fill="#1d1b19"/>
+<circle cx="0.3295" cy="0.0000" r="0.0100" fill="#1d1b19"/>
+<circle cx="0.3011" cy="-0.0028" r="0.0091" fill="#1d1b19"/>
+<circle cx="0.2727" cy="-0.0028" r="0.0078" fill="#1d1b19"/>
+<circle cx="0.2443" cy="-0.0057" r="0.0094" fill="#1d1b19"/>
+<circle cx="0.2188" cy="-0.0057" r="0.0071" fill="#1d1b19"/>
+<circle cx="0.1903" cy="-0.0057" r="0.0101" fill="#1d1b19"/>
+<circle cx="0.1648" cy="-0.0028" r="0.0070" fill="#1d1b19"/>
+<circle cx="0.1364" cy="-0.0057" r="0.0100" fill="#1d1b19"/>
+</svg>

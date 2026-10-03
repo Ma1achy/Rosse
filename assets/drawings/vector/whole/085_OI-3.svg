@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 1 1" width="512" height="512">
+<polyline points="-0.3324,-0.2670 -0.3267,-0.3068 -0.3097,-0.3324 -0.2784,-0.3636 -0.2330,-0.3892 -0.2188,-0.3920 -0.1932,-0.3892 -0.1818,-0.3949 -0.1562,-0.4176 -0.0994,-0.4574 -0.0739,-0.4574 -0.0568,-0.4432 -0.0398,-0.4375 0.0028,-0.4432 0.0455,-0.4432 0.0625,-0.4489" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.2699,-0.4006 0.2784,-0.4006 0.3011,-0.3864 0.3324,-0.3523 0.3523,-0.3011 0.3523,-0.2869 0.3608,-0.2557 0.3580,-0.2386" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="-0.2812,-0.1790 -0.2784,-0.1932 -0.2699,-0.2045 -0.2699,-0.2131 -0.2557,-0.2415 -0.2330,-0.2812 -0.2188,-0.2955 -0.2045,-0.3011 -0.1818,-0.2841 -0.1477,-0.2699 -0.1136,-0.2727" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.1932,-0.2528 0.2273,-0.2557 0.2358,-0.2500 0.2443,-0.2500 0.2557,-0.2443 0.2784,-0.2216 0.2841,-0.2074 0.2841,-0.1392 0.2727,-0.1080" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.0227,-0.0398 0.0199,-0.0369 0.0284,-0.0284 0.0483,-0.0142 0.0597,-0.0114 0.0852,0.0199" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="-0.1591,0.1705 -0.1562,0.1591 -0.1847,0.1250 -0.2074,0.1108 -0.2330,0.1023 -0.2500,0.0881 -0.2443,0.0682 -0.2188,0.0398 -0.1989,0.0057 -0.1989,-0.0114" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.3381,0.0767 0.3125,0.0938 0.2869,0.1193 0.2898,0.1733 0.2699,0.2102 0.2443,0.2301 0.2216,0.2330" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="-0.2812,0.3011 -0.3239,0.2983 -0.3494,0.2727 -0.3608,0.2273 -0.3636,0.1960 -0.3722,0.1875 -0.4119,0.1875 -0.4176,0.1818 -0.4176,0.1676 -0.4034,0.1477" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="0.0969" cy="-0.3803" r="0.0066" fill="#1d1b19"/>
+<circle cx="-0.0434" cy="-0.2841" r="0.0042" fill="#1d1b19"/>
+<circle cx="-0.0554" cy="-0.2812" r="0.0039" fill="#1d1b19"/>
+<circle cx="-0.0735" cy="-0.2781" r="0.0045" fill="#1d1b19"/>
+<circle cx="-0.0167" cy="-0.1531" r="0.0066" fill="#1d1b19"/>
+<circle cx="-0.3917" cy="-0.1225" r="0.0066" fill="#1d1b19"/>
+<circle cx="-0.3292" cy="-0.1133" r="0.0066" fill="#1d1b19"/>
+<circle cx="0.0312" cy="-0.0938" r="0.0120" fill="#1d1b19"/>
+<circle cx="-0.0827" cy="-0.0906" r="0.0066" fill="#1d1b19"/>
+<circle cx="-0.0392" cy="-0.0090" r="0.0254" fill="#1d1b19"/>
+<circle cx="0.1424" cy="0.0707" r="0.0066" fill="#1d1b19"/>
+<circle cx="0.0685" cy="0.1196" r="0.0095" fill="#1d1b19"/>
+<circle cx="-0.0451" cy="0.1446" r="0.0066" fill="#1d1b19"/>
+<circle cx="0.0536" cy="0.1765" r="0.0066" fill="#1d1b19"/>
+<circle cx="0.4173" cy="0.2503" r="0.0066" fill="#1d1b19"/>
+<circle cx="-0.0824" cy="0.3097" r="0.0101" fill="#1d1b19"/>
+<circle cx="-0.0568" cy="0.3040" r="0.0090" fill="#1d1b19"/>
+<circle cx="-0.0312" cy="0.2955" r="0.0085" fill="#1d1b19"/>
+<circle cx="-0.0199" cy="0.3153" r="0.0084" fill="#1d1b19"/>
+<circle cx="-0.0199" cy="0.3438" r="0.0098" fill="#1d1b19"/>
+<circle cx="-0.0199" cy="0.3722" r="0.0069" fill="#1d1b19"/>
+<circle cx="-0.0142" cy="0.3977" r="0.0072" fill="#1d1b19"/>
+<circle cx="0.0085" cy="0.3892" r="0.0071" fill="#1d1b19"/>
+<circle cx="0.0256" cy="0.3693" r="0.0094" fill="#1d1b19"/>
+<circle cx="0.3548" cy="0.3377" r="0.0066" fill="#1d1b19"/>
+<circle cx="0.2582" cy="0.3775" r="0.0066" fill="#1d1b19"/>
+</svg>

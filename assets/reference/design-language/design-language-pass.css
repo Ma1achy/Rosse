@@ -1,0 +1,21 @@
+<style id="design-language">
+/* ==== Design language, 2026-09 (appearance only; no behaviour changes) ==== */
+@font-face{font-family:'Principia Hand';src:url(/* embedded data omitted; see fonts/ */) format('woff2');font-display:swap} /* the current version of the marker hand, Threshold Grain */
+:root{--ink3:#4a463f;--hair:#c9c2b2;--mag:#b80f5e;--sheet:url(/* embedded data omitted; see fonts/ */)}
+:focus-visible{outline:2px solid var(--mag)!important;outline-offset:3px!important}
+.dl-ic{display:inline-block;width:18px;height:18px;flex:0 0 auto;vertical-align:middle}
+
+.bar .tb,#catgo{min-height:44px}
+/* the main action in each view is a filled button (Surprise me, Draw it); everything else stays a text button */
+.tb.big{background:var(--ink)!important;color:var(--paper)!important;border:0!important;padding:0 16px!important;min-height:44px!important;text-shadow:none}
+/* the real galaxy's print is taped onto the plate with one strip across the top */
+.inset{background-color:#f3eee2;background-image:var(--sheet);background-size:512px 512px;box-shadow:1px 2px 1.5px rgba(0,0,0,.28),2px 6px 10px rgba(0,0,0,.14)!important;overflow:visible}
+.inset::before{content:'';position:absolute;top:-10px;left:50%;width:74px;height:22px;margin-left:-37px;background:rgba(247,241,222,.72);box-shadow:0 0 1px rgba(0,0,0,.22);transform:rotate(-3deg);pointer-events:none;z-index:1}
+html[data-theme="dark"] .inset{background-image:none}
+html[data-theme="dark"] .inset::before{background:rgba(236,228,210,.28)}
+/* the timeline's play and pause are the drawn ones; the button's label and behaviour are unchanged */
+#tlplay{font-size:0!important;width:44px;display:inline-flex;align-items:center;justify-content:center}
+#tlplay::before{content:'';display:block;width:16px;height:16px;-webkit-mask:url(/* embedded data omitted; see fonts/ */) center/contain no-repeat;mask:url(/* embedded data omitted; see fonts/ */) center/contain no-repeat;background-color:currentColor}
+#tlplay[aria-label="Pause"]::before{-webkit-mask:url(/* embedded data omitted; see fonts/ */) center/contain no-repeat;mask:url(/* embedded data omitted; see fonts/ */) center/contain no-repeat;background-color:currentColor}
+html[data-theme="dark"]{--mag:#e86aa0}
+</style>

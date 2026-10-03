@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 1 1" width="512" height="512">
+<polyline points="-0.3937,-0.1594 -0.4062,-0.1344 -0.4250,-0.0719 -0.4406,0.0125 -0.4437,0.1125 -0.4281,0.1687 -0.4156,0.1781 -0.4000,0.1813 -0.3844,0.1750 -0.3750,0.1656 -0.3406,0.1062 -0.2781,-0.0531 -0.2344,-0.1375 -0.2031,-0.1781 -0.1813,-0.1969 -0.1562,-0.2094 -0.1281,-0.2094 -0.1094,-0.1937 -0.0844,-0.1281 -0.0656,0.0500 -0.0625,0.1500 -0.0594,0.1750 -0.0469,0.1875" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.4625,-0.1031 0.4469,-0.1000 0.4125,-0.0594 0.3500,0.0625 0.3156,0.1438 0.2937,0.1594" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="-0.0531,0.2688 -0.0469,0.1906" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.2906,0.1594 0.2750,0.1469 0.2719,0.0500 0.2688,0.0469 0.2719,0.0312 0.2688,-0.0563 0.2594,-0.1156 0.2500,-0.1500 0.2281,-0.1937 0.2031,-0.2156 0.1875,-0.2188" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.1813,-0.2188 0.1531,-0.2094 0.1281,-0.1844 0.0625,-0.0750 0.0281,0.0094 -0.0219,0.1687 -0.0438,0.1875" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="0.0520" cy="0.0156" rx="0.6097" ry="0.3233" transform="rotate(176.70 0.0520 0.0156)" fill="#1d1b19"/>
+</svg>

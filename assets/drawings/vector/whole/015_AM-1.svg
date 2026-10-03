@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 1 1" width="512" height="512">
+<polyline points="-0.0256,-0.1278 -0.0852,-0.1222 -0.0909,-0.1023 -0.1165,-0.0824 -0.1193,-0.0256 -0.1023,0.0114" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="-0.3352,0.2443 -0.3182,0.2159 -0.2898,0.1875" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.0426,-0.1136 0.0795,-0.1222 0.1108,-0.1222" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="-0.0994,0.0142 -0.0824,0.0170 -0.0653,0.0256 -0.0227,0.0256 0.0114,0.0142 0.0483,-0.0057 0.0739,-0.0312 0.0852,-0.0540 0.1080,-0.0824 0.1136,-0.0966 0.1136,-0.1193" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.1165,-0.1222 0.1222,-0.1307 0.1193,-0.2216 0.1023,-0.2500 0.0597,-0.2898 0.0312,-0.3011 -0.0256,-0.3097 -0.0312,-0.3153 -0.1080,-0.3153 -0.1193,-0.3097 -0.1449,-0.3068 -0.1733,-0.2955 -0.1932,-0.2926 -0.2358,-0.2727 -0.2642,-0.2528 -0.3153,-0.2045 -0.3267,-0.1875 -0.3267,-0.1705 -0.3466,-0.1307 -0.3580,-0.0767 -0.3636,-0.0682 -0.3636,0.0170 -0.3580,0.0227 -0.3551,0.0369 -0.3466,0.0455" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="-0.2869,0.1875 -0.2727,0.1932 -0.2131,0.2415 -0.1449,0.2756 -0.0938,0.2869 -0.0767,0.2869 -0.0625,0.2926 0.0398,0.2926 0.0483,0.2869 0.0824,0.2812 0.1250,0.2642 0.1705,0.2415 0.2273,0.2045 0.2812,0.1477 0.2955,0.1222 0.2983,0.0909" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="-0.2898,0.1847 -0.2926,0.1648 -0.3210,0.1250 -0.3438,0.0795 -0.3466,0.0483" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.4176,-0.2670 0.4119,-0.1875 0.3864,-0.0881 0.3324,0.0568 0.3210,0.0767 0.3125,0.0852 0.2983,0.0909" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="0.3832" cy="-0.4463" r="0.0095" fill="#1d1b19"/>
+<circle cx="-0.0678" cy="-0.3668" r="0.0066" fill="#1d1b19"/>
+<circle cx="-0.0110" cy="-0.3498" r="0.0066" fill="#1d1b19"/>
+<circle cx="-0.1907" cy="-0.3327" r="0.0095" fill="#1d1b19"/>
+<circle cx="0.1424" cy="-0.3292" r="0.0095" fill="#1d1b19"/>
+<circle cx="-0.3611" cy="-0.2610" r="0.0066" fill="#1d1b19"/>
+<circle cx="-0.0451" cy="-0.2553" r="0.0066" fill="#1d1b19"/>
+<circle cx="-0.1417" cy="-0.2532" r="0.0066" fill="#1d1b19"/>
+<circle cx="0.0742" cy="-0.2099" r="0.0045" fill="#1d1b19"/>
+<circle cx="-0.0032" cy="-0.1964" r="0.0045" fill="#1d1b19"/>
+<circle cx="0.0685" cy="-0.1701" r="0.0045" fill="#1d1b19"/>
+<circle cx="0.2184" cy="-0.1452" r="0.0066" fill="#1d1b19"/>
+<circle cx="0.4514" cy="-0.1133" r="0.0066" fill="#1d1b19"/>
+<circle cx="-0.2248" cy="-0.0827" r="0.0066" fill="#1d1b19"/>
+<circle cx="0.3412" cy="-0.0827" r="0.0066" fill="#1d1b19"/>
+<circle cx="0.0138" cy="-0.0621" r="0.0045" fill="#1d1b19"/>
+<circle cx="-0.4577" cy="-0.0430" r="0.0045" fill="#1d1b19"/>
+<circle cx="0.1822" cy="-0.0145" r="0.0066" fill="#1d1b19"/>
+<circle cx="-0.4179" cy="0.0025" r="0.0066" fill="#1d1b19"/>
+<circle cx="0.1197" cy="0.0117" r="0.0066" fill="#1d1b19"/>
+<circle cx="0.4230" cy="0.0628" r="0.0066" fill="#1d1b19"/>
+<circle cx="0.0912" cy="0.0742" r="0.0066" fill="#1d1b19"/>
+<circle cx="-0.0202" cy="0.0877" r="0.0066" fill="#1d1b19"/>
+<circle cx="-0.2383" cy="0.1310" r="0.0095" fill="#1d1b19"/>
+<circle cx="0.3526" cy="0.1878" r="0.0095" fill="#1d1b19"/>
+<circle cx="-0.3690" cy="0.1900" r="0.0066" fill="#1d1b19"/>
+<circle cx="0.0650" cy="0.2468" r="0.0066" fill="#1d1b19"/>
+<circle cx="0.1900" cy="0.3093" r="0.0095" fill="#1d1b19"/>
+<circle cx="-0.2361" cy="0.3377" r="0.0066" fill="#1d1b19"/>
+<circle cx="-0.1111" cy="0.3412" r="0.0095" fill="#1d1b19"/>
+<circle cx="-0.0032" cy="0.3718" r="0.0066" fill="#1d1b19"/>
+</svg>

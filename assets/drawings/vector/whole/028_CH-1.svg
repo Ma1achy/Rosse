@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 1 1" width="512" height="512">
+<polyline points="0.4403,-0.2983 0.4318,-0.2869 0.4233,-0.2557 0.4062,-0.2500 0.3892,-0.2330 0.3807,-0.2159 0.3665,-0.2045 0.3381,-0.1705" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="-0.0568,0.0739 -0.0369,0.0568 -0.0284,0.0426 -0.0057,0.0199 0.0028,0.0170 0.0170,0.0028" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="0.0426,0.0142 0.0227,0.0028" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="-0.1449,0.0341 -0.1619,0.0369 -0.1960,0.0739 -0.2131,0.0824 -0.2330,0.1023 -0.2358,0.1136 -0.2472,0.1222 -0.2670,0.1562 -0.2784,0.1676 -0.2898,0.2017 -0.2983,0.2131 -0.3097,0.2188" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="-0.3097,0.2983 -0.3409,0.3267 -0.3523,0.3324 -0.3835,0.3381" fill="none" stroke="#1d1b19" stroke-width="0.006" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="0.3210" cy="-0.3295" r="0.0120" fill="#1d1b19"/>
+<circle cx="0.1932" cy="-0.1562" r="0.0120" fill="#1d1b19"/>
+<circle cx="-0.0909" cy="-0.0881" r="0.0073" fill="#1d1b19"/>
+<circle cx="-0.0710" cy="-0.1080" r="0.0093" fill="#1d1b19"/>
+<circle cx="-0.0511" cy="-0.1278" r="0.0089" fill="#1d1b19"/>
+<circle cx="-0.0256" cy="-0.1278" r="0.0074" fill="#1d1b19"/>
+<circle cx="-0.0170" cy="-0.1051" r="0.0068" fill="#1d1b19"/>
+<circle cx="-0.0227" cy="-0.0795" r="0.0068" fill="#1d1b19"/>
+<circle cx="-0.0227" cy="-0.0540" r="0.0086" fill="#1d1b19"/>
+<circle cx="-0.0085" cy="-0.0312" r="0.0100" fill="#1d1b19"/>
+<circle cx="0.0085" cy="-0.0142" r="0.0090" fill="#1d1b19"/>
+<circle cx="0.0966" cy="-0.1108" r="0.0120" fill="#1d1b19"/>
+<circle cx="0.2642" cy="-0.0710" r="0.0120" fill="#1d1b19"/>
+<circle cx="0.1676" cy="-0.0398" r="0.0120" fill="#1d1b19"/>
+<circle cx="0.0969" cy="0.1310" r="0.0095" fill="#1d1b19"/>
+<circle cx="-0.3920" cy="0.1534" r="0.0120" fill="#1d1b19"/>
+<circle cx="-0.1080" cy="0.1648" r="0.0120" fill="#1d1b19"/>
+<circle cx="-0.0142" cy="0.1932" r="0.0120" fill="#1d1b19"/>
+<circle cx="-0.1875" cy="0.2358" r="0.0120" fill="#1d1b19"/>
+<ellipse cx="0.0257" cy="-0.0005" rx="0.0388" ry="0.0220" transform="rotate(-136.77 0.0257 -0.0005)" fill="#1d1b19"/>
+</svg>

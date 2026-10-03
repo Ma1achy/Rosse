@@ -1,0 +1,25 @@
+{
+ "counts": {
+  "bitmap:dots": 500,
+  "bitmap:knots": 160,
+  "bitmap:stars": 48,
+  "bitmap:cores": 27,
+  "vector:rings": 51,
+  "bitmap:strokes": 60,
+  "bitmap:pieces": 638,
+  "vector:arms": 44,
+  "vector:bars": 10,
+  "vector:env": 21,
+  "vector:whole": 156,
+  "vector:arcs": 15,
+  "vector:shells": 5,
+  "vector:companions": 10,
+  "bitmap:fgstars": 29,
+  "vector:trails": 13,
+  "vector:penlines": 25,
+  "vector:misc": 2,
+  "vector:sstars": 77
+ },
+ "fonts": 6,
+ "embedded_other": 81
+}
