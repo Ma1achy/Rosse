@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { mipChain } from '../../tools/pack-atlas/pack-lib.js';
+import { L_INKED, L_INSTANCES, L_PROBES, lAtlas } from '../vectors/l-shape';
 import {
   composite,
   createInkBuffer,
@@ -75,6 +76,16 @@ describe('CPU rasteriser (runs in Node)', () => {
     // a disc of radius 6 texels in a 16-texel cell drawn 12 px wide: radius 4.5 px
     expect(total).toBeGreaterThan(Math.PI * 4.5 ** 2 * 0.8);
     expect(total).toBeLessThan(Math.PI * 4.5 ** 2 * 1.2);
+  });
+
+  it('maps cells the right way up and turns them the reference way (L shape)', () => {
+    const ink = createInkBuffer(128, 64);
+    rasteriseSprites(ink, lAtlas(), L_INSTANCES, { pxPerUnit: 1, gain: 1 });
+    for (const [x, y, inked] of L_PROBES) {
+      const a = ink.data[(y * 128 + x) * 4 + 3] ?? -1;
+      if (inked) expect(a, `(${String(x)}, ${String(y)})`).toBeGreaterThan(L_INKED);
+      else expect(a, `(${String(x)}, ${String(y)})`).toBe(0);
+    }
   });
 
   it('gives the reference dot size at pen 2.4', () => {

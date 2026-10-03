@@ -6,13 +6,15 @@
  * - the ink target, read back and decoded from half floats, against the CPU's f32 ink buffer;
  * - the composited RGBA8 image, on Paper and on Chalkboard, against the CPU composite.
  *
- * Cases: the single dot at the centre and the page's sample scene, at DPR 1 and 2.
+ * Cases: the single dot at the centre and the page's sample scene, at DPR 1 and 2; and a
+ * synthetic L-shaped cell, upright and turned, checked pixel by pixel (tests/vectors/l-shape.ts).
  */
 import { BuiltAssets, type AtlasName } from '../../src/marks/atlas';
 import { CpuRenderer } from '../../src/fallback';
 import { GpuRenderer } from '../../src/render/frame';
 import { oneMark, sampleScene } from '../../src/render/sample-scene';
 import { SURFACES, type SurfaceName } from '../../src/render/surface';
+import { L_INKED, L_INSTANCES, L_PROBES, lAtlas } from '../vectors/l-shape';
 import { adapterName, device, halfToFloat, readTexture, run } from './harness';
 
 const TOL = 1 / 255;
@@ -112,6 +114,27 @@ run('one mark (CPU raster = GPU raster)', async () => {
       data[label] = { inkMax, inkSum, inkPixels };
       gpu.destroy();
     }
+  }
+  // orientation and cell mapping: the synthetic L, upright and turned, on the GPU
+  {
+    const size = { plateCss: 800, dpr: 1 };
+    const gpu = new GpuRenderer(dev, size, paper);
+    gpu.addAtlas(lAtlas());
+    gpu.setLayers([{ kind: 'sprites', atlas: 'dots', gain: 1, instances: L_INSTANCES }]);
+    gpu.drawInk();
+    const half = new Uint16Array((await readTexture(dev, gpu.ink, 8)).buffer);
+    const wrong = L_PROBES.filter(([x, y, inked]) => {
+      const a = halfToFloat(half[(y * gpu.width + x) * 4 + 3] ?? 0);
+      return inked ? !(a > L_INKED) : a !== 0;
+    });
+    lines.push(
+      `L shape, upright and turned: ${String(L_PROBES.length - wrong.length)}/${String(L_PROBES.length)} probe pixels right`,
+    );
+    if (wrong.length) {
+      pass = false;
+      lines.push(`  wrong: ${wrong.map(([x, y]) => `(${String(x)}, ${String(y)})`).join(' ')}`);
+    }
+    gpu.destroy();
   }
   lines.push(
     `worst: ink ${(worstInk * 255).toFixed(4)}/255, composite ${String(worstRgb)}/255 (tolerance 1/255)`,
