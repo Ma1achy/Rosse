@@ -34,20 +34,25 @@ export const L_INSTANCES: Instance[] = [
   { x: 96, y: 32, layer: 0, alpha: 1, m: simple(32, Math.PI / 2) },
 ];
 
-/** [x, y, inked] at 1 px per unit (pixel indices; centres at +0.5). */
+/**
+ * [x, y, inked] at 1 px per unit: pixel indices, whose centres are at (x + 0.5, y + 0.5).
+ * Turning a quarter clockwise about the centre C maps a pixel centre at offset (dx, dy) to offset
+ * (−dy, dx), so pixel (x, y) goes to pixel (C.x − (y + 0.5 − C.y) − 0.5, C.y + (x + 0.5 − C.x) − 0.5).
+ */
 export const L_PROBES: [number, number, boolean][] = [
-  // upright: quad spans 16..48; bar at x 18..25, y 18..45; foot at y 38..45, x 18..45
-  [20, 20, true], // top of the bar
-  [20, 44, true], // bottom of the bar
-  [40, 42, true], // the foot's right end
-  [40, 22, false], // top right is empty
-  [34, 30, false], // middle is empty
-  // turned a quarter clockwise about (96, 32): offset (dx, dy) goes to (-dy, dx)
-  [108, 20, true], // the bar is now along the top: (20, 20) → (108, 20)
-  [84, 20, true], // (20, 44) → (84, 20)
-  [86, 40, true], // the foot is now down the left: (40, 42) → (86, 40)
-  [106, 40, false], // (40, 22) → (106, 40): bottom right is empty
-  [84, 44, true], // the corner of the L: (44, 44) → (84, 44)
+  // upright about (32, 32): the quad spans 16..48; the bar covers x 18..25, y 18..45; the foot
+  // covers y 38..45, x 18..45
+  [20, 20, true], // the top of the bar
+  [20, 44, true], // the corner of the L, where the bar meets the foot
+  [44, 44, true], // the tip of the foot
+  [40, 22, false], // the top right is empty
+  [34, 30, false], // the middle is empty
+  // turned about (96, 32): each probe is the image of the upright one above it
+  [107, 20, true], // (20, 20) → (107, 20): the bar now runs along the top
+  [83, 20, true], // (20, 44) → (83, 20): the corner is now top left
+  [83, 44, true], // (44, 44) → (83, 44): the foot now runs down the left
+  [105, 40, false], // (40, 22) → (105, 40): the bottom right is empty
+  [97, 34, false], // (34, 30) → (97, 34): the middle is empty
 ];
 
 /** Coverage above this counts as inked; exactly 0 as empty. */

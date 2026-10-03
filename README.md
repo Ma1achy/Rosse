@@ -2,7 +2,7 @@
 
 A galaxy-drawing engine. Every mark it draws comes from a library of real hand drawings: dots, strokes, knots, stars and whole galaxies, drawn with a fineliner, scanned and cut out. Rosse builds each galaxy in 3D, then places, transforms and inks those drawings on paper.
 
-This repository is the WebGPU rebuild of Rosse v21. **Status: M1 (paper and one mark).** The page shows the plate on Paper or Chalkboard with one hand-drawn dot (and a few more marks), drawn with WebGPU, or with the CPU engine where WebGPU is missing. The galaxy model arrives in M2; see [docs/roadmap.md](docs/roadmap.md).
+This repository is the WebGPU rebuild of Rosse v21. **Status: M1 (paper and one mark).** The page shows the plate on Paper or Chalkboard with one hand-drawn dot (and a few more marks), drawn with WebGPU, or with the CPU engine where WebGPU is missing. The galaxy model arrives in M2; see [docs/roadmap.md](docs/roadmap.md). The CPU engine matches the WebGPU render to within 1/255, but that is proven on SwiftShader only; real GPUs are measured in M10 ([docs/milestones/m1/README.md](docs/milestones/m1/README.md)).
 
 ## Quick start
 

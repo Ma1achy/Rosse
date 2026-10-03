@@ -143,7 +143,10 @@ export async function surfaceCssCheck(browser, url) {
               cpu: b64(cpu.present(SURFACES[s])),
               gpu: b64(await readTexture(device, t, 4)),
             };
+            t.destroy();
           }
+          gpu.destroy();
+          device.destroy();
           return out;
         },
         { dpr, plate: PLATE },
