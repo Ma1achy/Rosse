@@ -79,18 +79,22 @@ export interface AtlasData {
   layers: number;
   repeatU: boolean;
   edge: readonly [number, number];
-  levels: { width: number; height: number; data: Uint8Array }[];
+  levels: { width: number; height: number; data: Uint8Array<ArrayBuffer> }[];
 }
 
 /** The paper texture, RGBA8. */
 export interface ImageData8 {
   width: number;
   height: number;
-  data: Uint8Array;
+  data: Uint8Array<ArrayBuffer>;
 }
 
 /** Splits an atlas from its file bytes. */
-export function atlasFromBytes(name: string, entry: AtlasEntry, bytes: Uint8Array): AtlasData {
+export function atlasFromBytes(
+  name: string,
+  entry: AtlasEntry,
+  bytes: Uint8Array<ArrayBuffer>,
+): AtlasData {
   return {
     name,
     layers: entry.layers,
@@ -123,7 +127,7 @@ export class BuiltAssets {
     return new BuiltAssets(base, (await res.json()) as BuiltIndex);
   }
 
-  private async bytes(file: string): Promise<Uint8Array> {
+  private async bytes(file: string): Promise<Uint8Array<ArrayBuffer>> {
     const res = await fetch(`${this.base}${file}`);
     if (!res.ok) throw new Error(`${file}: ${String(res.status)}`);
     return new Uint8Array(await res.arrayBuffer());
