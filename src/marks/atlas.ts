@@ -104,8 +104,10 @@ export function atlasFromBytes(
     repeatU: entry.repeatU,
     edge: inkEdge(name),
     meta: entry.meta,
-    levels: entry.levels.map((l) => {
+    levels: entry.levels.map((l, i) => {
       if (l.offset + l.byteLength > bytes.length) throw new Error(`atlas ${name}: file too short`);
+      if (l.byteLength !== entry.layers * l.width * l.height)
+        throw new Error(`atlas ${name}: level ${String(i)} is ${String(l.byteLength)} bytes`);
       return {
         width: l.width,
         height: l.height,

@@ -35,9 +35,12 @@ const sha = (b) => createHash('sha256').update(b).digest('hex');
 /** @param {string} p */
 const rel = (p) => relative(ROOT, p).replaceAll('\\', '/');
 
+// the packer's own code counts as a source: a change to the mip filter rebuilds everything
 const sources = [
   ...NAMES.flatMap((n) => [`${n}.png`, `${n}.json`].map((f) => join(SHEETS, f))),
   PAPER,
+  join(import.meta.dirname, 'pack.mjs'),
+  join(import.meta.dirname, 'pack-lib.js'),
 ];
 const sourceHash = sha(Buffer.concat(sources.map((f) => readFileSync(f))));
 
@@ -45,7 +48,13 @@ const indexPath = join(OUT, 'index.json');
 if (existsSync(indexPath) && !process.argv.includes('--force')) {
   try {
     const old = JSON.parse(readFileSync(indexPath, 'utf8'));
-    if (old.packer === PACKER_VERSION && old.sourceHash === sourceHash) {
+    /** @type {string[]} */
+    const files = [
+      ...Object.values(old.atlases ?? {}).map((a) => /** @type {{ file: string }} */ (a).file),
+      old.surfaces?.paper?.file,
+    ];
+    const present = files.length > 1 && files.every((f) => f && existsSync(join(OUT, f)));
+    if (old.packer === PACKER_VERSION && old.sourceHash === sourceHash && present) {
       console.log('assets-built/ is up to date');
       process.exit(0);
     }
