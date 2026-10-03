@@ -22,7 +22,7 @@ Made by `npm run capture:reference` (`tools/capture-reference/capture.mjs`):
 - The canvas is forced to 800 × 800 CSS px at device pixel ratio 1, matching v21's 800-unit plate.
 - The page is reloaded for every (preset, seed), because v21 keeps hidden state (`homeFor`).
 
-`npm run capture:reference -- --verify` captures everything again and compares pixel hashes with the manifest; see the M0 report for the result.
+`npm run capture:reference -- --verify` captures everything again and compares pixel hashes with the manifest. On 3 October 2026 an independent second run reproduced all 186 ink images bit for bit.
 
 ## The comparison (from M2)
 
