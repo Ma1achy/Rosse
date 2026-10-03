@@ -52,30 +52,7 @@ export function adapterName(adapter: GPUAdapter): string {
   return [i.vendor, i.architecture, i.device, i.description].filter(Boolean).join(' / ');
 }
 
-/** Reads a whole 2D texture back: rows tightly packed, `bytesPerPixel` each. */
-export async function readTexture(
-  device: GPUDevice,
-  texture: GPUTexture,
-  bytesPerPixel: number,
-): Promise<Uint8Array> {
-  const { width, height } = texture;
-  const row = width * bytesPerPixel;
-  const stride = Math.ceil(row / 256) * 256;
-  const buffer = device.createBuffer({
-    size: stride * height,
-    usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
-  });
-  const enc = device.createCommandEncoder();
-  enc.copyTextureToBuffer({ texture }, { buffer, bytesPerRow: stride }, [width, height]);
-  device.queue.submit([enc.finish()]);
-  await buffer.mapAsync(GPUMapMode.READ);
-  const src = new Uint8Array(buffer.getMappedRange());
-  const out = new Uint8Array(row * height);
-  for (let y = 0; y < height; y++) out.set(src.subarray(y * stride, y * stride + row), y * row);
-  buffer.unmap();
-  buffer.destroy();
-  return out;
-}
+export { readTexture } from '../../src/gpu/readback';
 
 /** IEEE half to number. */
 export function halfToFloat(h: number): number {
