@@ -7,9 +7,17 @@ import { wgslImports } from './tools/vite-wgsl.js';
  * WGSL files are imported as strings (`import src from './x.wgsl'`), after the
  * `// #import "path.wgsl"` lines in them are resolved by the same resolver the CI
  * validator uses (see tools/wgsl-resolve.js and docs/adr/0002-stack-and-build.md).
+ *
+ * `assets-built/` (written by `npm run prepare-assets`) is the public directory: the page fetches
+ * the packed atlases from it, and the build copies it into dist/.
  */
 export default defineConfig({
   plugins: [wgslImports()],
   build: { target: 'es2022' },
-  test: { include: ['tests/unit/**/*.test.ts'] },
+  publicDir: 'assets-built',
+  test: {
+    include: ['tests/unit/**/*.test.ts'],
+    // wgsl_reflect's "main" is a CommonJS build inside a "type": "module" package; use its ES build.
+    alias: { wgsl_reflect: 'wgsl_reflect/wgsl_reflect.module.js' },
+  },
 });
