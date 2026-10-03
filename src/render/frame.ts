@@ -27,25 +27,33 @@ export interface FrameSize {
 }
 
 export class GpuRenderer {
-  readonly width: number;
-  readonly height: number;
-  readonly pxPerUnit: number;
-  readonly ink: GPUTexture;
-  private readonly inkView: GPUTextureView;
+  width = 0;
+  height = 0;
+  pxPerUnit = 1;
+  ink!: GPUTexture;
+  private inkView!: GPUTextureView;
   private readonly sprites: SpritePipeline;
   private readonly composite: CompositePass;
   private readonly atlases = new Map<AtlasName, GpuAtlas>();
+  private layers: readonly InkLayer[] = [];
   private batches: SpriteBatch[] = [];
 
   constructor(
     readonly device: GPUDevice,
-    readonly size: FrameSize,
+    public size: FrameSize,
     paper: ImageData8,
   ) {
+    this.sprites = new SpritePipeline(device);
+    this.composite = new CompositePass(device, paper);
+    this.makeTarget(size);
+  }
+
+  private makeTarget(size: FrameSize): void {
+    this.size = size;
     this.width = Math.round(size.plateCss * size.dpr);
     this.height = this.width;
     this.pxPerUnit = this.width / PLATE_UNITS;
-    this.ink = device.createTexture({
+    this.ink = this.device.createTexture({
       label: 'ink target',
       size: [this.width, this.height],
       format: INK_FORMAT,
@@ -55,8 +63,16 @@ export class GpuRenderer {
         GPUTextureUsage.COPY_SRC,
     });
     this.inkView = this.ink.createView();
-    this.sprites = new SpritePipeline(device);
-    this.composite = new CompositePass(device, paper);
+  }
+
+  /**
+   * A new plate size or DPR: a new ink target and new instance batches (their uniforms hold the
+   * target size); the atlases and pipelines are kept. Call drawInk() after.
+   */
+  resize(size: FrameSize): void {
+    this.ink.destroy();
+    this.makeTarget(size);
+    this.setLayers(this.layers);
   }
 
   addAtlas(data: AtlasData): void {
@@ -66,6 +82,7 @@ export class GpuRenderer {
 
   /** View tier: instance buffers for every layer. */
   setLayers(layers: readonly InkLayer[]): void {
+    this.layers = layers;
     this.batches.forEach((b) => {
       b.destroy();
     });

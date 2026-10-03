@@ -75,6 +75,8 @@ export class Gpu {
   private failureListeners = new Set<(error: unknown) => void>();
   private destroyed = false;
   private recovering = false;
+  /** devices this object destroyed itself; any other loss, even reason 'destroyed', is recovered */
+  private readonly ownDestroys = new WeakSet<GPUDevice>();
   /** recoveries since the last healthy frame */
   private recoveries = 0;
 
@@ -128,13 +130,19 @@ export class Gpu {
 
   destroy(): void {
     this.destroyed = true;
-    this.device.destroy();
+    this.destroyDevice(this.device);
+  }
+
+  private destroyDevice(device: GPUDevice): void {
+    this.ownDestroys.add(device);
+    device.destroy();
   }
 
   private watch(device: GPUDevice): void {
     void device.lost.then((info) => {
-      if (this.destroyed || info.reason === 'destroyed' || device !== this.device) return;
-      console.warn(`WebGPU device lost: ${info.message}`);
+      // a device we destroyed ourselves is not a loss; one destroyed by anyone else is
+      if (this.destroyed || this.ownDestroys.has(device) || device !== this.device) return;
+      console.warn(`WebGPU device lost (${info.reason}): ${info.message}`);
       void this.recover();
     });
     device.addEventListener('uncapturederror', (e) => {
@@ -164,7 +172,7 @@ export class Gpu {
         }
         if (this.gone()) {
           // destroy() was called while we waited: the new device belongs to nobody
-          next.device.destroy();
+          this.destroyDevice(next.device);
           return;
         }
         this.adapter = next.adapter;
@@ -176,7 +184,7 @@ export class Gpu {
         } catch (e) {
           // a listener could not rebuild on the new device: drop it and try again
           console.warn('Rebuilding on the new WebGPU device failed:', e);
-          next.device.destroy();
+          this.destroyDevice(next.device);
           continue;
         }
         this.watch(next.device);
@@ -184,7 +192,11 @@ export class Gpu {
       }
       if (!this.destroyed)
         this.failureListeners.forEach((fn) => {
-          fn(new Error('WebGPU device lost and could not be recreated'));
+          try {
+            fn(new Error('WebGPU device lost and could not be recreated'));
+          } catch (e) {
+            console.error('A WebGPU failure listener threw:', e);
+          }
         });
     } finally {
       this.recovering = false;

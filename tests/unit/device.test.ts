@@ -179,4 +179,32 @@ describe('Gpu', () => {
     expect(f.devices).toHaveLength(2);
     expect(f.devices.every((d) => d.destroyed)).toBe(true);
   });
+
+  it('recovers from a destroy() it did not make itself', async () => {
+    const f = fakeNavigator();
+    const gpu = await Gpu.create(f.nav, 3, 0);
+    const seen = vi.fn();
+    gpu.onDevice(seen);
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    f.devices[0]?.lose('destroyed'); // as an external device.destroy() reports it
+    for (let i = 0; i < 10; i++) await tick();
+    expect(seen).toHaveBeenCalledTimes(1);
+    expect(gpu.device).toBe(seen.mock.calls[0]?.[0]);
+  });
+
+  it('survives a failure listener that throws', async () => {
+    const f = fakeNavigator({ adapters: [true, false] });
+    const gpu = await Gpu.create(f.nav, 1, 0);
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const err = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const second = vi.fn();
+    gpu.onFailure(() => {
+      throw new Error('listener');
+    });
+    gpu.onFailure(second);
+    f.devices[0]?.lose('unknown');
+    for (let i = 0; i < 10; i++) await tick();
+    expect(second).toHaveBeenCalledTimes(1);
+    expect(err).toHaveBeenCalled();
+  });
 });

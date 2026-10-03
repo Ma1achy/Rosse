@@ -58,12 +58,14 @@ export class CompositePass {
   private readonly paperTexture: GPUTexture;
   /**
    * One uniform buffer per (surface, plate size, DPR), written once, so two composites recorded
-   * into one submit never share a buffer; and one bind group per ink view.
+   * into one submit never share a buffer; and one bind group per ink view. Keyed on the Surface
+   * object itself, so a surface built at run time gets its own entry.
    */
-  private readonly bindings = new Map<
-    string,
-    { uniforms: GPUBuffer; groups: WeakMap<GPUTextureView, GPUBindGroup> }
+  private readonly bindings = new WeakMap<
+    Surface,
+    Map<string, { uniforms: GPUBuffer; groups: WeakMap<GPUTextureView, GPUBindGroup> }>
   >();
+  private readonly buffers: GPUBuffer[] = [];
   private readonly paperView: GPUTextureView;
 
   constructor(
@@ -127,18 +129,24 @@ export class CompositePass {
     plateCss: number,
     dpr: number,
   ): void {
-    const key = `${surface.name}|${String(plateCss)}|${String(dpr)}`;
-    let entry = this.bindings.get(key);
+    const key = `${String(plateCss)}|${String(dpr)}`;
+    let perSurface = this.bindings.get(surface);
+    if (!perSurface) {
+      perSurface = new Map();
+      this.bindings.set(surface, perSurface);
+    }
+    let entry = perSurface.get(key);
     if (!entry) {
       const data = compositeUniforms(surface, this.paper, plateCss, dpr);
       const uniforms = this.device.createBuffer({
-        label: `composite uniforms ${key}`,
+        label: `composite uniforms ${surface.name} ${key}`,
         size: data.byteLength,
         usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
       });
       this.device.queue.writeBuffer(uniforms, 0, data);
+      this.buffers.push(uniforms);
       entry = { uniforms, groups: new WeakMap() };
-      this.bindings.set(key, entry);
+      perSurface.set(key, entry);
     }
     let bindGroup = entry.groups.get(ink);
     if (!bindGroup) {
@@ -166,9 +174,9 @@ export class CompositePass {
 
   destroy(): void {
     this.paperTexture.destroy();
-    this.bindings.forEach((b) => {
-      b.uniforms.destroy();
+    this.buffers.forEach((b) => {
+      b.destroy();
     });
-    this.bindings.clear();
+    this.buffers.length = 0;
   }
 }

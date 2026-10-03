@@ -38,9 +38,11 @@ interface Scene {
 
 interface Engine {
   backend: Backend;
+  /** the size the engine draws at now */
+  size(): FrameSize;
   /** Composites onto the surface and shows it. Rejects if the frame could not be shown. */
   present(surface: SurfaceName): Promise<void>;
-  /** Rebuilds at a new plate size or DPR. */
+  /** A new plate size or DPR: re-inks at that size, keeping the drawings loaded. */
   resize(size: FrameSize): void;
   /**
    * After a failed frame: true when it failed because the device was lost, so recovery will
@@ -77,25 +79,28 @@ function cpuEngine(scene: Scene, size: FrameSize): Engine {
   const canvas = freshCanvas();
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('no 2D canvas');
-  let r: CpuRenderer;
-  const build = (s: FrameSize) => {
-    r = new CpuRenderer(s, scene.paper);
-    scene.atlases.forEach((a) => {
-      r.addAtlas(a);
-    });
-    r.setLayers(scene.layers);
+  const r = new CpuRenderer(size, scene.paper);
+  scene.atlases.forEach((a) => {
+    r.addAtlas(a);
+  });
+  r.setLayers(scene.layers);
+  const ink = () => {
     r.drawInk();
     canvas.width = canvas.height = r.width;
   };
-  build(size);
+  ink();
   return {
     backend: 'cpu',
+    size: () => r.size,
     present(surface) {
       const out = r.present(SURFACES[surface]);
       ctx.putImageData(new ImageData(out, r.width, r.height), 0, 0);
       return Promise.resolve();
     },
-    resize: build,
+    resize(s) {
+      r.resize(s);
+      ink();
+    },
     recovering: () => Promise.resolve(false),
     destroy: () => undefined,
   };
@@ -118,37 +123,52 @@ async function gpuEngine(
     const ctx2d = copy ? canvas.getContext('2d') : null;
     const ctxGpu = copy ? null : canvas.getContext('webgpu');
     if (copy ? !ctx2d : !ctxGpu) throw new Error('no canvas context');
-    let current = size;
+    // every device that has been lost, for whatever reason (onSubmittedWorkDone resolves on a
+    // lost device, so a frame's success has to be checked against this)
+    const lostDevices = new WeakSet<GPUDevice>();
     let renderer: GpuRenderer | null = null;
     let out: GPUTexture | null = null;
-    const build = (device: GPUDevice, s: FrameSize) => {
-      renderer?.destroy();
+    /** the output texture (copy mode) and canvas, at the renderer's size */
+    const fitOutput = (r: GpuRenderer) => {
       out?.destroy();
-      renderer = new GpuRenderer(device, s, scene.paper);
-      scene.atlases.forEach((a) => renderer?.addAtlas(a));
-      renderer.setLayers(scene.layers);
-      renderer.drawInk();
-      canvas.width = canvas.height = renderer.width;
-      if (ctxGpu) ctxGpu.configure({ device, format, alphaMode: 'opaque' });
+      canvas.width = canvas.height = r.width;
       out = copy
-        ? device.createTexture({
-            size: [renderer.width, renderer.height],
+        ? r.device.createTexture({
+            size: [r.width, r.height],
             format,
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
           })
         : null;
     };
+    /** everything, on a (new) device */
+    const build = (device: GPUDevice, s: FrameSize) => {
+      void device.lost.then(() => lostDevices.add(device));
+      renderer?.destroy();
+      const r = new GpuRenderer(device, s, scene.paper);
+      renderer = r;
+      scene.atlases.forEach((a) => {
+        r.addAtlas(a);
+      });
+      r.setLayers(scene.layers);
+      r.drawInk();
+      if (ctxGpu) ctxGpu.configure({ device, format, alphaMode: 'opaque' });
+      fitOutput(r);
+    };
     build(gpu.device, size);
     gpu.onDevice((device) => {
-      build(device, current);
+      build(device, renderer?.size ?? size);
       events.onRebuilt();
     });
     gpu.onFailure(events.onFailure);
+    const current = () => {
+      if (!renderer) throw new Error('no renderer');
+      return renderer;
+    };
     return {
       backend: 'webgpu',
+      size: () => current().size,
       async present(surface) {
-        const r = renderer;
-        if (!r) throw new Error('no renderer');
+        const r = current();
         if (out && ctx2d) {
           r.present(out.createView(), format, SURFACES[surface]);
           const px = new Uint8ClampedArray((await readTexture(r.device, out, 4)).buffer);
@@ -157,22 +177,30 @@ async function gpuEngine(
           r.present(ctxGpu.getCurrentTexture().createView(), format, SURFACES[surface]);
           await r.device.queue.onSubmittedWorkDone();
         }
+        // let a loss reported alongside the frame land before trusting it
+        await new Promise((res) => setTimeout(res, 0));
+        if (lostDevices.has(r.device) || r.device !== gpu.device || r !== renderer)
+          throw new Error('the device was lost during the frame');
         // a frame is on screen: the recovery budget counts losses in a row
         gpu.markHealthy();
       },
       resize(s) {
-        current = s;
-        build(gpu.device, s);
+        // keep the atlases and pipelines: a new ink target, batches and composite uniforms
+        const r = current();
+        r.resize(s);
+        r.drawInk();
+        fitOutput(r);
       },
       recovering() {
         // the loss may be reported just after the failed call that revealed it
         const device = renderer?.device;
         if (!device) return Promise.resolve(false);
+        if (lostDevices.has(device)) return Promise.resolve(true);
         return Promise.race([
           device.lost.then(() => true),
-          new Promise<boolean>((r) =>
+          new Promise<boolean>((res) =>
             setTimeout(() => {
-              r(false);
+              res(false);
             }, 200),
           ),
         ]);
@@ -218,22 +246,29 @@ async function start(): Promise<void> {
 
   /** the surface the toggle asks for; the plate catches up with it in show() */
   let surface: SurfaceName = 'paper';
-  let size = plateSize(plateCanvas());
+  /** the size the plate should be drawn at; applied in show(), before presenting */
+  let wantedSize = plateSize(plateCanvas());
   let frames = 0;
-  let engine: Engine;
+  let engine: Engine | undefined;
   // frames are shown one after another, never concurrently
   let queue = Promise.resolve();
 
+  const report = (e: unknown) => {
+    console.error(e);
+    if (note) note.textContent = `Could not draw: ${String(e)}`;
+  };
   const toCpu = (why: unknown) => {
     console.warn('Switching to the CPU engine:', why);
-    engine.destroy();
-    engine = cpuEngine(scene, size);
+    engine?.destroy();
+    engine = cpuEngine(scene, wantedSize);
     schedule();
   };
   const show = async () => {
     const e = engine;
+    if (!e) return; // the first frame will pick up the current surface and size
     const wanted = surface;
     try {
+      if (!sameSize(e.size(), wantedSize)) e.resize(wantedSize);
       await e.present(wanted);
     } catch (err) {
       if (e !== engine) return; // a newer engine has taken over
@@ -242,33 +277,15 @@ async function start(): Promise<void> {
       return;
     }
     frames++;
-    window.__rosse = { backend: e.backend, surface: wanted, frames, size };
+    window.__rosse = { backend: e.backend, surface: wanted, frames, size: e.size() };
     document.documentElement.dataset.backend = e.backend;
     if (note) note.textContent = e.backend === 'cpu' ? 'drawn on the CPU' : '';
   };
-  const schedule = () => {
-    queue = queue.then(show, show);
-  };
+  function schedule() {
+    queue = queue.then(show).catch(report);
+  }
 
-  const backend = await detectBackend(
-    navigator,
-    forced === 'cpu' || forced === 'webgpu' ? forced : null,
-  );
-  engine =
-    backend === 'webgpu'
-      ? await gpuEngine(scene, size, copy, {
-          onRebuilt: schedule,
-          onFailure: () => {
-            toCpu('device lost and not recreated');
-          },
-        }).catch((e: unknown) => {
-          console.warn('WebGPU failed, using the CPU engine:', e);
-          return cpuEngine(scene, size);
-        })
-      : cpuEngine(scene, size);
-  schedule();
-  await queue;
-
+  // the toggle works from the start: a click before the first frame sets the surface it shows
   document.querySelectorAll<HTMLButtonElement>('button[data-surface]').forEach((b) => {
     b.addEventListener('click', () => {
       surface = b.dataset.surface === 'chalk' ? 'chalk' : 'paper';
@@ -279,13 +296,17 @@ async function start(): Promise<void> {
     });
   });
 
-  // redraw when the plate's CSS width or the device pixel ratio changes, as v21 does
+  // redraw when the plate's CSS width or the device pixel ratio changes, as v21 does; resizes
+  // are coalesced to one per animation frame and applied in the frame queue
+  let resizePending = false;
   const resized = () => {
-    const s = plateSize(plateCanvas());
-    if (sameSize(s, size)) return;
-    size = s;
-    engine.resize(s);
-    schedule();
+    wantedSize = plateSize(plateCanvas());
+    if (resizePending) return;
+    resizePending = true;
+    requestAnimationFrame(() => {
+      resizePending = false;
+      schedule();
+    });
   };
   const plateBox = plateCanvas().parentElement;
   if (plateBox) new ResizeObserver(resized).observe(plateBox);
@@ -300,6 +321,25 @@ async function start(): Promise<void> {
     );
   };
   watchDpr();
+
+  const backend = await detectBackend(
+    navigator,
+    forced === 'cpu' || forced === 'webgpu' ? forced : null,
+  );
+  engine =
+    backend === 'webgpu'
+      ? await gpuEngine(scene, wantedSize, copy, {
+          onRebuilt: schedule,
+          onFailure: () => {
+            toCpu('device lost and not recreated');
+          },
+        }).catch((e: unknown) => {
+          console.warn('WebGPU failed, using the CPU engine:', e);
+          return cpuEngine(scene, wantedSize);
+        })
+      : cpuEngine(scene, wantedSize);
+  schedule();
+  await queue;
 }
 
 start().catch((e: unknown) => {
