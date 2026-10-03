@@ -34,3 +34,24 @@ jobs:
         run: cargo install naga-cli --version 30.0.1 --locked
       - run: npm run validate:wgsl
       - run: npm run build
+
+  gpu:
+    # WebGPU on SwiftShader in headless Chromium: the RNG vectors on the GPU, the one-mark
+    # render test (CPU raster = GPU raster within 1/255) and the surface check against CSS.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:gpu
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gpu-test-results
+          path: test-results/gpu.json
