@@ -1,10 +1,146 @@
 /**
- * Drawing parameters: the typed equivalent of the reference's `DEF` (app23.js:L11–19).
+ * Drawing parameters: the typed equivalent of the reference's `DEF` (app23.js:L11–19), with every
+ * key and the same defaults, in the same order. The schema (./schema.ts) gives each key its range
+ * and its cache tier (ADR 0010); the presets (./presets.ts) are sparse overrides of these.
  *
- * Planned: a `Params` type, the defaults, and a split of every key into the cache tier it
- * invalidates (ADR 0010): model keys (shape of the galaxy), view keys (incl, az, pa, zoom) and
- * present keys (surface, plates, pen colour). The reference also uses hidden state (the camera at
- * first placement in `homeFor`, app23.js:L445); here it becomes explicit parameters
- * (`lensHome`, `overlayHome`), so a drawing is a pure function of its parameters (ADR 0008).
+ * Zoom is not a parameter here, as in the reference (`ZOOM`, app23.js:L857): it belongs to the
+ * camera (src/view/camera.ts). Hidden state of the reference (`homeFor`, app23.js:L445) becomes
+ * explicit parameters when lensing and overlays arrive (M7, M9).
  */
-export {};
+
+export const DEF = {
+  seed: 7,
+  stars: 9500,
+  bulge: 0.2,
+  bulgeSize: 0.5,
+  bulgeFlat: 0.8,
+  thick: 0.08,
+  arms: 2,
+  pitch: 18,
+  armStrength: 0.8,
+  armWidth: 0.35,
+  flocc: 0.0,
+  bar: 0.0,
+  barLen: 0.45,
+  ring: 0.0,
+  ringR: 1.6,
+  halo: 0.15,
+  dust: 0.0,
+  knots: 0.35,
+  sparkle: 0.35,
+  incl: 30,
+  pa: 20,
+  winding: 1,
+  lines: 0.7,
+  stroke: 'mixed',
+  stipple: 1.0,
+  outline: 0.0,
+  armStyle: 'ribbons',
+  barStyle: 'drawn',
+  ringStyle: 'drawn',
+  whole: 0,
+  envelope: 0,
+  nuclear: 0,
+  companions: 0,
+  lens: 0,
+  shells: 0,
+  tail: 0,
+  fgstars: 0.3,
+  trails: 0,
+  arrow: 0,
+  plates: 'ink',
+  kind: 'auto',
+  pen: 2.4,
+  vary: 0.6,
+  merger: 0,
+  mRatio: 0.6,
+  mPeri: 1.4,
+  mStage: 1.2,
+  mSpin1: 25,
+  mSpin2: 40,
+  mFriction: 0,
+  mStars: 11000,
+  mBulge: 0.2,
+  mType1: 'spiral',
+  mType2: 'spiral',
+  mArms1: 2,
+  mArms2: 2,
+  mSize1: 1,
+  mSize2: 1,
+  mBar1: 0,
+  mBar2: 0,
+  mTilt: 0,
+  mEcc: 1,
+  mHorizon: 2,
+  subject: 'galaxy',
+  artefact: 'trail',
+  starBright: 0.7,
+  spikes: 0.7,
+  starRings: 0.4,
+  bleed: 0.3,
+  ovStar: 0,
+  ovStarD: 1.9,
+  ovStarA: 40,
+  ovArtefact: 'none',
+  mTime: 1,
+  az: 0,
+  starMix: 0.6,
+  dustScribble: 0.5,
+  field: 0.3,
+  dustLines: 0,
+  bubbles: 0.4,
+  streams: 0,
+  distort: 0,
+  rewind: 1,
+  unwrap: 0,
+  lensSource: 'galaxy',
+  jet: 0,
+  mWarp: 1,
+  sersicN: 0,
+  re: 0.9,
+  patchy: 0,
+  ringOnlyLines: 0,
+  irr: 0,
+  lensOn: 0,
+  lensR: 1.3,
+  lensSrc: 0.12,
+  lensSrcA: 30,
+  lensShear: 0.06,
+  lensShearA: 20,
+  lensSize: 0.28,
+  lensStars: 6000,
+  lensQ: 0.8,
+  lensAngle: 0,
+  lensCore: 0.05,
+  lensCluster: 0,
+  lensDouble: 0,
+  shellsOn: 0,
+  shellTime: 70,
+  shellAxis: 30,
+  shellStars: 6000,
+} as const;
+
+type Widen<T> = T extends number ? number : T extends string ? string : T;
+
+/** A full parameter set. Keys are exactly the reference's `DEF`. */
+export type Params = { -readonly [K in keyof typeof DEF]: Widen<(typeof DEF)[K]> };
+
+export type ParamKey = keyof Params;
+
+/** The keys, in `DEF` order. */
+export const PARAM_KEYS = Object.keys(DEF) as ParamKey[];
+
+/** A fresh copy of the defaults. */
+export function defaults(): Params {
+  return { ...DEF };
+}
+
+/**
+ * Parameters from a partial set laid over the defaults, as the reference builds `P`
+ * (`Object.assign({}, DEF, overrides)`). Unknown keys are rejected.
+ */
+export function withDefaults(overrides: Partial<Params> = {}): Params {
+  for (const k of Object.keys(overrides))
+    if (!(k in DEF)) throw new Error(`unknown parameter ${JSON.stringify(k)}`);
+  return { ...DEF, ...overrides };
+}
