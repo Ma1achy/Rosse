@@ -13,14 +13,20 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:gpu": "node tools/gpu-test/run.mjs",
+    "vectors": "ROSSE_WRITE_VECTORS=1 vitest run tests/unit/rng.test.ts",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
     "validate:wgsl": "node tools/validate-wgsl.mjs",
+    "prepare-assets": "node tools/pack-atlas/pack.mjs",
+    "screenshots": "node tools/gpu-test/screenshot.mjs",
     "golden": "node tests/golden/compare/compare.mjs",
     "capture:reference": "node tools/capture-reference/capture.mjs",
     "profile:reference": "node tools/profile-reference/profile.mjs",
-    "spike": "node spikes/vector-lines/run.mjs"
+    "spike": "node spikes/vector-lines/run.mjs",
+    "predev": "npm run prepare-assets",
+    "prebuild": "npm run prepare-assets"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -35,6 +41,7 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.2",
-    "vitest": "^4.0.8"
+    "vitest": "^4.0.8",
+    "wgsl_reflect": "^1.6.0"
   }
 }
