@@ -21,6 +21,7 @@ export const SPRITE_UNIFORMS_LAYOUT: StructLayout = {
     { name: 'cell', type: 'f32', offset: 40, size: 4 },
     { name: 'max_lod', type: 'f32', offset: 44, size: 4 },
     { name: 'layer_base', type: 'u32', offset: 48, size: 4 },
+    { name: 'layer_count', type: 'u32', offset: 52, size: 4 },
   ],
 };
 
@@ -122,6 +123,7 @@ export class SpriteBatch {
           cell: atlas.cellWidth,
           max_lod: atlas.maxLod,
           layer_base: arr.first,
+          layer_count: arr.count,
         }),
         GPUBufferUsage.UNIFORM,
         `sprite uniforms ${atlas.data.name}`,
@@ -157,6 +159,89 @@ export class SpriteBatch {
     for (const d of this.draws) {
       pass.setBindGroup(0, d.bindGroup);
       pass.draw(4, d.count, 0, d.first);
+    }
+  }
+
+  destroy(): void {
+    this.buffers.forEach((b) => {
+      b.destroy();
+    });
+  }
+}
+
+/** Instances written by a compute pass, drawn with an indirect count (no read-back, ADR 0003). */
+export interface GpuInstances {
+  buffer: GPUBuffer;
+  /** byte offset of the first instance (a multiple of 256) */
+  offset: number;
+  /** bytes available from `offset` */
+  size: number;
+  /** indirect draw arguments [4, count, 0, 0] */
+  indirect: GPUBuffer;
+  indirectOffset: number;
+}
+
+/**
+ * One layer of GPU-written sprites. An atlas split over several texture arrays is drawn once per
+ * array from the same instances; the vertex stage skips instances of other arrays.
+ */
+export class IndirectSpriteBatch {
+  private buffers: GPUBuffer[] = [];
+  private readonly draws: GPUBindGroup[] = [];
+
+  constructor(
+    pipe: SpritePipeline,
+    atlas: GpuAtlas,
+    readonly source: GpuInstances,
+    opts: {
+      targetWidth: number;
+      targetHeight: number;
+      pxPerUnit: number;
+      gain: number;
+      ink?: readonly [number, number, number];
+    },
+  ) {
+    const device = pipe.device;
+    for (const arr of atlas.arrays) {
+      const uniforms = bufferWithData(
+        device,
+        packStruct(SPRITE_UNIFORMS_LAYOUT, {
+          ink: [...(opts.ink ?? [1, 1, 1]), 1],
+          target_size: [opts.targetWidth, opts.targetHeight],
+          edge: atlas.data.edge,
+          px_per_unit: opts.pxPerUnit,
+          gain: opts.gain,
+          cell: atlas.cellWidth,
+          max_lod: atlas.maxLod,
+          layer_base: arr.first,
+          layer_count: arr.count,
+        }),
+        GPUBufferUsage.UNIFORM,
+        `sprite uniforms ${atlas.data.name} (indirect)`,
+      );
+      this.buffers.push(uniforms);
+      this.draws.push(
+        device.createBindGroup({
+          layout: pipe.layout,
+          entries: [
+            { binding: 0, resource: { buffer: uniforms } },
+            {
+              binding: 1,
+              resource: { buffer: source.buffer, offset: source.offset, size: source.size },
+            },
+            { binding: 2, resource: arr.view },
+            { binding: 3, resource: atlas.data.repeatU ? pipe.samplerRepeat : pipe.sampler },
+          ],
+        }),
+      );
+    }
+  }
+
+  encode(pass: GPURenderPassEncoder, pipe: SpritePipeline): void {
+    pass.setPipeline(pipe.pipeline);
+    for (const g of this.draws) {
+      pass.setBindGroup(0, g);
+      pass.drawIndirect(this.source.indirect, this.source.indirectOffset);
     }
   }
 

@@ -33,6 +33,9 @@ struct Sprite {
   max_lod: f32,
   // first atlas layer held by the bound texture array
   layer_base: u32,
+  // how many layers it holds: instances of other layers are not drawn by this draw (an atlas
+  // split over several arrays is drawn once per array from the same instance buffer)
+  layer_count: u32,
 }
 
 @group(0) @binding(0) var<uniform> sprite: Sprite;
@@ -73,6 +76,12 @@ fn sprite_lod(m: vec4<f32>) -> f32 {
 @vertex
 fn vs(@builtin(vertex_index) v: u32, @builtin(instance_index) i: u32) -> VertexOut {
   let s = instances[i];
+  var out: VertexOut;
+  if (s.layer < sprite.layer_base || s.layer - sprite.layer_base >= sprite.layer_count) {
+    // not in this texture array: a degenerate quad outside the clip volume
+    out.position = vec4<f32>(-2.0, -2.0, 0.0, 1.0);
+    return out;
+  }
   let m = s.m * sprite.px_per_unit;
   // one device pixel of padding on each side, along each of the quad's axes
   let axes = vec2<f32>(length(m.xy), length(m.zw));
@@ -80,7 +89,6 @@ fn vs(@builtin(vertex_index) v: u32, @builtin(instance_index) i: u32) -> VertexO
   let centre = s.pos * sprite.px_per_unit;
   let p = centre + vec2<f32>(m.x * c.x + m.z * c.y, m.y * c.x + m.w * c.y);
   let d = p / sprite.target_size * 2.0 - 1.0;
-  var out: VertexOut;
   out.position = vec4<f32>(d.x, -d.y, 0.0, 1.0);
   out.centre = centre;
   out.inv = inverse2(m);

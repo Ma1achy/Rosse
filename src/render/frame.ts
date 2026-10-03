@@ -16,7 +16,7 @@ import {
 import { CompositePass } from './composite';
 import type { InkLayer } from './layers';
 import { PLATE_UNITS } from './sample-scene';
-import { INK_FORMAT, SpriteBatch, SpritePipeline } from './sprites';
+import { INK_FORMAT, IndirectSpriteBatch, SpriteBatch, SpritePipeline } from './sprites';
 import type { Surface } from './surface';
 
 export interface FrameSize {
@@ -34,7 +34,7 @@ export class GpuRenderer {
   private readonly sprites: SpritePipeline;
   private readonly composite: CompositePass;
   private readonly atlases = new Map<AtlasName, GpuAtlas>();
-  private batches: SpriteBatch[] = [];
+  private batches: (SpriteBatch | IndirectSpriteBatch)[] = [];
 
   constructor(
     readonly device: GPUDevice,
@@ -70,12 +70,15 @@ export class GpuRenderer {
     this.batches = layers.map((l) => {
       const atlas = this.atlases.get(l.atlas);
       if (!atlas) throw new Error(`atlas ${l.atlas} not loaded`);
-      return new SpriteBatch(this.sprites, atlas, l.instances, {
+      const opts = {
         targetWidth: this.width,
         targetHeight: this.height,
         pxPerUnit: this.pxPerUnit,
         gain: l.gain,
-      });
+      };
+      return l.kind === 'gpu-sprites'
+        ? new IndirectSpriteBatch(this.sprites, atlas, l.source, opts)
+        : new SpriteBatch(this.sprites, atlas, l.instances, opts);
     });
   }
 

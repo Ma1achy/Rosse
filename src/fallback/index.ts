@@ -46,6 +46,7 @@ export class CpuRenderer {
     for (const l of this.layers) {
       const atlas = this.atlases.get(l.atlas);
       if (!atlas) throw new Error(`atlas ${l.atlas} not loaded`);
+      if (l.kind !== 'sprites') throw new Error('the CPU engine draws CPU instance lists only');
       rasteriseSprites(this.ink, atlas, l.instances, { pxPerUnit: this.pxPerUnit, gain: l.gain });
     }
   }

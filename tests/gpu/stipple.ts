@@ -1,0 +1,201 @@
+/**
+ * Stipple parity (ADR 0004 L1, ADR 0011, 0014): the stipple, projection and compaction kernels on
+ * the GPU (compute/stipple.wgsl, project.wgsl, scan.wgsl) against their CPU twins
+ * (src/fallback/kernels/), on the same scene descriptions.
+ *
+ * Per case it compares:
+ * - samples (model tier), index by index: the same class, and positions within 0.05 plate px;
+ * - projected instances (view tier), index by index: the same class after the culls, position
+ *   within 0.05 px, size within 0.1%, angle within 1e-3 rad;
+ * - per-class counts of the compacted lists: within ±0.1% (L1);
+ * - the compacted lists themselves, slot by slot, where the counts agree.
+ * L1 passes when ≥ 99.9% of instances match and every class count is within ±0.1%.
+ */
+import { presetParams } from '../../src/core/presets';
+import type { Params } from '../../src/core/params';
+import { INSTANCE_WORDS, runProject } from '../../src/fallback/kernels/project';
+import { compact } from '../../src/fallback/kernels/scan';
+import { SAMPLE_WORDS, runStipple } from '../../src/fallback/kernels/stipple';
+import { BuiltAssets } from '../../src/marks/atlas';
+import { CLASS_COUNT } from '../../src/model/classes';
+import { buildScene, drawingsMeta } from '../../src/model/scene';
+import { GpuStipple } from '../../src/render/stipple';
+import { UNIT_SCALE, cameraOf, viewDesc } from '../../src/view/camera';
+import { classCapacity } from '../../src/fallback/kernels/scan';
+import { adapterName, device, run } from './harness';
+
+const POS_TOL = 0.05;
+const SIZE_TOL = 1e-3;
+const ANGLE_TOL = 1e-3;
+
+const CASES: [string, Params][] = [
+  ...['Smooth, round', 'Cigar-shaped', 'Disc, no arms'].flatMap((n): [string, Params][] =>
+    [7, 4242].map((s) => [
+      `${n} (stipple) s${String(s)}`,
+      presetParams(n, s, { lines: 0, knots: 0, envelope: 0, starMix: 0, field: 0, fgstars: 0 }),
+    ]),
+  ),
+  ...[
+    'Grand design',
+    'Barred spiral',
+    'Flocculent',
+    'Ringed',
+    'Edge-on with dust',
+    'Lens: Einstein ring',
+    'Shell galaxy',
+  ].map((n): [string, Params] => [`${n} s7`, presetParams(n, 7)]),
+  [
+    'every branch: patchy, irregular, flocculent, dusty, ringed, barred',
+    presetParams('Grand design', 99, {
+      patchy: 0.6,
+      irr: 0.5,
+      flocc: 0.7,
+      dust: 0.5,
+      ring: 0.4,
+      bar: 0.4,
+      arms: 4,
+      incl: 70,
+      az: 40,
+    }),
+  ],
+];
+
+run('stipple kernels (GPU = CPU, L1)', async () => {
+  const { adapter, device: dev } = await device();
+  const assets = await BuiltAssets.load('/');
+  const [dots, knots, stars, cores] = await Promise.all(
+    (['dots', 'knots', 'stars', 'cores'] as const).map((n) => assets.atlas(n)),
+  );
+  if (!dots || !knots || !stars || !cores) throw new Error('atlases missing');
+  const meta = drawingsMeta({ dots, knots, stars, cores });
+  const gpu = await GpuStipple.create(dev);
+  const lines = [`adapter: ${adapterName(adapter)}`];
+  let pass = true;
+  const data: Record<string, unknown> = {};
+  let worstMatch = 1;
+  let worstCount = 0;
+  let worstPos = 0;
+
+  for (const [name, P] of CASES) {
+    const scene = buildScene(P, meta);
+    const cam = cameraOf(P);
+    gpu.setScene(scene);
+    gpu.setView(cam);
+    const gS = new Float32Array(await gpu.readSamples());
+    const gSu = new Uint32Array(gS.buffer);
+    const gP = await gpu.readProjected();
+    const gPf = new Float32Array(gP.instances);
+    const gCounts = await gpu.readCounts();
+    const gOut = await gpu.readInstances();
+
+    const cS = runStipple(scene.galaxy);
+    const n = cS.n;
+    const V = viewDesc(cam, scene.galaxy.g.dust ?? 0, n, classCapacity(n));
+    const cP = runProject(V, cS);
+    const cC = compact(cP.classes, n, cP.u32);
+
+    // samples, model tier
+    let sClassDiff = 0;
+    let sPosBad = 0;
+    let sPosMax = 0;
+    for (let i = 0; i < n; i++) {
+      const o = i * SAMPLE_WORDS;
+      if ((gSu[o + 3] ?? 0) !== (cS.u32[o + 3] ?? 0)) {
+        sClassDiff++;
+        continue;
+      }
+      const d =
+        Math.hypot(
+          (gS[o] ?? 0) - (cS.f32[o] ?? 0),
+          (gS[o + 1] ?? 0) - (cS.f32[o + 1] ?? 0),
+          (gS[o + 2] ?? 0) - (cS.f32[o + 2] ?? 0),
+        ) * UNIT_SCALE;
+      sPosMax = Math.max(sPosMax, d);
+      if (d > POS_TOL) sPosBad++;
+    }
+    // projected instances, view tier
+    let pClassDiff = 0;
+    let pBad = 0;
+    let pPosMax = 0;
+    let kept = 0;
+    for (let i = 0; i < n; i++) {
+      const gc = gP.classes[i] ?? 255;
+      const cc = cP.classes[i] ?? 255;
+      if (gc !== cc) {
+        pClassDiff++;
+        continue;
+      }
+      if (gc >= CLASS_COUNT) continue;
+      kept++;
+      const o = i * INSTANCE_WORDS;
+      const g = (k: number) => gPf[o + k] ?? 0;
+      const c = (k: number) => cP.f32[o + k] ?? 0;
+      const dpos = Math.hypot(g(0) - c(0), g(1) - c(1));
+      const gs = Math.hypot(g(4), g(5));
+      const cs = Math.hypot(c(4), c(5));
+      const dsize = cs > 0 ? Math.abs(gs - cs) / cs : 0;
+      const dang = Math.abs(
+        Math.atan2(
+          Math.sin(Math.atan2(g(5), g(4)) - Math.atan2(c(5), c(4))),
+          Math.cos(Math.atan2(g(5), g(4)) - Math.atan2(c(5), c(4))),
+        ),
+      );
+      pPosMax = Math.max(pPosMax, dpos);
+      if (dpos > POS_TOL || dsize > SIZE_TOL || dang > ANGLE_TOL) pBad++;
+    }
+    const match = kept ? (kept - pBad) / (kept + pClassDiff) : 1;
+    // counts and compacted lists
+    let countWorst = 0;
+    let slotsBad = 0;
+    let slots = 0;
+    const gOutF = new Float32Array(gOut.out);
+    const cOutF = new Float32Array(cC.out.buffer);
+    for (let c = 0; c < CLASS_COUNT; c++) {
+      const gk = gCounts.perClass[c] ?? 0;
+      const ck = cC.counts[c] ?? 0;
+      const rel = ck ? Math.abs(gk - ck) / ck : gk ? 1 : 0;
+      countWorst = Math.max(countWorst, rel);
+      if (gk !== ck) continue;
+      for (let j = 0; j < ck; j++) {
+        const og = (c * gOut.cap + j) * INSTANCE_WORDS;
+        const oc = (c * cC.cap + j) * INSTANCE_WORDS;
+        slots++;
+        const d = Math.hypot(
+          (gOutF[og] ?? 0) - (cOutF[oc] ?? 0),
+          (gOutF[og + 1] ?? 0) - (cOutF[oc + 1] ?? 0),
+        );
+        if (d > POS_TOL) slotsBad++;
+      }
+    }
+    const ok = match >= 0.999 && countWorst <= 0.001;
+    if (!ok) pass = false;
+    worstMatch = Math.min(worstMatch, match);
+    worstCount = Math.max(worstCount, countWorst);
+    worstPos = Math.max(worstPos, pPosMax);
+    lines.push(
+      `${ok ? 'ok  ' : 'FAIL'} ${name}: n ${String(n)}; samples: ${String(sClassDiff)} class differences, max |Δp| ${sPosMax.toExponential(2)} px; ` +
+        `instances: ${String(pClassDiff)} class differences, ${(100 * match).toFixed(3)}% within tolerance, max |Δp| ${pPosMax.toExponential(2)} px; ` +
+        `counts GPU [${Array.from(gCounts.perClass).join(', ')}] CPU [${Array.from(cC.counts).join(', ')}] (worst ${(100 * countWorst).toFixed(3)}%); ` +
+        `compacted slots ${String(slots - slotsBad)}/${String(slots)} match`,
+    );
+    data[name] = {
+      n,
+      sampleClassDiff: sClassDiff,
+      samplePosMax: sPosMax,
+      samplePosOver: sPosBad,
+      instanceClassDiff: pClassDiff,
+      instanceMatch: match,
+      instancePosMax: pPosMax,
+      countsGpu: Array.from(gCounts.perClass),
+      countsCpu: Array.from(cC.counts),
+      countWorst,
+      slots,
+      slotsBad,
+    };
+  }
+  lines.push(
+    `worst: ${(100 * worstMatch).toFixed(3)}% instances within tolerance (≥ 99.9%), count difference ${(100 * worstCount).toFixed(3)}% (≤ 0.1%), max |Δp| ${worstPos.toExponential(2)} px`,
+  );
+  gpu.destroy();
+  return { pass, lines, data: { cases: data, worstMatch, worstCount, worstPos } };
+});

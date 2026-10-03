@@ -6,6 +6,9 @@ import { INSTANCE_LAYOUT, packInstances, type StructLayout } from '../../src/mar
 import { packStruct } from '../../src/gpu/buffers';
 import { SPRITE_UNIFORMS_LAYOUT } from '../../src/render/sprites';
 import { COMPOSITE_UNIFORMS_LAYOUT } from '../../src/render/composite';
+import { GALAXY_LAYOUT } from '../../src/model/galaxy';
+import { VIEW_LAYOUT } from '../../src/view/camera';
+import { SAMPLE_LAYOUT } from '../../src/fallback/kernels/stipple';
 
 /**
  * Struct layouts are written twice, in WGSL and in TypeScript (ADR 0002). These tests parse the
@@ -54,6 +57,24 @@ describe('struct layouts (WGSL = TS)', () => {
     checkLayout('render/composite.wgsl', COMPOSITE_UNIFORMS_LAYOUT);
   });
 
+  it('Galaxy (the stipple model description)', () => {
+    checkLayout('compute/stipple.wgsl', GALAXY_LAYOUT);
+  });
+
+  it('Sample (the model tier output), in the writer and the reader', () => {
+    checkLayout('compute/stipple.wgsl', SAMPLE_LAYOUT);
+    checkLayout('compute/project.wgsl', SAMPLE_LAYOUT);
+  });
+
+  it('View (the camera of the view tier)', () => {
+    checkLayout('compute/project.wgsl', VIEW_LAYOUT);
+  });
+
+  it('the stipple passes write the Instance the sprite shader reads', () => {
+    checkLayout('compute/project.wgsl', INSTANCE_LAYOUT);
+    checkLayout('compute/scan.wgsl', INSTANCE_LAYOUT);
+  });
+
   it('packs uniform structs by layout', () => {
     const b = packStruct(SPRITE_UNIFORMS_LAYOUT, {
       ink: [1, 1, 1, 1],
@@ -64,6 +85,7 @@ describe('struct layouts (WGSL = TS)', () => {
       cell: 32,
       max_lod: 5,
       layer_base: 256,
+      layer_count: 256,
     });
     expect(new Float32Array(b)[10]).toBe(32);
     expect(new Uint32Array(b)[12]).toBe(256);
