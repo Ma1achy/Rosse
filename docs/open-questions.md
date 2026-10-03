@@ -105,17 +105,33 @@ Options:
 
 docs/architecture.md proposes 60 fps orbit (< 4 ms GPU) on the reference machines, < 30 ms to first frame on a parameter change, and < 100 ms per frame for the CPU engine. Confirm, or change the targets.
 
-### Q11. Git LFS for the existing asset pack
+### Q11. Git LFS
 
-The pack (~108 MB) is in ordinary Git history. New binaries (goldens, spike screenshots) go to LFS.
+The plan was to put new binaries (goldens, spike screenshots) in Git LFS. **LFS uploads are refused from the environment this project is built in** (`POST …/verify: Forbidden` from the LFS endpoint), so the 186 golden captures (68 MB) and the spike screenshots are committed as ordinary blobs, like the asset pack (~108 MB).
+- (a) Leave everything as ordinary blobs.
+- (b) Enable LFS from a machine where it works, migrating `tests/golden/` and `spikes/` in one commit.
+- (c) Later, `git lfs migrate import` across history, with a force-push of `main`, to shrink clones.
 
-- (a) Leave the history alone.
-- (b) Later, `git lfs migrate import` with a force-push of `main`, to shrink clones.
-
-**Recommendation:** (a) until clone size bothers anyone. Rewriting `main` breaks every existing clone.
+**Recommendation:** (a) for now. The repository is about 180 MB, which is fine for GitHub. Revisit with (b) if goldens are re-captured often.
 
 ### Q12. Should the new engine also reproduce v21's known oddities?
 
 These are the reference-notes "flagged" items: atlas mip bleed, the dead overlay-trail branch (trails are placed in screen space, not the scene), and `sin`-hash noise.
 
 **Recommendation:** fix all three as listed in docs/architecture.md, "Deliberate divergences". One question remains: should an overlay satellite trail stay fixed on the image (as v21 does in effect, and its comment says it intends: "a satellite near Earth doesn't turn with the galaxy") or move with the scene? **Recommendation:** keep it fixed on the image, as v21 does.
+
+### Q13. v21 bugs whose effects are visible: reproduce them or fix them?
+
+The reference notes (section 20) found bugs that change what v21 draws, so they are baked into the golden images:
+- **`RMAX` is declared twice**, as 4.2 at L121 and 240 at L857. At run time it is 240, so the disc, halo, Sérsic and shell truncations never fire, and stars reach about 20 units out.
+- **Vector marks ignore instance alpha** (L1212–1218). The ring meant to be drawn at 0.55 is drawn at full strength.
+- **A cluster's deep field is sheared twice** (L902, then L1273).
+- **The edge-on midplane stroke's alpha** uses `incl`, not `incE()` (L788), so it can exceed 1 above 90°.
+- **Sérsic hosts and shells ignore the camera** (L223–233, L741–760).
+
+The options:
+- (a) Reproduce the visible behaviour (parity with the goldens).
+- (b) Fix them all, and re-capture or adjust the affected goldens.
+- (c) Decide each one.
+
+**Recommendation:** (a) for M2–M9, so parity tests stay meaningful; each reproduced bug is marked in code with `// v21 parity: …` and a link to the notes. Then (c) as a pass after M9, each fix in its own pull request with a render diff. The `RMAX` truncation in particular changes the look of every galaxy (fainter, wider haloes), so it is your call rather than ours.

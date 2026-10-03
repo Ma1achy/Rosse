@@ -1,8 +1,8 @@
 # Normalise text files to LF.
 * text=auto eol=lf
 
-# Binaries are committed as ordinary blobs (Git LFS is not used): keep new ones small,
-# screenshots as JPEG where possible.
+# Binaries are ordinary Git blobs. Git LFS was planned for goldens and screenshots, but LFS
+# uploads are refused from the environment this project is built in; see docs/open-questions.md Q11.
 
 # Binary types: never diff or normalise.
 *.png binary
