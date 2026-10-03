@@ -44,3 +44,8 @@ coverage/
 *.zip
 *.tar
 *.tar.gz
+# Rosse: generated output
+tests/golden/actual/
+tests/golden/diff/
+test-results/
+playwright-report/

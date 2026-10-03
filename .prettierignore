@@ -1,0 +1,9 @@
+assets/
+node_modules/
+dist/
+coverage/
+package-lock.json
+tests/golden/reference/
+docs/data/
+spikes/
+*.md
