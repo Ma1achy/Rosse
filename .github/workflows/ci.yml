@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        # LFS objects are not needed for these checks.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - name: Cache naga
+        id: naga
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/naga
+          key: naga-cli-30.0.1-${{ runner.os }}
+      - name: Install naga
+        if: steps.naga.outputs.cache-hit != 'true'
+        run: cargo install naga-cli --version 30.0.1 --locked
+      - run: npm run validate:wgsl
+      - run: npm run build
