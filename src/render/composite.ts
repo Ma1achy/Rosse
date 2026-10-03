@@ -12,23 +12,59 @@ import { texelPerPx, type Surface } from './surface';
 /** The `Composite` uniform of composite.wgsl. */
 export const COMPOSITE_UNIFORMS_LAYOUT: StructLayout = {
   name: 'Composite',
-  size: 48,
+  size: 112,
   align: 16,
   fields: [
     { name: 'field', type: 'vec4<f32>', offset: 0, size: 16 },
     { name: 'ink', type: 'vec4<f32>', offset: 16, size: 16 },
-    { name: 'paper_size', type: 'vec2<f32>', offset: 32, size: 8 },
-    { name: 'texel_per_px', type: 'f32', offset: 40, size: 4 },
-    { name: 'blend_mode', type: 'u32', offset: 44, size: 4 },
+    { name: 'shadow0', type: 'vec4<f32>', offset: 32, size: 16 },
+    { name: 'shadow1', type: 'vec4<f32>', offset: 48, size: 16 },
+    { name: 'shadow_geom', type: 'vec4<f32>', offset: 64, size: 16 },
+    { name: 'paper_size', type: 'vec2<f32>', offset: 80, size: 8 },
+    { name: 'texel_per_px', type: 'f32', offset: 88, size: 4 },
+    { name: 'blend_mode', type: 'u32', offset: 92, size: 4 },
+    { name: 'plate_css', type: 'f32', offset: 96, size: 4 },
+    { name: 'dpr', type: 'f32', offset: 100, size: 4 },
   ],
 };
+
+/** The uniform values for a surface at a plate size and DPR. */
+export function compositeUniforms(
+  surface: Surface,
+  paper: { width: number; height: number },
+  plateCss: number,
+  dpr: number,
+): ArrayBuffer {
+  if (surface.shadows.length > 2) throw new Error('at most two inset shadows');
+  const [s0, s1] = surface.shadows;
+  return packStruct(COMPOSITE_UNIFORMS_LAYOUT, {
+    field: [...surface.field, 1],
+    ink: [...surface.palette.ink, 1],
+    shadow0: s0 ? s0.rgba : [0, 0, 0, 0],
+    shadow1: s1 ? s1.rgba : [0, 0, 0, 0],
+    shadow_geom: [s0?.spread ?? 0, (s0?.blur ?? 0) / 2, s1?.spread ?? 0, (s1?.blur ?? 0) / 2],
+    paper_size: [paper.width, paper.height],
+    texel_per_px: texelPerPx(paper.width, dpr),
+    blend_mode: surface.blend === 'multiply' ? 0 : 1,
+    plate_css: plateCss,
+    dpr,
+  });
+}
 
 export class CompositePass {
   private readonly pipelines = new Map<GPUTextureFormat, GPURenderPipeline>();
   private readonly layout: GPUBindGroupLayout;
   private readonly module: GPUShaderModule;
   private readonly paperTexture: GPUTexture;
-  private readonly uniforms: GPUBuffer;
+  /**
+   * One uniform buffer per (surface, plate size, DPR), written once, so two composites recorded
+   * into one submit never share a buffer; and one bind group per ink view.
+   */
+  private readonly bindings = new Map<
+    string,
+    { uniforms: GPUBuffer; groups: WeakMap<GPUTextureView, GPUBindGroup> }
+  >();
+  private readonly paperView: GPUTextureView;
 
   constructor(
     readonly device: GPUDevice,
@@ -63,11 +99,7 @@ export class CompositePass {
       { bytesPerRow: paper.width * 4 },
       [paper.width, paper.height],
     );
-    this.uniforms = device.createBuffer({
-      label: 'composite uniforms',
-      size: COMPOSITE_UNIFORMS_LAYOUT.size,
-      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-    });
+    this.paperView = this.paperTexture.createView();
   }
 
   private pipeline(format: GPUTextureFormat): GPURenderPipeline {
@@ -92,27 +124,34 @@ export class CompositePass {
     output: GPUTextureView,
     outputFormat: GPUTextureFormat,
     surface: Surface,
+    plateCss: number,
     dpr: number,
   ): void {
-    this.device.queue.writeBuffer(
-      this.uniforms,
-      0,
-      packStruct(COMPOSITE_UNIFORMS_LAYOUT, {
-        field: [...surface.field, 1],
-        ink: [...surface.palette.ink, 1],
-        paper_size: [this.paper.width, this.paper.height],
-        texel_per_px: texelPerPx(this.paper.width, dpr),
-        blend_mode: surface.blend === 'overlay' ? 0 : 1,
-      }),
-    );
-    const bindGroup = this.device.createBindGroup({
-      layout: this.layout,
-      entries: [
-        { binding: 0, resource: { buffer: this.uniforms } },
-        { binding: 1, resource: ink },
-        { binding: 2, resource: this.paperTexture.createView() },
-      ],
-    });
+    const key = `${surface.name}|${String(plateCss)}|${String(dpr)}`;
+    let entry = this.bindings.get(key);
+    if (!entry) {
+      const data = compositeUniforms(surface, this.paper, plateCss, dpr);
+      const uniforms = this.device.createBuffer({
+        label: `composite uniforms ${key}`,
+        size: data.byteLength,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      });
+      this.device.queue.writeBuffer(uniforms, 0, data);
+      entry = { uniforms, groups: new WeakMap() };
+      this.bindings.set(key, entry);
+    }
+    let bindGroup = entry.groups.get(ink);
+    if (!bindGroup) {
+      bindGroup = this.device.createBindGroup({
+        layout: this.layout,
+        entries: [
+          { binding: 0, resource: { buffer: entry.uniforms } },
+          { binding: 1, resource: ink },
+          { binding: 2, resource: this.paperView },
+        ],
+      });
+      entry.groups.set(ink, bindGroup);
+    }
     const pass = encoder.beginRenderPass({
       label: 'composite',
       colorAttachments: [
@@ -127,6 +166,9 @@ export class CompositePass {
 
   destroy(): void {
     this.paperTexture.destroy();
-    this.uniforms.destroy();
+    this.bindings.forEach((b) => {
+      b.uniforms.destroy();
+    });
+    this.bindings.clear();
   }
 }

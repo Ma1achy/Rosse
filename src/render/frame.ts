@@ -31,6 +31,7 @@ export class GpuRenderer {
   readonly height: number;
   readonly pxPerUnit: number;
   readonly ink: GPUTexture;
+  private readonly inkView: GPUTextureView;
   private readonly sprites: SpritePipeline;
   private readonly composite: CompositePass;
   private readonly atlases = new Map<AtlasName, GpuAtlas>();
@@ -53,6 +54,7 @@ export class GpuRenderer {
         GPUTextureUsage.TEXTURE_BINDING |
         GPUTextureUsage.COPY_SRC,
     });
+    this.inkView = this.ink.createView();
     this.sprites = new SpritePipeline(device);
     this.composite = new CompositePass(device, paper);
   }
@@ -86,7 +88,7 @@ export class GpuRenderer {
       label: 'ink',
       colorAttachments: [
         {
-          view: this.ink.createView(),
+          view: this.inkView,
           loadOp: 'clear',
           storeOp: 'store',
           clearValue: [0, 0, 0, 0],
@@ -101,7 +103,15 @@ export class GpuRenderer {
   /** Present tier: the ink target over `surface` into `output`. */
   present(output: GPUTextureView, format: GPUTextureFormat, surface: Surface): void {
     const encoder = this.device.createCommandEncoder({ label: 'present' });
-    this.composite.encode(encoder, this.ink.createView(), output, format, surface, this.size.dpr);
+    this.composite.encode(
+      encoder,
+      this.inkView,
+      output,
+      format,
+      surface,
+      this.size.plateCss,
+      this.size.dpr,
+    );
     this.device.queue.submit([encoder.finish()]);
   }
 

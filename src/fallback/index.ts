@@ -52,7 +52,11 @@ export class CpuRenderer {
 
   /** The ink over `surface`, as RGBA8 bytes (width × height × 4). */
   present(surface: Surface, out = new Uint8ClampedArray(this.width * this.height * 4)) {
-    composite(this.ink, { surface, paper: this.paper, dpr: this.size.dpr }, out);
+    composite(
+      this.ink,
+      { surface, paper: this.paper, dpr: this.size.dpr, plateCss: this.size.plateCss },
+      out,
+    );
     return out;
   }
 }
