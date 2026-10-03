@@ -33,10 +33,11 @@ fn rand_f32(seed: u32, stream: u32, index: u32, draw: u32) -> f32 {
 }
 
 // A standard normal from draws `draw` and `draw + 1` (Box-Muller, cosine branch). Uses log, sqrt
-// and cos, so it matches the CPU within a tolerance, not bit for bit.
+// and cos, so it matches the CPU within a tolerance, not bit for bit. cos(2 pi u2) is computed as
+// -cos(2 pi u2 - pi), so the argument stays in [-pi, pi), where WGSL bounds cos's error.
 fn rand_gauss(seed: u32, stream: u32, index: u32, draw: u32) -> f32 {
   let u1 = rand_f32(seed, stream, index, draw);
   let u2 = rand_f32(seed, stream, index, draw + 1u);
   let r = sqrt(-2.0 * log(1.0 - u1));
-  return r * cos(6.2831853071795864 * u2);
+  return r * -cos(6.2831853071795864 * u2 - 3.1415926535897932);
 }

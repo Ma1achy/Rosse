@@ -14,7 +14,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:gpu": "node tools/gpu-test/run.mjs",
-    "vectors": "ROSSE_WRITE_VECTORS=1 vitest run tests/unit/rng.test.ts",
+    "vectors": "node tools/rng-vectors.mjs",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",

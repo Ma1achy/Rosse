@@ -65,16 +65,19 @@ export function randF32(seed: number, stream: number, index: number, draw: numbe
 
 /** 2π in f32. */
 const TWO_PI = f(2 * Math.PI);
+/** π in f32. */
+const PI = f(Math.PI);
 
 /**
  * A standard normal f32 from draws `draw` and `draw + 1` (Box–Muller, cosine branch).
- * `1 - u1` lies in (0, 1], so the logarithm is finite.
+ * `1 - u1` lies in (0, 1], so the logarithm is finite. cos(2π u2) is computed as
+ * −cos(2π u2 − π), so the argument stays in [−π, π), where WGSL bounds `cos`'s error.
  */
 export function randGauss(seed: number, stream: number, index: number, draw: number): number {
   const u1 = randF32(seed, stream, index, draw);
   const u2 = randF32(seed, stream, index, (draw + 1) >>> 0);
   const r = f(Math.sqrt(f(f(-2) * f(Math.log(f(1 - u1))))));
-  return f(r * f(Math.cos(f(TWO_PI * u2))));
+  return f(r * f(-Math.cos(f(f(TWO_PI * u2) - PI))));
 }
 
 /**
