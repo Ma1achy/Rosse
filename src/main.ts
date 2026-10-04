@@ -17,8 +17,8 @@
  * preset's; the seed keeps them; the zoom is kept, as in v21.
  *
  * URL parameters: `preset`, `seed`, `variant=stipple` (the M2 golden overrides: no lines, knots,
- * envelope, drawn stars, deep field or foreground stars), `zoom`, `backend=cpu|webgpu`,
- * `present=copy`.
+ * envelope, drawn stars, deep field or foreground stars), `az`, `incl`, `pa`, `zoom`,
+ * `backend=cpu|webgpu`, `present=copy`.
  */
 import type { Params } from './core/params';
 import { PRESET_NAMES, presetParams } from './core/presets';
@@ -36,7 +36,7 @@ import { PLATE_UNITS } from './render/sample-scene';
 import { GpuStipple } from './render/stipple';
 import { SURFACES, type SurfaceName } from './render/surface';
 import { attachOrbit, type OrbitState } from './ui/orbit';
-import { cameraOf, clampZoom } from './view/camera';
+import { cameraOf, clampZoom, wrapDeg } from './view/camera';
 
 declare global {
   interface Window {
@@ -361,6 +361,12 @@ async function start(): Promise<void> {
   let engine: Engine | undefined;
   /** the parameters and zoom wanted, and the engine, parameters and zoom last drawn */
   let wantedP = params0();
+  // the camera from the URL, if given (az, incl, pa in degrees, as the orbit control sets them)
+  for (const k of ['az', 'incl', 'pa'] as const) {
+    const v = Number(params.get(k) ?? NaN);
+    if (Number.isFinite(v))
+      wantedP = { ...wantedP, [k]: k === 'incl' ? Math.min(180, Math.max(0, v)) : wrapDeg(v) };
+  }
   let drawnBy: Engine | null = null;
   let drawnP: Params | null = null;
   let drawnZoom = zoom;

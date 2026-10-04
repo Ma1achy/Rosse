@@ -1,22 +1,42 @@
 // @ts-check
 /**
- * `node tools/gpu-test/side-by-side.mjs [out dir]`: the new engine (WebGPU on SwiftShader, the
- * page with `?present=copy`) beside v21's capture of the same case (tests/golden/reference/
- * <name>.plate.jpg), as small JPEGs for the milestone notes. Default: docs/milestones/m2.
+ * `node tools/gpu-test/side-by-side.mjs [out dir] [--set m2|m3]`: the new engine (WebGPU on
+ * SwiftShader, the page with `?present=copy`) beside v21's capture of the same case
+ * (tests/golden/reference/<name>.plate.jpg), as small JPEGs for the milestone notes. The page is
+ * given the capture's camera (az, incl, pa) and zoom. Default: the m2 set, in docs/milestones/m2.
  */
 import { mkdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { ROOT, launch, prepareAssets, startServer } from './browser.mjs';
 
-const outDir = resolve(ROOT, process.argv[2] ?? 'docs/milestones/m2');
+const args = process.argv.slice(2);
+const setArg = args.indexOf('--set');
+const set = setArg >= 0 ? (args[setArg + 1] ?? 'm2') : 'm2';
+const positional = args.filter((a, i) => !a.startsWith('--') && args[i - 1] !== '--set');
+const outDir = resolve(ROOT, positional[0] ?? `docs/milestones/${set}`);
 mkdirSync(outDir, { recursive: true });
 
 /** [file stem, reference capture, preset, seed, page variant] */
-const CASES = [
-  ['smooth-round-s7', 'smooth-round--stipple__s7__home', 'Smooth, round', 7, 'stipple'],
-  ['cigar-shaped-s4242', 'cigar-shaped--stipple__s4242__home', 'Cigar-shaped', 4242, 'stipple'],
-  ['disc-no-arms-s7', 'disc-no-arms--stipple__s7__home', 'Disc, no arms', 7, 'stipple'],
-];
+const SETS = {
+  m2: [
+    ['smooth-round-s7', 'smooth-round--stipple__s7__home', 'Smooth, round', 7, 'stipple'],
+    ['cigar-shaped-s4242', 'cigar-shaped--stipple__s4242__home', 'Cigar-shaped', 4242, 'stipple'],
+    ['disc-no-arms-s7', 'disc-no-arms--stipple__s7__home', 'Disc, no arms', 7, 'stipple'],
+  ],
+  m3: [
+    ['smooth-round-s7-zoom', 'smooth-round--stipple__s7__zoom', 'Smooth, round', 7, 'stipple'],
+    [
+      'disc-no-arms-s4242-zoom',
+      'disc-no-arms--stipple__s4242__zoom',
+      'Disc, no arms',
+      4242,
+      'stipple',
+    ],
+    ['cigar-shaped-s7-orbit', 'cigar-shaped--stipple__s7__orbit', 'Cigar-shaped', 7, 'stipple'],
+  ],
+};
+const CASES = SETS[/** @type {'m2' | 'm3'} */ (set)];
+if (!CASES) throw new Error(`unknown set ${set}`);
 
 prepareAssets();
 const server = await startServer();
@@ -27,10 +47,17 @@ try {
       deviceScaleFactor: 1,
       viewport: { width: 900, height: 1000 },
     });
+    const rec = JSON.parse(
+      readFileSync(join(ROOT, 'tests/golden/reference', `${String(ref)}.json`), 'utf8'),
+    );
     const q = new URLSearchParams({
       preset: String(preset),
       seed: String(seed),
       variant: String(variant),
+      az: String(rec.params.az ?? 0),
+      incl: String(rec.params.incl),
+      pa: String(rec.params.pa),
+      zoom: String(rec.zoom ?? 1),
       backend: 'webgpu',
       present: 'copy',
     });
