@@ -1,11 +1,12 @@
 {
-  "name": "smooth-round--stipple__s4242__orbit",
-  "preset": "Smooth, round",
+  "name": "radio-jet--stipple__s4242__orbit",
+  "preset": "Radio jet",
   "seed": 4242,
   "camera": "orbit",
   "surface": "paper",
   "variant": "stipple",
   "overrides": {
+    "jet": 0,
     "lines": 0,
     "knots": 0,
     "envelope": 0,
@@ -29,7 +30,7 @@
     "stars": 0,
     "curves": 0,
     "used": 1,
-    "ms": 6
+    "ms": 11
   },
   "hand": [
     44,
@@ -62,8 +63,8 @@
     "seed": 4242,
     "stars": 9500,
     "bulge": 1,
-    "bulgeSize": 0.9,
-    "bulgeFlat": 0.95,
+    "bulgeSize": 0.5,
+    "bulgeFlat": 0.9,
     "thick": 0.08,
     "arms": 0,
     "pitch": 18,
@@ -74,11 +75,11 @@
     "barLen": 0.45,
     "ring": 0,
     "ringR": 1.6,
-    "halo": 0.25,
+    "halo": 0.15,
     "dust": 0,
     "knots": 0,
     "sparkle": 0,
-    "incl": 30,
+    "incl": 108,
     "pa": 20,
     "winding": 1,
     "lines": 0,
@@ -146,8 +147,8 @@
     "lensSource": "galaxy",
     "jet": 0,
     "mWarp": 1,
-    "sersicN": 0,
-    "re": 0.9,
+    "sersicN": 4,
+    "re": 0.7,
     "patchy": 0,
     "ringOnlyLines": 0,
     "irr": 0,
@@ -170,5 +171,5 @@
     "shellStars": 6000
   },
   "pageErrors": [],
-  "inkPixelSha256": "20ff70686aa126d6155498fadac5deabc1c8c24d683c89c9cbfbee456c4b8f9f"
+  "inkPixelSha256": "fd54791363760f2fbbfba79fa2ac8136829f5425e265ff6f4df97571e6e559b9"
 }
