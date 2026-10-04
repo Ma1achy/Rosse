@@ -1,30 +1,35 @@
 // @ts-check
 /**
- * Golden comparison entry point (`npm run golden`), the metric of
- * docs/adr/0013-golden-image-metric.md (see ../README.md).
+ * Golden comparison entry point (`npm run golden`): the metric of
+ * docs/adr/0013-golden-image-metric.md as calibrated in docs/adr/0015-golden-metric-as-calibrated-in-m2.md
+ * (see ../README.md).
  *
  * 1. Checks that the reference captures in tests/golden/reference/ are complete and match their
  *    manifest (every ink image present, pixel hashes identical, no page errors).
  * 2. Renders every required case with the new engine, twice over: WebGPU on SwiftShader in
  *    Chromium (./render-gpu.ts, through tests/golden/render.html) and the CPU engine in Node
- *    (./engine-cpu.ts). The required cases are the captures with a `variant` (M2: the
- *    stipple-only captures of tests/golden/extra-cases.json); later milestones add theirs.
+ *    (./engine-cpu.ts). The required cases are the captures with a `variant`
+ *    (tests/golden/extra-cases.json). The engine draws v21's own variation (the hand, arms,
+ *    spurs, clumps, dust patches, lopsidedness, warp), replayed offline from v21's stream
+ *    (./v21.ts), so that only the dots differ; the result with the engine's own variation is
+ *    printed for information.
  * 3. For each case:
- *    - parity (L2): WebGPU against v21, and the CPU engine against v21, tests (a)–(d) at the
- *      family's parity thresholds (../thresholds.json);
- *    - strict (L1): the CPU engine against WebGPU, (a)–(d) at the strict thresholds;
+ *    - parity (L2): WebGPU against v21, and the CPU engine against v21, at the family's parity
+ *      thresholds (../thresholds.json): ink, coarse density SSIM, stroke widths, counts, and the
+ *      moment and extent test; the σ = 4 px density SSIM is reported, not gated (ADR 0015);
+ *    - strict (L1): the CPU engine against WebGPU at the strict thresholds;
  *    - L0: WebGPU rendered twice is bit-identical; (e) against the engine's own goldens
  *      (../engine-hashes.json) when they exist.
- *    The engine draws with the reference's hand (its dot pool, recorded at capture), so ink and
- *    pen weight compare the same pen; the result with the engine's own hand is printed too.
- * 4. Writes test-results/golden.json, and tests/golden/diff/<name>.html for each failing case
+ * 4. Count gates on full presets: the drawn-star count of the full captures of the acceptance
+ *    presets (v21's `STATS.rstars` does not depend on its breathing room), CPU engine.
+ * 5. Writes test-results/golden.json, and tests/golden/diff/<name>.html for each failing case
  *    (every case with --report-all).
  *
  * Options:
  *   --all             also compare every preset capture (informational: never fails the run)
- *   --calibrate       measure "same galaxy, other dots" pairs and write ../thresholds.json and
- *                     ../calibration.json (ADR 0013); needs tests/golden/actual/reroll/ from
- *                     `npm run capture:reference -- --reroll` for the v21 source
+ *   --calibrate       measure "same galaxy, other dots" pairs and the negative controls, and write
+ *                     ../thresholds.json and ../calibration.json; needs tests/golden/actual/reroll/
+ *                     from `npm run capture:reference -- --reroll` for the v21 source
  *   --no-gpu          the CPU engine only (no browser)
  *   --only a,b        only the cases whose name contains one of these (for working on a few; the
  *                     run then checks fewer than the required set)
@@ -33,18 +38,29 @@
  */
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { spawn } from 'node:child_process';
 import { join, resolve } from 'node:path';
 import { PNG } from 'pngjs';
 import { ROOT, launch, prepareAssets, startServer } from '../../../tools/gpu-test/browser.mjs';
 
 const args = process.argv.slice(2);
 const flag = (/** @type {string} */ f) => args.includes(f);
+const opt = (/** @type {string} */ k) => {
+  const i = args.indexOf(k);
+  return i >= 0 ? args[i + 1] : undefined;
+};
 const dir = resolve(import.meta.dirname, '../reference');
 const manifestPath = join(dir, 'manifest.json');
 if (!existsSync(manifestPath)) {
   console.error('No tests/golden/reference/manifest.json: run `npm run capture:reference` first.');
   process.exit(1);
 }
+
+/** The position angle is gated only where the reference's axis ratio is below this. */
+const PA_BELOW_Q = 0.8;
+
+/** Presets whose full captures carry the drawn-star count gate. */
+const RSTAR_GATE = ['Smooth, round', 'Cigar-shaped', 'Disc, no arms'];
 
 // 1. integrity of the reference captures
 const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
@@ -73,28 +89,18 @@ prepareAssets();
 const server = await startServer();
 /** @type {any} */
 let browser = null;
-let failed = 0;
+let failed;
 try {
-  const vite = server.vite;
   /** @type {typeof import('./node.ts')} */
-  const G = await vite.ssrLoadModule('/tests/golden/compare/node.ts');
+  const G = await server.vite.ssrLoadModule('/tests/golden/compare/node.ts');
   const node = new G.GoldenNode(ROOT);
-
-  if (flag('--calibrate')) {
-    await calibrate(G, node);
-  } else {
-    failed = await compareAll(G, node);
-  }
+  failed = flag('--calibrate') ? (await calibrate(G, node), 0) : await compareAll(G, node);
 } finally {
   if (browser) await browser.close();
   await server.close();
 }
 process.exit(failed ? 1 : 0);
 
-/**
- * @param {typeof import('./node.ts')} G
- * @param {import('./node.ts').GoldenNode} node
- */
 async function gpuPage() {
   browser = await launch();
   const page = await browser.newPage();
@@ -111,6 +117,14 @@ async function gpuPage() {
   const err = await page.evaluate(() => window.__goldenError);
   if (err) throw new Error(`golden render page: ${err}`);
   return { page, errors, adapter: await page.evaluate(() => window.__golden?.adapter) };
+}
+
+function pct(/** @type {number} */ x) {
+  return `${(100 * x).toFixed(1)}%`.padStart(7);
+}
+/** One line of numbers for a comparison. */
+function line(/** @type {any} */ c) {
+  return `${pct(c.inkRel)} ${c.ssim.toFixed(3).padStart(6)} ${c.ssimCoarse.toFixed(3).padStart(6)} ${pct(c.medianRel)} ${pct(c.p90Rel)} ${pct(c.r50Rel)} ${pct(c.r90Rel)} ${pct(c.outerDiff)} ${c.qDiff.toFixed(3).padStart(7)} ${c.paDiff.toFixed(1).padStart(6)}`;
 }
 
 /**
@@ -139,20 +153,16 @@ async function compareAll(G, node) {
   /** @type {any[]} */
   const results = [];
   let fails = 0;
-  const pct = (/** @type {number} */ x) => `${(100 * x).toFixed(1)}%`.padStart(7);
   console.log(
-    `\n${'case'.padEnd(40)} ${'engine'.padEnd(9)} ${'ink'.padStart(7)} ${'ssim'.padStart(6)} ${'coarse'.padStart(6)} ${'median'.padStart(7)} ${'p90'.padStart(7)}  counts (dots, knots, stars, rstars)  result`,
+    `\n${'case'.padEnd(44)} ${'engine'.padEnd(9)} ${'ink'.padStart(7)} ${'(b)'.padStart(6)} ${"(b')".padStart(6)} ${'median'.padStart(7)} ${'p90'.padStart(7)} ${'r50'.padStart(7)} ${'r90'.padStart(7)} ${'outer'.padStart(7)} ${'Δq'.padStart(7)} ${'Δpa°'.padStart(6)}  counts (dots knots stars rstars)  result`,
   );
   for (const c of [...required, ...informational]) {
     const isRequired = !!c.variant;
     const rec = node.record(c.name);
-    // the reference's hand, and from M4 (the 'ribbons' cases) the reference's variation and stroke
-    // choices: the arms' phases, spurs, clumps and strokes are discrete random choices, like the
-    // hand (reference-variation.ts)
-    const opts = {
-      ...(rec.hand?.length ? { hand: rec.hand } : {}),
-      ...(G.usesReferenceVariation(c.variant) ? node.referenceChoices(rec.params) : {}),
-    };
+    // v21's own variation (ADR 0015) and, from M4, v21's own stroke choices (v21-curves.ts):
+    // both engines draw the same galaxy with the same pens and strokes, and only the dots differ
+    const variation = node.v21Variation(rec.params);
+    const opts = { variation, curvePicks: node.v21CurvePicks(rec.params, variation) };
     const ref = node.reference(c.name);
     const refM = G.measure(ref);
     const refCounts = G.countsOf(rec.stats);
@@ -167,22 +177,19 @@ async function compareAll(G, node) {
     /** @type {{ engine: string, alpha: any, measures: any, counts: any }[]} */
     const engines = [{ engine: 'cpu', alpha: cpu.alpha, measures: cpuM, counts: cpu.counts }];
     if (gpu) {
+      const render = () =>
+        gpu.page.evaluate(({ P, o, z }) => window.__golden?.render(P, o, z), {
+          P: rec.params,
+          o: opts,
+          z: zoom,
+        });
       /** @type {any} */
-      const r1 = await gpu.page.evaluate(({ P, o, z }) => window.__golden?.render(P, o, z), {
-        P: rec.params,
-        o: opts,
-        z: zoom,
-      });
+      const r1 = await render();
       /** @type {any} */
-      const r2 = await gpu.page.evaluate(({ P, o, z }) => window.__golden?.render(P, o, z), {
-        P: rec.params,
-        o: opts,
-        z: zoom,
-      });
+      const r2 = await render();
       const a1 = G.alphaFromBase64(r1.alpha, r1.width, r1.height);
       const h1 = G.alphaHash(a1);
-      const h2 = G.alphaHash(G.alphaFromBase64(r2.alpha, r2.width, r2.height));
-      row.l0 = h1 === h2;
+      row.l0 = h1 === G.alphaHash(G.alphaFromBase64(r2.alpha, r2.width, r2.height));
       row.gpuHash = h1;
       newHashes[c.name] = h1;
       if (engineHashes[c.name]) row.e = engineHashes[c.name] === h1;
@@ -205,7 +212,7 @@ async function compareAll(G, node) {
         .map((k) => `${ev.counts[k]?.render}/${ev.counts[k]?.ref}`)
         .join(' ');
       console.log(
-        `${c.name.padEnd(40)} ${e.engine.padEnd(9)} ${pct(cmp.inkRel)} ${cmp.ssim.toFixed(3).padStart(6)} ${cmp.ssimCoarse.toFixed(3).padStart(6)} ${pct(cmp.medianRel)} ${pct(cmp.p90Rel)}  ${counts.padEnd(34)} ${ev.pass ? 'pass' : `FAIL ${ev.failures.join('; ')}`}`,
+        `${c.name.padEnd(44)} ${e.engine.padEnd(9)} ${line(cmp)}  ${counts.padEnd(32)} ${ev.pass ? 'pass' : `FAIL ${ev.failures.join('; ')}`}`,
       );
       if (!ev.pass || flag('--report-all'))
         node.writeReport(
@@ -221,13 +228,11 @@ async function compareAll(G, node) {
           [`thresholds: ${JSON.stringify(parity)}`],
         );
     }
-    // the engine's own hand, for information
+    // the engine's own variation, for information
     const own = node.renderCpu(rec.params, {}, zoom);
     const ownCmp = G.compareMeasures(refM, G.measure(own.alpha));
-    row.ownHand = ownCmp;
-    console.log(
-      `${''.padEnd(40)} ${'own hand'.padEnd(9)} ${pct(ownCmp.inkRel)} ${ownCmp.ssim.toFixed(3).padStart(6)} ${ownCmp.ssimCoarse.toFixed(3).padStart(6)} ${pct(ownCmp.medianRel)} ${pct(ownCmp.p90Rel)}  (information only)`,
-    );
+    row.ownVariation = ownCmp;
+    console.log(`${''.padEnd(44)} ${'own var.'.padEnd(9)} ${line(ownCmp)}  (information only)`);
     if (gpu) {
       const [w, cp] = engines;
       if (w && cp) {
@@ -235,7 +240,7 @@ async function compareAll(G, node) {
         const ev = G.evaluate(cmp, G.engineCounts(w.counts), G.engineCounts(cp.counts), strict);
         row.strict = { ...cmp, pass: ev.pass, failures: ev.failures };
         console.log(
-          `${''.padEnd(40)} ${'CPU=GPU'.padEnd(9)} ${pct(cmp.inkRel)} ${cmp.ssim.toFixed(3).padStart(6)} ${cmp.ssimCoarse.toFixed(3).padStart(6)} ${pct(cmp.medianRel)} ${pct(cmp.p90Rel)}  ${'strict'.padEnd(34)} ${ev.pass ? 'pass' : `FAIL ${ev.failures.join('; ')}`}  L0 ${row.l0 ? 'identical' : 'DIFFERS'}${row.e === undefined ? '' : `  (e) ${row.e ? 'identical' : 'DIFFERS'}`}`,
+          `${''.padEnd(44)} ${'CPU=GPU'.padEnd(9)} ${line(cmp)}  ${'strict'.padEnd(32)} ${ev.pass ? 'pass' : `FAIL ${ev.failures.join('; ')}`}  L0 ${row.l0 ? 'identical' : 'DIFFERS'}${row.e === undefined ? '' : `  (e) ${row.e ? 'identical' : 'DIFFERS'}`}`,
         );
         if (!ev.pass || !row.l0 || row.e === false) pass = false;
         if (!ev.pass || flag('--report-all'))
@@ -253,6 +258,36 @@ async function compareAll(G, node) {
     results.push(row);
     if (!pass && isRequired) fails++;
   }
+
+  // 4. drawn-star count gate on the full captures of the acceptance presets
+  console.log('\ndrawn stars (rstars) on the full presets, CPU engine with v21 variation:');
+  const gates = manifest.captures.filter(
+    (/** @type {any} */ c) => !c.variant && c.surface === 'paper' && RSTAR_GATE.includes(c.preset),
+  );
+  let gateFails = 0;
+  for (const c of gates) {
+    const rec = node.record(c.name);
+    const r = node.renderCpu(rec.params, { variation: node.v21Variation(rec.params) });
+    const ref = rec.stats.rstars;
+    const ours = r.counts.rstars;
+    const allowed = G.countAllowance(ref, ours, node.parity(rec.preset));
+    const ok = Math.abs(ours - ref) <= allowed;
+    if (!ok) gateFails++;
+    results.push({
+      name: c.name,
+      gate: 'rstars',
+      ref,
+      render: ours,
+      allowed,
+      pass: ok,
+      required: true,
+    });
+    console.log(
+      `${c.name.padEnd(44)} ${String(ours).padStart(5)}/${String(ref).padEnd(5)} Δ ${String(ours - ref).padStart(4)} (±${allowed.toFixed(0)})  ${ok ? 'pass' : 'FAIL'}`,
+    );
+  }
+  fails += gateFails;
+
   if (gpu?.errors.length) {
     console.log(`WebGPU errors:\n  ${gpu.errors.join('\n  ')}`);
     fails++;
@@ -278,39 +313,38 @@ async function compareAll(G, node) {
     );
     console.log(`wrote ${enginePath}`);
   }
-  const req = results.filter((r) => r.required);
+  const req = results.filter((r) => r.required && !r.gate);
+  const reqFails = req.filter((r) => !r.pass).length;
   console.log(
-    `\n${req.length - fails}/${req.length} required golden cases pass${informational.length ? ` (${results.length - req.length} informational)` : ''}`,
+    `\n${req.length - reqFails}/${req.length} required golden cases pass; ${gates.length - gateFails}/${gates.length} drawn-star gates pass${informational.length ? ` (${results.length - req.length - gates.length} informational)` : ''}`,
   );
   return fails;
 }
 
 /**
- * ADR 0013 calibration: thresholds per family from "same galaxy, other dots" pairs.
+ * ADR 0013 / 0015 calibration: thresholds per family from "same galaxy, other dots" pairs, then
+ * the negative controls evaluated against them.
  *
  * @param {typeof import('./node.ts')} G
  * @param {import('./node.ts').GoldenNode} node
  */
 async function calibrate(G, node) {
-  const K = 4;
-  /** The single-galaxy presets the M2 engine draws (stipple), per family. */
+  const K = 3;
+  /** The single-galaxy presets the M2 engine draws (stipple). */
   const presets = [
     'Grand design',
     'Barred spiral',
     'Flocculent',
-    'Hand-drawn arms',
     'Tightly wound',
-    'Loose, open arms',
     'Ringed',
     'Disc, no arms',
     'Edge-on with dust',
     'Smooth, round',
     'Cigar-shaped',
-    'Deep field',
     'Radio jet',
     'Shell galaxy',
   ];
-  /** @type {{ preset: string, family: string, params: any, hand?: number[] }[]} */
+  /** @type {{ preset: string, family: string, params: any }[]} */
   const cases = [];
   for (const preset of presets)
     for (const seed of [7, 4242])
@@ -324,66 +358,172 @@ async function calibrate(G, node) {
       preset: `${rec.preset} (${c.variant})`,
       family: G.goldenFamily(rec.preset),
       params: rec.params,
-      ...(rec.hand ? { hand: rec.hand } : {}),
     });
   }
-  console.log(`calibration: ${cases.length} configurations × ${K} re-keys (new engine)`);
-  const eng = node.calibrateEngine(cases, K, (s) => console.log(s));
+  console.log(
+    `calibration: ${cases.length} configurations × ${K} re-keys and the negative controls`,
+  );
+  // the engine pairs are measured in parallel processes (--jobs, default 4), each taking every
+  // n-th configuration (--shard k/n) and writing its comparisons to test-results/
+  const shard = opt('--shard');
+  if (shard) {
+    const [k, n] = shard.split('/').map(Number);
+    const mine = cases.filter((_, i) => i % (n ?? 1) === k);
+    const part = node.calibrateEngine(mine, K, (s) => console.log(`[${shard}] ${s}`));
+    mkdirSync(join(ROOT, 'test-results'), { recursive: true });
+    writeFileSync(join(ROOT, `test-results/calibration-shard-${k}.json`), JSON.stringify(part));
+    return;
+  }
+  const jobs = Number(opt('--jobs') ?? 4);
+  await Promise.all(
+    Array.from(
+      { length: jobs },
+      (_, k) =>
+        new Promise((ok, fail) => {
+          const child = spawn(
+            process.execPath,
+            [import.meta.filename, '--calibrate', '--shard', `${k}/${jobs}`],
+            { stdio: 'inherit' },
+          );
+          child.on('exit', (code) => (code ? fail(new Error(`shard ${k}: ${code}`)) : ok(code)));
+        }),
+    ),
+  );
+  /** @type {{ pairs: Record<string, any[]>, controls: Record<string, Record<string, any[]>> }} */
+  const eng = { pairs: {}, controls: {} };
+  for (let k = 0; k < jobs; k++) {
+    const part = JSON.parse(
+      readFileSync(join(ROOT, `test-results/calibration-shard-${k}.json`), 'utf8'),
+    );
+    for (const [f, list] of Object.entries(part.pairs)) (eng.pairs[f] ??= []).push(...list);
+    for (const [f, byName] of Object.entries(part.controls))
+      for (const [name, list] of Object.entries(byName))
+        ((eng.controls[f] ??= {})[name] ??= []).push(...list);
+  }
   console.log('calibration: v21 re-roll pairs');
   const v21 = node.calibrateReroll(join(ROOT, 'tests/golden/actual/reroll'), () => {});
   console.log(`  ${v21.used} v21 pairs whose stipple re-rolled`);
 
   const ADR = { ink: 0.05, median: 0.1, p90: 0.1, counts: 0.03, countsSmall: 0.1, poisson: 3 };
+  const KEYS = /** @type {const} */ ([
+    ['ssim', (/** @type {any} */ c) => c.ssim],
+    ['ssimCoarse', (/** @type {any} */ c) => c.ssimCoarse],
+    ['inkAbs', (/** @type {any} */ c) => Math.abs(c.inkRel)],
+    ['medianAbs', (/** @type {any} */ c) => Math.abs(c.medianRel)],
+    ['p90Abs', (/** @type {any} */ c) => Math.abs(c.p90Rel)],
+    ['r25Abs', (/** @type {any} */ c) => Math.abs(c.r25Rel)],
+    ['r50Abs', (/** @type {any} */ c) => Math.abs(c.r50Rel)],
+    ['r90Abs', (/** @type {any} */ c) => Math.abs(c.r90Rel)],
+    ['outerAbs', (/** @type {any} */ c) => Math.abs(c.outerDiff)],
+    ['qAbs', (/** @type {any} */ c) => Math.abs(c.qDiff)],
+    ['qInnerAbs', (/** @type {any} */ c) => Math.abs(c.qInnerDiff)],
+    // the position angle only where the reference has one (axis ratio below PA_BELOW_Q)
+    ['paAbs', (/** @type {any} */ c) => (c.ref.q < PA_BELOW_Q ? Math.abs(c.paDiff) : NaN)],
+  ]);
+  const stats = (/** @type {any[]} */ list) =>
+    Object.fromEntries(
+      KEYS.map(([k, f]) => [k, G.summary(list.map(f).filter((x) => !Number.isNaN(x)))]),
+    );
+  const floor2 = (/** @type {number} */ x) => Math.floor(x * 100) / 100;
+  const ceil3 = (/** @type {number} */ x) => Math.ceil(x * 1000) / 1000;
+  /** 1.5 × p95 of the re-draw spread, and at least `min` */
+  const spread = (/** @type {any} */ s, /** @type {string} */ k, /** @type {number} */ min) =>
+    Math.max(min, ceil3(1.5 * s[k].p95));
   /** @type {Record<string, any>} */
   const parity = {};
   /** @type {Record<string, any>} */
   const numbers = {};
-  const stats = (/** @type {any[]} */ list) => ({
-    ssim: G.summary(list.map((c) => c.ssim)),
-    ssimCoarse: G.summary(list.map((c) => c.ssimCoarse)),
-    inkAbs: G.summary(list.map((c) => Math.abs(c.inkRel))),
-    medianAbs: G.summary(list.map((c) => Math.abs(c.medianRel))),
-    p90Abs: G.summary(list.map((c) => Math.abs(c.p90Rel))),
-  });
-  const floor2 = (/** @type {number} */ x) => Math.floor(x * 100) / 100;
-  const ceil3 = (/** @type {number} */ x) => Math.ceil(x * 1000) / 1000;
   for (const family of ['spiral', 'smooth', 'merger', 'lens', 'star', 'artefact']) {
     const list = eng.pairs[family] ?? [];
-    numbers[family] = {
-      engineRekey: list.length ? stats(list) : null,
-      engineOtherStructure: eng.structure[family]?.length ? stats(eng.structure[family]) : null,
-      v21Reroll: v21.pairs[family]?.length ? stats(v21.pairs[family]) : null,
-    };
-    if (!list.length) {
-      parity[family] = { ...ADR, ssim: 0.85, ssimCoarse: 0.85, provisional: true };
-      continue;
-    }
-    const s = numbers[family].engineRekey;
-    parity[family] = {
-      // the ADR's ±5% and ±10% stay as floors: they also cover the renderers' deliberate
-      // differences (per-drawing mipmaps, no MSAA, f16 accumulation), which re-draw pairs do not
-      ink: Math.max(ADR.ink, ceil3(1.5 * s.inkAbs.p95)),
-      ssim: floor2(s.ssim.p5 - 0.02),
-      ssimCoarse: floor2(s.ssimCoarse.p5 - 0.02),
-      median: Math.max(ADR.median, ceil3(1.5 * s.medianAbs.p95)),
-      p90: Math.max(ADR.p90, ceil3(1.5 * s.p90Abs.p95)),
+    const base = {
       counts: ADR.counts,
       countsSmall: ADR.countsSmall,
       poisson: ADR.poisson,
+      // the drawn stars of a disc galaxy (about 1,000–1,100 of ~11,000 proposals) are a binomial
+      // draw too: ±3% there is under one standard deviation of the difference of two draws
+      poissonBelow: 2000,
+      paBelowQ: PA_BELOW_Q,
+    };
+    if (!list.length) {
+      parity[family] = {
+        ...base,
+        ink: ADR.ink,
+        ssimCoarse: 0.85,
+        median: ADR.median,
+        p90: ADR.p90,
+        r25: 0.1,
+        r50: 0.1,
+        r90: 0.1,
+        outer: 0.03,
+        q: 0.05,
+        qInner: 0.05,
+        pa: 10,
+        provisional: true,
+      };
+      numbers[family] = { v21Reroll: v21.pairs[family]?.length ? stats(v21.pairs[family]) : null };
+      continue;
+    }
+    const s = stats(list);
+    parity[family] = {
+      ...base,
+      // the ADR's ±5% and ±10% stay as floors: they also cover the renderers' deliberate
+      // differences (per-drawing mipmaps, no MSAA, f16 accumulation), which re-draw pairs do not
+      ink: Math.max(ADR.ink, ceil3(1.5 * s.inkAbs.p95)),
+      ssimCoarse: floor2(s.ssimCoarse.p5 - 0.02),
+      median: Math.max(ADR.median, ceil3(1.5 * s.medianAbs.p95)),
+      p90: Math.max(ADR.p90, ceil3(1.5 * s.p90Abs.p95)),
+      // the moment and extent test: 1.5 × the p95 of the re-draw spread, with small floors for
+      // a quantity's resolution (half a radial bin of 0.25 px is 0.1% of a 100 px radius)
+      r25: spread(s, 'r25Abs', 0.01),
+      r50: spread(s, 'r50Abs', 0.01),
+      r90: spread(s, 'r90Abs', 0.01),
+      outer: spread(s, 'outerAbs', 0.003),
+      q: spread(s, 'qAbs', 0.005),
+      qInner: spread(s, 'qInnerAbs', 0.005),
+      pa: spread(s, 'paAbs', 1),
+    };
+    // the negative controls against these thresholds
+    /** @type {Record<string, any>} */
+    const ctl = {};
+    for (const [name, list2] of Object.entries(eng.controls[family] ?? {})) {
+      const rows = list2.map((/** @type {any} */ x) => {
+        const ev = G.evaluate(x.c, {}, {}, parity[family]);
+        return { config: x.config, failed: !ev.pass, by: ev.failures.map((f) => f.split(' (')[0]) };
+      });
+      ctl[name] = {
+        applicable: rows.length,
+        detected: rows.filter((r) => r.failed).length,
+        missed: rows.filter((r) => !r.failed).map((r) => r.config),
+        ...stats(list2.map((/** @type {any} */ x) => x.c)),
+        firstFailures: rows.slice(0, 4),
+      };
+    }
+    numbers[family] = {
+      engineRekey: s,
+      negativeControls: ctl,
+      v21Reroll: v21.pairs[family]?.length ? stats(v21.pairs[family]) : null,
     };
   }
   const file = {
     about:
-      'Golden thresholds (ADR 0013). parity: the new engine against v21 (L2), per family; strict: the CPU engine against WebGPU (L1). Written by `npm run golden -- --calibrate`; the numbers behind them are in calibration.json and docs/milestones/m2/README.md. Families marked provisional have no engine yet and keep the ADR values.',
+      'Golden thresholds (ADR 0013, as calibrated in ADR 0015). parity: the new engine against v21 (L2), per family; strict: the CPU engine against WebGPU (L1). Gated: ink, coarse SSIM (b′), widths, counts, and the moment and extent test (r25, r50, r90, outer ink, axis ratio q, position angle pa where the reference q < paBelowQ). Written by `npm run golden -- --calibrate`; the numbers behind them are in calibration.json and docs/milestones/m2/README.md. Families marked provisional have no engine yet.',
     strict: {
       ink: 0.005,
-      ssim: 0.98,
       ssimCoarse: 0.98,
       median: 0.02,
       p90: 0.02,
+      r25: 0.005,
+      r50: 0.005,
+      r90: 0.005,
+      outer: 0.002,
+      q: 0.003,
+      qInner: 0.003,
+      pa: 1,
+      paBelowQ: PA_BELOW_Q,
       counts: 0.001,
       countsSmall: 0.001,
       poisson: 0,
+      poissonBelow: 0,
     },
     parity,
   };
@@ -393,18 +533,22 @@ async function calibrate(G, node) {
     JSON.stringify(
       {
         about:
-          'ADR 0013 calibration: per family, summaries of (a)-(c) over "same galaxy, other dots" pairs. engineRekey: the new engine (CPU, L1-equal to WebGPU) re-keying its placement stream, 4 keys per preset, seed and camera (a full re-draw). engineOtherStructure: the orbit camera (az + 35°, incl + 20°) against home, re-keyed (real change of structure, for the margin). v21Reroll: v21 at az and az + 0.3° where its stipple re-rolled (a partial re-draw).',
+          "ADR 0013 / 0015 calibration: per family, summaries (n, min, p5, median, p95, max) of each measure. engineRekey: the new engine (CPU, equal to WebGPU at L1) drawing v21's replayed variation and re-keying its placement stream, 3 keys per configuration (a full re-draw). negativeControls: one structural or pen change per control, re-keyed, against the base, with how many applicable configurations the thresholds caught. v21Reroll: v21 at az and az + 0.3° where its stipple re-rolled (a partial re-draw).",
         keys: K,
-        configurations: cases.map(
-          (c) => c.preset + ' s' + c.params.seed + ' incl ' + c.params.incl,
-        ),
+        configurations: cases.map((c) => `${c.preset} s${c.params.seed} incl ${c.params.incl}`),
         families: numbers,
       },
       null,
       2,
     ) + '\n',
   );
-  console.log(JSON.stringify({ parity, numbers }, null, 1));
+  for (const [family, n] of Object.entries(numbers))
+    if (n.negativeControls)
+      for (const [name, x] of Object.entries(n.negativeControls))
+        console.log(
+          `${family.padEnd(7)} ${name.padEnd(16)} detected ${x.detected}/${x.applicable}${x.missed.length ? `  missed: ${x.missed.join(', ')}` : ''}`,
+        );
+  console.log(JSON.stringify(parity, null, 1));
 }
 
 /** @param {string} s */

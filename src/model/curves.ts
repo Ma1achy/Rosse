@@ -281,6 +281,7 @@ export function curves(
 }
 
 /** The edge-on midplane stroke's alpha (app23.js:L788): `lines · (incl − 72) / 18`. */
+// v21 parity: `incl`, not `incE()`; computed per view (src/model/ribbons.ts ribUniform)
 export function edgeOnAlpha(lines: number, incl: number): number {
   return (lines * (incl - 72)) / 18;
 }

@@ -117,9 +117,9 @@ run('line-work kernels and raster (GPU = CPU, L1)', async () => {
       const G = scene.galaxy;
       const R = scene.ribbons;
       const n = sampleCount(G);
-      const V = viewDesc(camera, G.g.dust ?? 0, n, classCapacity(n));
+      const V = viewDesc(camera, G.g.dust, n, classCapacity(n));
       const M = ribbonModel(R, G.pool, G.dotBase);
-      const c = runRibbons(M, V, ribUniform(R, camera, P, G.g.n_dot_pool ?? 1));
+      const c = runRibbons(M, V, ribUniform(R, camera, P, G.g.n_dot_pool));
       const bad: string[] = [];
       let maxPos = 0;
       const near = (what: string, a: ArrayLike<number>, b: ArrayLike<number>, idx: number[]) => {

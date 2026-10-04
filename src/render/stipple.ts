@@ -157,7 +157,7 @@ export class GpuStipple {
     const G = scene.galaxy;
     // every sample: the proposals, then the ring knots' and clumps' marks
     const n = sampleCount(G);
-    const nExtra = G.g.n_extra ?? 0;
+    const nExtra = G.g.n_extra;
     const cap = classCapacity(n);
     const blocks = blockCount(n);
     const buf = (size: number, usage: number, label: string) =>
@@ -268,7 +268,7 @@ export class GpuStipple {
     const pass = enc.beginComputePass({ label: 'stipple' });
     pass.setPipeline(P.stipple);
     pass.setBindGroup(0, this.model.groups.stipple);
-    pass.dispatchWorkgroups(Math.ceil((G.g.n ?? 0) / 64) || 1);
+    pass.dispatchWorkgroups(Math.ceil(G.g.n / 64) || 1);
     if (nExtra) {
       pass.setPipeline(P.extra);
       pass.setBindGroup(0, this.model.groups.extra);
@@ -284,13 +284,13 @@ export class GpuStipple {
     if (!m || !this.scene) throw new Error('setScene first');
     const d = this.device;
     const { P: params, galaxy } = this.scene;
-    d.queue.writeBuffer(m.view, 0, packView(viewDesc(cam, galaxy.g.dust ?? 0, m.n, m.cap)));
+    d.queue.writeBuffer(m.view, 0, packView(viewDesc(cam, galaxy.g.dust, m.n, m.cap)));
     d.queue.writeBuffer(
       m.culls,
       0,
-      packStruct(CULLS_LAYOUT, cullsUniform(this.scene.ribbons, cam, params, galaxy.g.key ?? 0)),
+      packStruct(CULLS_LAYOUT, cullsUniform(this.scene.ribbons, cam, params, galaxy.g.key)),
     );
-    this.ribbons.setView(cam, params, galaxy.g.n_dot_pool ?? 1);
+    this.ribbons.setView(cam, params, galaxy.g.n_dot_pool);
     const enc = d.createCommandEncoder({ label: 'stipple view' });
     const pass = enc.beginComputePass({ label: 'project + compact' });
     const P = this.pipes;

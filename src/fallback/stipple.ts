@@ -108,10 +108,10 @@ export class CpuStipple {
   view(cam: Camera): CpuStippleView {
     const n = this.samples.n;
     const { P, galaxy, ribbons: R } = this.scene;
-    const V = viewDesc(cam, galaxy.g.dust ?? 0, n, classCapacity(n));
-    const rv = runRibbons(this.lines, V, ribUniform(R, cam, P, galaxy.g.n_dot_pool ?? 1));
+    const V = viewDesc(cam, galaxy.g.dust, n, classCapacity(n));
+    const rv = runRibbons(this.lines, V, ribUniform(R, cam, P, galaxy.g.n_dot_pool));
     const culls = {
-      c: cullsUniform(R, cam, P, galaxy.g.key ?? 0),
+      c: cullsUniform(R, cam, P, galaxy.g.key),
       points: rv.points,
       carve: R.carve,
     };

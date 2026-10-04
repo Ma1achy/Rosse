@@ -1,41 +1,45 @@
 /**
- * The golden metric of ADR 0013, on the alpha channel α (0–1) of an ink image:
+ * The golden metric of ADR 0013 and 0015, on the alpha channel α (0–1) of an ink image:
  *
  * a. total ink: Σα;
- * b. structure: SSIM between density maps (α blurred with a Gaussian of σ = 4 plate px,
+ * b. fine structure: SSIM between density maps (α blurred with a Gaussian of σ = 4 plate px,
  *    downsampled 4×, SSIM over 7 × 7 windows);
  * c. pen weight: stroke widths from the Euclidean distance transform of the mask α ≥ 0.5, sampled
  *    on its medial axis, ×2: median and 90th percentile (as band means, see `bandMean`);
  * d. mark counts (compared in ./thresholds.ts).
  *
- * plus (b′), added in M2: the same SSIM on a coarse density map (σ = 16 px, downsampled 8×). The
- * M2 calibration (docs/milestones/m2/README.md) found that at σ = 4 px a full re-draw of a
- * stipple-only galaxy scores only 0.3–0.5, because the σ = 4 px map still resolves the random
- * dots; at σ = 16 px a re-draw scores about 0.9 and a 35° orbit clearly less, so (b′) is the test
- * of structure that can tell the two apart. Both are gated, each at its calibrated threshold.
+ * and, as calibrated in M2 (ADR 0015):
+ *
+ * b′. coarse structure: the same SSIM on a coarse density map (σ = 16 px, downsampled 8×). At
+ *    σ = 4 px a full re-draw of a stipple-only galaxy scores only 0.33–0.67 (spiral) and
+ *    0.48–0.65 (smooth), because the map still resolves the random dots, so (b) is reported but
+ *    not gated; at σ = 16 px re-draws score 0.89–0.97 (spiral) and 0.93–0.96 (smooth), and a 35°
+ *    orbit of a spiral 0.56–0.81 (calibration.json);
+ * f. moments and extent (`extentOf`, `momentsOf`): radii, outer ink, axis ratios and position
+ *    angle, which density maps hardly see.
  *
  * Plain arrays and numbers, no DOM, so it runs in Node, in vitest and in the page.
  */
 
-export interface Gray {
+export interface Grey {
   width: number;
   height: number;
   data: Float32Array;
 }
 
-export function gray(width: number, height: number, data?: Float32Array): Gray {
+export function grey(width: number, height: number, data?: Float32Array): Grey {
   return { width, height, data: data ?? new Float32Array(width * height) };
 }
 
 /** α from RGBA8 bytes (as decoded from a PNG). */
-export function alphaFromRgba8(width: number, height: number, rgba: Uint8Array): Gray {
-  const out = gray(width, height);
+export function alphaFromRgba8(width: number, height: number, rgba: Uint8Array): Grey {
+  const out = grey(width, height);
   for (let i = 0; i < width * height; i++) out.data[i] = (rgba[i * 4 + 3] ?? 0) / 255;
   return out;
 }
 
 /** (a) Σα. */
-export function totalInk(a: Gray): number {
+export function totalInk(a: Grey): number {
   let s = 0;
   for (const v of a.data) s += v;
   return s;
@@ -51,12 +55,12 @@ function gaussianKernel(sigma: number): Float32Array {
 }
 
 /** Separable Gaussian blur, zero outside the image (there is no ink beyond the plate). */
-export function blur(a: Gray, sigma: number): Gray {
+export function blur(a: Grey, sigma: number): Grey {
   const k = gaussianKernel(sigma);
   const r = (k.length - 1) / 2;
   const { width: w, height: h } = a;
   const tmp = new Float32Array(w * h);
-  const out = gray(w, h);
+  const out = grey(w, h);
   for (let y = 0; y < h; y++)
     for (let x = 0; x < w; x++) {
       let s = 0;
@@ -79,10 +83,10 @@ export function blur(a: Gray, sigma: number): Gray {
 }
 
 /** Box downsample by an integer factor. */
-export function downsample(a: Gray, factor: number): Gray {
+export function downsample(a: Grey, factor: number): Grey {
   const w = Math.floor(a.width / factor);
   const h = Math.floor(a.height / factor);
-  const out = gray(w, h);
+  const out = grey(w, h);
   const n = factor * factor;
   for (let y = 0; y < h; y++)
     for (let x = 0; x < w; x++) {
@@ -96,12 +100,12 @@ export function downsample(a: Gray, factor: number): Gray {
 }
 
 /** The density map of (b): σ = 4 px blur, then 4× downsampling (800² → 200²). */
-export function densityMap(a: Gray, sigma = 4, factor = 4): Gray {
+export function densityMap(a: Grey, sigma = 4, factor = 4): Grey {
   return downsample(blur(a, sigma), factor);
 }
 
 /** The coarse density map of (b′): σ = 16 px blur, then 8× downsampling (800² → 100²). */
-export function coarseDensityMap(a: Gray): Gray {
+export function coarseDensityMap(a: Grey): Grey {
   return densityMap(a, 16, 8);
 }
 
@@ -114,7 +118,7 @@ export function coarseDensityMap(a: Gray): Gray {
  * score 1 for any pair of drawings, and on a plate that is mostly empty they would hide a change
  * of structure. Pass `empty = -1` to average over every window.
  */
-export function ssim(a: Gray, b: Gray, win = 7, empty = 1e-3): number {
+export function ssim(a: Grey, b: Grey, win = 7, empty = 1e-3): number {
   if (a.width !== b.width || a.height !== b.height) throw new Error('ssim: sizes differ');
   const { width: w, height: h } = a;
   const C1 = 1e-4;
@@ -221,10 +225,10 @@ export function distanceTransform(mask: Uint8Array, w: number, h: number): Float
 }
 
 /** Bilinear upsampling by an integer factor (sample positions at the new pixel centres). */
-export function upsample(a: Gray, factor: number): Gray {
+export function upsample(a: Grey, factor: number): Grey {
   const W = a.width * factor;
   const H = a.height * factor;
-  const out = gray(W, H);
+  const out = grey(W, H);
   const at = (x: number, y: number) =>
     a.data[
       Math.min(a.height - 1, Math.max(0, y)) * a.width + Math.min(a.width - 1, Math.max(0, x))
@@ -258,7 +262,7 @@ export interface StrokeWidths {
  * neighbours), in plate pixels. Upsampling makes the distances fine enough to resolve the 2–3 px
  * dots of the stipple: at 1× a dot's distance can only be 1, √2 or 2.
  */
-export function strokeWidths(a: Gray, factor = 4): StrokeWidths {
+export function strokeWidths(a: Grey, factor = 4): StrokeWidths {
   const up = factor > 1 ? upsample(a, factor) : a;
   const { width: w, height: h } = up;
   const mask = new Uint8Array(w * h);
@@ -311,45 +315,187 @@ export function quantile(sorted: ArrayLike<number>, q: number): number {
   return sorted[i] ?? 0;
 }
 
-/** Every measure of one image. */
-export interface ImageMeasures {
-  ink: number;
-  density: Gray;
-  coarse: Gray;
-  strokes: StrokeWidths;
+/**
+ * (f) Moments and extent of the ink about the plate's centre (ADR 0015): the radii holding 25%, 50%
+ * and 90% of the ink, the ink beyond the reference's r90, and, within the reference's r90, the
+ * axis ratio and position angle of the second moments. Density maps compare local means and are
+ * nearly blind to a galaxy that is a little rounder, bigger, smaller or without its halo; these
+ * are not.
+ */
+export interface Extent {
+  /** ink within radius r, cumulative, in bins of RADIAL_BIN px from the centre */
+  cdf: Float64Array;
+  total: number;
+  r25: number;
+  r50: number;
+  r90: number;
 }
 
-export function measure(a: Gray): ImageMeasures {
+export const RADIAL_BIN = 0.25;
+export const CENTRE = 400;
+
+export function extentOf(a: Grey, cx = CENTRE, cy = CENTRE): Extent {
+  const bins = Math.ceil(Math.hypot(a.width, a.height) / RADIAL_BIN) + 2;
+  const hist = new Float64Array(bins);
+  for (let y = 0; y < a.height; y++)
+    for (let x = 0; x < a.width; x++) {
+      const v = a.data[y * a.width + x] ?? 0;
+      if (!v) continue;
+      const i = Math.floor(Math.hypot(x + 0.5 - cx, y + 0.5 - cy) / RADIAL_BIN);
+      hist[i] = (hist[i] ?? 0) + v;
+    }
+  const cdf = new Float64Array(bins);
+  let s = 0;
+  for (let i = 0; i < bins; i++) cdf[i] = s += hist[i] ?? 0;
+  const ext: Extent = { cdf, total: s, r25: 0, r50: 0, r90: 0 };
+  ext.r25 = radiusAt(ext, 0.25);
+  ext.r50 = radiusAt(ext, 0.5);
+  ext.r90 = radiusAt(ext, 0.9);
+  return ext;
+}
+
+/** The radius holding a fraction of the ink (linear within a bin). */
+export function radiusAt(e: Extent, frac: number): number {
+  const want = frac * e.total;
+  let prev = 0;
+  for (let i = 0; i < e.cdf.length; i++) {
+    const c = e.cdf[i] ?? 0;
+    if (c >= want) {
+      const t = c > prev ? (want - prev) / (c - prev) : 0;
+      return (i + t) * RADIAL_BIN;
+    }
+    prev = c;
+  }
+  return e.cdf.length * RADIAL_BIN;
+}
+
+/** The fraction of the ink beyond radius r. */
+export function inkBeyond(e: Extent, r: number): number {
+  if (!e.total) return 0;
+  const i = Math.min(e.cdf.length - 1, Math.max(0, Math.floor(r / RADIAL_BIN)));
+  return 1 - (e.cdf[i] ?? 0) / e.total;
+}
+
+export interface Moments {
+  /** axis ratio, minor / major, from the second moments */
+  q: number;
+  /** position angle of the major axis, degrees in [0, 180), y down */
+  pa: number;
+}
+
+/** Second moments of the ink within `aperture` px of the centre. */
+export function momentsOf(a: Grey, aperture: number, cx = CENTRE, cy = CENTRE): Moments {
+  let sxx = 0;
+  let syy = 0;
+  let sxy = 0;
+  const r2 = aperture * aperture;
+  for (let y = 0; y < a.height; y++)
+    for (let x = 0; x < a.width; x++) {
+      const v = a.data[y * a.width + x] ?? 0;
+      if (!v) continue;
+      const dx = x + 0.5 - cx;
+      const dy = y + 0.5 - cy;
+      if (dx * dx + dy * dy > r2) continue;
+      sxx += v * dx * dx;
+      syy += v * dy * dy;
+      sxy += v * dx * dy;
+    }
+  const tr = sxx + syy;
+  const d = Math.sqrt(((sxx - syy) / 2) ** 2 + sxy * sxy);
+  const l1 = tr / 2 + d;
+  const l2 = tr / 2 - d;
+  const pa = ((((0.5 * Math.atan2(2 * sxy, sxx - syy) * 180) / Math.PI) % 180) + 180) % 180;
+  return { q: l1 > 0 ? Math.sqrt(Math.max(0, l2) / l1) : 1, pa };
+}
+
+/** Every measure of one image. */
+export interface ImageMeasures {
+  alpha: Grey;
+  ink: number;
+  density: Grey;
+  coarse: Grey;
+  strokes: StrokeWidths;
+  extent: Extent;
+}
+
+export function measure(a: Grey): ImageMeasures {
   return {
+    alpha: a,
     ink: totalInk(a),
     density: densityMap(a),
     coarse: coarseDensityMap(a),
     strokes: strokeWidths(a),
+    extent: extentOf(a),
   };
+}
+
+interface Side {
+  ink: number;
+  median: number;
+  p90: number;
+  r50: number;
+  r90: number;
+  q: number;
+  pa: number;
 }
 
 /** The comparison of a render against a reference. */
 export interface Comparison {
   /** (render − reference) / reference */
   inkRel: number;
+  /** (b), informational since ADR 0015 */
   ssim: number;
+  /** (b′) */
   ssimCoarse: number;
   medianRel: number;
   p90Rel: number;
-  ref: { ink: number; median: number; p90: number };
-  render: { ink: number; median: number; p90: number };
+  /** (f): radii, relative */
+  r25Rel: number;
+  r50Rel: number;
+  r90Rel: number;
+  /** (f): ink beyond the reference's r90, render − reference (fractions of the total) */
+  outerDiff: number;
+  /** (f): axis ratio within the reference's r90, render − reference */
+  qDiff: number;
+  /** (f): axis ratio within the reference's r50 (the inner galaxy: bulge, thickness) */
+  qInnerDiff: number;
+  /** (f): position angle difference, degrees, in [−90, 90) */
+  paDiff: number;
+  ref: Side;
+  render: Side;
 }
 
 const rel = (x: number, ref: number) => (ref === 0 ? (x === 0 ? 0 : Infinity) : (x - ref) / ref);
 
 export function compareMeasures(ref: ImageMeasures, render: ImageMeasures): Comparison {
+  const ap = ref.extent.r90;
+  const mRef = momentsOf(ref.alpha, ap);
+  const mRen = momentsOf(render.alpha, ap);
+  const inner = ref.extent.r50;
+  const qInnerDiff = momentsOf(render.alpha, inner).q - momentsOf(ref.alpha, inner).q;
+  const side = (m: ImageMeasures, mo: Moments): Side => ({
+    ink: m.ink,
+    median: m.strokes.median,
+    p90: m.strokes.p90,
+    r50: m.extent.r50,
+    r90: m.extent.r90,
+    q: mo.q,
+    pa: mo.pa,
+  });
   return {
     inkRel: rel(render.ink, ref.ink),
     ssim: ssim(ref.density, render.density),
     ssimCoarse: ssim(ref.coarse, render.coarse),
     medianRel: rel(render.strokes.median, ref.strokes.median),
     p90Rel: rel(render.strokes.p90, ref.strokes.p90),
-    ref: { ink: ref.ink, median: ref.strokes.median, p90: ref.strokes.p90 },
-    render: { ink: render.ink, median: render.strokes.median, p90: render.strokes.p90 },
+    r25Rel: rel(render.extent.r25, ref.extent.r25),
+    r50Rel: rel(render.extent.r50, ref.extent.r50),
+    r90Rel: rel(render.extent.r90, ref.extent.r90),
+    outerDiff: inkBeyond(render.extent, ap) - inkBeyond(ref.extent, ap),
+    qDiff: mRen.q - mRef.q,
+    qInnerDiff,
+    paDiff: ((((mRen.pa - mRef.pa) % 180) + 270) % 180) - 90,
+    ref: side(ref, mRef),
+    render: side(render, mRen),
   };
 }

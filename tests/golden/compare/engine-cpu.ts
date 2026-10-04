@@ -23,7 +23,7 @@ import {
 } from '../../../src/model/scene';
 import type { VectorSheet } from '../../../src/marks/vector';
 import { cameraOf } from '../../../src/view/camera';
-import { gray, type Gray } from './metrics';
+import { grey, type Grey } from './metrics';
 
 export const ATLASES: AtlasName[] = ['dots', 'knots', 'stars', 'cores', 'pieces', 'strokes'];
 
@@ -64,15 +64,15 @@ export function metaOf(atlases: AtlasData[], penlines?: VectorSheet) {
 }
 
 /** α of a premultiplied ink buffer (RGBA f32), rounded to 8 bits. */
-export function alphaOf(width: number, height: number, rgba: ArrayLike<number>): Gray {
-  const g = gray(width, height);
+export function alphaOf(width: number, height: number, rgba: ArrayLike<number>): Grey {
+  const g = grey(width, height);
   for (let i = 0; i < width * height; i++)
     g.data[i] = Math.round(Math.min(1, Math.max(0, rgba[i * 4 + 3] ?? 0)) * 255) / 255;
   return g;
 }
 
 export interface RenderResult {
-  alpha: Gray;
+  alpha: Grey;
   counts: MarkCounts;
   ms: number;
 }

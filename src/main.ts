@@ -32,7 +32,7 @@ import { drawingsMeta, type MarkCounts } from './model/scene';
 import type { DrawingsMeta } from './model/variation';
 import { GpuRenderer, type FrameSize } from './render/frame';
 import type { InkLayer } from './render/layers';
-import { PLATE_UNITS } from './render/sample-scene';
+import { PLATE } from './view/camera';
 import { GpuStipple } from './render/stipple';
 import { SURFACES, type SurfaceName } from './render/surface';
 import { attachOrbit, type OrbitState } from './ui/orbit';
@@ -133,7 +133,7 @@ function plateCanvas(): HTMLCanvasElement {
 
 function plateSize(canvas: HTMLCanvasElement): FrameSize {
   return {
-    plateCss: canvas.clientWidth || PLATE_UNITS,
+    plateCss: canvas.clientWidth || PLATE,
     dpr: Math.min(MAX_DPR, window.devicePixelRatio || 1),
   };
 }

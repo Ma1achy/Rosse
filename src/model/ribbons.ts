@@ -392,6 +392,9 @@ export function ribUniform(R: RibbonDesc, cam: Camera, P: Params, nDotPool: numb
     pen_line: f(R.penLine),
     wobble: wobbleAmplitude(P.distort),
     zoom: f(cam.zoom),
+    // v21 parity: the edge-on stroke's alpha is lines·(incl − 72)/18 from the RAW inclination
+    // (app23.js:L788), continuous and asymmetric about 90° (1.5·lines at 99°, 0.5·lines at 81°,
+    // one incE bucket), so it is a view-tier number; whether the stroke exists is the bucket's
     edge_alpha: f(edgeOnAlpha(R.lines, cam.incl)),
     sheet_w: R.sheetW,
     sheet_h: R.sheetH,

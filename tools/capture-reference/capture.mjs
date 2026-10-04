@@ -174,8 +174,8 @@ async function captureJob(browser, url, job, out) {
         return {
           P: JSON.parse(JSON.stringify(G.P())),
           stats: G.stats(),
-          // the dot pool of this galaxy's hand (VAR.dotPool, first 400), so a comparison can
-          // draw with the same pen (tests/golden/README.md)
+          // the dot pool of this galaxy's hand (VAR.dotPool, truncated by the page at 400): a
+          // cross-check of the offline replay the comparison uses (tests/unit/v21-replay.test.ts)
           hand: G.var().pool,
           canvas: [c.width, c.height],
           ink: c.toDataURL('image/png'),
@@ -261,7 +261,7 @@ async function main() {
   /** @type {Job[]} */
   let jobs;
   if (extraFile) {
-    /** @type {{ cameras?: string[], cases: { preset: string, variant: string, overrides: Record<string, unknown> }[] }} */
+    /** @type {{ cameras?: string[], cases: { preset: string, variant: string, overrides: Record<string, unknown>, seeds?: number[] }[] }} */
     const extra = JSON.parse(readFileSync(resolve(ROOT, extraFile), 'utf8'));
     const cams = (extra.cameras ?? [...CAMERAS]).filter(
       (c) => !onlyCameras || onlyCameras.includes(c),
@@ -275,7 +275,8 @@ async function main() {
       .filter((c) => !only || only.includes(c.preset))
       .flatMap((c) => {
         if (!presets[c.preset]) throw new Error(`unknown preset ${c.preset}`);
-        return SEEDS.map((seed) => ({ ...c, seed, chalk: false, cameras: cams }));
+        const { seeds, ...rest } = c;
+        return (seeds ?? SEEDS).map((seed) => ({ ...rest, seed, chalk: false, cameras: cams }));
       });
   } else if (reroll) {
     jobs = names.flatMap((preset) =>

@@ -16,15 +16,15 @@ import {
 import { CompositePass } from './composite';
 import type { InkLayer } from './layers';
 import { CapsuleBatch, RibbonBatch, RibbonPipeline } from './ribbon-pass';
-import { PLATE_UNITS } from './sample-scene';
+import { PLATE } from '../view/camera';
 import { INK_FORMAT, IndirectSpriteBatch, SpriteBatch, SpritePipeline } from './sprites';
+import type { Surface } from './surface';
 
 /** A layer ready to draw. */
 interface Batch {
   encode(pass: GPURenderPassEncoder): void;
   destroy(): void;
 }
-import type { Surface } from './surface';
 
 export interface FrameSize {
   /** plate size in CSS pixels */
@@ -61,7 +61,7 @@ export class GpuRenderer {
     this.size = size;
     this.width = Math.round(size.plateCss * size.dpr);
     this.height = this.width;
-    this.pxPerUnit = this.width / PLATE_UNITS;
+    this.pxPerUnit = this.width / PLATE;
     this.ink = this.device.createTexture({
       label: 'ink target',
       size: [this.width, this.height],

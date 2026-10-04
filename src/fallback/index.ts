@@ -9,7 +9,7 @@
  */
 import type { AtlasData, AtlasName, ImageData8 } from '../marks/atlas';
 import type { InkLayer } from '../render/layers';
-import { PLATE_UNITS } from '../render/sample-scene';
+import { PLATE } from '../view/camera';
 import type { Surface } from '../render/surface';
 import {
   composite,
@@ -42,7 +42,7 @@ export class CpuRenderer {
     this.size = size;
     this.width = Math.round(size.plateCss * size.dpr);
     this.height = this.width;
-    this.pxPerUnit = this.width / PLATE_UNITS;
+    this.pxPerUnit = this.width / PLATE;
     this.ink = createInkBuffer(this.width, this.height);
   }
 
