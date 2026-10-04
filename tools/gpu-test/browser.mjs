@@ -35,7 +35,12 @@ export async function startServer() {
   await server.listen();
   const address = server.httpServer?.address();
   if (!address || typeof address === 'string') throw new Error('no server address');
-  return { url: `http://localhost:${String(address.port)}`, close: () => server.close() };
+  return {
+    url: `http://localhost:${String(address.port)}`,
+    close: () => server.close(),
+    /** the Vite server itself (the golden runner loads TypeScript with ssrLoadModule) */
+    vite: server,
+  };
 }
 
 export async function launch() {

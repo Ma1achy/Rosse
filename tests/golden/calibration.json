@@ -1,0 +1,434 @@
+{
+  "about": "ADR 0013 calibration: per family, summaries of (a)-(c) over \"same galaxy, other dots\" pairs. engineRekey: the new engine (CPU, L1-equal to WebGPU) re-keying its placement stream, 4 keys per preset, seed and camera (a full re-draw). engineOtherStructure: the orbit camera (az + 35°, incl + 20°) against home, re-keyed (real change of structure, for the margin). v21Reroll: v21 at az and az + 0.3° where its stipple re-rolled (a partial re-draw).",
+  "keys": 4,
+  "configurations": [
+    "Grand design s7 incl 30",
+    "Grand design s7 incl 50",
+    "Grand design s4242 incl 30",
+    "Grand design s4242 incl 50",
+    "Barred spiral s7 incl 30",
+    "Barred spiral s7 incl 50",
+    "Barred spiral s4242 incl 30",
+    "Barred spiral s4242 incl 50",
+    "Flocculent s7 incl 30",
+    "Flocculent s7 incl 50",
+    "Flocculent s4242 incl 30",
+    "Flocculent s4242 incl 50",
+    "Hand-drawn arms s7 incl 30",
+    "Hand-drawn arms s7 incl 50",
+    "Hand-drawn arms s4242 incl 30",
+    "Hand-drawn arms s4242 incl 50",
+    "Tightly wound s7 incl 30",
+    "Tightly wound s7 incl 50",
+    "Tightly wound s4242 incl 30",
+    "Tightly wound s4242 incl 50",
+    "Loose, open arms s7 incl 30",
+    "Loose, open arms s7 incl 50",
+    "Loose, open arms s4242 incl 30",
+    "Loose, open arms s4242 incl 50",
+    "Ringed s7 incl 30",
+    "Ringed s7 incl 50",
+    "Ringed s4242 incl 30",
+    "Ringed s4242 incl 50",
+    "Disc, no arms s7 incl 45",
+    "Disc, no arms s7 incl 65",
+    "Disc, no arms s4242 incl 45",
+    "Disc, no arms s4242 incl 65",
+    "Edge-on with dust s7 incl 88",
+    "Edge-on with dust s7 incl 108",
+    "Edge-on with dust s4242 incl 88",
+    "Edge-on with dust s4242 incl 108",
+    "Smooth, round s7 incl 10",
+    "Smooth, round s7 incl 30",
+    "Smooth, round s4242 incl 10",
+    "Smooth, round s4242 incl 30",
+    "Cigar-shaped s7 incl 88",
+    "Cigar-shaped s7 incl 108",
+    "Cigar-shaped s4242 incl 88",
+    "Cigar-shaped s4242 incl 108",
+    "Deep field s7 incl 88",
+    "Deep field s7 incl 108",
+    "Deep field s4242 incl 88",
+    "Deep field s4242 incl 108",
+    "Radio jet s7 incl 88",
+    "Radio jet s7 incl 108",
+    "Radio jet s4242 incl 88",
+    "Radio jet s4242 incl 108",
+    "Shell galaxy s7 incl 88",
+    "Shell galaxy s7 incl 108",
+    "Shell galaxy s4242 incl 88",
+    "Shell galaxy s4242 incl 108",
+    "Cigar-shaped (stipple) s4242 incl 88",
+    "Cigar-shaped (stipple) s4242 incl 108",
+    "Cigar-shaped (stipple) s7 incl 88",
+    "Cigar-shaped (stipple) s7 incl 108",
+    "Disc, no arms (stipple) s4242 incl 45",
+    "Disc, no arms (stipple) s4242 incl 65",
+    "Disc, no arms (stipple) s7 incl 45",
+    "Disc, no arms (stipple) s7 incl 65",
+    "Smooth, round (stipple) s4242 incl 10",
+    "Smooth, round (stipple) s4242 incl 30",
+    "Smooth, round (stipple) s7 incl 10",
+    "Smooth, round (stipple) s7 incl 30"
+  ],
+  "families": {
+    "spiral": {
+      "engineRekey": {
+        "ssim": {
+          "n": 160,
+          "min": 0.2826,
+          "p5": 0.3131,
+          "median": 0.4138,
+          "p95": 0.5695,
+          "max": 0.634
+        },
+        "ssimCoarse": {
+          "n": 160,
+          "min": 0.8823,
+          "p5": 0.8942,
+          "median": 0.9192,
+          "p95": 0.9512,
+          "max": 0.961
+        },
+        "inkAbs": {
+          "n": 160,
+          "min": 0,
+          "p5": 0.0005,
+          "median": 0.0064,
+          "p95": 0.0244,
+          "max": 0.0354
+        },
+        "medianAbs": {
+          "n": 160,
+          "min": 0,
+          "p5": 0,
+          "median": 0,
+          "p95": 0.0505,
+          "max": 0.0541
+        },
+        "p90Abs": {
+          "n": 160,
+          "min": 0,
+          "p5": 0,
+          "median": 0.0062,
+          "p95": 0.05,
+          "max": 0.0932
+        }
+      },
+      "engineOtherStructure": {
+        "ssim": {
+          "n": 40,
+          "min": 0.2542,
+          "p5": 0.2555,
+          "median": 0.3358,
+          "p95": 0.475,
+          "max": 0.4792
+        },
+        "ssimCoarse": {
+          "n": 40,
+          "min": 0.4837,
+          "p5": 0.5263,
+          "median": 0.6994,
+          "p95": 0.781,
+          "max": 0.8213
+        },
+        "inkAbs": {
+          "n": 40,
+          "min": 0.0135,
+          "p5": 0.0341,
+          "median": 0.1146,
+          "p95": 0.2732,
+          "max": 0.7719
+        },
+        "medianAbs": {
+          "n": 40,
+          "min": 0,
+          "p5": 0,
+          "median": 0.029,
+          "p95": 0.118,
+          "max": 0.1785
+        },
+        "p90Abs": {
+          "n": 40,
+          "min": 0,
+          "p5": 0.0077,
+          "median": 0.1068,
+          "p95": 0.2403,
+          "max": 0.2494
+        }
+      },
+      "v21Reroll": {
+        "ssim": {
+          "n": 32,
+          "min": 0.8899,
+          "p5": 0.8956,
+          "median": 0.9688,
+          "p95": 0.9767,
+          "max": 0.9783
+        },
+        "ssimCoarse": {
+          "n": 32,
+          "min": 0.9719,
+          "p5": 0.975,
+          "median": 0.997,
+          "p95": 0.9985,
+          "max": 0.9985
+        },
+        "inkAbs": {
+          "n": 32,
+          "min": 0.0001,
+          "p5": 0.0001,
+          "median": 0.0009,
+          "p95": 0.0026,
+          "max": 0.004
+        },
+        "medianAbs": {
+          "n": 32,
+          "min": 0,
+          "p5": 0,
+          "median": 0,
+          "p95": 0,
+          "max": 0
+        },
+        "p90Abs": {
+          "n": 32,
+          "min": 0,
+          "p5": 0,
+          "median": 0,
+          "p95": 0.0534,
+          "max": 0.0561
+        }
+      }
+    },
+    "smooth": {
+      "engineRekey": {
+        "ssim": {
+          "n": 112,
+          "min": 0.3801,
+          "p5": 0.3845,
+          "median": 0.5165,
+          "p95": 0.6271,
+          "max": 0.6365
+        },
+        "ssimCoarse": {
+          "n": 112,
+          "min": 0.9072,
+          "p5": 0.9128,
+          "median": 0.9411,
+          "p95": 0.96,
+          "max": 0.9626
+        },
+        "inkAbs": {
+          "n": 112,
+          "min": 0.0001,
+          "p5": 0.0009,
+          "median": 0.0073,
+          "p95": 0.0263,
+          "max": 0.0415
+        },
+        "medianAbs": {
+          "n": 112,
+          "min": 0,
+          "p5": 0,
+          "median": 0,
+          "p95": 0,
+          "max": 0
+        },
+        "p90Abs": {
+          "n": 112,
+          "min": 0,
+          "p5": 0,
+          "median": 0,
+          "p95": 0.0572,
+          "max": 0.0945
+        }
+      },
+      "engineOtherStructure": {
+        "ssim": {
+          "n": 28,
+          "min": 0.3868,
+          "p5": 0.3949,
+          "median": 0.5085,
+          "p95": 0.61,
+          "max": 0.6171
+        },
+        "ssimCoarse": {
+          "n": 28,
+          "min": 0.8923,
+          "p5": 0.9094,
+          "median": 0.9303,
+          "p95": 0.9509,
+          "max": 0.9517
+        },
+        "inkAbs": {
+          "n": 28,
+          "min": 0.0002,
+          "p5": 0.0009,
+          "median": 0.0059,
+          "p95": 0.118,
+          "max": 0.1232
+        },
+        "medianAbs": {
+          "n": 28,
+          "min": 0,
+          "p5": 0,
+          "median": 0,
+          "p95": 0,
+          "max": 0
+        },
+        "p90Abs": {
+          "n": 28,
+          "min": 0,
+          "p5": 0,
+          "median": 0,
+          "p95": 0.0572,
+          "max": 0.0572
+        }
+      },
+      "v21Reroll": {
+        "ssim": {
+          "n": 9,
+          "min": 0.8949,
+          "p5": 0.8949,
+          "median": 0.9523,
+          "p95": 0.9845,
+          "max": 0.9845
+        },
+        "ssimCoarse": {
+          "n": 9,
+          "min": 0.9745,
+          "p5": 0.9745,
+          "median": 0.9938,
+          "p95": 0.9991,
+          "max": 0.9991
+        },
+        "inkAbs": {
+          "n": 9,
+          "min": 0.0001,
+          "p5": 0.0001,
+          "median": 0.001,
+          "p95": 0.0074,
+          "max": 0.0074
+        },
+        "medianAbs": {
+          "n": 9,
+          "min": 0,
+          "p5": 0,
+          "median": 0,
+          "p95": 0.1094,
+          "max": 0.1094
+        },
+        "p90Abs": {
+          "n": 9,
+          "min": 0,
+          "p5": 0,
+          "median": 0,
+          "p95": 0.0505,
+          "max": 0.0505
+        }
+      }
+    },
+    "merger": {
+      "engineRekey": null,
+      "engineOtherStructure": null,
+      "v21Reroll": {
+        "ssim": {
+          "n": 18,
+          "min": 0.9292,
+          "p5": 0.9292,
+          "median": 0.9643,
+          "p95": 0.9745,
+          "max": 0.9745
+        },
+        "ssimCoarse": {
+          "n": 18,
+          "min": 0.9861,
+          "p5": 0.9861,
+          "median": 0.9946,
+          "p95": 0.9974,
+          "max": 0.9974
+        },
+        "inkAbs": {
+          "n": 18,
+          "min": 0,
+          "p5": 0,
+          "median": 0.0011,
+          "p95": 0.0033,
+          "max": 0.0033
+        },
+        "medianAbs": {
+          "n": 18,
+          "min": 0,
+          "p5": 0,
+          "median": 0,
+          "p95": 0.0282,
+          "max": 0.0282
+        },
+        "p90Abs": {
+          "n": 18,
+          "min": 0,
+          "p5": 0,
+          "median": 0,
+          "p95": 0.0728,
+          "max": 0.0728
+        }
+      }
+    },
+    "lens": {
+      "engineRekey": null,
+      "engineOtherStructure": null,
+      "v21Reroll": {
+        "ssim": {
+          "n": 12,
+          "min": 0.8732,
+          "p5": 0.8732,
+          "median": 0.9337,
+          "p95": 0.9758,
+          "max": 0.9758
+        },
+        "ssimCoarse": {
+          "n": 12,
+          "min": 0.9724,
+          "p5": 0.9724,
+          "median": 0.9796,
+          "p95": 0.9949,
+          "max": 0.9949
+        },
+        "inkAbs": {
+          "n": 12,
+          "min": 0.0001,
+          "p5": 0.0001,
+          "median": 0.003,
+          "p95": 0.0098,
+          "max": 0.0098
+        },
+        "medianAbs": {
+          "n": 12,
+          "min": 0,
+          "p5": 0,
+          "median": 0,
+          "p95": 0,
+          "max": 0
+        },
+        "p90Abs": {
+          "n": 12,
+          "min": 0,
+          "p5": 0,
+          "median": 0,
+          "p95": 0.0499,
+          "max": 0.0499
+        }
+      }
+    },
+    "star": {
+      "engineRekey": null,
+      "engineOtherStructure": null,
+      "v21Reroll": null
+    },
+    "artefact": {
+      "engineRekey": null,
+      "engineOtherStructure": null,
+      "v21Reroll": null
+    }
+  }
+}

@@ -6,6 +6,16 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- M2, the stipple from the model and the comparison harness:
+  - `core/params`, `core/schema`, `core/presets`: the typed `DEF` (109 keys, v21's defaults), every key's range (from v21's controls) and cache tier (ADR 0010, with `incE` buckets dirtying the model), and the 45 presets verbatim, checked against `app23.js`.
+  - `model/variation`: `makeVariation` on the counter RNG, one index per group of fields (changing the arms no longer changes the hand); the hand of 1–3 readable pens and the knot pool; `dotSprite`.
+  - `model/galaxy`, `model/scene`, `model/parts` (the drawn core only): the scene description shared by both engines.
+  - `compute/stipple.wgsl`, `project.wgsl`, `scan.wgsl` with CPU twins in `fallback/kernels/`: bulge, halo, bar, ring, disc (with arms, spurs, flocculence, patchiness, irregularity, warp, lopsidedness, dust patches) and Sérsic components with bounded rejection; dot, knot, sparkle-star and drawn-star classification by population; dust optical depth as a pure view cull; deterministic per-class compaction into instance buffers drawn with `drawIndirect`. `sin`, `cos` and the stipple's Gaussian are built from `+ − ×` (`core/f32math`, `common/math.wgsl`) so the GPU and the CPU agree.
+  - The page draws the chosen preset and seed (`?preset=`, `?seed=`, `?variant=stipple`).
+  - `npm run golden`: the metric of ADR 0013 (`tests/golden/compare/`: density maps, SSIM, stroke widths from the distance transform, counts, HTML reports), WebGPU on SwiftShader and the CPU engine against v21, and the CPU engine against WebGPU; `--calibrate` writes `tests/golden/thresholds.json` and `calibration.json`.
+  - `tools/capture-reference`: `--extra` (preset plus overrides, added to the manifest; the capture records v21's hand) and `--reroll` (v21's 0.3° re-roll pairs); 12 stipple-only captures of `Smooth, round`, `Cigar-shaped` and `Disc, no arms`.
+  - `npm run test:gpu`: the stipple kernels on the GPU against their CPU twins (L1).
+
 - M1, paper and one mark:
   - `gpu/device`: adapter and device request with the adapter's texture-array and buffer limits, device-loss recovery, and `detectBackend()` choosing WebGPU or the CPU engine.
   - `core/rng` and `shaders/common/rng.wgsl`: the counter-based RNG of ADR 0004 (pcg4d keyed by seed, stream, index and draw), named streams in `core/streams`, and shared vectors in `tests/vectors/rng.json`.

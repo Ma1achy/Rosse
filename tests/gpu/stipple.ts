@@ -68,7 +68,7 @@ run('stipple kernels (GPU = CPU, L1)', async () => {
   );
   if (!dots || !knots || !stars || !cores) throw new Error('atlases missing');
   const meta = drawingsMeta({ dots, knots, stars, cores });
-  const gpu = await GpuStipple.create(dev);
+  const gpu = GpuStipple.create(dev);
   const lines = [`adapter: ${adapterName(adapter)}`];
   let pass = true;
   const data: Record<string, unknown> = {};

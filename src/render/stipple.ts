@@ -23,9 +23,9 @@ import type { GpuSpriteLayer } from './layers';
 
 const STORAGE = GPUBufferUsage.STORAGE;
 
-async function pipeline(device: GPUDevice, code: string, entryPoint: string, label: string) {
+function pipeline(device: GPUDevice, code: string, entryPoint: string, label: string) {
   const module = device.createShaderModule({ label, code });
-  return device.createComputePipelineAsync({
+  return device.createComputePipeline({
     label: `${label} ${entryPoint}`,
     layout: 'auto',
     compute: { module, entryPoint },
@@ -75,14 +75,14 @@ export class GpuStipple {
     },
   ) {}
 
-  static async create(device: GPUDevice): Promise<GpuStipple> {
-    const [stipple, project, local, blocks, scatter] = await Promise.all([
+  static create(device: GPUDevice): GpuStipple {
+    const [stipple, project, local, blocks, scatter] = [
       pipeline(device, stippleWgsl, 'main', 'stipple.wgsl'),
       pipeline(device, projectWgsl, 'main', 'project.wgsl'),
       pipeline(device, scanWgsl, 'scan_local', 'scan.wgsl'),
       pipeline(device, scanWgsl, 'scan_blocks', 'scan.wgsl'),
       pipeline(device, scanWgsl, 'scatter', 'scan.wgsl'),
-    ]);
+    ];
     return new GpuStipple(device, { stipple, project, local, blocks, scatter });
   }
 

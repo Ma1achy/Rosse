@@ -18,5 +18,12 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src", "tests/unit", "tests/gpu", "tests/vectors", "vite.config.ts"]
+  "include": [
+    "src",
+    "tests/unit",
+    "tests/gpu",
+    "tests/vectors",
+    "tests/golden/compare",
+    "vite.config.ts"
+  ]
 }

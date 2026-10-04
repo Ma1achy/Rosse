@@ -1,0 +1,79 @@
+{
+  "about": "Golden thresholds (ADR 0013). parity: the new engine against v21 (L2), per family; strict: the CPU engine against WebGPU (L1). Written by `npm run golden -- --calibrate`; the numbers behind them are in calibration.json and docs/milestones/m2/README.md. Families marked provisional have no engine yet and keep the ADR values.",
+  "strict": {
+    "ink": 0.005,
+    "ssim": 0.98,
+    "ssimCoarse": 0.98,
+    "median": 0.02,
+    "p90": 0.02,
+    "counts": 0.001,
+    "countsSmall": 0.001,
+    "poisson": 0
+  },
+  "parity": {
+    "spiral": {
+      "ink": 0.05,
+      "ssim": 0.29,
+      "ssimCoarse": 0.87,
+      "median": 0.1,
+      "p90": 0.1,
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3
+    },
+    "smooth": {
+      "ink": 0.05,
+      "ssim": 0.36,
+      "ssimCoarse": 0.89,
+      "median": 0.1,
+      "p90": 0.1,
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3
+    },
+    "merger": {
+      "ink": 0.05,
+      "median": 0.1,
+      "p90": 0.1,
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "ssim": 0.85,
+      "ssimCoarse": 0.85,
+      "provisional": true
+    },
+    "lens": {
+      "ink": 0.05,
+      "median": 0.1,
+      "p90": 0.1,
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "ssim": 0.85,
+      "ssimCoarse": 0.85,
+      "provisional": true
+    },
+    "star": {
+      "ink": 0.05,
+      "median": 0.1,
+      "p90": 0.1,
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "ssim": 0.85,
+      "ssimCoarse": 0.85,
+      "provisional": true
+    },
+    "artefact": {
+      "ink": 0.05,
+      "median": 0.1,
+      "p90": 0.1,
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "ssim": 0.85,
+      "ssimCoarse": 0.85,
+      "provisional": true
+    }
+  }
+}
