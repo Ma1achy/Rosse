@@ -5,20 +5,24 @@ import {
   compareMeasures,
   densityMap,
   distanceTransform,
+  extentOf,
+  inkBeyond,
+  momentsOf,
+  radiusAt,
   downsample,
-  gray,
+  grey,
   measure,
   quantile,
   ssim,
   strokeWidths,
   totalInk,
-  type Gray,
+  type Grey,
 } from '../../tests/golden/compare/metrics';
-import { evaluate, type Thresholds } from '../../tests/golden/compare/thresholds';
+import { countAllowance, evaluate, type Thresholds } from '../../tests/golden/compare/thresholds';
 
 /** A plate with anti-aliased discs (coverage by 4×4 supersampling). */
-function discs(w: number, h: number, list: [number, number, number][]): Gray {
-  const g = gray(w, h);
+function discs(w: number, h: number, list: [number, number, number][]): Grey {
+  const g = grey(w, h);
   for (const [cx, cy, r] of list)
     for (let y = Math.max(0, Math.floor(cy - r)); y <= Math.min(h - 1, Math.ceil(cy + r)); y++)
       for (let x = Math.max(0, Math.floor(cx - r)); x <= Math.min(w - 1, Math.ceil(cx + r)); x++) {
@@ -37,7 +41,7 @@ function discs(w: number, h: number, list: [number, number, number][]): Gray {
 }
 
 /** Random dots of radius r, from a tiny LCG (deterministic). */
-function randomDots(n: number, r: number, seed: number, w = 200, h = 200): Gray {
+function randomDots(n: number, r: number, seed: number, w = 200, h = 200): Grey {
   let s = seed;
   const u = () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 2 ** 32;
   return discs(
@@ -48,7 +52,7 @@ function randomDots(n: number, r: number, seed: number, w = 200, h = 200): Gray 
 }
 
 /** A little galaxy: n dots with an exponential surface density of scale `h` round (cx, cy). */
-function blobDots(n: number, seed: number, cx = 200, cy = 200, h = 30, w = 400): Gray {
+function blobDots(n: number, seed: number, cx = 200, cy = 200, h = 30, w = 400): Grey {
   let s = seed;
   const u = () => ((s = (Math.imul(s, 1664525) + 1013904223) >>> 0) + 0.5) / 2 ** 32;
   return discs(
@@ -64,12 +68,12 @@ function blobDots(n: number, seed: number, cx = 200, cy = 200, h = 30, w = 400):
 
 describe('golden metric (ADR 0013)', () => {
   it('total ink is the sum of α', () => {
-    const g = gray(4, 4, new Float32Array(16).fill(0.25));
+    const g = grey(4, 4, new Float32Array(16).fill(0.25));
     expect(totalInk(g)).toBeCloseTo(4, 6);
   });
 
   it('the density map conserves ink away from the edges and is 4× smaller', () => {
-    const g = gray(64, 64);
+    const g = grey(64, 64);
     g.data[32 * 64 + 30] = 1;
     g.data[20 * 64 + 40] = 0.5;
     const b = blur(g, 4);
@@ -77,7 +81,7 @@ describe('golden metric (ADR 0013)', () => {
     const d = densityMap(g);
     expect([d.width, d.height]).toEqual([16, 16]);
     expect(totalInk(d) * 16).toBeCloseTo(1.5, 4);
-    expect(totalInk(downsample(gray(8, 8, new Float32Array(64).fill(1)), 4))).toBe(4);
+    expect(totalInk(downsample(grey(8, 8, new Float32Array(64).fill(1)), 4))).toBe(4);
   });
 
   it('SSIM is 1 for identical maps, high for re-drawn dots, low for other structure', () => {
@@ -120,7 +124,7 @@ describe('golden metric (ADR 0013)', () => {
     expect(d10.median).toBeGreaterThan(9);
     expect(d10.median).toBeLessThan(11);
     // a horizontal line 3 px wide
-    const line = gray(60, 20);
+    const line = grey(60, 20);
     for (let x = 5; x < 55; x++) for (let y = 9; y < 12; y++) line.data[y * 60 + x] = 1;
     const l3 = strokeWidths(line);
     expect(l3.median).toBeGreaterThan(2.7);
@@ -145,23 +149,65 @@ describe('golden metric (ADR 0013)', () => {
     expect(Math.abs(c.inkRel)).toBeLessThan(0.05);
     const t: Thresholds = {
       ink: 0.05,
-      ssim: 0.4,
       ssimCoarse: 0.6,
       median: 0.1,
       p90: 0.1,
+      r25: 0.1,
+      r50: 0.1,
+      r90: 0.1,
+      outer: 0.03,
+      q: 0.05,
+      qInner: 0.05,
+      pa: 10,
+      paBelowQ: 0.8,
       counts: 0.03,
       countsSmall: 0.1,
       poisson: 3,
+      poissonBelow: 1000,
     };
     const e = evaluate(c, { dots: 300 }, { dots: 303 }, t);
-    expect(e.pass).toBe(true);
+    expect(e.failures).toEqual([]);
     const bad = evaluate(c, { dots: 300 }, { dots: 400 }, t);
     expect(bad.pass).toBe(false);
     expect(bad.failures.join(' ')).toMatch(/dots/);
-    // a class under 100 marks gets the wider tolerance, and a small one the Poisson allowance
+    // a class under 100 marks gets the wider tolerance, a small one the Poisson allowance
     expect(evaluate(c, { knots: 50 }, { knots: 54 }, t).pass).toBe(true);
     expect(evaluate(c, { stars: 3 }, { stars: 0 }, t).pass).toBe(true);
     expect(evaluate(c, { stars: 3 }, { stars: 0 }, { ...t, poisson: 0 }).pass).toBe(false);
+    // none in the reference: none allowed
+    expect(evaluate(c, { stars: 0 }, { stars: 1 }, t).pass).toBe(false);
+    expect(countAllowance(0, 3, t)).toBe(0);
+    // the effective widths: 3 √(ref + render) below 1,000, the relative tolerance above
+    expect(countAllowance(720, 774, t)).toBeCloseTo(3 * Math.sqrt(1494), 6);
+    expect(countAllowance(9500, 9500, t)).toBeCloseTo(285, 6);
+    expect(countAllowance(1016, 1082, t)).toBeCloseTo(30.48, 6);
+  });
+
+  it('measures extent and shape: radii, outer ink, axis ratio, position angle', () => {
+    const round = blobDots(6000, 6, 400, 400, 30, 800);
+    const big = blobDots(6000, 7, 400, 400, 45, 800);
+    const m = measure(round);
+    expect(m.extent.r25).toBeLessThan(m.extent.r50);
+    expect(m.extent.r50).toBeLessThan(m.extent.r90);
+    const c = compareMeasures(m, measure(big));
+    expect(c.r50Rel).toBeGreaterThan(0.3);
+    expect(c.outerDiff).toBeGreaterThan(0.1);
+    // an elongated ellipse of ink at 30° (y down)
+    const g = grey(400, 400);
+    for (let y = 0; y < 400; y++)
+      for (let x = 0; x < 400; x++) {
+        const dx = x + 0.5 - 200;
+        const dy = y + 0.5 - 200;
+        const a = (30 * Math.PI) / 180;
+        const u = dx * Math.cos(a) + dy * Math.sin(a);
+        const v = -dx * Math.sin(a) + dy * Math.cos(a);
+        if ((u / 80) ** 2 + (v / 40) ** 2 <= 1) g.data[y * 400 + x] = 1;
+      }
+    const mo = momentsOf(g, 150, 200, 200);
+    expect(mo.q).toBeCloseTo(0.5, 2);
+    expect(mo.pa).toBeCloseTo(30, 0);
+    expect(radiusAt(extentOf(g, 200, 200), 1)).toBeLessThan(81);
+    expect(inkBeyond(extentOf(g, 200, 200), 40)).toBeGreaterThan(0.3);
   });
 });
 
