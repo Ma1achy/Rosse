@@ -1,10 +1,12 @@
 /**
- * The stipple on the GPU (ADR 0003, 0010): the model tier (compute/stipple.wgsl, re-run only when
- * the scene changes) and the view tier (compute/project.wgsl, then the three entry points of
- * compute/scan.wgsl), giving one instance list per class in a single buffer
- * (`CLASS_COUNT × cap` slots) and the indirect draw arguments per class. The sprite pass draws
- * the lists with drawIndirect: nothing is read back on the frame path. The read-back helpers at
- * the end are for tests and statistics only.
+ * The galaxy on the GPU (ADR 0003, 0010): the model tier (compute/stipple.wgsl, re-run only when
+ * the scene changes: the proposals, then the ring knots' and clumps' marks) and the view tier
+ * (compute/ribbons.wgsl `project_points`, compute/project.wgsl with the dust culls, the three entry
+ * points of compute/scan.wgsl, then the rest of ribbons.wgsl), giving one instance list per class
+ * in a single buffer (`CLASS_COUNT × cap` slots), the indirect draw arguments per class, and the
+ * line-work's ribbons, capsules and pieces (./ribbons.ts). The ink passes draw them with direct or
+ * indirect draws: nothing is read back on the frame path. The read-back helpers at the end are for
+ * tests and statistics only.
  *
  * CPU twin: src/fallback/stipple.ts.
  */
@@ -14,7 +16,11 @@ import scanWgsl from '../shaders/compute/scan.wgsl';
 import { bufferWithData } from '../gpu/buffers';
 import { INSTANCE_LAYOUT } from '../marks/instance';
 import { CLASS_COUNT } from '../model/classes';
-import { packGalaxy } from '../model/galaxy';
+import { packGalaxy, sampleCount } from '../model/galaxy';
+import { cullsUniform } from '../model/ribbons';
+import { packStruct } from '../gpu/buffers';
+import { CULLS_LAYOUT } from '../fallback/kernels/project';
+import { GpuRibbons } from './ribbons';
 import {
   STIPPLE_LAYERS,
   buildScene,
@@ -29,7 +35,7 @@ import { cameraOf, packView, viewDesc, type Camera } from '../view/camera';
 import { TierState, type TierWork } from './tiers';
 import { SAMPLE_LAYOUT } from '../fallback/kernels/stipple';
 import { BLOCK_STRIDE, blockCount, classCapacity } from '../fallback/kernels/scan';
-import type { GpuSpriteLayer } from './layers';
+import type { GpuSpriteLayer, InkLayer } from './layers';
 
 const STORAGE = GPUBufferUsage.STORAGE;
 
@@ -51,8 +57,10 @@ interface ModelBuffers {
   shape: GPUBuffer;
   pool: GPUBuffer;
   dotBase: GPUBuffer;
+  groupsBuf: GPUBuffer;
   samples: GPUBuffer;
   view: GPUBuffer;
+  culls: GPUBuffer;
   scan: GPUBuffer;
   projected: GPUBuffer;
   classes: GPUBuffer;
@@ -63,6 +71,7 @@ interface ModelBuffers {
   out: GPUBuffer;
   groups: {
     stipple: GPUBindGroup;
+    extra: GPUBindGroup;
     project: GPUBindGroup;
     local: GPUBindGroup;
     blocks: GPUBindGroup;
@@ -80,22 +89,30 @@ export class GpuStipple {
     readonly device: GPUDevice,
     private readonly pipes: {
       stipple: GPUComputePipeline;
+      extra: GPUComputePipeline;
       project: GPUComputePipeline;
       local: GPUComputePipeline;
       blocks: GPUComputePipeline;
       scatter: GPUComputePipeline;
     },
+    /** the line-work (M4) */
+    readonly ribbons: GpuRibbons,
   ) {}
 
   static create(device: GPUDevice): GpuStipple {
-    const [stipple, project, local, blocks, scatter] = [
+    const [stipple, extra, project, local, blocks, scatter] = [
       pipeline(device, stippleWgsl, 'main', 'stipple.wgsl'),
+      pipeline(device, stippleWgsl, 'extra', 'stipple.wgsl'),
       pipeline(device, projectWgsl, 'main', 'project.wgsl'),
       pipeline(device, scanWgsl, 'scan_local', 'scan.wgsl'),
       pipeline(device, scanWgsl, 'scan_blocks', 'scan.wgsl'),
       pipeline(device, scanWgsl, 'scatter', 'scan.wgsl'),
     ];
-    return new GpuStipple(device, { stipple, project, local, blocks, scatter });
+    return new GpuStipple(
+      device,
+      { stipple, extra, project, local, blocks, scatter },
+      GpuRibbons.create(device),
+    );
   }
 
   /**
@@ -138,7 +155,9 @@ export class GpuStipple {
     this.scene = scene;
     const d = this.device;
     const G = scene.galaxy;
-    const n = G.g.n ?? 0;
+    // every sample: the proposals, then the ring knots' and clumps' marks
+    const n = sampleCount(G);
+    const nExtra = G.g.n_extra ?? 0;
     const cap = classCapacity(n);
     const blocks = blockCount(n);
     const buf = (size: number, usage: number, label: string) =>
@@ -147,8 +166,11 @@ export class GpuStipple {
     const shape = bufferWithData(d, G.shape, STORAGE, 'galaxy shape');
     const pool = bufferWithData(d, G.pool, STORAGE, 'galaxy pools');
     const dotBase = bufferWithData(d, G.dotBase, STORAGE, 'dot sizes');
+    const groupsBuf = bufferWithData(d, G.groups, STORAGE, 'ring knots and clumps');
     const samples = buf(n * SAMPLE_LAYOUT.size, STORAGE | GPUBufferUsage.COPY_SRC, 'samples');
     const view = buf(64, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'view');
+    const culls = buf(CULLS_LAYOUT.size, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'culls');
+    this.ribbons.load(scene.ribbons, view, pool, dotBase);
     const scan = bufferWithData(
       d,
       new Uint32Array([n, cap, blocks, 0]),
@@ -184,8 +206,10 @@ export class GpuStipple {
       shape,
       pool,
       dotBase,
+      groupsBuf,
       samples,
       view,
+      culls,
       scan,
       projected,
       classes,
@@ -202,11 +226,21 @@ export class GpuStipple {
           [3, dotBase],
           [4, samples],
         ]),
+        extra: group(P.extra, [
+          [0, galaxy],
+          [2, pool],
+          [3, dotBase],
+          [4, samples],
+          [5, groupsBuf],
+        ]),
         project: group(P.project, [
           [0, view],
           [1, samples],
           [2, projected],
           [3, classes],
+          [4, culls],
+          [5, this.ribbons.points],
+          [6, this.ribbons.carve],
         ]),
         local: group(P.local, [
           [0, scan],
@@ -234,7 +268,12 @@ export class GpuStipple {
     const pass = enc.beginComputePass({ label: 'stipple' });
     pass.setPipeline(P.stipple);
     pass.setBindGroup(0, this.model.groups.stipple);
-    pass.dispatchWorkgroups(Math.ceil(n / 64) || 1);
+    pass.dispatchWorkgroups(Math.ceil((G.g.n ?? 0) / 64) || 1);
+    if (nExtra) {
+      pass.setPipeline(P.extra);
+      pass.setBindGroup(0, this.model.groups.extra);
+      pass.dispatchWorkgroups(Math.ceil(nExtra / 64));
+    }
     pass.end();
     d.queue.submit([enc.finish()]);
   }
@@ -244,14 +283,18 @@ export class GpuStipple {
     const m = this.model;
     if (!m || !this.scene) throw new Error('setScene first');
     const d = this.device;
+    const { P: params, galaxy } = this.scene;
+    d.queue.writeBuffer(m.view, 0, packView(viewDesc(cam, galaxy.g.dust ?? 0, m.n, m.cap)));
     d.queue.writeBuffer(
-      m.view,
+      m.culls,
       0,
-      packView(viewDesc(cam, this.scene.galaxy.g.dust ?? 0, m.n, m.cap)),
+      packStruct(CULLS_LAYOUT, cullsUniform(this.scene.ribbons, cam, params, galaxy.g.key ?? 0)),
     );
+    this.ribbons.setView(cam, params, galaxy.g.n_dot_pool ?? 1);
     const enc = d.createCommandEncoder({ label: 'stipple view' });
     const pass = enc.beginComputePass({ label: 'project + compact' });
     const P = this.pipes;
+    this.ribbons.encodeProject(pass);
     pass.setPipeline(P.project);
     pass.setBindGroup(0, m.groups.project);
     pass.dispatchWorkgroups(Math.ceil(m.n / 64) || 1);
@@ -264,8 +307,14 @@ export class GpuStipple {
     pass.setPipeline(P.scatter);
     pass.setBindGroup(0, m.groups.scatter);
     pass.dispatchWorkgroups(Math.ceil(m.n / 64) || 1);
+    this.ribbons.encodeExpand(pass);
     pass.end();
     d.queue.submit([enc.finish()]);
+  }
+
+  /** The line-work's layers (ribbons, hatching, pieces), drawn before the stipple. */
+  lineLayers(): InkLayer[] {
+    return this.model ? this.ribbons.layers() : [];
   }
 
   /** The drawn classes as indirect sprite layers, in draw order. */
@@ -306,7 +355,17 @@ export class GpuStipple {
     const a = new Uint32Array(await this.read(m.args, CLASS_COUNT * 16));
     const perClass = new Uint32Array(CLASS_COUNT);
     for (let c = 0; c < CLASS_COUNT; c++) perClass[c] = a[c * 4 + 1] ?? 0;
-    return { perClass, counts: markCounts(perClass) };
+    const R = this.scene?.ribbons;
+    return {
+      perClass,
+      counts: {
+        ...markCounts(perClass),
+        curves: R?.nCurves ?? 0,
+        pieces: await this.ribbons.readPieceCount(),
+        ribbonSegments: R?.nSegs ?? 0,
+        hatches: R?.nHatch ?? 0,
+      },
+    };
   }
 
   async readSamples(): Promise<ArrayBuffer> {
@@ -338,8 +397,10 @@ export class GpuStipple {
       m.shape,
       m.pool,
       m.dotBase,
+      m.groupsBuf,
       m.samples,
       m.view,
+      m.culls,
       m.scan,
       m.projected,
       m.classes,
@@ -350,6 +411,7 @@ export class GpuStipple {
       m.out,
     ])
       b.destroy();
+    this.ribbons.destroy();
     this.model = null;
   }
 

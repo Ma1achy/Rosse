@@ -17,7 +17,7 @@
  * preset's; the seed keeps them; the zoom is kept, as in v21.
  *
  * URL parameters: `preset`, `seed`, `variant=stipple` (the M2 golden overrides: no lines, knots,
- * envelope, drawn stars, deep field or foreground stars), `az`, `incl`, `pa`, `zoom`,
+ * envelope, drawn stars, deep field or foreground stars), `variant=ribbons` (the M4 overrides), `az`, `incl`, `pa`, `zoom`,
  * `backend=cpu|webgpu`, `present=copy`.
  */
 import type { Params } from './core/params';
@@ -59,7 +59,7 @@ declare global {
   }
 }
 
-const ATLASES: AtlasName[] = ['dots', 'knots', 'stars', 'cores'];
+const ATLASES: AtlasName[] = ['dots', 'knots', 'stars', 'cores', 'pieces', 'strokes'];
 /** v21 caps the device pixel ratio at 2 (app23.js:L1224). */
 const MAX_DPR = 2;
 
@@ -72,6 +72,23 @@ const STIPPLE_ONLY: Partial<Params> = {
   field: 0,
   fgstars: 0,
 };
+
+/**
+ * The M4 golden overrides (tests/golden/extra-cases.json, variant `ribbons`): no drawn stars among
+ * the stipple, deep field, foreground stars, bubbles, whole drawings or envelopes (vector and sky
+ * marks of later milestones); `Barred spiral` draws its bar and ring as ribbons.
+ */
+function ribbonsOnly(preset: string): Partial<Params> {
+  return {
+    starMix: 0,
+    field: 0,
+    fgstars: 0,
+    bubbles: 0,
+    whole: 0,
+    envelope: 0,
+    ...(preset === 'Barred spiral' ? { barStyle: 'ribbon', ringStyle: 'ribbon' } : {}),
+  };
+}
 
 interface Scene {
   atlases: AtlasData[];
@@ -232,7 +249,8 @@ async function gpuEngine(
       const st = stipple;
       if (!st) throw new Error('no stipple passes');
       const work = st.frame(P, zoom, scene.meta);
-      if (work.view) r.setLayers([...st.layers(), ...coreLayer(P, scene.meta, zoom)]);
+      if (work.view)
+        r.setLayers([...st.lineLayers(), ...st.layers(), ...coreLayer(P, scene.meta, zoom)]);
       r.drawInk();
       drawn = { P, zoom };
       return st;
@@ -316,7 +334,7 @@ async function start(): Promise<void> {
   // `?present=copy`: Chromium's SwiftShader WebGPU loses the device when a WebGPU canvas is
   // presented headless, so the screenshot tool uses this; it is never the default.
   const copy = params.get('present') === 'copy';
-  const stippleOnly = params.get('variant') === 'stipple';
+  const variant = params.get('variant');
   const note = document.getElementById('note');
   const stats = document.getElementById('stats');
   const select = document.getElementById('preset');
@@ -330,9 +348,10 @@ async function start(): Promise<void> {
   seedInput.value = String(seed);
 
   const assets = await BuiltAssets.load(import.meta.env.BASE_URL);
-  const [atlases, paper] = await Promise.all([
+  const [atlases, paper, penlines] = await Promise.all([
     Promise.all(ATLASES.map((n) => assets.atlas(n))),
     assets.paper(),
+    assets.vector('penlines'),
   ]);
   const by = (n: AtlasName) => {
     const a = atlases.find((x) => x.name === n);
@@ -342,14 +361,23 @@ async function start(): Promise<void> {
   const scene: Scene = {
     atlases,
     paper,
-    meta: drawingsMeta({
-      dots: by('dots'),
-      knots: by('knots'),
-      stars: by('stars'),
-      cores: by('cores'),
-    }),
+    meta: drawingsMeta(
+      {
+        dots: by('dots'),
+        knots: by('knots'),
+        stars: by('stars'),
+        cores: by('cores'),
+        strokes: by('strokes'),
+      },
+      penlines,
+    ),
   };
-  const params0 = () => presetParams(preset, seed, stippleOnly ? STIPPLE_ONLY : {});
+  const params0 = () =>
+    presetParams(
+      preset,
+      seed,
+      variant === 'stipple' ? STIPPLE_ONLY : variant === 'ribbons' ? ribbonsOnly(preset) : {},
+    );
   /** the page's zoom (v21's ZOOM: not a parameter, a view input) */
   let zoom = clampZoom(Number(params.get('zoom') ?? 1) || 1);
 

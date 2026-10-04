@@ -7,6 +7,7 @@ import { presetParams } from '../../src/core/presets';
 import { SCHEMA, tierOf } from '../../src/core/schema';
 import { CpuStippleTiers } from '../../src/fallback/stipple';
 import { packGalaxy } from '../../src/model/galaxy';
+import { hasDustCulls } from '../../src/model/ribbons';
 import { buildScene } from '../../src/model/scene';
 import type { DrawingsMeta } from '../../src/model/variation';
 import { TierState, tierWork } from '../../src/render/tiers';
@@ -154,8 +155,10 @@ describe('the CPU engine: orbiting changes no model buffer (hashes)', () => {
         expect(eng.stipple, m.what).toBe(stipple);
         expect(sha(stipple.samples.f32), m.what).toBe(h0);
         if (m.what !== 'mTime 0.7') expect(sha(view.projected), m.what).not.toBe(pos0);
-        // without dust nothing is culled by the view, so the count cannot change
-        if (!P.dust) expect(total(view.perClass), m.what).toBe(n0);
+        // without dust (extinction, lanes, carving lines) nothing is culled by the view, so the
+        // count cannot change
+        if (!P.dust && !hasDustCulls(stipple.scene.ribbons))
+          expect(total(view.perClass), m.what).toBe(n0);
       }
       expect(eng.tiers.runs.model).toBe(1);
       // across a bucket: the model is rebuilt, once

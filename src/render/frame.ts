@@ -15,8 +15,15 @@ import {
 } from '../marks/atlas';
 import { CompositePass } from './composite';
 import type { InkLayer } from './layers';
+import { CapsuleBatch, RibbonBatch, RibbonPipeline } from './ribbon-pass';
 import { PLATE_UNITS } from './sample-scene';
 import { INK_FORMAT, IndirectSpriteBatch, SpriteBatch, SpritePipeline } from './sprites';
+
+/** A layer ready to draw. */
+interface Batch {
+  encode(pass: GPURenderPassEncoder): void;
+  destroy(): void;
+}
 import type { Surface } from './surface';
 
 export interface FrameSize {
@@ -33,10 +40,11 @@ export class GpuRenderer {
   ink!: GPUTexture;
   private inkView!: GPUTextureView;
   private readonly sprites: SpritePipeline;
+  private readonly ribbons: RibbonPipeline;
   private readonly composite: CompositePass;
   private readonly atlases = new Map<AtlasName, GpuAtlas>();
   private layers: readonly InkLayer[] = [];
-  private batches: (SpriteBatch | IndirectSpriteBatch)[] = [];
+  private batches: Batch[] = [];
 
   constructor(
     readonly device: GPUDevice,
@@ -44,6 +52,7 @@ export class GpuRenderer {
     paper: ImageData8,
   ) {
     this.sprites = new SpritePipeline(device);
+    this.ribbons = new RibbonPipeline(device);
     this.composite = new CompositePass(device, paper);
     this.makeTarget(size);
   }
@@ -86,18 +95,33 @@ export class GpuRenderer {
     this.batches.forEach((b) => {
       b.destroy();
     });
-    this.batches = layers.map((l) => {
-      const atlas = this.atlases.get(l.atlas);
-      if (!atlas) throw new Error(`atlas ${l.atlas} not loaded`);
+    this.batches = layers.map((l): Batch => {
       const opts = {
         targetWidth: this.width,
         targetHeight: this.height,
         pxPerUnit: this.pxPerUnit,
         gain: l.gain,
       };
-      return l.kind === 'gpu-sprites'
-        ? new IndirectSpriteBatch(this.sprites, atlas, l.source, opts)
-        : new SpriteBatch(this.sprites, atlas, l.instances, opts);
+      if (l.kind === 'gpu-capsules') return new CapsuleBatch(this.ribbons, l.buffer, l.count, opts);
+      if (l.kind === 'capsules' || l.kind === 'ribbons')
+        throw new Error('the WebGPU engine draws GPU ribbon buffers only');
+      const atlas = this.atlases.get(l.atlas);
+      if (!atlas) throw new Error(`atlas ${l.atlas} not loaded`);
+      if (l.kind === 'gpu-ribbons')
+        return new RibbonBatch(this.ribbons, atlas, l.buffer, l.count, opts);
+      const sprites = this.sprites;
+      const b =
+        l.kind === 'gpu-sprites'
+          ? new IndirectSpriteBatch(sprites, atlas, l.source, opts)
+          : new SpriteBatch(sprites, atlas, l.instances, opts);
+      return {
+        encode: (pass) => {
+          b.encode(pass, sprites);
+        },
+        destroy: () => {
+          b.destroy();
+        },
+      };
     });
   }
 
@@ -115,7 +139,7 @@ export class GpuRenderer {
         },
       ],
     });
-    for (const b of this.batches) b.encode(pass, this.sprites);
+    for (const b of this.batches) b.encode(pass);
     pass.end();
     this.device.queue.submit([encoder.finish()]);
   }

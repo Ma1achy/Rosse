@@ -25,7 +25,7 @@ struct Galaxy {
   n_star_tiles: u32,
   flags: u32,
   key: u32,
-  pad1: u32,
+  n_groups: u32,
   c_bulge: f32,
   c_halo: f32,
   c_bar: f32,
@@ -57,7 +57,20 @@ struct Galaxy {
   warp: f32,
   warp_a: f32,
   rmax: f32,
-  pad2: f32,
+  n_extra: u32,
+}
+
+// A ring-knot cluster or a clump (GROUP_LAYOUT in src/model/galaxy.ts, src/model/clumps.ts).
+struct Group {
+  c: vec3<f32>,
+  s: f32,
+  // its first extra sample
+  first: u32,
+  // marks, then drawn stars
+  count: u32,
+  rstars: u32,
+  // kind in the low byte (0 ring knots, 1 clump), the group's index within its kind above
+  tag: u32,
 }
 
 // Layout of `shape` (SHAPE in src/model/galaxy.ts)
@@ -76,6 +89,9 @@ const SALT_IRR: u32 = 3u;
 const SALT_RING: u32 = 4u;
 
 const STREAM_STIPPLE: u32 = 2u;
+const STREAM_CLUMPS: u32 = 5u;
+const STREAM_RING_KNOTS: u32 = 15u;
+const GROUP_STRIDE: u32 = 256u;
 const DEG: f32 = 0.0174532925199433;
 
 @group(0) @binding(0) var<uniform> galaxy: Galaxy;
@@ -83,19 +99,21 @@ const DEG: f32 = 0.0174532925199433;
 @group(0) @binding(2) var<storage, read> pool: array<u32>;
 @group(0) @binding(3) var<storage, read> dot_base: array<f32>;
 @group(0) @binding(4) var<storage, read_write> samples: array<Sample>;
+@group(0) @binding(5) var<storage, read> groups: array<Group>;
 
 // The draws of one sample.
+var<private> rng_stream: u32 = STREAM_STIPPLE;
 var<private> rng_index: u32;
 var<private> rng_draw: u32;
 
 fn next() -> f32 {
-  let x = rand_f32(galaxy.key, STREAM_STIPPLE, rng_index, rng_draw);
+  let x = rand_f32(galaxy.key, rng_stream, rng_index, rng_draw);
   rng_draw = rng_draw + 1u;
   return x;
 }
 
 fn gauss() -> f32 {
-  let g = rand_gauss_f(galaxy.key, STREAM_STIPPLE, rng_index, rng_draw);
+  let g = rand_gauss_f(galaxy.key, rng_stream, rng_index, rng_draw);
   rng_draw = rng_draw + 2u;
   return g;
 }
@@ -381,7 +399,13 @@ fn sample(i: u32) {
     }
   }
 
+  // the view culls of the dust lanes (disc) and the carving lines (disc, bar, ring)
   var flags_out = 0u;
+  if (comp == 4u) {
+    flags_out = FLAG_LANE | FLAG_CARVE;
+  } else if (comp >= 2u) {
+    flags_out = FLAG_CARVE;
+  }
   var u_tau = 0.0;
   if (galaxy.dust > 0.0 && comp != 1u) {
     // the extinction cull's random number, stored for the view tier (app23.js:L262)
@@ -445,4 +469,63 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     return;
   }
   sample(id.x);
+}
+
+// Extra sample j: a mark of a ring knot or a clump (app23.js:L282-297), written at n + j. Its
+// group is the last whose first sample is at or before j (binary search); its draws are on the
+// group's stream, index id * GROUP_STRIDE + local. CPU twin: sampleExtra.
+fn sample_extra(j: u32) {
+  let i = galaxy.n + j;
+  var lo = 0u;
+  var hi = galaxy.n_groups;
+  while (hi - lo > 1u) {
+    let mid = (lo + hi) >> 1u;
+    if (groups[mid].first <= j) {
+      lo = mid;
+    } else {
+      hi = mid;
+    }
+  }
+  let g = groups[lo];
+  let local = j - g.first;
+  let ring = (g.tag & 255u) == 0u;
+  rng_stream = select(STREAM_CLUMPS, STREAM_RING_KNOTS, ring);
+  rng_index = (g.tag >> 8u) * GROUP_STRIDE + local;
+  rng_draw = 0u;
+  if (local >= g.count) {
+    // a drawn star: at the ring knot's centre, or scattered over the clump (classified only)
+    if (ring) {
+      put(i, g.c, CLS_RSTAR, 0u, 0.0, 0.0, 0.0);
+    } else {
+      let ss = g.s * 1.3;
+      let x = g.c.x + gauss() * ss;
+      let y = g.c.y + gauss() * ss;
+      put(i, vec3<f32>(x, y, 0.0), CLS_RSTAR, 0u, 0.0, 0.0, 0.0);
+    }
+    return;
+  }
+  let x = g.c.x + gauss() * g.s;
+  let y = g.c.y + gauss() * g.s;
+  var z = g.c.z;
+  if (!ring) {
+    z = g.c.z + gauss() * 0.02;
+  }
+  let p = vec3<f32>(x, y, z);
+  if (next() < select(0.25, 0.5, ring)) {
+    let tile = pool[min(KNOT_POOL - 1u, u32(floor(next() * f32(KNOT_POOL))))];
+    let size = (3.0 + 4.0 * next()) * galaxy.pen_dot;
+    put(i, p, CLS_KNOT, tile, size, next() * 6.28, 0.0);
+    return;
+  }
+  let t = dot_tile();
+  let k = select(0.8, 0.9, ring) + 0.5 * next();
+  put(i, p, CLS_YOUNG, t, dot_base[t] * k, next() * 6.28, 0.0);
+}
+
+@compute @workgroup_size(64)
+fn extra(@builtin(global_invocation_id) id: vec3<u32>) {
+  if (id.x >= galaxy.n_extra) {
+    return;
+  }
+  sample_extra(id.x);
 }

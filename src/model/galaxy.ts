@@ -10,6 +10,7 @@
 import type { Params } from '../core/params';
 import type { StructLayout } from '../marks/instance';
 import { dotSprite, penWeights, type DrawingsMeta, type Variation } from './variation';
+import { GROUP_STRIDE, markGroups, type MarkGroup } from './clumps';
 
 const f = Math.fround;
 
@@ -58,7 +59,7 @@ export const GALAXY_LAYOUT: StructLayout = {
     ['n_star_tiles', 'u32'],
     ['flags', 'u32'],
     ['key', 'u32'],
-    ['pad1', 'u32'],
+    ['n_groups', 'u32'],
     ['c_bulge', 'f32'],
     ['c_halo', 'f32'],
     ['c_bar', 'f32'],
@@ -90,7 +91,7 @@ export const GALAXY_LAYOUT: StructLayout = {
     ['warp', 'f32'],
     ['warp_a', 'f32'],
     ['rmax', 'f32'],
-    ['pad2', 'f32'],
+    ['n_extra', 'u32'],
   ].map(([name, type], i) => ({
     name: name as string,
     type: type as 'u32' | 'f32',
@@ -110,6 +111,52 @@ export interface GalaxyDesc {
   pool: Uint32Array<ArrayBuffer>;
   /** per dot tile: the quad size at k = 1 (dotSprite, app23.js:L81) */
   dotBase: Float32Array<ArrayBuffer>;
+  /** ring knots and clumps (./clumps.ts), GROUP_LAYOUT; their marks follow the stipple's samples */
+  groups: ArrayBuffer;
+  /** the same, unpacked */
+  groupList: MarkGroup[];
+}
+
+/** One ring-knot cluster or clump: the `Group` struct of stipple.wgsl. */
+export const GROUP_LAYOUT: StructLayout = {
+  name: 'Group',
+  size: 32,
+  align: 16,
+  fields: [
+    { name: 'c', type: 'vec3<f32>', offset: 0, size: 12 },
+    { name: 's', type: 'f32', offset: 12, size: 4 },
+    { name: 'first', type: 'u32', offset: 16, size: 4 },
+    { name: 'count', type: 'u32', offset: 20, size: 4 },
+    { name: 'rstars', type: 'u32', offset: 24, size: 4 },
+    { name: 'tag', type: 'u32', offset: 28, size: 4 },
+  ],
+};
+export const GROUP_WORDS = GROUP_LAYOUT.size / 4;
+
+/** Packs the groups; `first` is each group's first extra sample. Returns the buffer and the total. */
+export function packGroups(groups: readonly MarkGroup[]): { buf: ArrayBuffer; total: number } {
+  const buf = new ArrayBuffer(Math.max(1, groups.length) * GROUP_LAYOUT.size);
+  const fl = new Float32Array(buf);
+  const u = new Uint32Array(buf);
+  let first = 0;
+  groups.forEach((g, i) => {
+    const o = i * GROUP_WORDS;
+    fl[o] = g.c[0];
+    fl[o + 1] = g.c[1];
+    fl[o + 2] = g.c[2];
+    fl[o + 3] = g.s;
+    u[o + 4] = first;
+    u[o + 5] = Math.min(g.count, GROUP_STRIDE - 8);
+    u[o + 6] = Math.min(g.rstars, 8);
+    u[o + 7] = (g.kind & 0xff) | (g.id << 8);
+    first += (u[o + 5] ?? 0) + (u[o + 6] ?? 0);
+  });
+  return { buf, total: first };
+}
+
+/** Every sample the stipple buffer holds: the proposals, then the ring knots' and clumps' marks. */
+export function sampleCount(G: GalaxyDesc): number {
+  return (G.g.n ?? 0) + (G.g.n_extra ?? 0);
 }
 
 /** Number of stipple proposals: `round(stars · stipple · (1 + 0.28 · starMix))` (app23.js:L176). */
@@ -141,7 +188,7 @@ export function describeGalaxy(P: Params, V: Variation, meta: DrawingsMeta): Gal
     n_star_tiles: meta.stars.count,
     flags: (armsOn ? GalaxyFlag.armsOn : 0) | (sersic ? GalaxyFlag.sersic : 0),
     key: P.seed >>> 0,
-    pad1: 0,
+    n_groups: 0,
     c_bulge: f(wb),
     c_halo: f(wb + wh),
     c_bar: f(wb + wh + wbar),
@@ -173,8 +220,12 @@ export function describeGalaxy(P: Params, V: Variation, meta: DrawingsMeta): Gal
     warp: f(V.warp),
     warp_a: f(V.warpA),
     rmax: f(RMAX),
-    pad2: 0,
+    n_extra: 0,
   };
+  const groupList = markGroups(P, V);
+  const packed = packGroups(groupList);
+  g.n_groups = groupList.length;
+  g.n_extra = packed.total;
 
   const shape = new Float32Array(SHAPE.size * 4);
   V.arms.slice(0, MAX_ARMS).forEach((a, k) => {
@@ -192,7 +243,7 @@ export function describeGalaxy(P: Params, V: Variation, meta: DrawingsMeta): Gal
   pool.set(V.dotPool, KNOT_POOL);
 
   const dotBase = new Float32Array(meta.dots.size.map((s) => dotSprite(s, penDot, 1)));
-  return { g, shape, pool, dotBase };
+  return { g, shape, pool, dotBase, groups: packed.buf, groupList };
 }
 
 /** The Galaxy uniform as bytes. */

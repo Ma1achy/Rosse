@@ -163,7 +163,8 @@ describe('stipple model', () => {
   });
 
   it('keeps every mark under orbit when no view cull applies (ADR 0004)', () => {
-    const P = presetParams('Grand design', 7);
+    // no dust lanes, so no lane cull (M4)
+    const P = presetParams('Grand design', 7, { dustScribble: 0 });
     const s = new CpuStipple(buildScene(P, M));
     const a = s.view(cameraOf(P));
     const b = s.view(cameraOf({ ...P, az: 35, incl: 50 }));

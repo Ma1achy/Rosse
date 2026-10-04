@@ -230,3 +230,187 @@ export function composite(ink: InkBuffer, p: CompositeParams, out: Uint8ClampedA
     }
   }
 }
+
+const edgeFn = (ax: number, ay: number, bx: number, by: number, cx: number, cy: number) =>
+  f(f(f(bx - ax) * f(cy - ay)) - f(f(by - ay) * f(cx - ax)));
+
+/**
+ * Barycentric weights of (cx, cy) in the triangle a, b, d, edges included, with its doubled
+ * area; null outside (render/ribbon.wgsl `bary`).
+ */
+function bary(
+  ax: number,
+  ay: number,
+  bx: number,
+  by: number,
+  dx: number,
+  dy: number,
+  cx: number,
+  cy: number,
+): [number, number, number, number] | null {
+  const area = edgeFn(ax, ay, bx, by, dx, dy);
+  if (area === 0) return null;
+  const w0 = f(edgeFn(bx, by, dx, dy, cx, cy) / area);
+  const w1 = f(edgeFn(dx, dy, ax, ay, cx, cy) / area);
+  const w2 = f(edgeFn(ax, ay, bx, by, cx, cy) / area);
+  if (w0 < 0 || w1 < 0 || w2 < 0) return null;
+  return [w0, w1, w2, area];
+}
+
+/** The mip level of a triangle from its texel-per-pixel Jacobian (render/ribbon.wgsl `tri_lod`). */
+function triLod(p: readonly number[], t: readonly number[], area: number, maxLod: number): number {
+  const [ax = 0, ay = 0, bx = 0, by = 0, dx = 0, dy = 0] = p;
+  const g = [f(f(by - dy) / area), f(f(dy - ay) / area), f(f(ay - by) / area)];
+  const h = [f(f(dx - bx) / area), f(f(ax - dx) / area), f(f(bx - ax) / area)];
+  const comb = (w: number[], k: number) =>
+    f(
+      f(f(f(t[k] ?? 0) * (w[0] ?? 0)) + f((t[k + 2] ?? 0) * (w[1] ?? 0))) +
+        f((t[k + 4] ?? 0) * (w[2] ?? 0)),
+    );
+  const rho = Math.max(len2(comb(g, 0), comb(g, 1)), len2(comb(h, 0), comb(h, 1)));
+  const lod = f(Math.log2(rho));
+  return Number.isNaN(lod) ? 0 : Math.min(Math.max(lod, 0), maxLod);
+}
+
+/** The v21 ribbon's v at the +n and −n edges of a stroke row (app23.js:L829). */
+const V0 = f(0.02);
+const V1 = f(0.98);
+
+/**
+ * Textured ribbon segments (RIBBON_SEG_WORDS each, plate units), in order, into the ink buffer:
+ * the twin of render/ribbon.wgsl `vs_ribbon`/`fs_ribbon`. Each segment is the reference's two
+ * triangles; a pixel belongs to the first that holds its centre, edges included.
+ */
+export function rasteriseRibbons(
+  target: InkBuffer,
+  atlas: AtlasData,
+  segsF: Float32Array,
+  segsU: Uint32Array,
+  count: number,
+  params: SpriteParams,
+): void {
+  const top = atlas.levels[0];
+  if (!top) return;
+  const px = f(params.pxPerUnit);
+  const ink = params.ink ?? [1, 1, 1];
+  const [lo, hi] = atlas.edge;
+  const { width: W, height: H, data } = target;
+  const maxLod = atlas.levels.length - 1;
+  const cw = f(top.width);
+  const ch = f(top.height);
+  for (let s = 0; s < count; s++) {
+    const o = s * 12;
+    const p = Array.from({ length: 8 }, (_, k) => f((segsF[o + k] ?? 0) * px));
+    const [p0x = 0, p0y = 0, p1x = 0, p1y = 0, p2x = 0, p2y = 0, p3x = 0, p3y = 0] = p;
+    const u0 = segsF[o + 8] ?? 0;
+    const u1 = segsF[o + 9] ?? 0;
+    const layer = segsU[o + 10] ?? 0;
+    const alpha = segsF[o + 11] ?? 0;
+    const tA = [u0, V0, u0, V1, u1, V0];
+    const tB = [u0, V1, u1, V1, u1, V0];
+    const xs = [p0x, p1x, p2x, p3x];
+    const ys = [p0y, p1y, p2y, p3y];
+    const x0 = Math.max(0, Math.floor(Math.min(...xs) - 2));
+    const x1 = Math.min(W - 1, Math.ceil(Math.max(...xs) + 2));
+    const y0 = Math.max(0, Math.floor(Math.min(...ys) - 2));
+    const y1 = Math.min(H - 1, Math.ceil(Math.max(...ys) + 2));
+    let lodA = -1;
+    let lodB = -1;
+    for (let y = y0; y <= y1; y++) {
+      const cy = f(y + 0.5);
+      for (let x = x0; x <= x1; x++) {
+        const cx = f(x + 0.5);
+        let u: number;
+        let v: number;
+        let lod: number;
+        const wa = bary(p0x, p0y, p1x, p1y, p2x, p2y, cx, cy);
+        if (wa) {
+          u = f(f(f(f(tA[0] ?? 0) * wa[0]) + f((tA[2] ?? 0) * wa[1])) + f((tA[4] ?? 0) * wa[2]));
+          v = f(f(f(f(tA[1] ?? 0) * wa[0]) + f((tA[3] ?? 0) * wa[1])) + f((tA[5] ?? 0) * wa[2]));
+          if (lodA < 0)
+            lodA = triLod(
+              [p0x, p0y, p1x, p1y, p2x, p2y],
+              tA.map((t, k) => f(t * (k % 2 ? ch : cw))),
+              wa[3],
+              maxLod,
+            );
+          lod = lodA;
+        } else {
+          const wb = bary(p1x, p1y, p3x, p3y, p2x, p2y, cx, cy);
+          if (!wb) continue;
+          u = f(f(f(f(tB[0] ?? 0) * wb[0]) + f((tB[2] ?? 0) * wb[1])) + f((tB[4] ?? 0) * wb[2]));
+          v = f(f(f(f(tB[1] ?? 0) * wb[0]) + f((tB[3] ?? 0) * wb[1])) + f((tB[5] ?? 0) * wb[2]));
+          if (lodB < 0)
+            lodB = triLod(
+              [p1x, p1y, p3x, p3y, p2x, p2y],
+              tB.map((t, k) => f(t * (k % 2 ? ch : cw))),
+              wb[3],
+              maxLod,
+            );
+          lod = lodB;
+        }
+        const t = sampleLevel(atlas, layer, u, v, lod);
+        const a = f(f(smoothstep(lo, hi, t) * f(alpha)) * f(params.gain));
+        if (a === 0) continue;
+        const oo = (y * W + x) * 4;
+        const k = f(1 - a);
+        data[oo] = f(f(ink[0] * a) + f((data[oo] ?? 0) * k));
+        data[oo + 1] = f(f(ink[1] * a) + f((data[oo + 1] ?? 0) * k));
+        data[oo + 2] = f(f(ink[2] * a) + f((data[oo + 2] ?? 0) * k));
+        data[oo + 3] = f(a + f((data[oo + 3] ?? 0) * k));
+      }
+    }
+  }
+}
+
+/**
+ * Pen-line capsules (CAPSULE_WORDS each, plate units), in order: the twin of render/ribbon.wgsl
+ * `vs_capsule`/`fs_capsule`, coverage clamp(w + 0.5 − distance, 0, 1) (ADR 0006).
+ */
+export function rasteriseCapsules(
+  target: InkBuffer,
+  caps: Float32Array,
+  count: number,
+  params: SpriteParams,
+): void {
+  const px = f(params.pxPerUnit);
+  const ink = params.ink ?? [1, 1, 1];
+  const { width: W, height: H, data } = target;
+  for (let s = 0; s < count; s++) {
+    const o = s * 8;
+    const ax = f((caps[o] ?? 0) * px);
+    const ay = f((caps[o + 1] ?? 0) * px);
+    const bx = f((caps[o + 2] ?? 0) * px);
+    const by = f((caps[o + 3] ?? 0) * px);
+    const w = f((caps[o + 4] ?? 0) * px);
+    const alpha = caps[o + 5] ?? 0;
+    const vx = f(bx - ax);
+    const vy = f(by - ay);
+    const l2 = f(f(vx * vx) + f(vy * vy));
+    const r = w + 2;
+    const x0 = Math.max(0, Math.floor(Math.min(ax, bx) - r));
+    const x1 = Math.min(W - 1, Math.ceil(Math.max(ax, bx) + r));
+    const y0 = Math.max(0, Math.floor(Math.min(ay, by) - r));
+    const y1 = Math.min(H - 1, Math.ceil(Math.max(ay, by) + r));
+    for (let y = y0; y <= y1; y++) {
+      const cy = f(y + 0.5);
+      for (let x = x0; x <= x1; x++) {
+        const cx = f(x + 0.5);
+        const t =
+          l2 > 0 ? Math.min(Math.max(f(f(f(f(cx - ax) * vx) + f(f(cy - ay) * vy)) / l2), 0), 1) : 0;
+        const ex = f(f(ax + f(t * vx)) - cx);
+        const ey = f(f(ay + f(t * vy)) - cy);
+        const d = f(Math.sqrt(f(f(ex * ex) + f(ey * ey))));
+        const cov = Math.min(Math.max(f(f(w + 0.5) - d), 0), 1);
+        if (cov <= 0) continue;
+        const a = f(f(cov * f(alpha)) * f(params.gain));
+        const oo = (y * W + x) * 4;
+        const k = f(1 - a);
+        data[oo] = f(f(ink[0] * a) + f((data[oo] ?? 0) * k));
+        data[oo + 1] = f(f(ink[1] * a) + f((data[oo + 1] ?? 0) * k));
+        data[oo + 2] = f(f(ink[2] * a) + f((data[oo + 2] ?? 0) * k));
+        data[oo + 3] = f(a + f((data[oo + 3] ?? 0) * k));
+      }
+    }
+  }
+}

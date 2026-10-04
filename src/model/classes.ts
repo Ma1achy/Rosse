@@ -15,4 +15,8 @@ export const SampleFlag = {
   sersic2d: 1 << 8,
   /** subject to the dust optical-depth cull */
   tau: 1 << 9,
+  /** a disc sample: thinned under the hatched dust lanes (inLane, app23.js:L265) */
+  lane: 1 << 10,
+  /** a disc, bar or ring sample: carved by the dust lines (nearDust, app23.js:L264) */
+  carve: 1 << 11,
 } as const;
