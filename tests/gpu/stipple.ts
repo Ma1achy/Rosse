@@ -9,7 +9,9 @@
  *   within 0.05 px, size within 0.1%, angle within 1e-3 rad;
  * - per-class counts of the compacted lists: within ±0.1% (L1);
  * - the compacted lists themselves, slot by slot, where the counts agree.
- * L1 passes when ≥ 99.9% of instances match and every class count is within ±0.1%.
+ * L1 passes when ≥ 99.9% of instances match and every class count is within ±0.1%. On SwiftShader,
+ * where it was established, the match must also be exact in structure (no class differences, every
+ * compacted slot within tolerance); on other adapters only L1 is claimed (ADR 0015).
  */
 import { presetParams } from '../../src/core/presets';
 import type { Params } from '../../src/core/params';
@@ -69,7 +71,10 @@ run('stipple kernels (GPU = CPU, L1)', async () => {
   if (!dots || !knots || !stars || !cores) throw new Error('atlases missing');
   const meta = drawingsMeta({ dots, knots, stars, cores });
   const gpu = GpuStipple.create(dev);
-  const lines = [`adapter: ${adapterName(adapter)}`];
+  const swiftShader = /swiftshader/i.test(adapterName(adapter));
+  const lines = [
+    `adapter: ${adapterName(adapter)} (${swiftShader ? 'SwiftShader: exact structure required' : 'L1 tolerances'})`,
+  ];
   let pass = true;
   const data: Record<string, unknown> = {};
   let worstMatch = 1;
@@ -90,7 +95,7 @@ run('stipple kernels (GPU = CPU, L1)', async () => {
 
     const cS = runStipple(scene.galaxy);
     const n = cS.n;
-    const V = viewDesc(cam, scene.galaxy.g.dust ?? 0, n, classCapacity(n));
+    const V = viewDesc(cam, scene.galaxy.g.dust, n, classCapacity(n));
     const cP = runProject(V, cS);
     const cC = compact(cP.classes, n, cP.u32);
 
@@ -167,7 +172,11 @@ run('stipple kernels (GPU = CPU, L1)', async () => {
         if (d > POS_TOL) slotsBad++;
       }
     }
-    const ok = match >= 0.999 && countWorst <= 0.001;
+    // On SwiftShader, where it was established, the match is exact in structure: no class
+    // differences and every compacted slot within tolerance. Elsewhere (FMA contraction, other
+    // log, exp, pow and sqrt) only L1 is claimed: ≥ 99.9% of instances, counts within 0.1%.
+    const l1 = match >= 0.999 && countWorst <= 0.001;
+    const ok = swiftShader ? l1 && sClassDiff === 0 && pClassDiff === 0 && slotsBad === 0 : l1;
     if (!ok) pass = false;
     worstMatch = Math.min(worstMatch, match);
     worstCount = Math.max(worstCount, countWorst);

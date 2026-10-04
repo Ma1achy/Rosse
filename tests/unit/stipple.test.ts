@@ -19,7 +19,7 @@ import {
   readableSources,
   type DrawingsMeta,
 } from '../../src/model/variation';
-import { cameraOf, viewDesc } from '../../src/view/camera';
+import { cameraOf, project, viewDesc, type Camera } from '../../src/view/camera';
 
 /** The drawings' metadata, from the packed atlases (npm run prepare-assets). */
 function meta(): DrawingsMeta {
@@ -228,6 +228,26 @@ describe('stipple model', () => {
 });
 
 describe('compaction (scan)', () => {
+  it('handles no samples, and a last block that is not full', () => {
+    const empty = compact(new Uint32Array(0), 0, new Uint32Array(0));
+    expect(Array.from(empty.counts)).toEqual([0, 0, 0, 0, 0, 0]);
+    expect(Array.from(empty.args)).toEqual([
+      4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0,
+    ]);
+    for (const n of [1, 255, 257, 300]) {
+      const classes = new Uint32Array(n).map((_, i) => i % CLASS_COUNT);
+      const inst = new Uint32Array(n * 8).map((_, k) => (k % 8 === 0 ? k / 8 : 0));
+      const { out, counts, cap } = compact(classes, n, inst);
+      expect(counts.reduce((x, y) => x + y, 0)).toBe(n);
+      expect(cap % 8).toBe(0);
+      for (let c = 0; c < Math.min(n, CLASS_COUNT); c++) expect(out[c * cap * 8]).toBe(c);
+      // the last sample lands at the end of its class's list
+      const last = n - 1;
+      const lc = last % CLASS_COUNT;
+      expect(out[(lc * cap + (counts[lc] ?? 0) - 1) * 8]).toBe(last);
+    }
+  });
+
   it('matches a per-class filter in sample order, across blocks', () => {
     const n = SCAN_BLOCK * 3 + 77;
     const classes = new Uint32Array(n);
@@ -264,11 +284,46 @@ describe('parts', () => {
   });
 
   it('projects with the reference camera', () => {
-    const P = presetParams('Grand design', 7);
-    const G = buildScene(P, M).galaxy;
-    const s = runStipple(G);
-    const V = viewDesc(cameraOf(P), 0, s.n, 8);
-    const p = runProject(V, s);
-    expect(p.classes.length).toBe(s.n);
+    /** samples at given galaxy-frame positions, class old, size 2, rotation 0 */
+    const samples = (pts: [number, number, number][]) => {
+      const buf = new ArrayBuffer(pts.length * SAMPLE_WORDS * 4);
+      const f = new Float32Array(buf);
+      const u = new Uint32Array(buf);
+      pts.forEach((p, i) => {
+        f.set(p.map(Math.fround), i * SAMPLE_WORDS);
+        u[i * SAMPLE_WORDS + 3] = Cls.old;
+        f[i * SAMPLE_WORDS + 5] = 2;
+      });
+      return { f32: f, u32: u, n: pts.length };
+    };
+    const at = (cam: Camera, pts: [number, number, number][]) => {
+      const p = runProject(viewDesc(cam, 0, pts.length, 8), samples(pts));
+      return pts.map((_, i) => [p.f32[i * 8] ?? NaN, p.f32[i * 8 + 1] ?? NaN]);
+    };
+    // by hand, v21's project (app23.js:L153) for p = (1, 0.5, 0.2), winding −1, incl 90°, pa 90°:
+    // x0 = −1, y0 = 0.5; no orbit; y = 0.5 cos 90° − 0.2 sin 90° = −0.2;
+    // screen = (400 + (x cos 90° − y sin 90°) 84, 400 + (x sin 90° + y cos 90°) 84) = (416.8, 316)
+    const cam: Camera = { incl: 90, az: 0, pa: 90, winding: -1, zoom: 1 };
+    const [q] = at(cam, [[1, 0.5, 0.2]]);
+    expect(q?.[0]).toBeCloseTo(416.8, 3);
+    expect(q?.[1]).toBeCloseTo(316, 3);
+    expect(project([1, 0.5, 0.2], cam)[0]).toBeCloseTo(416.8, 9);
+    // and against camera.project (f64) for other cameras and points
+    const pts: [number, number, number][] = [
+      [0.3, -1.2, 0.05],
+      [-2.5, 0.7, -0.3],
+      [4, 3, 1],
+      [0, 0, 0],
+    ];
+    const cams: Camera[] = [
+      { incl: 30, az: 0, pa: 20, winding: 1, zoom: 1 },
+      { incl: 88, az: 35, pa: 120, winding: -1, zoom: 1 },
+      { incl: 150, az: 300, pa: 0, winding: 1, zoom: 2.5 },
+    ];
+    for (const c of cams)
+      at(c, pts).forEach((q2, i) => {
+        const want = project(pts[i] ?? [0, 0, 0], c);
+        expect(Math.hypot((q2[0] ?? 0) - want[0], (q2[1] ?? 0) - want[1])).toBeLessThan(2e-3);
+      });
   });
 });
