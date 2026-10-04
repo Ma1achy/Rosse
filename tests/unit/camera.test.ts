@@ -3,7 +3,9 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   CAM,
+  CI_PREDICATES,
   INCE_USES,
+  INCL_CONTINUOUS,
   INCL_BUCKETS,
   R_FG,
   SKY_RMAX,
@@ -22,6 +24,7 @@ import {
   rotationOf,
   scenePoint,
   srcNow,
+  structureKey,
   toScreen,
   toView,
   viewDesc,
@@ -196,5 +199,55 @@ describe('incE uses and buckets', () => {
     expect(inclBucket(80)).not.toBe(inclBucket(79.99));
     expect(inclBucket(80)).not.toBe(inclBucket(80.01));
     expect(inclBucket(100)).toBe(inclBucket(80));
+  });
+});
+
+describe('every use of the inclination in app23.js is classified (ADR 0017)', () => {
+  it('each P.incl, ci() and incE() is a structure predicate or a continuous view input', () => {
+    const found: string[] = [];
+    const tokens: [string, RegExp][] = [
+      ['P.incl', /(?<![A-Za-z0-9_.])P\.incl(?![A-Za-z0-9_])/g],
+      ['ci()', /(?<![A-Za-z0-9_.])ci\(\)/g],
+      ['incE()', /(?<![A-Za-z0-9_.])incE\(\)/g],
+    ];
+    SRC.forEach((line, i) => {
+      for (const [token, re] of tokens)
+        for (let k = (line.match(re) ?? []).length; k > 0; k--)
+          found.push(`${String(i + 1)} ${token}`);
+    });
+    const listed = [
+      ...INCE_USES.map((u) => `${String(u.line)} incE()`),
+      ...CI_PREDICATES.map((c) => `${String(c.line)} ci()`),
+      ...INCL_CONTINUOUS.flatMap((c) =>
+        Array.from({ length: c.count ?? 1 }, () => `${String(c.line)} ${c.token}`),
+      ),
+    ];
+    const sort = (a: string[]) => [...a].sort();
+    expect(sort(listed)).toEqual(sort(found));
+    for (const c of CI_PREDICATES) expect(SRC[c.line - 1]).toContain(c.source);
+  });
+
+  it('the structure key separates what v21 separates and nothing else', () => {
+    const P = { incl: 30, kind: 'auto', bulge: 1, bulgeFlat: 0.9 };
+    // L1000's raw cos i: 30° and 150° share an incE bucket but not the structure
+    expect(inclBucket(30)).toBe(inclBucket(150));
+    expect(structureKey(P)).not.toBe(structureKey({ ...P, incl: 150 }));
+    // it flips at bulgeFlat · cos i = 0.5, i = 56.25° for bulgeFlat 0.9, inside bucket 0
+    expect(structureKey({ ...P, incl: 56.2 })).not.toBe(structureKey({ ...P, incl: 56.3 }));
+    expect(inclBucket(56.2)).toBe(inclBucket(56.3));
+    // v21 does not evaluate it for a galaxy with a disc, or with an explicit kind
+    for (const q of [
+      { ...P, bulge: 0.5 },
+      { ...P, kind: 'smooth' },
+    ])
+      expect(structureKey({ ...q, incl: 30 })).toBe(structureKey({ ...q, incl: 150 }));
+    // otherwise the incE buckets decide
+    const elongated = (i: number) => 0.9 * Math.max(Math.cos((i * Math.PI) / 180), 0.05) < 0.5;
+    for (let a = 0; a <= 180; a += 0.5)
+      for (const b of [a + 0.25, 180 - a]) {
+        const same = structureKey({ ...P, incl: a }) === structureKey({ ...P, incl: b });
+        const want = elongated(a) === elongated(b) && inclBucket(a) === inclBucket(b);
+        expect(same, `${String(a)} ${String(b)}`).toBe(want);
+      }
   });
 });

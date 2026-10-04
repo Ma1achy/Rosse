@@ -20,10 +20,12 @@
  * (tests/unit/camera.test.ts against tests/vectors/camera.json, made by evaluating v21's own
  * functions: `npm run vectors:camera`).
  *
- * **incE buckets.** v21 switches structure at fixed inclinations through `incE()` (L856), the
- * inclination folded into 0–90°. `INCE_USES` lists every use; `inclBucket` numbers the intervals
- * between them, so that every use gives the same answer for any two inclinations in one bucket.
- * The bucket is part of the model tier's key (ADR 0010): crossing one rebuilds the model.
+ * **Inclination and structure.** v21 switches structure at fixed inclinations, mostly through
+ * `incE()` (L856), the inclination folded into 0–90° (`INCE_USES`, with `inclBucket` numbering
+ * the intervals between them), and once on the raw cos i (L1000, `CI_PREDICATES`). The model
+ * tier's key is `structureKey`, the answer of every one of these switches (ADR 0010, ADR 0017):
+ * a change of it rebuilds the model. Every other use of the inclination is continuous and
+ * belongs to the view tier (`INCL_CONTINUOUS`).
  *
  * **Zoom.** Not a parameter in v21 (`ZOOM`, L857) but page state: `VIEW.scale` = 84 · zoom
  * (L1227), clamped to 0.15–12 by every control (L1853–1874). It is a view-tier input here.
@@ -422,6 +424,119 @@ export function inclBucket(incl: number): number {
   for (const edge of BUCKET_EDGES) if (edge(e)) b++;
   return b;
 }
+
+// ---------------------------------------------------------------------------------------------
+// Inclination and structure: the model tier's key (ADR 0010, ADR 0017)
+
+/** What a structure predicate reads besides the inclination. */
+export type StructureParams = Pick<Params, 'incl' | 'kind' | 'bulge' | 'bulgeFlat'>;
+
+/**
+ * A discrete switch of structure on the inclination that does not go through `incE()`. v21 has
+ * one: L1000 picks the whole drawing `smooth:elongated` when `bulgeFlat · max(cos i, 0.05) < 0.5`,
+ * with the raw cos i (so 30° and 150° differ, and for bulgeFlat 0.9 the answer flips at 56.25°,
+ * inside the first incE bucket). The test is evaluated only where v21 evaluates it: its guard in
+ * the same expression is `kind` auto and bulge ≥ 0.95.
+ */
+export interface InclPredicate {
+  line: number;
+  source: string;
+  /** null when v21 does not evaluate the test for these parameters */
+  test: (P: StructureParams) => boolean | null;
+  what: string;
+  milestone: string;
+}
+
+export const CI_PREDICATES: readonly InclPredicate[] = [
+  {
+    line: 1000,
+    source: 'P.bulgeFlat * Math.max(ci(), 0.05) < 0.5',
+    test: (P) =>
+      P.kind === 'auto' && P.bulge >= 0.95
+        ? P.bulgeFlat * Math.max(Math.cos(rad(P.incl)), 0.05) < 0.5
+        : null,
+    milestone: 'M5',
+    what: "whole-drawing type 'smooth:elongated' from the projected flattening",
+  },
+];
+
+/**
+ * The structure signature of an inclination for these parameters: the answer of every discrete
+ * inclination switch in v21 (`INCE_USES` and `CI_PREDICATES`). The model tier is rebuilt when it
+ * changes (`dirtyTier`). Everything else the inclination does is continuous and belongs to the
+ * view tier (`INCL_CONTINUOUS`).
+ */
+export function structureKey(P: StructureParams): string {
+  const e = incE(P.incl);
+  const bits: string[] = INCE_USES.map((u) => (u.test(e) ? '1' : '0'));
+  for (const c of CI_PREDICATES) {
+    const t = c.test(P);
+    bits.push(t === null ? '-' : t ? '1' : '0');
+  }
+  return bits.join('');
+}
+
+/**
+ * Every other use of the inclination in app23.js. Each is continuous, so a view-tier input, or
+ * not a drawing input at all. `token` is the expression as written. tests/unit/camera.test.ts
+ * checks that every `P.incl`, `ci()` and `incE()` in app23.js is listed here or is a structure
+ * predicate (`INCE_USES`, `CI_PREDICATES`).
+ */
+export const INCL_CONTINUOUS: readonly {
+  line: number;
+  token: string;
+  what: string;
+  /** how many times the token appears on the line, when more than once */
+  count?: number;
+}[] = [
+  { line: 123, token: 'P.incl', what: 'the definition of `ci()`' },
+  { line: 123, token: 'ci()', what: 'the definition of `ci()`' },
+  { line: 126, token: 'ci()', what: '`discM`: the disc plane to the plate (view)' },
+  { line: 154, token: 'P.incl', what: '`project` (view: project.wgsl)' },
+  {
+    line: 177,
+    token: 'P.incl',
+    what: "`generate`'s cos i and sin i, used only by the dust optical depth at L262 (a pure view cull in project.wgsl)",
+  },
+  {
+    line: 442,
+    token: 'P.incl',
+    what: '`orientNow` (homes of overlays and lensed sources, M7, M9)',
+  },
+  { line: 498, token: 'P.incl', what: 'the merger framed from its 3D extent (view, M8)' },
+  {
+    line: 788,
+    token: 'P.incl',
+    what: "the edge-on midplane stroke's alpha `lines · (incl − 72) / 18` (view, M4)",
+  },
+  { line: 856, token: 'P.incl', what: 'the definition of `incE()`' },
+  { line: 856, token: 'incE()', what: 'the definition of `incE()`' },
+  { line: 859, token: 'P.incl', what: '`toView` (the sky, view, M7)' },
+  {
+    line: 924,
+    token: 'P.incl',
+    what: 'the dust clouds cache key: clouds are placed in screen space (view, M4)',
+  },
+  {
+    line: 945,
+    token: 'P.incl',
+    what: 'the dust lanes cache key: lanes are hatched in screen space (view, M4)',
+  },
+  { line: 995, token: 'ci()', what: 'an envelope flattened by max(bulgeFlat, cos i) (view, M5)' },
+  {
+    line: 1007,
+    token: 'ci()',
+    what: 'a smooth whole drawing flattened by max(bulgeFlat, cos i) (view, M5)',
+  },
+  {
+    line: 1033,
+    token: 'ci()',
+    what: 'the core flattened by max(bulgeFlat, cos i) (view: model/parts.ts)',
+  },
+  { line: 1474, token: 'P.incl', what: "the page's summary text (not drawing)" },
+  { line: 1849, token: 'P.incl', count: 2, what: 'the orbit drag (input: ui/orbit.ts)' },
+  { line: 1871, token: 'P.incl', count: 4, what: 'the arrow keys (input: ui/orbit.ts)' },
+];
 
 // ---------------------------------------------------------------------------------------------
 // The View uniform
