@@ -10,7 +10,17 @@
  * - keys: arrows orbit ±5° and tilt ∓4°, Q/E roll ∓5°, + or = and − or _ zoom ×/÷ 1.15, 0 zoom 1.
  *
  * Zoom is clamped to 0.15–12, angles wrap into [0, 360). The canvas gets `touch-action: none`,
- * the grab cursor, a tab stop, and no context menu.
+ * the grab cursor, a tab stop, an accessible name with the key hints (unless the page gave it
+ * one), and no context menu.
+ *
+ * v21's quirks, reproduced on purpose so the plate behaves as v21's does (tests/unit/orbit.test.ts
+ * runs v21's own handlers beside these):
+ * - there is no `lostpointercapture` handler: a pointer whose capture is lost without a
+ *   `pointerup` or `pointercancel` stays in the pointer map until it next goes up;
+ * - the key handler ignores modifiers, so Ctrl and + or − zoom the plate and are swallowed
+ *   (`preventDefault`), never reaching the browser's own page zoom while the plate has focus;
+ * - the wheel ignores `deltaMode`: a line- or page-mode delta is taken as pixels, so a mouse
+ *   that reports lines zooms more gently than in pixels.
  *
  * The maths is in pure functions (unit-tested against v21's formulas); `attachOrbit` wires them
  * to the canvas. It only reports new camera states; the page decides when to draw (one frame per
@@ -154,6 +164,11 @@ export function attachOrbit(canvas: HTMLCanvasElement, target: OrbitTarget): () 
   canvas.style.touchAction = 'none';
   canvas.style.cursor = 'grab';
   canvas.tabIndex = 0;
+  if (!canvas.getAttribute('aria-label'))
+    canvas.setAttribute(
+      'aria-label',
+      'Galaxy plate: drag to orbit, arrows to turn, Q and E to roll, + and − to zoom',
+    );
   const two = () => {
     const [a, b] = [...ptrs.values()];
     return twoFingers(a ?? [0, 0], b ?? [0, 0]);

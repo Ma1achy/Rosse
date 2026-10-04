@@ -35,7 +35,8 @@ import type { InkLayer } from './render/layers';
 import { GpuStipple } from './render/stipple';
 import { SURFACES, type SurfaceName } from './render/surface';
 import { attachOrbit, type OrbitState } from './ui/orbit';
-import { PLATE, cameraOf, clampZoom, wrapDeg } from './view/camera';
+import { parseUrlView } from './ui/url';
+import { PLATE, cameraOf } from './view/camera';
 
 declare global {
   interface Window {
@@ -128,11 +129,16 @@ function plateSize(canvas: HTMLCanvasElement): FrameSize {
 
 const sameSize = (a: FrameSize, b: FrameSize) => a.plateCss === b.plateCss && a.dpr === b.dpr;
 
-/** A canvas keeps its first context type, so switching engine needs a new element. */
+/**
+ * A canvas keeps its first context type, so switching engine needs a new element. It keeps the
+ * old one's attributes (tab stop, label) and, if the old one had focus, the focus.
+ */
 function freshCanvas(): HTMLCanvasElement {
   const old = plateCanvas();
+  const hadFocus = document.activeElement === old;
   const c = old.cloneNode() as HTMLCanvasElement;
   old.replaceWith(c);
+  if (hadFocus) c.focus();
   return c;
 }
 
@@ -361,8 +367,8 @@ async function start(): Promise<void> {
     }),
   };
   const params0 = () => presetParams(preset, seed, stippleOnly ? STIPPLE_ONLY : {});
-  /** the page's zoom (v21's ZOOM: not a parameter, a view input) */
-  const zoom0 = clampZoom(Number(params.get('zoom') ?? 1) || 1);
+  /** the camera from the URL, if given (src/ui/url.ts) */
+  const urlView = parseUrlView(params);
 
   /** the surface the toggle asks for; the plate catches up with it in show() */
   let surface: SurfaceName = 'paper';
@@ -371,18 +377,17 @@ async function start(): Promise<void> {
   let frames = 0;
   let engine: Engine | undefined;
   /** the parameters and zoom wanted, and the engine and parameters last drawn */
-  let wanted = { P: params0(), preset, zoom: zoom0 };
-  // the camera from the URL, if given (az, incl, pa in degrees, as the orbit control sets them)
-  for (const k of ['az', 'incl', 'pa'] as const) {
-    const v = Number(params.get(k) ?? NaN);
-    if (Number.isFinite(v))
-      wanted.P = { ...wanted.P, [k]: k === 'incl' ? Math.min(180, Math.max(0, v)) : wrapDeg(v) };
-  }
+  let wanted = (() => {
+    const P = params0();
+    const { az = P.az, incl = P.incl, pa = P.pa, zoom = 1 } = urlView;
+    // zoom is the page's (v21's ZOOM: not a parameter, a view input)
+    return { P: { ...P, az, incl, pa }, preset, zoom };
+  })();
   let drawnBy: Engine | null = null;
   let drawn: typeof wanted | null = null;
   // frames are shown one after another, never concurrently
   let queue = Promise.resolve();
-  /** frames scheduled and not yet started, and the most there have ever been */
+  /** frames scheduled and not yet started (0 or 1), and the most there have ever been */
   let queued = 0;
   let maxQueued = 0;
 
@@ -448,14 +453,20 @@ async function start(): Promise<void> {
     document.documentElement.dataset.backend = e.backend;
     if (note) note.textContent = e.backend === 'cpu' ? 'drawn on the CPU' : '';
   };
+  /**
+   * Asks for a frame. Every change (camera, surface, preset, seed, size, engine) comes through
+   * here, and at most one frame waits in the queue: if one is already waiting, it will draw the
+   * latest state when it starts, so another is not added.
+   */
   function schedule() {
+    if (queued > 0) return;
     queued++;
     maxQueued = Math.max(maxQueued, queued);
     queue = queue.then(show).catch(report);
   }
   /**
    * A camera move or resize: one frame on the next animation frame, unless one is already
-   * requested or waiting in the queue (it will draw the latest camera when it starts).
+   * requested (schedule() then coalesces it with any frame waiting in the queue).
    */
   let frameRequested = false;
   function requestFrame() {

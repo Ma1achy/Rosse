@@ -35,6 +35,13 @@ class FakeCanvas extends EventTarget {
   setPointerCapture(id: number) {
     this.captured.push(id);
   }
+  attrs = new Map<string, string>();
+  getAttribute(k: string) {
+    return this.attrs.get(k) ?? null;
+  }
+  setAttribute(k: string, v: string) {
+    this.attrs.set(k, v);
+  }
 }
 
 type Init = Record<string, number | boolean | string>;
@@ -110,6 +117,8 @@ describe("orbit controls, event for event against v21's own handlers", () => {
     expect(ourCv.style).toEqual({ touchAction: 'none', cursor: 'grab' });
     expect(ourCv.style).toEqual(refCv.style);
     expect(ourCv.tabIndex).toBe(0);
+    // an accessible name with the key hints (v21 has none; an addition)
+    expect(ourCv.getAttribute('aria-label')).toMatch(/drag to orbit.*arrows.*zoom/);
   });
 
   it('drag: orbit and tilt, clamped at 0 and 180°, wrapping at 360°', () => {
