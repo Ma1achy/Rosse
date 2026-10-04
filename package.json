@@ -11,6 +11,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
+    "pretest": "npm run prepare-assets",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:gpu": "node tools/gpu-test/run.mjs",
