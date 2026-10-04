@@ -99,7 +99,7 @@ Options:
 - (b) Drawing and page first; catalogue, real galaxies and exports in a later M12.
 - (c) Drop some.
 
-**Recommendation:** (b). `fromVotes` is pure parameter mapping, so it can come early and cheaply if you want the real galaxies in the golden set.
+**Decided (4 October 2026): (b).** The catalogue browser, the real galaxies, and SVG and GIF export are milestone **M12** in docs/roadmap.md, after the page (M11). The timeline stays in M8 (mergers) and M11 (page). `fromVotes` is pure parameter mapping, so it lands in M12 with its own tests.
 
 ### Q10. Performance budget
 
