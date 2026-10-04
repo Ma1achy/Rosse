@@ -33,6 +33,8 @@ export function inkEdge(atlas: string): readonly [number, number] {
   return MAGNIFIED.has(atlas) ? INK_EDGE_MAGNIFIED : INK_EDGE;
 }
 
+import type { VectorSheet } from './vector';
+
 export type AtlasName = 'dots' | 'knots' | 'stars' | 'cores' | 'fgstars' | 'pieces' | 'strokes';
 
 export interface LevelEntry {
@@ -67,11 +69,21 @@ export interface SurfaceEntry {
   sha256: string;
 }
 
+/** A vector sheet copied by the packer (assets-built/vector/<name>.json). */
+export interface VectorEntry {
+  file: string;
+  count: number;
+  source: string;
+  sha256: string;
+}
+
 /** assets-built/index.json */
 export interface BuiltIndex {
   packer: number;
   sourceHash: string;
   atlases: Record<AtlasName, AtlasEntry>;
+  /** from packer 3 (M4): the vector sheets the engine reads on the CPU */
+  vectors: Record<string, VectorEntry>;
   surfaces: { paper: SurfaceEntry };
 }
 
@@ -142,6 +154,15 @@ export class BuiltAssets {
   async atlas(name: AtlasName): Promise<AtlasData> {
     const entry = this.index.atlases[name];
     return atlasFromBytes(name, entry, await this.bytes(entry.file));
+  }
+
+  /** A vector sheet (M4: `penlines`). */
+  async vector(name: string): Promise<VectorSheet> {
+    const e = this.index.vectors[name];
+    if (!e) throw new Error(`vector sheet ${name} not packed (run npm run prepare-assets)`);
+    const res = await fetch(`${this.base}${e.file}`);
+    if (!res.ok) throw new Error(`${e.file}: ${String(res.status)}`);
+    return (await res.json()) as VectorSheet;
   }
 
   async paper(): Promise<ImageData8> {

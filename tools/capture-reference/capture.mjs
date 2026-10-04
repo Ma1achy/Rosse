@@ -19,6 +19,8 @@
  *             <preset-slug>--<variant>__s<seed>__<camera>, at the file's cameras (home and orbit
  *             by default; "zoom" is home at zoom 2, through __GEN.zoom). They are added to (or
  *             replaced in) the existing manifest, which records the file.
+ *   --only    presets, comma-separated, or separated by | when a name holds a comma
+ *             (--only "Grand design|Loose, open arms").
  *   --cameras capture only these cameras (comma-separated), e.g. --cameras zoom.
  *   --reroll  for calibration (ADR 0013): every preset at the home camera and again at az + 0.3°,
  *             which in v21 re-rolls the stipple when dust lanes are on (reference notes 20.1).
@@ -250,9 +252,8 @@ async function main() {
   mkdirSync(out, { recursive: true });
 
   const presets = readPresets();
-  const only = opt('--only')
-    ?.split(',')
-    .map((s) => s.trim());
+  const onlyArg = opt('--only');
+  const only = onlyArg?.split(onlyArg.includes('|') ? '|' : ',').map((s) => s.trim());
   const onlyCameras = opt('--cameras')
     ?.split(',')
     .map((s) => s.trim());
