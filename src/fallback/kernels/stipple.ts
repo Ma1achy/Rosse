@@ -87,9 +87,9 @@ function shapeAt(G: GalaxyDesc, entry: number, c: number): number {
 /** `armPhase(R, k)` (app23.js:L127). */
 export function armPhase(G: GalaxyDesc, R: number, k: number): number {
   const g = G.g;
-  const r0 = g.arm_r0 ?? 0.25;
-  const a = (k % (g.n_var_arms ?? 1)) * 2 + SHAPE.arms;
-  const pitch = f((g.pitch ?? 0) * shapeAt(G, a, 0));
+  const r0 = g.arm_r0;
+  const a = (k % g.n_var_arms) * 2 + SHAPE.arms;
+  const pitch = f(g.pitch * shapeAt(G, a, 0));
   let ph = f(log(f(Math.max(R, r0) / r0)) / tanF(f(clamp(pitch, 4, 60) * DEG)));
   const wig = shapeAt(G, a + 1, 0);
   const wf = shapeAt(G, a + 1, 1);
@@ -101,15 +101,15 @@ export function armPhase(G: GalaxyDesc, R: number, k: number): number {
 /** `armProfile(R, θ)` (app23.js:L132–144): the arm density, with spurs and flocculence. */
 export function armProfile(G: GalaxyDesc, R: number, th: number): number {
   const g = G.g;
-  const arms = g.arms ?? 0;
+  const arms = g.arms;
   if (arms < 1) return 0;
   const per = f(TAU / arms);
   const half = f(per / 2);
-  const w = g.arm_width ?? 0.35;
+  const w = g.arm_width;
   const w2 = f(w * w);
   let fv = 0;
   for (let k = 0; k < arms; k++) {
-    const a = (k % (g.n_var_arms ?? 1)) * 2 + SHAPE.arms;
+    const a = (k % g.n_var_arms) * 2 + SHAPE.arms;
     const rmax = shapeAt(G, a, 3);
     if (R > f(rmax + 0.4)) continue;
     const d = wrapPi(f(f(th - armPhase(G, R, k)) - f(per * k)));
@@ -118,7 +118,7 @@ export function armProfile(G: GalaxyDesc, R: number, th: number): number {
     if (R > rmax) gk = f(gk * Math.max(0, f(1 - f(f(R - rmax) / 0.4))));
     if (gk > fv) fv = gk;
   }
-  for (let i = 0; i < (g.n_spurs ?? 0); i++) {
+  for (let i = 0; i < g.n_spurs; i++) {
     const e = SHAPE.spurs + i;
     const sk = shapeAt(G, e, 0);
     const R0 = shapeAt(G, e, 1);
@@ -126,22 +126,22 @@ export function armProfile(G: GalaxyDesc, R: number, th: number): number {
     const pk = shapeAt(G, e, 3);
     if (R < R0 || R > f(R0 + len)) continue;
     const base = f(armPhase(G, R0, sk) + f(per * sk));
-    const want = f(base + f(log(f(R / R0)) / tanF(f(clamp(f((g.pitch ?? 0) * pk), 10, 70) * DEG))));
+    const want = f(base + f(log(f(R / R0)) / tanF(f(clamp(f(g.pitch * pk), 10, 70) * DEG))));
     const ds = f(wrapPi(f(th - want)) / half);
     const gs = f(f(f(0.8) * exp(f(-f(ds * ds) / f(f(0.5) * w2)))) * f(1 - f(f(R - R0) / len)));
     if (gs > fv) fv = gs;
   }
-  const flocc = g.flocc ?? 0;
+  const flocc = g.flocc;
   if (flocc > 0) {
     const n = vnoise(
       f(f(R * f(2.2)) + 11),
       f(f(th - armPhase(G, R, 0)) * f(1.6)),
-      g.seed ?? 0,
+      g.seed,
       NoiseSalt.flocc,
     );
     fv = f(fv * f(f(1 - flocc) + f(flocc * Math.max(0, f(f(n - f(0.35)) * f(2.2))))));
   }
-  const inner = g.arm_inner ?? 0.3;
+  const inner = g.arm_inner;
   if (R < inner) fv = f(fv * f(R / inner));
   return fv;
 }
@@ -199,37 +199,37 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
   const none = () => {
     put(0, 0, 0, Cls.none, 0, 0, 0, 0);
   };
-  const r = new Rng(g.key ?? 0, i);
-  const rmax = g.rmax ?? 240;
-  const flags = g.flags ?? 0;
+  const r = new Rng(g.key, i);
+  const rmax = g.rmax;
+  const flags = g.flags;
   const dotTile = (): number => {
-    const n = g.n_dot_pool ?? 1;
+    const n = g.n_dot_pool;
     return G.pool[KNOT_POOL + Math.min(n - 1, Math.floor(f(r.next() * n)))] ?? 0;
   };
   const dotSize = (t: number, k: number) => f((G.dotBase[t] ?? 0) * k);
 
-  const u = f(r.next() * (g.tot ?? 1));
+  const u = f(r.next() * g.tot);
   // components: 0 bulge, 1 halo, 2 bar, 3 ring, 4 disc
   let comp: number;
-  if (u < (g.c_bulge ?? 0)) comp = 0;
-  else if (u < (g.c_halo ?? 0)) comp = 1;
-  else if (u < (g.c_bar ?? 0)) comp = 2;
-  else if (u < (g.c_ring ?? 0)) comp = 3;
+  if (u < g.c_bulge) comp = 0;
+  else if (u < g.c_halo) comp = 1;
+  else if (u < g.c_bar) comp = 2;
+  else if (u < g.c_ring) comp = 3;
   else comp = 4;
 
   if (comp === 0 && flags & GalaxyFlag.sersic) {
     // a smooth galaxy: an exact Sérsic radius, in 2D (v21 parity: app23.js:L223–233)
-    const nS = g.sersic_n ?? 4;
-    const rS = f((g.re ?? 1) * pow(f(gammaS(f(2 * nS), r) / (g.sersic_b ?? 1)), nS));
+    const nS = g.sersic_n;
+    const rS = f(g.re * pow(f(gammaS(f(2 * nS), r) / g.sersic_b), nS));
     if (rS > f(rmax + f(0.8))) {
       none();
       return;
     }
     const thS = f(r.next() * f(6.28));
     const xS = f(rS * cos(thS));
-    const yS = f(f(rS * sin(thS)) * (g.bulge_flat ?? 1));
-    const dust = g.dust ?? 0;
-    const re = g.re ?? 1;
+    const yS = f(f(rS * sin(thS)) * g.bulge_flat);
+    const dust = g.dust;
+    const re = g.re;
     if (
       dust > f(0.25) &&
       Math.abs(f(yS - f(f(0.08) * xS))) < f(f(0.09) * dust) &&
@@ -248,7 +248,7 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
       none();
       return;
     }
-    const starMix = g.star_mix ?? 0;
+    const starMix = g.star_mix;
     if (starMix > f(0.01) && rS < f(f(2.2) * re) && r.next() < f(f(0.09) * starMix)) {
       put(xS, yS, 0, Cls.rstar | SampleFlag.sersic2d, 0, 0, 0, 0);
       return;
@@ -264,7 +264,7 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
   let pz: number;
   let arm = 0;
   if (comp === 0) {
-    const a = g.bulge_a ?? 0.11;
+    const a = g.bulge_a;
     const sq = sqrt(Math.min(r.next(), f(0.985)));
     const rr = f(f(a * sq) / f(1 - sq));
     const cz = f(f(2 * r.next()) - 1);
@@ -272,7 +272,7 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
     const sz = sqrt(f(1 - f(cz * cz)));
     px = f(f(rr * sz) * cos(ph));
     py = f(f(rr * sz) * sin(ph));
-    pz = f(f(rr * cz) * (g.bulge_flat ?? 1));
+    pz = f(f(rr * cz) * g.bulge_flat);
   } else if (comp === 1) {
     // −1.4 ln(1 − u) rather than −1.4 ln(u): the same distribution, finite at u = 0
     const rh = f(f(-1.4) * log(f(1 - r.next())));
@@ -287,7 +287,7 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
     py = f(f(rh * s2) * sin(ph));
     pz = f(f(rh * cz) * f(0.7));
   } else if (comp === 2) {
-    const bl = g.bar_len ?? 0.45;
+    const bl = g.bar_len;
     let x = f(f(r.next() * 2) - 1);
     x = f(f(Math.sign(x) * pow(Math.abs(x), f(0.8))) * bl);
     px = x;
@@ -301,19 +301,19 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
       th = f(TAU * r.next());
       rt++;
       if (rt >= 6) break;
-      const nz = vnoise(f(cos(th) * f(2.2)), f(sin(th) * f(2.2)), g.seed ?? 0, NoiseSalt.ring);
+      const nz = vnoise(f(cos(th) * f(2.2)), f(sin(th) * f(2.2)), g.seed, NoiseSalt.ring);
       if (!(r.next() > f(f(0.45) + f(f(0.55) * nz)))) break;
     }
-    const R = f((g.ring_r ?? 1.6) * f(1 + f(r.gauss() * f(0.035))));
+    const R = f(g.ring_r * f(1 + f(r.gauss() * f(0.035))));
     px = f(R * cos(th));
     py = f(R * sin(th));
-    pz = f(f(r.gauss() * (g.thick ?? 0.08)) * f(0.5));
+    pz = f(f(r.gauss() * g.thick) * f(0.5));
   } else {
     let R2 = 0;
     let th2 = 0;
-    const patchy = g.patchy ?? 0;
+    const patchy = g.patchy;
     const armsOn = (flags & GalaxyFlag.armsOn) !== 0;
-    const as = g.arm_strength ?? 0.8;
+    const as = g.arm_strength;
     for (let tries = 0; tries < 30;) {
       const u1 = r.next();
       const u2 = r.next();
@@ -325,7 +325,7 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
         const nz = vnoise(
           f(f(R2 * cos(th2)) * f(1.4)),
           f(f(R2 * sin(th2)) * f(1.4)),
-          g.seed ?? 0,
+          g.seed,
           NoiseSalt.patchy,
         );
         if (r.next() > f(f(1 - patchy) + f(f(patchy * pow(nz, f(2.2))) * f(2.2)))) continue;
@@ -338,12 +338,12 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
       none();
       return;
     }
-    const irr = g.irr ?? 0;
+    const irr = g.irr;
     if (irr > 0) {
       const nz = vnoise(
         f(f(R2 * cos(th2)) * f(1.3)),
         f(f(R2 * sin(th2)) * f(1.3)),
-        g.seed ?? 0,
+        g.seed,
         NoiseSalt.irr,
       );
       if (r.next() > f(f(0.5) + f(f(1.1) * Math.max(0, f(nz - f(0.3)))))) {
@@ -351,19 +351,19 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
         return;
       }
     }
-    let z = f(f(-(g.thick ?? 0.08)) * log(f(1 - r.next())));
+    let z = f(f(-g.thick) * log(f(1 - r.next())));
     if (r.next() < f(0.5)) z = f(-z);
-    const warp = g.warp ?? 0;
+    const warp = g.warp;
     if (warp > 0 && R2 > f(1.8)) {
       const dr = f(R2 - f(1.8));
-      z = f(z + f(f(f(warp * dr) * dr) * sin(f(th2 - (g.warp_a ?? 0)))));
+      z = f(z + f(f(f(warp * dr) * dr) * sin(f(th2 - g.warp_a))));
     }
-    const lop = g.lop ?? 0;
-    const lopA = g.lop_a ?? 0;
+    const lop = g.lop;
+    const lopA = g.lop_a;
     px = f(f(R2 * cos(th2)) + f(f(f(lop * R2) * cos(lopA)) * f(0.35)));
     py = f(f(R2 * sin(th2)) + f(f(f(lop * R2) * sin(lopA)) * f(0.35)));
     pz = z;
-    for (let d = 0; d < (g.n_dust ?? 0); d++) {
+    for (let d = 0; d < g.n_dust; d++) {
       const e = SHAPE.dust + d;
       const DR = shapeAt(G, e, 0);
       const Dth = shapeAt(G, e, 1);
@@ -379,13 +379,13 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
 
   let flagsOut = 0;
   let uTau = 0;
-  if ((g.dust ?? 0) > 0 && comp !== 1) {
+  if (g.dust > 0 && comp !== 1) {
     // the extinction cull's random number, stored for the view tier (app23.js:L262)
     uTau = r.next();
     flagsOut |= SampleFlag.tau;
   }
   const roll = r.next();
-  const starMix = g.star_mix ?? 0;
+  const starMix = g.star_mix;
   if (starMix > f(0.01) && comp !== 1) {
     const Rg = sqrt(f(f(px * px) + f(py * py)));
     const kc = comp === 0 ? f(0.4) : comp === 3 ? f(1.6) : arm > f(0.55) ? f(1.35) : f(0.85);
@@ -394,17 +394,14 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
       return;
     }
   }
-  if (comp === 4 && arm > f(0.55) && roll < f(f((g.knots ?? 0) * f(0.12)) * arm)) {
+  if (comp === 4 && arm > f(0.55) && roll < f(f(g.knots * f(0.12)) * arm)) {
     const tile = G.pool[Math.min(KNOT_POOL - 1, Math.floor(f(r.next() * KNOT_POOL)))] ?? 0;
-    const size = f(f(5 + f(6 * r.next())) * (g.pen_dot ?? 1));
+    const size = f(f(5 + f(6 * r.next())) * g.pen_dot);
     put(px, py, pz, Cls.knot | flagsOut, tile, size, f(r.next() * f(6.28)), uTau);
     return;
   }
-  if (
-    (comp === 4 || comp === 3) &&
-    roll > f(1 - f(f((g.sparkle ?? 0) * f(0.012)) * f(f(0.4) + arm)))
-  ) {
-    const n = g.n_star_tiles ?? 1;
+  if ((comp === 4 || comp === 3) && roll > f(1 - f(f(g.sparkle * f(0.012)) * f(f(0.4) + arm)))) {
+    const n = g.n_star_tiles;
     const tile = Math.min(n - 1, Math.floor(f(r.next() * n)));
     const size = f(10 + f(13 * r.next()));
     put(px, py, pz, Cls.star | flagsOut, tile, size, f(r.next() * f(6.28)), uTau);
@@ -418,7 +415,7 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
 
 /** Runs the kernel over every sample: the model tier's output, SAMPLE_WORDS words per sample. */
 export function runStipple(G: GalaxyDesc): { f32: Float32Array; u32: Uint32Array; n: number } {
-  const n = G.g.n ?? 0;
+  const n = G.g.n;
   const buf = new ArrayBuffer(Math.max(1, n) * SAMPLE_LAYOUT.size);
   const fo = new Float32Array(buf);
   const uo = new Uint32Array(buf);

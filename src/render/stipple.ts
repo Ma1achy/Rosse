@@ -92,7 +92,7 @@ export class GpuStipple {
     this.scene = scene;
     const d = this.device;
     const G = scene.galaxy;
-    const n = G.g.n ?? 0;
+    const n = G.g.n;
     const cap = classCapacity(n);
     const blocks = blockCount(n);
     const buf = (size: number, usage: number, label: string) =>
@@ -198,11 +198,7 @@ export class GpuStipple {
     const m = this.model;
     if (!m || !this.scene) throw new Error('setScene first');
     const d = this.device;
-    d.queue.writeBuffer(
-      m.view,
-      0,
-      packView(viewDesc(cam, this.scene.galaxy.g.dust ?? 0, m.n, m.cap)),
-    );
+    d.queue.writeBuffer(m.view, 0, packView(viewDesc(cam, this.scene.galaxy.g.dust, m.n, m.cap)));
     const enc = d.createCommandEncoder({ label: 'stipple view' });
     const pass = enc.beginComputePass({ label: 'project + compact' });
     const P = this.pipes;

@@ -15,7 +15,7 @@ import {
 } from '../marks/atlas';
 import { CompositePass } from './composite';
 import type { InkLayer } from './layers';
-import { PLATE_UNITS } from './sample-scene';
+import { PLATE } from '../view/camera';
 import { INK_FORMAT, IndirectSpriteBatch, SpriteBatch, SpritePipeline } from './sprites';
 import type { Surface } from './surface';
 
@@ -52,7 +52,7 @@ export class GpuRenderer {
     this.size = size;
     this.width = Math.round(size.plateCss * size.dpr);
     this.height = this.width;
-    this.pxPerUnit = this.width / PLATE_UNITS;
+    this.pxPerUnit = this.width / PLATE;
     this.ink = this.device.createTexture({
       label: 'ink target',
       size: [this.width, this.height],
