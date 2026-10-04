@@ -4,7 +4,7 @@
  * numbers. Written to tests/golden/diff/<name>.html (not committed; CI uploads it).
  */
 import { PNG } from 'pngjs';
-import type { Comparison, Gray, ImageMeasures } from './metrics';
+import type { Comparison, Grey, ImageMeasures } from './metrics';
 import type { Evaluation } from './thresholds';
 
 function png(width: number, height: number, rgba: (i: number) => [number, number, number]): string {
@@ -20,14 +20,14 @@ function png(width: number, height: number, rgba: (i: number) => [number, number
 }
 
 /** Ink on paper: α as dark on white. */
-function inkImage(a: Gray): string {
+function inkImage(a: Grey): string {
   return png(a.width, a.height, (i) => {
     const v = Math.round(255 * (1 - (a.data[i] ?? 0)));
     return [v, v, v];
   });
 }
 
-function densityImage(d: Gray, max: number): string {
+function densityImage(d: Grey, max: number): string {
   return png(d.width, d.height, (i) => {
     const v = Math.round(255 * (1 - Math.min(1, (d.data[i] ?? 0) / max)));
     return [v, v, v];
@@ -35,7 +35,7 @@ function densityImage(d: Gray, max: number): string {
 }
 
 /** Render − reference: red where the render has more ink, blue where it has less. */
-function diffImage(ref: Gray, render: Gray, max: number): string {
+function diffImage(ref: Grey, render: Grey, max: number): string {
   return png(ref.width, ref.height, (i) => {
     const t = Math.max(-1, Math.min(1, ((render.data[i] ?? 0) - (ref.data[i] ?? 0)) / max));
     const k = Math.round(255 * (1 - Math.abs(t)));
@@ -82,7 +82,7 @@ const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
 export interface ReportSide {
   label: string;
-  alpha: Gray;
+  alpha: Grey;
   measures: ImageMeasures;
 }
 
@@ -100,10 +100,17 @@ export function reportHtml(
   const pct = (x: number) => `${(100 * x).toFixed(2)}%`;
   const rows = [
     ['total ink Σα', ref.measures.ink.toFixed(1), render.measures.ink.toFixed(1), pct(c.inkRel)],
-    ['density SSIM', '', '', c.ssim.toFixed(4)],
+    ['density SSIM (b, not gated)', '', '', c.ssim.toFixed(4)],
     ['coarse density SSIM', '', '', c.ssimCoarse.toFixed(4)],
     ['median stroke width', c.ref.median.toFixed(3), c.render.median.toFixed(3), pct(c.medianRel)],
     ['p90 stroke width', c.ref.p90.toFixed(3), c.render.p90.toFixed(3), pct(c.p90Rel)],
+    ['r25', '', '', pct(c.r25Rel)],
+    ['r50 (px)', c.ref.r50.toFixed(1), c.render.r50.toFixed(1), pct(c.r50Rel)],
+    ['r90 (px)', c.ref.r90.toFixed(1), c.render.r90.toFixed(1), pct(c.r90Rel)],
+    ['ink beyond the reference r90', '', '', pct(c.outerDiff)],
+    ['axis ratio', c.ref.q.toFixed(3), c.render.q.toFixed(3), c.qDiff.toFixed(4)],
+    ['inner axis ratio (within r50)', '', '', c.qInnerDiff.toFixed(4)],
+    ['position angle (°)', c.ref.pa.toFixed(1), c.render.pa.toFixed(1), c.paDiff.toFixed(2)],
     ...Object.entries(e.counts).map(([k, v]) => [k, String(v.ref), String(v.render), pct(v.rel)]),
   ]
     .map((r) => `<tr>${r.map((x) => `<td>${esc(x)}</td>`).join('')}</tr>`)

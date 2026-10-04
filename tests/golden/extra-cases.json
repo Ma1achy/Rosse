@@ -1,10 +1,10 @@
 {
-  "about": "Extra reference captures (npm run capture:reference -- --extra tests/golden/extra-cases.json). Each is a preset with overrides set after the preset and the seed. 'stipple' is the M2 acceptance variant (docs/roadmap.md): lines, knots and envelope off as the roadmap says, and also the drawn stars among the dots (starMix), the deep field (field) and the foreground stars (fgstars), which are vector or sky marks that arrive in later milestones; with them on, v21's plate holds ink the M2 engine does not draw yet. trails is already 0 in these presets. Cameras: home, orbit (az + 35°, incl + 20°) and, from M3, zoom: home at zoom 2 (v21's ZOOM through __GEN.zoom(2), so VIEW.scale = 168), the zoom camera of open question Q8.",
-  "cameras": ["home", "orbit", "zoom"],
+  "about": "Extra reference captures (npm run capture:reference -- --extra tests/golden/extra-cases.json): a preset with overrides set after the preset and the seed, at seeds 7 and 4242 unless `seeds` says otherwise, home and orbit cameras, and (from M3) the zoom camera for the seeds a case lists in `zoom`: home at zoom 2 through v21's __GEN.zoom(2), so VIEW.scale = 168 (open question Q8). They are the required golden cases (tests/golden/README.md, ADR 0015). 'stipple': lines, knots and envelope off, as the roadmap's M2 acceptance says, and also starMix (drawn stars among the dots), field (the deep field) and fgstars (foreground stars), which are vector or sky marks of later milestones; these three extra overrides await the owner's sign-off (ADR 0015). Seeds 3 and 11 give v21 hands of 2 and 3 pens. 'Radio jet' also has its jet off (the Sersic profile). 'stipple-arms' is Grand design with vary 0 (no spurs, clumps or dust patches, lopsidedness or warp, and every dot drawing) and dustScribble 0 (no dust lanes), so its stipple has arms and nothing M2 does not draw.",
   "cases": [
     {
       "preset": "Smooth, round",
       "variant": "stipple",
+      "seeds": [7, 4242, 3, 11],
       "overrides": {
         "lines": 0,
         "knots": 0,
@@ -12,7 +12,8 @@
         "starMix": 0,
         "field": 0,
         "fgstars": 0
-      }
+      },
+      "zoom": [7, 4242]
     },
     {
       "preset": "Cigar-shaped",
@@ -24,12 +25,42 @@
         "starMix": 0,
         "field": 0,
         "fgstars": 0
-      }
+      },
+      "zoom": [7, 4242]
     },
     {
       "preset": "Disc, no arms",
       "variant": "stipple",
+      "seeds": [7, 4242, 3, 11],
       "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "zoom": [7, 4242]
+    },
+    {
+      "preset": "Radio jet",
+      "variant": "stipple",
+      "overrides": {
+        "jet": 0,
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Grand design",
+      "variant": "stipple-arms",
+      "overrides": {
+        "vary": 0,
+        "dustScribble": 0,
         "lines": 0,
         "knots": 0,
         "envelope": 0,

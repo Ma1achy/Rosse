@@ -4,7 +4,7 @@ Date: 2026-10-03
 
 ## Status
 
-Accepted. The thresholds are provisional until calibrated in M2.
+Accepted; superseded in part by [0015](0015-golden-metric-as-calibrated-in-m2.md). The thresholds were provisional until calibrated in M2.
 
 ## Context
 
@@ -54,7 +54,3 @@ For each preset we compute tests (a)–(c) over pairs from both sources. τ_ref 
 - One misplaced drawing, such as a bar rotated 90°, may pass (b) if it carries little ink. The pen-weight and count tests catch some such cases. Visual review of the report catches the rest, which is why render diffs are attached to pull requests.
 - Density maps at σ = 4 px are blind to the texture inside a stroke (beaded versus plain). Test (c) and the counts cover that partly. Stroke texture is otherwise judged by eye.
 - The thresholds are empirical. They must be recalibrated, by a deliberate pull request, if the capture setup changes (browser, resolution, seeds).
-
-## Calibration in M2 (addendum, for the owner to confirm)
-
-The M2 calibration is in `docs/milestones/m2/README.md` and `tests/golden/calibration.json`. It changed the metric in five ways, each reasoned there: a coarse structure test (b′) at σ = 16 px, gated with (b), because at σ = 4 px a full re-draw of the stipple scores 0.3–0.6 and cannot be told from a 35° orbit; SSIM averaged over windows with ink; (c) as band means of the width distribution rather than single order statistics; a Poisson allowance of 3√n on counts against v21; and comparisons drawn with the reference's hand (its dot pool, recorded at capture). The calibrated thresholds are in `tests/golden/thresholds.json`.

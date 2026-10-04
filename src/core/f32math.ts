@@ -6,7 +6,13 @@
  * galaxy units the stipple reaches, that is up to a plate pixel. These are Cephes' `sinf` and
  * `cosf` (Moshier): reduction by π/4 in three parts, then minimax polynomials, accurate to about
  * 1 ULP for |x| < 8192. Built from correctly rounded additions and multiplications only, they
- * give the same bits on the GPU and on the CPU (fused multiply-add aside).
+ * give the same bits on the GPU and on the CPU, fused multiply-add aside.
+ *
+ * What is proven, and where: the stipple kernels still use WGSL's built-in `log`, `exp`, `pow` and
+ * `sqrt` (a few ULP), and WGSL allows a GPU to fuse a multiply and an add. On SwiftShader the GPU
+ * and the CPU twins match slot for slot (tests/gpu/stipple.ts). On other adapters only L1 is
+ * claimed (ADR 0004: ≥ 99.9% of instances within tolerance, counts within 0.1%), and the parity
+ * test falls back to it there (ADR 0015).
  */
 import { randF32 } from './rng';
 

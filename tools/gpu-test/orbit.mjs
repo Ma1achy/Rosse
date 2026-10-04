@@ -64,12 +64,18 @@ export async function orbitCheck(browser, url) {
         for (let i = 0; i < d.length; i++) h = Math.imul(h ^ (d[i] ?? 0), 16777619) >>> 0;
         return h.toString(16);
       });
-    /** waits until the frame on the plate shows camera `want` */
+    /**
+     * waits until the frame on the plate shows camera `want` and its counts have been read back
+     * (the page reads them after presenting, outside the frame queue)
+     */
     const settle = async (/** @type {Record<string, number>} */ want) => {
       await page.waitForFunction(
         ({ want, tol }) => {
-          const c = /** @type {any} */ (window.__rosse?.camera);
-          return !!c && Object.entries(want).every(([k, v]) => Math.abs(c[k] - v) <= tol);
+          const r = window.__rosse;
+          const c = /** @type {any} */ (r?.camera);
+          return (
+            !!c && !!r?.counts && Object.entries(want).every(([k, v]) => Math.abs(c[k] - v) <= tol)
+          );
         },
         { want, tol: TOL },
         { timeout: 120_000 },
@@ -83,6 +89,7 @@ export async function orbitCheck(browser, url) {
       if (now === frames) break;
       frames = now;
     }
+    await page.waitForFunction(() => !!window.__rosse?.counts, undefined, { timeout: 120_000 });
     const s0 = await state();
     const before = await pixels();
     const box = await page.locator('#plate').boundingBox();

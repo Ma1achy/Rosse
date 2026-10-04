@@ -20,24 +20,30 @@ export interface GalaxyScene {
 
 export interface SceneOptions {
   /**
-   * Draw with this hand (dot tiles) instead of the one makeVariation picks. The golden runner
-   * passes the reference's own `VAR.dotPool`, recorded at capture, so that ink and pen weight are
-   * compared with the same pen (tests/golden/README.md); the choice of hand is a discrete random
-   * choice that the two engines make differently (ADR 0005).
+   * Draw with this variation instead of the one makeVariation picks. The golden runner passes
+   * v21's own (replayed offline from v21's stream, tests/golden/compare/v21.ts), so that both
+   * engines draw the same galaxy with the same pens and only the dots differ (ADR 0015): the
+   * variation's choices are discrete random choices the two engines make differently (ADR 0005).
    */
-  hand?: readonly number[];
+  variation?: Variation;
   /**
    * The key of the placement streams (the stipple), the seed by default. Re-keying keeps every
-   * structural choice and re-draws the dots: the calibration of ADR 0013.
+   * structural choice and re-draws the dots: the calibration of ADR 0013 and 0015.
    */
   placementKey?: number;
+  /** Calibration only (negative controls, ADR 0015): a truncation radius in place of RMAX. */
+  rmax?: number;
+  /** Calibration only (negative controls): every dot's quad scaled by this. */
+  dotScale?: number;
 }
 
 export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {}): GalaxyScene {
-  const variation = makeVariation(P, meta);
-  if (opts.hand?.length) variation.dotPool = [...opts.hand];
+  const variation = opts.variation ?? makeVariation(P, meta);
   const galaxy = describeGalaxy(P, variation, meta);
   if (opts.placementKey !== undefined) galaxy.g.key = opts.placementKey >>> 0;
+  if (opts.rmax !== undefined) galaxy.g.rmax = Math.fround(opts.rmax);
+  if (opts.dotScale !== undefined)
+    galaxy.dotBase = galaxy.dotBase.map((x) => Math.fround(x * (opts.dotScale ?? 1)));
   return { P, variation, galaxy, meta };
 }
 

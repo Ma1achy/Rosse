@@ -22,7 +22,7 @@ export const RMAX = 240;
 
 /** The most arms a galaxy has (the control's range, 0–6). */
 export const MAX_ARMS = 6;
-/** Spurs: round(vary · (2 + 4u) · min(1, arms)) ≤ 6. */
+/** Spurs: round(vary · (2 + 4u) · min(1, arms)) ≤ 6, with room to spare. */
 export const MAX_SPURS = 8;
 /** Dust patches: round(5 · vary · u) ≤ 5. */
 export const MAX_DUST = 5;
@@ -41,66 +41,66 @@ export const SHAPE = {
 /** Galaxy flags. */
 export const GalaxyFlag = { armsOn: 1, sersic: 2 } as const;
 
-/** The `Galaxy` uniform of stipple.wgsl, scalars only. */
+/** The fields of the `Galaxy` uniform of stipple.wgsl, in order: scalars only. */
+const GALAXY_FIELDS = [
+  ['seed', 'u32'],
+  ['n', 'u32'],
+  ['arms', 'u32'],
+  ['n_var_arms', 'u32'],
+  ['n_spurs', 'u32'],
+  ['n_dust', 'u32'],
+  ['n_dot_pool', 'u32'],
+  ['n_knot_pool', 'u32'],
+  ['n_star_tiles', 'u32'],
+  ['flags', 'u32'],
+  ['key', 'u32'],
+  ['pad1', 'u32'],
+  ['c_bulge', 'f32'],
+  ['c_halo', 'f32'],
+  ['c_bar', 'f32'],
+  ['c_ring', 'f32'],
+  ['tot', 'f32'],
+  ['bulge_a', 'f32'],
+  ['bulge_flat', 'f32'],
+  ['bar_len', 'f32'],
+  ['ring_r', 'f32'],
+  ['thick', 'f32'],
+  ['pitch', 'f32'],
+  ['arm_strength', 'f32'],
+  ['arm_width', 'f32'],
+  ['flocc', 'f32'],
+  ['arm_r0', 'f32'],
+  ['arm_inner', 'f32'],
+  ['patchy', 'f32'],
+  ['irr', 'f32'],
+  ['sersic_n', 'f32'],
+  ['sersic_b', 'f32'],
+  ['re', 'f32'],
+  ['dust', 'f32'],
+  ['star_mix', 'f32'],
+  ['knots', 'f32'],
+  ['sparkle', 'f32'],
+  ['pen_dot', 'f32'],
+  ['lop', 'f32'],
+  ['lop_a', 'f32'],
+  ['warp', 'f32'],
+  ['warp_a', 'f32'],
+  ['rmax', 'f32'],
+  ['pad2', 'f32'],
+] as const;
+
+export type GalaxyField = (typeof GALAXY_FIELDS)[number][0];
+
+/** The `Galaxy` uniform of stipple.wgsl. */
 export const GALAXY_LAYOUT: StructLayout = {
   name: 'Galaxy',
-  size: 176,
+  size: GALAXY_FIELDS.length * 4,
   align: 4,
-  fields: [
-    ['seed', 'u32'],
-    ['n', 'u32'],
-    ['arms', 'u32'],
-    ['n_var_arms', 'u32'],
-    ['n_spurs', 'u32'],
-    ['n_dust', 'u32'],
-    ['n_dot_pool', 'u32'],
-    ['n_knot_pool', 'u32'],
-    ['n_star_tiles', 'u32'],
-    ['flags', 'u32'],
-    ['key', 'u32'],
-    ['pad1', 'u32'],
-    ['c_bulge', 'f32'],
-    ['c_halo', 'f32'],
-    ['c_bar', 'f32'],
-    ['c_ring', 'f32'],
-    ['tot', 'f32'],
-    ['bulge_a', 'f32'],
-    ['bulge_flat', 'f32'],
-    ['bar_len', 'f32'],
-    ['ring_r', 'f32'],
-    ['thick', 'f32'],
-    ['pitch', 'f32'],
-    ['arm_strength', 'f32'],
-    ['arm_width', 'f32'],
-    ['flocc', 'f32'],
-    ['arm_r0', 'f32'],
-    ['arm_inner', 'f32'],
-    ['patchy', 'f32'],
-    ['irr', 'f32'],
-    ['sersic_n', 'f32'],
-    ['sersic_b', 'f32'],
-    ['re', 'f32'],
-    ['dust', 'f32'],
-    ['star_mix', 'f32'],
-    ['knots', 'f32'],
-    ['sparkle', 'f32'],
-    ['pen_dot', 'f32'],
-    ['lop', 'f32'],
-    ['lop_a', 'f32'],
-    ['warp', 'f32'],
-    ['warp_a', 'f32'],
-    ['rmax', 'f32'],
-    ['pad2', 'f32'],
-  ].map(([name, type], i) => ({
-    name: name as string,
-    type: type as 'u32' | 'f32',
-    offset: i * 4,
-    size: 4,
-  })),
+  fields: GALAXY_FIELDS.map(([name, type], i) => ({ name, type, offset: i * 4, size: 4 })),
 };
 
 /** The scalar part of the description, named as GALAXY_LAYOUT. */
-export type GalaxyScalars = Record<string, number>;
+export type GalaxyScalars = Record<GalaxyField, number>;
 
 export interface GalaxyDesc {
   g: GalaxyScalars;
@@ -201,8 +201,7 @@ export function packGalaxy(g: GalaxyScalars): ArrayBuffer {
   const u = new Uint32Array(buf);
   const fl = new Float32Array(buf);
   for (const field of GALAXY_LAYOUT.fields) {
-    const v = g[field.name];
-    if (v === undefined) throw new Error(`Galaxy.${field.name} missing`);
+    const v = g[field.name as GalaxyField];
     if (field.type === 'u32') u[field.offset / 4] = v;
     else fl[field.offset / 4] = v;
   }

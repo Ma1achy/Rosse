@@ -9,7 +9,12 @@ import { requestDevice } from '../../../src/gpu/device';
 import { readTexture } from '../../../src/gpu/readback';
 import { BuiltAssets, type AtlasName } from '../../../src/marks/atlas';
 import { coreInstances } from '../../../src/model/parts';
-import { buildScene, drawingsMeta, type MarkCounts } from '../../../src/model/scene';
+import {
+  buildScene,
+  drawingsMeta,
+  type MarkCounts,
+  type SceneOptions,
+} from '../../../src/model/scene';
 import { GpuRenderer } from '../../../src/render/frame';
 import type { InkLayer } from '../../../src/render/layers';
 import { GpuStipple } from '../../../src/render/stipple';
@@ -28,11 +33,7 @@ declare global {
   interface Window {
     __golden?: {
       adapter: string;
-      render(
-        P: Params,
-        opts: { hand?: number[]; placementKey?: number },
-        zoom?: number,
-      ): Promise<GoldenRender>;
+      render(P: Params, opts: SceneOptions, zoom?: number): Promise<GoldenRender>;
     };
     __goldenError?: string;
   }

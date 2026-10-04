@@ -42,7 +42,7 @@ export class CpuStipple {
 
   view(cam: Camera): CpuStippleView {
     const n = this.samples.n;
-    const V = viewDesc(cam, this.scene.galaxy.g.dust ?? 0, n, classCapacity(n));
+    const V = viewDesc(cam, this.scene.galaxy.g.dust, n, classCapacity(n));
     const p = runProject(V, this.samples);
     const { out, counts, cap } = compact(p.classes, n, p.u32);
     const outF = new Float32Array(out.buffer);

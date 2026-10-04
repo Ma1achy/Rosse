@@ -12,8 +12,6 @@ import type { SpriteLayer } from './layers';
 
 export { dotSprite, penWeights };
 
-export const PLATE_UNITS = 800;
-
 /** One dot, cell 0, at the centre: the one-mark test. */
 export function oneMark(dotSizes: readonly number[], pen = 2.4): SpriteLayer[] {
   const size = dotSprite(dotSizes[0] ?? 4, penWeights(pen).dot);

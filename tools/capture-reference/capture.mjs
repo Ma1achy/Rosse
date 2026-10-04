@@ -14,11 +14,12 @@
  *   node tools/capture-reference/capture.mjs --extra tests/golden/extra-cases.json [--verify]
  *   node tools/capture-reference/capture.mjs --reroll [--out dir] [--only …]
  *   --verify  capture again into a temporary folder and compare pixel hashes with the manifest.
- *   --extra   capture the cases of a file ({ cameras?, cases: [{ preset, variant, overrides }] }): a
- *             preset with parameter overrides set after it (and after the seed), named
- *             <preset-slug>--<variant>__s<seed>__<camera>, at the file's cameras (home and orbit
- *             by default; "zoom" is home at zoom 2, through __GEN.zoom). They are added to (or
- *             replaced in) the existing manifest, which records the file.
+ *   --extra   capture the cases of a file ({ cameras?, cases: [{ preset, variant, overrides,
+ *             seeds?, zoom? }] }): a preset with parameter overrides set after it (and after the
+ *             seed), named <preset-slug>--<variant>__s<seed>__<camera>, at its seeds (7 and 4242
+ *             by default) and the file's cameras (home and orbit by default), plus the "zoom"
+ *             camera (home at zoom 2, through __GEN.zoom) for the seeds a case lists in `zoom`.
+ *             They are added to (or replaced in) the existing manifest, which records the file.
  *   --cameras capture only these cameras (comma-separated), e.g. --cameras zoom.
  *   --reroll  for calibration (ADR 0013): every preset at the home camera and again at az + 0.3°,
  *             which in v21 re-rolls the stipple when dust lanes are on (reference notes 20.1).
@@ -172,8 +173,8 @@ async function captureJob(browser, url, job, out) {
         return {
           P: JSON.parse(JSON.stringify(G.P())),
           stats: G.stats(),
-          // the dot pool of this galaxy's hand (VAR.dotPool, first 400), so a comparison can
-          // draw with the same pen (tests/golden/README.md)
+          // the dot pool of this galaxy's hand (VAR.dotPool, truncated by the page at 400): a
+          // cross-check of the offline replay the comparison uses (tests/unit/v21-replay.test.ts)
           hand: G.var().pool,
           canvas: [c.width, c.height],
           ink: c.toDataURL('image/png'),
@@ -260,21 +261,32 @@ async function main() {
   /** @type {Job[]} */
   let jobs;
   if (extraFile) {
-    /** @type {{ cameras?: string[], cases: { preset: string, variant: string, overrides: Record<string, unknown> }[] }} */
+    /**
+     * @type {{ cameras?: string[], cases: { preset: string, variant: string,
+     *   overrides: Record<string, unknown>, seeds?: number[], zoom?: number[] }[] }}
+     */
     const extra = JSON.parse(readFileSync(resolve(ROOT, extraFile), 'utf8'));
-    const cams = (extra.cameras ?? [...CAMERAS]).filter(
-      (c) => !onlyCameras || onlyCameras.includes(c),
-    );
-    for (const c of cams)
-      if (!['home', 'orbit', 'zoom'].includes(c)) throw new Error(`unknown camera ${c}`);
-    // orbit is reached from home, so it needs home captured first in the same page
-    if (cams.includes('orbit') && !cams.includes('home'))
-      throw new Error('the orbit camera needs the home camera');
+    const fileCams = extra.cameras ?? [...CAMERAS];
+    for (const c of fileCams)
+      if (!['home', 'orbit'].includes(c)) throw new Error(`unknown camera ${c}`);
+    /** the cameras of one (case, seed): the file's, plus zoom where the case's `zoom` lists the seed */
+    const camsFor = (/** @type {number[] | undefined} */ zoomSeeds, /** @type {number} */ seed) => {
+      const cams = [...fileCams, ...(zoomSeeds?.includes(seed) ? ['zoom'] : [])].filter(
+        (c) => !onlyCameras || onlyCameras.includes(c),
+      );
+      // orbit is reached from home, so it needs home captured first in the same page
+      if (cams.includes('orbit') && !cams.includes('home'))
+        throw new Error('the orbit camera needs the home camera');
+      return cams;
+    };
     jobs = extra.cases
       .filter((c) => !only || only.includes(c.preset))
       .flatMap((c) => {
         if (!presets[c.preset]) throw new Error(`unknown preset ${c.preset}`);
-        return SEEDS.map((seed) => ({ ...c, seed, chalk: false, cameras: cams }));
+        const { seeds, zoom, ...rest } = c;
+        return (seeds ?? SEEDS)
+          .map((seed) => ({ ...rest, seed, chalk: false, cameras: camsFor(zoom, seed) }))
+          .filter((j) => j.cameras.length);
       });
   } else if (reroll) {
     jobs = names.flatMap((preset) =>

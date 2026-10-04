@@ -28,15 +28,14 @@ import { Gpu, detectBackend, type Backend } from './gpu/device';
 import { readTexture } from './gpu/readback';
 import { BuiltAssets, type AtlasData, type AtlasName, type ImageData8 } from './marks/atlas';
 import { coreInstances } from './model/parts';
-import { drawingsMeta, type MarkCounts } from './model/scene';
+import { drawingsMeta, markCounts, type MarkCounts } from './model/scene';
 import type { DrawingsMeta } from './model/variation';
 import { GpuRenderer, type FrameSize } from './render/frame';
 import type { InkLayer } from './render/layers';
-import { PLATE_UNITS } from './render/sample-scene';
 import { GpuStipple } from './render/stipple';
 import { SURFACES, type SurfaceName } from './render/surface';
 import { attachOrbit, type OrbitState } from './ui/orbit';
-import { cameraOf, clampZoom, wrapDeg } from './view/camera';
+import { PLATE, cameraOf, clampZoom, wrapDeg } from './view/camera';
 
 declare global {
   interface Window {
@@ -91,11 +90,17 @@ interface Engine {
   size(): FrameSize;
   /**
    * The model and view tiers these parameters and zoom need (only the view tier when just the
-   * camera moved, ADR 0010), then the ink. Resolves to the mark counts.
+   * camera moved, ADR 0010), then the ink.
    */
-  draw(P: Params, zoom: number): Promise<MarkCounts>;
+  draw(P: Params, zoom: number): void;
   /** how many times each tier has run */
   tierRuns(): { model: number; view: number };
+  /**
+   * The mark counts of the last draw, for the line under the plate. On the GPU this reads the
+   * indirect draw arguments back (`mapAsync`), so the page asks for it after presenting, outside
+   * the frame queue.
+   */
+  counts(): Promise<MarkCounts>;
   /** Composites onto the surface and shows it. Rejects if the frame could not be shown. */
   present(surface: SurfaceName): Promise<void>;
   /** A new plate size or DPR: re-inks at that size, keeping the drawings loaded. */
@@ -116,7 +121,7 @@ function plateCanvas(): HTMLCanvasElement {
 
 function plateSize(canvas: HTMLCanvasElement): FrameSize {
   return {
-    plateCss: canvas.clientWidth || PLATE_UNITS,
+    plateCss: canvas.clientWidth || PLATE,
     dpr: Math.min(MAX_DPR, window.devicePixelRatio || 1),
   };
 }
@@ -143,6 +148,7 @@ function cpuEngine(scene: Scene, size: FrameSize): Engine {
     r.drawInk();
     canvas.width = canvas.height = r.width;
   };
+  let counts: MarkCounts = markCounts([]);
   const stipple = new CpuStippleTiers(scene.meta);
   return {
     backend: 'cpu',
@@ -151,9 +157,10 @@ function cpuEngine(scene: Scene, size: FrameSize): Engine {
       const { view, work } = stipple.frame(P, zoom);
       if (work.view) r.setLayers(view.layers);
       ink();
-      return Promise.resolve(view.counts);
+      counts = view.counts;
     },
     tierRuns: () => ({ ...stipple.tiers.runs }),
+    counts: () => Promise.resolve(counts),
     present(surface) {
       const out = r.present(SURFACES[surface]);
       ctx.putImageData(new ImageData(out, r.width, r.height), 0, 0);
@@ -250,9 +257,17 @@ async function gpuEngine(
     return {
       backend: 'webgpu',
       size: () => current().size,
-      async draw(P, zoom) {
-        const st = inkScene(P, zoom);
-        // the counts for the line under the plate: a read-back, off the frame path
+      draw(P, zoom) {
+        inkScene(P, zoom);
+      },
+      tierRuns() {
+        const now = stipple?.tiers.runs ?? { model: 0, view: 0 };
+        return { model: pastRuns.model + now.model, view: pastRuns.view + now.view };
+      },
+      async counts() {
+        const st = stipple;
+        if (!st) throw new Error('no stipple passes');
+        // a read-back of the indirect draw arguments: never awaited by the frame queue
         return (await st.readCounts()).counts;
       },
       async present(surface) {
@@ -271,10 +286,6 @@ async function gpuEngine(
           throw new Error('the device was lost during the frame');
         // a frame is on screen: the recovery budget counts losses in a row
         gpu.markHealthy();
-      },
-      tierRuns() {
-        const now = stipple?.tiers.runs ?? { model: 0, view: 0 };
-        return { model: pastRuns.model + now.model, view: pastRuns.view + now.view };
       },
       resize(s) {
         // keep the atlases and pipelines: a new ink target, batches and composite uniforms
@@ -351,7 +362,7 @@ async function start(): Promise<void> {
   };
   const params0 = () => presetParams(preset, seed, stippleOnly ? STIPPLE_ONLY : {});
   /** the page's zoom (v21's ZOOM: not a parameter, a view input) */
-  let zoom = clampZoom(Number(params.get('zoom') ?? 1) || 1);
+  const zoom0 = clampZoom(Number(params.get('zoom') ?? 1) || 1);
 
   /** the surface the toggle asks for; the plate catches up with it in show() */
   let surface: SurfaceName = 'paper';
@@ -359,18 +370,16 @@ async function start(): Promise<void> {
   let wantedSize = plateSize(plateCanvas());
   let frames = 0;
   let engine: Engine | undefined;
-  /** the parameters and zoom wanted, and the engine, parameters and zoom last drawn */
-  let wantedP = params0();
+  /** the parameters and zoom wanted, and the engine and parameters last drawn */
+  let wanted = { P: params0(), preset, zoom: zoom0 };
   // the camera from the URL, if given (az, incl, pa in degrees, as the orbit control sets them)
   for (const k of ['az', 'incl', 'pa'] as const) {
     const v = Number(params.get(k) ?? NaN);
     if (Number.isFinite(v))
-      wantedP = { ...wantedP, [k]: k === 'incl' ? Math.min(180, Math.max(0, v)) : wrapDeg(v) };
+      wanted.P = { ...wanted.P, [k]: k === 'incl' ? Math.min(180, Math.max(0, v)) : wrapDeg(v) };
   }
   let drawnBy: Engine | null = null;
-  let drawnP: Params | null = null;
-  let drawnZoom = zoom;
-  let counts: MarkCounts | null = null;
+  let drawn: typeof wanted | null = null;
   // frames are shown one after another, never concurrently
   let queue = Promise.resolve();
   /** frames scheduled and not yet started, and the most there have ever been */
@@ -393,22 +402,15 @@ async function start(): Promise<void> {
     frameRequested = false;
     const e = engine;
     if (!e) return; // the first frame will pick up the current surface and size
-    const wanted = surface;
+    const wantedSurface = surface;
     try {
-      if (drawnBy !== e || drawnP !== wantedP || drawnZoom !== zoom) {
-        const P = wantedP;
-        const z = zoom;
-        counts = await e.draw(P, z);
+      if (drawnBy !== e || drawn !== wanted) {
+        e.draw(wanted.P, wanted.zoom);
         drawnBy = e;
-        drawnP = P;
-        drawnZoom = z;
-        if (stats) {
-          const n = (x: number) => x.toLocaleString('en-GB');
-          stats.textContent = `${n(counts.dots)} dots · ${n(counts.knots)} knots · ${n(counts.stars)} stars`;
-        }
+        drawn = wanted;
       }
       if (!sameSize(e.size(), wantedSize)) e.resize(wantedSize);
-      await e.present(wanted);
+      await e.present(wantedSurface);
     } catch (err) {
       if (e !== engine) return; // a newer engine has taken over
       // a lost device is being recreated, and onRebuilt will show the frame again
@@ -416,18 +418,33 @@ async function start(): Promise<void> {
       return;
     }
     frames++;
-    window.__rosse = {
+    const shown = drawn;
+    const rosse = {
       backend: e.backend,
-      surface: wanted,
+      surface: wantedSurface,
       frames,
       size: e.size(),
-      preset,
-      seed,
-      counts,
-      camera: { az: drawnP.az || 0, incl: drawnP.incl, pa: drawnP.pa, zoom: drawnZoom },
+      // what is on the plate, which may lag the controls by a frame
+      preset: shown.preset,
+      seed: shown.P.seed,
+      counts: null as MarkCounts | null,
+      camera: { az: shown.P.az || 0, incl: shown.P.incl, pa: shown.P.pa, zoom: shown.zoom },
       tiers: e.tierRuns(),
       maxQueued,
     };
+    window.__rosse = rosse;
+    // the counts, after the frame and outside the queue
+    void e.counts().then(
+      (c) => {
+        if (drawn !== shown) return;
+        rosse.counts = c;
+        if (stats) {
+          const n = (x: number) => x.toLocaleString('en-GB');
+          stats.textContent = `${n(c.dots)} dots · ${n(c.knots)} knots · ${n(c.stars)} stars`;
+        }
+      },
+      () => undefined,
+    );
     document.documentElement.dataset.backend = e.backend;
     if (note) note.textContent = e.backend === 'cpu' ? 'drawn on the CPU' : '';
   };
@@ -437,8 +454,8 @@ async function start(): Promise<void> {
     queue = queue.then(show).catch(report);
   }
   /**
-   * A camera move: one frame on the next animation frame, unless one is already requested or
-   * waiting in the queue (it will draw the latest camera when it starts).
+   * A camera move or resize: one frame on the next animation frame, unless one is already
+   * requested or waiting in the queue (it will draw the latest camera when it starts).
    */
   let frameRequested = false;
   function requestFrame() {
@@ -452,10 +469,12 @@ async function start(): Promise<void> {
   const bindOrbit = () => {
     detachOrbit?.();
     detachOrbit = attachOrbit(plateCanvas(), {
-      get: () => ({ az: wantedP.az || 0, incl: wantedP.incl, pa: wantedP.pa, zoom }),
+      get: () => {
+        const P = wanted.P;
+        return { az: P.az || 0, incl: P.incl, pa: P.pa, zoom: wanted.zoom };
+      },
       set: (c) => {
-        wantedP = { ...wantedP, az: c.az, incl: c.incl, pa: c.pa };
-        zoom = c.zoom;
+        wanted = { ...wanted, P: { ...wanted.P, az: c.az, incl: c.incl, pa: c.pa }, zoom: c.zoom };
         requestFrame();
       },
     });
@@ -474,14 +493,15 @@ async function start(): Promise<void> {
 
   select.addEventListener('change', () => {
     preset = select.value;
-    wantedP = params0();
+    wanted = { P: params0(), preset, zoom: wanted.zoom };
     schedule();
   });
   seedInput.addEventListener('change', () => {
     seed = Math.min(9999, Math.max(1, Math.round(Number(seedInput.value)) || 1));
     seedInput.value = String(seed);
     // a new seed keeps the camera
-    wantedP = { ...params0(), az: wantedP.az, incl: wantedP.incl, pa: wantedP.pa };
+    const { az, incl, pa } = wanted.P;
+    wanted = { P: { ...params0(), az, incl, pa }, preset, zoom: wanted.zoom };
     schedule();
   });
 
