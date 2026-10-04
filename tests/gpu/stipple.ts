@@ -14,6 +14,8 @@
 import { presetParams } from '../../src/core/presets';
 import type { Params } from '../../src/core/params';
 import { INSTANCE_WORDS, runProject } from '../../src/fallback/kernels/project';
+import { ribbonModel, runRibbons } from '../../src/fallback/kernels/ribbons';
+import { cullsUniform, ribUniform } from '../../src/model/ribbons';
 import { compact } from '../../src/fallback/kernels/scan';
 import { SAMPLE_WORDS, runStipple } from '../../src/fallback/kernels/stipple';
 import { BuiltAssets } from '../../src/marks/atlas';
@@ -43,6 +45,9 @@ const CASES: [string, Params][] = [
     'Edge-on with dust',
     'Lens: Einstein ring',
     'Shell galaxy',
+    'Dusty spiral',
+    'Hand wobble',
+    'Tightly wound',
   ].map((n): [string, Params] => [`${n} s7`, presetParams(n, 7)]),
   [
     'every branch: patchy, irregular, flocculent, dusty, ringed, barred',
@@ -63,11 +68,14 @@ const CASES: [string, Params][] = [
 run('stipple kernels (GPU = CPU, L1)', async () => {
   const { adapter, device: dev } = await device();
   const assets = await BuiltAssets.load('/');
-  const [dots, knots, stars, cores] = await Promise.all(
-    (['dots', 'knots', 'stars', 'cores'] as const).map((n) => assets.atlas(n)),
+  const [dots, knots, stars, cores, strokes] = await Promise.all(
+    (['dots', 'knots', 'stars', 'cores', 'strokes'] as const).map((n) => assets.atlas(n)),
   );
-  if (!dots || !knots || !stars || !cores) throw new Error('atlases missing');
-  const meta = drawingsMeta({ dots, knots, stars, cores });
+  if (!dots || !knots || !stars || !cores || !strokes) throw new Error('atlases missing');
+  const meta = drawingsMeta(
+    { dots, knots, stars, cores, strokes },
+    await assets.vector('penlines'),
+  );
   const gpu = GpuStipple.create(dev);
   const lines = [`adapter: ${adapterName(adapter)}`];
   let pass = true;
@@ -91,7 +99,18 @@ run('stipple kernels (GPU = CPU, L1)', async () => {
     const cS = runStipple(scene.galaxy);
     const n = cS.n;
     const V = viewDesc(cam, scene.galaxy.g.dust ?? 0, n, classCapacity(n));
-    const cP = runProject(V, cS);
+    // the dust culls read the line-work's projected points (M4)
+    const G = scene.galaxy;
+    const rv = runRibbons(
+      ribbonModel(scene.ribbons, G.pool, G.dotBase),
+      V,
+      ribUniform(scene.ribbons, cam, P, G.g.n_dot_pool ?? 1),
+    );
+    const cP = runProject(V, cS, {
+      c: cullsUniform(scene.ribbons, cam, P, G.g.key ?? 0),
+      points: rv.points,
+      carve: scene.ribbons.carve,
+    });
     const cC = compact(cP.classes, n, cP.u32);
 
     // samples, model tier
