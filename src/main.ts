@@ -22,11 +22,11 @@ import { Gpu, detectBackend, type Backend } from './gpu/device';
 import { readTexture } from './gpu/readback';
 import { BuiltAssets, type AtlasData, type AtlasName, type ImageData8 } from './marks/atlas';
 import { coreInstances } from './model/parts';
-import { buildScene, drawingsMeta, type MarkCounts } from './model/scene';
+import { buildScene, drawingsMeta, markCounts, type MarkCounts } from './model/scene';
 import type { DrawingsMeta } from './model/variation';
 import { GpuRenderer, type FrameSize } from './render/frame';
 import type { InkLayer } from './render/layers';
-import { PLATE_UNITS } from './render/sample-scene';
+import { PLATE } from './view/camera';
 import { GpuStipple } from './render/stipple';
 import { SURFACES, type SurfaceName } from './render/surface';
 import { cameraOf } from './view/camera';
@@ -76,8 +76,14 @@ interface Engine {
   backend: Backend;
   /** the size the engine draws at now */
   size(): FrameSize;
-  /** Model and view tiers for these parameters, then the ink. Resolves to the mark counts. */
-  draw(P: Params): Promise<MarkCounts>;
+  /** Model and view tiers for these parameters, then the ink. */
+  draw(P: Params): void;
+  /**
+   * The mark counts of the last draw, for the line under the plate. On the GPU this reads the
+   * indirect draw arguments back (`mapAsync`), so the page asks for it after presenting, outside
+   * the frame queue.
+   */
+  counts(): Promise<MarkCounts>;
   /** Composites onto the surface and shows it. Rejects if the frame could not be shown. */
   present(surface: SurfaceName): Promise<void>;
   /** A new plate size or DPR: re-inks at that size, keeping the drawings loaded. */
@@ -98,7 +104,7 @@ function plateCanvas(): HTMLCanvasElement {
 
 function plateSize(canvas: HTMLCanvasElement): FrameSize {
   return {
-    plateCss: canvas.clientWidth || PLATE_UNITS,
+    plateCss: canvas.clientWidth || PLATE,
     dpr: Math.min(MAX_DPR, window.devicePixelRatio || 1),
   };
 }
@@ -125,6 +131,7 @@ function cpuEngine(scene: Scene, size: FrameSize): Engine {
     r.drawInk();
     canvas.width = canvas.height = r.width;
   };
+  let counts: MarkCounts = markCounts([]);
   return {
     backend: 'cpu',
     size: () => r.size,
@@ -132,8 +139,9 @@ function cpuEngine(scene: Scene, size: FrameSize): Engine {
       const view = new CpuStipple(buildScene(P, scene.meta)).view(cameraOf(P));
       r.setLayers(view.layers);
       ink();
-      return Promise.resolve(view.counts);
+      counts = view.counts;
     },
+    counts: () => Promise.resolve(counts),
     present(surface) {
       const out = r.present(SURFACES[surface]);
       ctx.putImageData(new ImageData(out, r.width, r.height), 0, 0);
@@ -225,9 +233,13 @@ async function gpuEngine(
     return {
       backend: 'webgpu',
       size: () => current().size,
-      async draw(P) {
-        const st = inkScene(P);
-        // the counts for the line under the plate: a read-back, off the frame path
+      draw(P) {
+        inkScene(P);
+      },
+      async counts() {
+        const st = stipple;
+        if (!st) throw new Error('no stipple passes');
+        // a read-back of the indirect draw arguments: never awaited by the frame queue
         return (await st.readCounts()).counts;
       },
       async present(surface) {
@@ -329,10 +341,9 @@ async function start(): Promise<void> {
   let frames = 0;
   let engine: Engine | undefined;
   /** the parameters wanted, and the engine and parameters last drawn */
-  let wantedP = params0();
+  let wanted = { P: params0(), preset };
   let drawnBy: Engine | null = null;
-  let drawnP: Params | null = null;
-  let counts: MarkCounts | null = null;
+  let drawn: typeof wanted | null = null;
   // frames are shown one after another, never concurrently
   let queue = Promise.resolve();
 
@@ -349,20 +360,15 @@ async function start(): Promise<void> {
   const show = async () => {
     const e = engine;
     if (!e) return; // the first frame will pick up the current surface and size
-    const wanted = surface;
+    const wantedSurface = surface;
     try {
-      if (drawnBy !== e || drawnP !== wantedP) {
-        const P = wantedP;
-        counts = await e.draw(P);
+      if (drawnBy !== e || drawn !== wanted) {
+        e.draw(wanted.P);
         drawnBy = e;
-        drawnP = P;
-        if (stats) {
-          const n = (x: number) => x.toLocaleString('en-GB');
-          stats.textContent = `${n(counts.dots)} dots · ${n(counts.knots)} knots · ${n(counts.stars)} stars`;
-        }
+        drawn = wanted;
       }
       if (!sameSize(e.size(), wantedSize)) e.resize(wantedSize);
-      await e.present(wanted);
+      await e.present(wantedSurface);
     } catch (err) {
       if (e !== engine) return; // a newer engine has taken over
       // a lost device is being recreated, and onRebuilt will show the frame again
@@ -370,15 +376,30 @@ async function start(): Promise<void> {
       return;
     }
     frames++;
-    window.__rosse = {
+    const shown = drawn;
+    const rosse = {
       backend: e.backend,
-      surface: wanted,
+      surface: wantedSurface,
       frames,
       size: e.size(),
-      preset,
-      seed,
-      counts,
+      // what is on the plate, which may lag the controls by a frame
+      preset: shown.preset,
+      seed: shown.P.seed,
+      counts: null as MarkCounts | null,
     };
+    window.__rosse = rosse;
+    // the counts, after the frame and outside the queue
+    void e.counts().then(
+      (c) => {
+        if (drawn !== shown) return;
+        rosse.counts = c;
+        if (stats) {
+          const n = (x: number) => x.toLocaleString('en-GB');
+          stats.textContent = `${n(c.dots)} dots · ${n(c.knots)} knots · ${n(c.stars)} stars`;
+        }
+      },
+      () => undefined,
+    );
     document.documentElement.dataset.backend = e.backend;
     if (note) note.textContent = e.backend === 'cpu' ? 'drawn on the CPU' : '';
   };
@@ -399,13 +420,13 @@ async function start(): Promise<void> {
 
   select.addEventListener('change', () => {
     preset = select.value;
-    wantedP = params0();
+    wanted = { P: params0(), preset };
     schedule();
   });
   seedInput.addEventListener('change', () => {
     seed = Math.min(9999, Math.max(1, Math.round(Number(seedInput.value)) || 1));
     seedInput.value = String(seed);
-    wantedP = params0();
+    wanted = { P: params0(), preset };
     schedule();
   });
 
