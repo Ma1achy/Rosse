@@ -13,6 +13,8 @@
 import { Draws } from '../core/rng';
 import { Stream } from '../core/streams';
 import type { Params } from '../core/params';
+import type { StrokesMeta } from '../marks/strokes';
+import type { VectorSheet } from '../marks/vector';
 
 const f = Math.fround;
 
@@ -34,6 +36,10 @@ export interface DrawingsMeta {
   knots: { count: number };
   stars: { count: number };
   cores: { kind: readonly string[]; style: readonly string[] };
+  /** the strokes sheet (M4): without it no curves are drawn */
+  strokes?: StrokesMeta;
+  /** the pen lines of the dust hatching and carving (M4): without them no hatches */
+  penlines?: VectorSheet;
 }
 
 export interface ArmVariation {

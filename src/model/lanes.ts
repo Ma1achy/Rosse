@@ -1,0 +1,227 @@
+/**
+ * Dust as data (ADR 0003, 0010): the hatched dust lanes (`dustLanes`, app23.js:L944–985), the pen
+ * lines that carve the stipple (`dustLines`, `DL`, app23.js:L199–220) and the hatching drawn
+ * along the lanes (`parts`, app23.js:L1047–1050), all in the galaxy frame.
+ *
+ * In v21 all of this is computed in screen space: the lanes are projected as they are made, and
+ * the stipple under them is culled from inside the sequential stream, so orbiting re-rolls the
+ * stipple (reference notes 20.1). Here the model tier keeps 3D anchor points and each hatch's own
+ * random numbers (offsets in plate px at zoom 1, angle jitter, length); the view tier projects
+ * them and lays out the hatches, and the stipple's lane and carving culls are pure filters on
+ * per-sample uniforms (compute/project.wgsl). Which hatches exist does not depend on the camera
+ * (the lanes' noise is evaluated in the galaxy frame), only on the `incE` bucket: past 74° the
+ * lanes become one hatched midplane, past 72° the carving lines lie along the midplane.
+ */
+import type { Params } from '../core/params';
+import { NoiseSalt, vnoise } from '../core/noise';
+import { Draws } from '../core/rng';
+import { Stream } from '../core/streams';
+import { lineParam, longestLine, type VectorSheet } from '../marks/vector';
+import { incE } from '../view/camera';
+import { armPhaseCpu, frac, type Vec3 } from './curves';
+import type { Variation } from './variation';
+
+/**
+ * One hatch: a pen line laid along a lane. In the view tier, with q = project(a) and the unit
+ * direction d0 of project(b) − q:
+ * - the angle is d0 turned by `dAng`;
+ * - the centre is q + n(d0)·offN·zoom + (0, offY·zoom) + d·offF·zoom, where n(d0) is d0's normal
+ *   and d the final direction;
+ * - the drawing is `tile` of `penlines`, scaled (len·zoom, 0.28·len·zoom), at pen scale 0.38.
+ */
+export interface Hatch {
+  a: Vec3;
+  b: Vec3;
+  offN: number;
+  offY: number;
+  offF: number;
+  dAng: number;
+  len: number;
+  tile: number;
+}
+
+export interface DustLanes {
+  hatches: Hatch[];
+  /** the lane points the stipple is thinned near (v21's `pts`) */
+  pts: Vec3[];
+  /** v21's LR at zoom 1: disc samples within this many plate px of a lane point are thinned */
+  laneR: number;
+  /** the carving lines (`DL`), galaxy frame */
+  lines: Vec3[][];
+}
+
+/** Indices on the `dust` stream. Fixed forever (ADR 0004). */
+export const DustIndex = {
+  /** edge-on row r, step s: `edge + 1000 r + s` */
+  edge: 0,
+  ring: 3000,
+  /** arm k, step s: `arms + 1000 k + s` */
+  arms: 4000,
+  /** carving line li: `lines + li` */
+  lines: 900,
+  /** hatch h's drawing: `tiles + h` */
+  tiles: 100000,
+} as const;
+
+/** The hatching's pen scale (app23.js:L1048). */
+export const HATCH_PEN = 0.38;
+/** The hatching's flattening (app23.js:L1048). */
+export const HATCH_FLAT = 0.28;
+
+export function dustLanes(
+  P: Params,
+  V: Variation,
+  penlines: VectorSheet | undefined,
+  incl: number,
+): DustLanes {
+  const hatches: Hatch[] = [];
+  const pts: Vec3[] = [];
+  const e = incE(incl);
+  if ((P.dustScribble > 0.02 || P.ring > 0.1) && P.bulge < 0.9 && !P.merger && !P.irr) {
+    const keep = 0.3 + 0.55 * Math.max(P.dustScribble, P.ring > 0.1 ? 0.5 : 0);
+    if (e > 74) {
+      // the edge-on midplane: three rows of hatches, thickest at the centre
+      for (let row = 0; row < 3; row++) {
+        const zo = (row - 1) * 0.022;
+        let step = 0;
+        for (let x = -2.8; x <= 2.8; x += 0.055, step++) {
+          const dens = Math.exp(-Math.abs(x) / 1.5);
+          const n = vnoise(x * 1.9 + frac(P.seed * 0.1), row * 3.1, P.seed, NoiseSalt.laneEdge);
+          const a: Vec3 = [x, 0, zo];
+          if (row === 1) pts.push(a);
+          const r = new Draws(P.seed, Stream.dust, DustIndex.edge + 1000 * row + step);
+          if (n > keep * (0.4 + 0.8 * dens) || r.f32() > 0.85) continue;
+          hatches.push({
+            a,
+            b: [x + 0.1, 0, zo],
+            offN: 0,
+            offY: r.gauss() * 1.2,
+            offF: 0,
+            dAng: r.gauss() * 0.08,
+            len: (10 + 9 * r.f32()) * (0.6 + 0.6 * dens),
+            tile: 0,
+          });
+        }
+      }
+    }
+    if (P.ring > 0.1 && e <= 74) {
+      // a hatched dust lane just inside the ring
+      let step = 0;
+      for (let tr0 = 0; tr0 < 6.2832; tr0 += 0.07, step++) {
+        const Rr = P.ringR * 0.9;
+        const nr = vnoise(
+          Math.cos(tr0) * 2.6 + 11,
+          Math.sin(tr0) * 2.6 + frac(P.seed * 0.01),
+          P.seed,
+          NoiseSalt.laneRing,
+        );
+        if (nr > keep * 1.05) continue;
+        const a: Vec3 = [Rr * Math.cos(tr0), Rr * Math.sin(tr0), 0];
+        pts.push(a);
+        const r = new Draws(P.seed, Stream.dust, DustIndex.ring + step);
+        hatches.push({
+          a,
+          b: [Rr * Math.cos(tr0 + 0.05), Rr * Math.sin(tr0 + 0.05), 0],
+          offN: 0,
+          offY: 0,
+          offF: 0,
+          dAng: r.gauss() * 0.08,
+          len: 9 + 8 * r.f32(),
+          tile: 0,
+        });
+      }
+    }
+    if (e <= 74 && P.arms >= 1) {
+      // along the inner, trailing edge of each arm, patchy, with the odd feather
+      const lx = V.lop * Math.cos(V.lopA) * 0.35;
+      const ly = V.lop * Math.sin(V.lopA) * 0.35;
+      for (let k = 0; k < P.arms; k++) {
+        const va = V.arms[k % V.arms.length];
+        const Rend = (va ? va.rmax : 2.1) * 0.95;
+        const off = (2 * Math.PI * k) / P.arms;
+        let step = 0;
+        for (let R = 0.45; R <= Rend; R += 0.035 + 0.02 * R, step++) {
+          const th = armPhaseCpu(P, V, R, k) + off - (0.12 + 0.04 * Math.sin(R * 3 + k));
+          const a: Vec3 = [R * Math.cos(th) + lx * R, R * Math.sin(th) + ly * R, 0];
+          const R2 = R + 0.05;
+          const th2 = armPhaseCpu(P, V, R2, k) + off - (0.12 + 0.04 * Math.sin(R2 * 3 + k));
+          const b: Vec3 = [R2 * Math.cos(th2) + lx * R, R2 * Math.sin(th2) + ly * R, 0];
+          const n = vnoise(R * 2.1 + k * 5.3, 7 + frac(P.seed * 0.01), P.seed, NoiseSalt.laneArm);
+          if (n > keep) continue; // dust is patchy
+          pts.push(a);
+          const r = new Draws(P.seed, Stream.dust, DustIndex.arms + 1000 * k + step);
+          hatches.push({
+            a,
+            b,
+            offN: r.gauss() * 2.2,
+            offY: 0,
+            offF: 0,
+            dAng: r.gauss() * 0.07,
+            len: 9 + 9 * r.f32(),
+            tile: 0,
+          });
+          if (r.f32() < 0.14 * P.dustScribble) {
+            // a feather: a short wisp crossing outward
+            const fa = (r.f32() < 0.5 ? 1 : -1) * (1.0 + 0.4 * r.f32());
+            const fl = 8 + 8 * r.f32();
+            hatches.push({ a, b, offN: 0, offY: 0, offF: fl * 0.45, dAng: fa, len: fl, tile: 0 });
+          }
+        }
+      }
+    }
+  }
+  // each hatch: one of the pen lines, picked on its own index (app23.js:L1048)
+  const nPen = penlines?.n ?? 0;
+  hatches.forEach((h, i) => {
+    h.tile = nPen
+      ? Math.min(
+          nPen - 1,
+          Math.floor(new Draws(P.seed, Stream.dust, DustIndex.tiles + i).f32() * nPen),
+        )
+      : 0;
+  });
+  if (!nPen) hatches.length = 0;
+  return {
+    hatches,
+    pts,
+    laneR: 3.5 + 3 * P.dustScribble,
+    lines: dustLines(P, V, penlines, incl),
+  };
+}
+
+/**
+ * The pen lines that carve gaps in the stipple (app23.js:L199–213): the longest polyline of 1–3
+ * `penlines` drawings, laid along the arms' inner edges, or along the midplane past 72°. They are
+ * never drawn; the stipple near them is culled (compute/project.wgsl).
+ */
+export function dustLines(
+  P: Params,
+  V: Variation,
+  penlines: VectorSheet | undefined,
+  incl: number,
+): Vec3[][] {
+  const out: Vec3[][] = [];
+  if (!(P.dustLines > 0.02 && P.bulge < 0.95) || !penlines?.n) return out;
+  const edge = incE(incl) > 72;
+  const lanes = edge ? 1 : Math.min(3, P.arms);
+  for (let li = 0; li < lanes; li++) {
+    const r = new Draws(P.seed, Stream.dust, DustIndex.lines + li);
+    const pi = Math.min(penlines.n - 1, Math.floor(r.f32() * penlines.n));
+    const rec = penlines.vec[pi];
+    const fl = rec ? longestLine(rec) : null;
+    if (!fl) continue;
+    out.push(
+      lineParam(fl).map(([s, d]): Vec3 => {
+        if (edge) return [-3 + 6 * s, 0, d * 0.28];
+        const Rr = 0.5 + 2.0 * s;
+        const th =
+          armPhaseCpu(P, V, Rr, li) +
+          (2 * Math.PI * li) / Math.max(1, P.arms) -
+          0.16 +
+          (d * 0.5) / Rr;
+        return [Rr * Math.cos(th), Rr * Math.sin(th), 0];
+      }),
+    );
+  }
+  return out;
+}

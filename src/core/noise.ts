@@ -15,7 +15,21 @@ import { Stream } from './streams';
 const f = Math.fround;
 
 /** Salts: which use of the noise (the low byte of the stream word is the noise stream). */
-export const NoiseSalt = { flocc: 1, patchy: 2, irr: 3, ring: 4 } as const;
+export const NoiseSalt = {
+  flocc: 1,
+  patchy: 2,
+  irr: 3,
+  ring: 4,
+  /** where a flocculent arm's ribbon breaks (curves, app23.js:L780) */
+  floccArm: 5,
+  /** the dust lanes' patchiness: edge-on midplane, ring, arms (dustLanes, app23.js:L952–969) */
+  laneEdge: 6,
+  laneRing: 7,
+  laneArm: 8,
+  /** the hand wobble, x and y (SM, app23.js:L163) */
+  wobbleX: 9,
+  wobbleY: 10,
+} as const;
 
 function corner(ix: number, iy: number, seed: number, salt: number): number {
   return u32ToUnit(pcg4d(ix >>> 0, iy >>> 0, seed >>> 0, (Stream.noise | (salt << 8)) >>> 0)[0]);
