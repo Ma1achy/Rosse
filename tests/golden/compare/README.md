@@ -1,6 +1,9 @@
 # tests/golden/compare
 
-`compare.mjs` is the entry point of `npm run golden`.
+The golden comparison of ADR 0013 (`npm run golden`; see ../README.md).
 
-- **Today (M0):** it checks that the reference captures are complete and match their manifest.
-- **From M2:** it renders each case with the new engine and applies the metric. The metric's functions (density map, SSIM, distance transform, stroke-width distribution) will live beside it as small, unit-tested modules.
+- `compare.mjs`: the entry point. Checks the reference captures against their manifest, starts Vite, renders every required case on WebGPU (Chromium on SwiftShader, `../render.html` → `render-gpu.ts`) and on the CPU engine (`engine-cpu.ts`, loaded in Node through Vite's SSR loader), and applies the metric. `--calibrate` writes `../thresholds.json` and `../calibration.json`.
+- `metrics.ts`: total ink, density maps, SSIM, the distance transform and stroke widths. Unit-tested in `tests/unit/golden-metrics.test.ts`.
+- `thresholds.ts`: thresholds and the pass/fail decision of one case.
+- `report.ts`: the HTML report written to `../diff/` (not committed).
+- `node.ts`: the Node half (reading captures, the CPU engine, reports, calibration).
