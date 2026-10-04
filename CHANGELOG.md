@@ -11,6 +11,14 @@ All notable changes to this project are documented here. The format follows [Kee
   - The view tier (ADR 0010): `render/tiers.ts` runs the model tier only when the schema's tier tags or an `incE` bucket crossing say so, and the view tier on camera, `mTime` or zoom changes. Both engines use it (`GpuStipple.frame`, `CpuStippleTiers`). Tests hash the stipple samples before and after camera moves, on the GPU and the CPU.
   - `ui/orbit.ts`: v21's orbit controls. They cover drag orbit and tilt, shift- or right-drag roll, pinch and twist, wheel and ctrl-wheel zoom, Safari gestures, double-click, and the arrow, Q/E, +/− and 0 keys. They are tested event for event against v21's own handler code. Camera moves are coalesced to at most one queued frame. The page also takes `?zoom=`, `?az=`, `?incl=` and `?pa=`.
   - Zoom goldens (open question Q8): `capture:reference --extra` has a `zoom` camera (home at `__GEN.zoom(2)`) and `--cameras`. Cases opt in per seed with `"zoom": [7, 4242]`. There are 6 new v21 captures of the M2 stipple-only set, and the golden runner renders each case at its capture's zoom. All 34 required cases pass, including the 6 zoom cases under ADR 0015's moment gate.
+  - Review fixes:
+    - The model tier's inclination key is a structure signature (ADR 0017), covering L1000's raw cos i switch that `incE` buckets missed. A scan test classifies every use of the inclination in v21.
+    - `schedule()` coalesces every frame request.
+    - The URL camera parsing is strict.
+    - Per-camera run records and per-capture times in the golden manifest.
+    - `GpuStipple` keys its model on the drawings' metadata.
+    - The GPU hash test covers every model buffer.
+    - The plate has an accessible name.
   - `npm run test:gpu`: the tier hash test with indicative orbit timings, and a Playwright check that drags, rolls and zooms the page and compares the camera with v21's formulas.
 
 - M2, the stipple from the model and the comparison harness:

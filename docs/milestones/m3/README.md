@@ -37,10 +37,21 @@ These are the stipple-only variants, taken with `node tools/gpu-test/side-by-sid
 | 1028 | `incE() < 80` | the drawn core | M2 (built) |
 | 1029 | `incE() > 70` | the core's dotted style | M2 (built) |
 | 1031 | `incE() > 78` | the core flattened to 0.55 | M5 |
+| 1000 | `P.bulgeFlat * Math.max(ci(), 0.05) < 0.5` (raw cos i, not `incE`) | whole-drawing type `smooth:elongated` (only for kind auto, bulge ≥ 0.95) | M5 |
+| 788 | `P.lines * (P.incl - 72) / 18` (continuous) | the midplane stroke's alpha: a **view-tier input**, not a switch | M4 |
+
+**Inclination and the model tier (review fix, [ADR 0017](../../adr/0017-model-tier-key-is-a-structure-signature.md)).** The `incE` buckets alone were not a sufficient model key:
+
+- L1000 switches on the raw cos i. `Smooth, round` (bulgeFlat 0.95) changes its whole drawing at 58.2°, inside bucket 0, and 30° differs from 150°.
+- The model tier's key is now `structureKey(P)`: the answer of every discrete inclination switch (the 12 `incE` tests, and L1000 under its own guard). `dirtyTier` rebuilds the model when it changes.
+- Every other use of the inclination (23, among them L788's alpha, the flattenings by `max(bulgeFlat, cos i)` and the dust optical depth) is listed in `INCL_CONTINUOUS` as a view-tier input.
+- `tests/unit/camera.test.ts` scans `app23.js`, and every `P.incl`, `ci()` and `incE()` must be in one of the two lists.
+
+This clarifies ADR 0010's "the `incE` bucket" without changing its tiers.
 
 - **The view tier (ADR 0010), driven by the schema.** `render/tiers.ts` decides what each frame rebuilds:
   - `dirtyTier` reads the tier tags of the changed parameters;
-  - a model parameter, or an inclination that crosses a bucket, rebuilds the model tier and everything after it;
+  - a model parameter, or an inclination that changes the structure signature (`structureKey`, ADR 0017), rebuilds the model tier and everything after it;
   - the camera, `mTime` or the zoom re-runs only the view tier;
   - a stage that throws invalidates the state, so the next frame rebuilds everything.
 
@@ -56,7 +67,9 @@ These are the stipple-only variants, taken with `node tools/gpu-test/side-by-sid
   - `touch-action: none`, the grab cursor, `tabIndex` 0, and no context menu.
 
   `tests/unit/orbit.test.ts` runs v21's own `orbit()` block, cut from `app23.js`, on a stand-in canvas and sends it and ours the same event sequences. After every event, az, incl, pa, zoom, the cursor and `preventDefault` are identical.
-- **Frames.** Camera moves and resizes go through M1's frame queue via `requestFrame`, which requests one animation frame. While a frame is requested or waiting, further moves only update the wanted camera, so at most one frame ever waits. Changing the preset resets the angles, a new seed keeps them, and the zoom persists, as in v21.
+- **Frames.** Every frame request goes through M1's frame queue via `schedule()`: camera moves, resizes, surface toggles, preset and seed changes, and engine switches. It coalesces: with a frame already waiting it returns, and the waiting frame draws the latest state when it starts, so at most one frame ever waits. Camera moves and resizes also wait for the next animation frame (`requestFrame`). The orbit check interleaves 9 surface toggles and a seed change with a drag and still sees at most one waiting. Changing the preset resets the angles, a new seed keeps them, and the zoom persists, as in v21.
+- **URL camera** (`ui/url.ts`): `?az`, `?incl`, `?pa` and `?zoom`. An empty or non-numeric value is absent, so `?incl=` keeps the preset's inclination. Values are brought into range as the controls do, so `?zoom=0` becomes 0.15. Unit-tested.
+- **Accessibility:** the plate has an accessible name with the key hints and keeps the focus across an engine switch. `orbit.ts` documents the v21 quirks kept on purpose: there is no `lostpointercapture` handler; Ctrl with + or − is swallowed by the plate; the wheel ignores `deltaMode`.
 
 ## Acceptance
 
@@ -129,6 +142,13 @@ On SwiftShader the sprite ink pass dominates: it rasterises about 10,000 quads a
 - **The `incE` uses** are listed and bucketed, but only the two core uses (L1028, L1029) have consumers. The rest arrive with M4 and M5, and the bucket rebuild is ready for them. As in v21, a threshold has no hysteresis. Orbiting back and forth across 72–80° rebuilds the model at each crossing, which shows as a change of structure, not a re-roll (the roadmap's "flicker" risk). No consumer exists yet to judge whether hysteresis would be wanted.
 - **`toView`, `orient`, `scenePoint`, `srcNow` and `perspective`** are built and checked against v21 but unused until the sky (M7) and the lens (M9). The home orientation as a saved parameter (divergence 2) comes with them.
 - **The counts line under the plate** still awaits a read-back of the indirect arguments after each frame (as in M2). It does not block the GPU and is only for the statistics line. Moving it fully off the frame path, or reading it only when the counts can change, is left to M10.
+- **Zoom-dependent inputs still to come, all view-tier.** Zoom never rebuilds the model, so when these land they must be computed in the view tier, not baked into model buffers:
+  - the drawn stars' size factor `ZL = (VIEW.scale / 84)^0.45` (L183);
+  - the lane radius `LR` (L194);
+  - the dust clouds' and hatching's `zf` (L936, L947);
+  - the breathing-room grid round bright stars, which is in screen pixels.
+
+  v21 computes all of them inside `generate`, `dustClouds` and `dustLanes`, which re-run on every zoom. Here they must be view-tier culls and expansions over the stored model.
 - **`setLayers` on every view frame** re-creates the sprite batches' small uniform buffers (6 layers). It is cheap, but it could be kept across view frames in M10.
 
 ## Checks
