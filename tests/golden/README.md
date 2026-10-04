@@ -66,12 +66,13 @@ npm run golden -- --report-all       # an HTML report for every case, not only f
 npm run golden -- --calibrate        # re-measure and rewrite thresholds.json and calibration.json
 npm run golden -- --update-engine    # rewrite engine-hashes.json, the engine's own goldens (test e)
 npm run capture:reference -- --extra tests/golden/extra-cases.json   # the variant captures
+npm run capture:reference -- --extra tests/golden/extra-cases.json --cameras zoom   # only the zoom camera
 npm run capture:reference -- --reroll                                # v21 re-roll pairs, for --calibrate
 ```
 
 What M2 settled, beyond ADR 0013's text:
 
-- **Required cases** are the captures with a `variant` (from `extra-cases.json`): in M2 the stipple-only captures of `Smooth, round`, `Cigar-shaped` and `Disc, no arms` (both seeds, both cameras). Each is compared three ways: WebGPU against v21 and the CPU engine against v21 at the family's parity thresholds, and the CPU engine against WebGPU at the strict ones; WebGPU is also rendered twice (L0) and checked against `engine-hashes.json` (e).
+- **Required cases** are the captures with a `variant` (from `extra-cases.json`): in M2 the stipple-only captures of `Smooth, round`, `Cigar-shaped` and `Disc, no arms` (both seeds, both cameras), and from M3 the same at the **zoom camera** (open question Q8): the home view at zoom 2, captured through v21's `__GEN.zoom(2)` (`VIEW.scale` = 168), recorded as `"zoom": 2` in the capture and the manifest and rendered by the engine at the same zoom. 18 cases. Each is compared three ways: WebGPU against v21 and the CPU engine against v21 at the family's parity thresholds, and the CPU engine against WebGPU at the strict ones; WebGPU is also rendered twice (L0) and checked against `engine-hashes.json` (e).
 - **The same pen.** v21 picks each galaxy's hand (the pens its dots come from) from its own random stream, and the new engine from its own, so for a given seed they usually draw with different pens, which changes total ink by up to ±25% and stroke width by up to ±30%. That is a discrete choice of drawings (ADR 0005), not structure. The capture tool records v21's hand (`hand` in each capture's JSON) and the engine draws with it for the comparison; the result with the engine's own hand is printed as information.
 - **(b′) coarse structure.** At σ = 4 px a full re-draw of a stipple-only galaxy scores only 0.3–0.6, so (b) cannot tell a re-draw from a change of structure. A second SSIM at σ = 16 px (100² map) scores re-draws 0.88–0.96 and a 35° orbit 0.48–0.82; both are gated, each at its calibrated threshold.
 - **(c) as band means.** The "median" and "p90" are the means of the 40th–60th and 85th–95th percentiles: distances on a pixel grid take few values, and a single order statistic jumped by 12% between identical distributions.

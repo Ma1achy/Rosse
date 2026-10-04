@@ -28,7 +28,11 @@ declare global {
   interface Window {
     __golden?: {
       adapter: string;
-      render(P: Params, opts: { hand?: number[]; placementKey?: number }): Promise<GoldenRender>;
+      render(
+        P: Params,
+        opts: { hand?: number[]; placementKey?: number },
+        zoom?: number,
+      ): Promise<GoldenRender>;
     };
     __goldenError?: string;
   }
@@ -78,10 +82,10 @@ async function main(): Promise<void> {
   const info = adapter.info;
   window.__golden = {
     adapter: [info.vendor, info.architecture, info.description].filter(Boolean).join(' / '),
-    async render(P, opts) {
+    async render(P, opts, zoom = 1) {
       const t0 = performance.now();
       const scene = buildScene(P, meta, opts);
-      const cam = cameraOf(P);
+      const cam = cameraOf(P, zoom);
       stipple.setScene(scene);
       stipple.setView(cam);
       const layers: InkLayer[] = [...stipple.layers()];

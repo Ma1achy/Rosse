@@ -33,6 +33,8 @@ export interface CaptureRecord {
   variant?: string;
   seed: number;
   camera: string;
+  /** the reference's ZOOM at capture (2 for the zoom camera) */
+  zoom?: number;
   stats: { dots: number; knots: number; stars: number; rstars: number };
   params: Params;
   hand?: number[];
@@ -102,8 +104,8 @@ export class GoldenNode {
     return readPngAlpha(join(this.root, 'tests/golden/reference', `${name}.ink.png`));
   }
 
-  renderCpu(P: Params, opts: { hand?: number[]; placementKey?: number } = {}) {
-    return this.cpu.render(P, opts);
+  renderCpu(P: Params, opts: { hand?: number[]; placementKey?: number } = {}, zoom = 1) {
+    return this.cpu.render(P, opts, zoom);
   }
 
   parity(preset: string): Thresholds {

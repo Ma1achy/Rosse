@@ -149,20 +149,23 @@ async function compareAll(G, node) {
     /** @type {Record<string, any>} */
     const row = { name: c.name, preset: rec.preset, required: isRequired };
 
-    const cpu = node.renderCpu(rec.params, opts);
+    const zoom = rec.zoom ?? 1;
+    const cpu = node.renderCpu(rec.params, opts, zoom);
     const cpuM = G.measure(cpu.alpha);
     /** @type {{ engine: string, alpha: any, measures: any, counts: any }[]} */
     const engines = [{ engine: 'cpu', alpha: cpu.alpha, measures: cpuM, counts: cpu.counts }];
     if (gpu) {
       /** @type {any} */
-      const r1 = await gpu.page.evaluate(({ P, o }) => window.__golden?.render(P, o), {
+      const r1 = await gpu.page.evaluate(({ P, o, z }) => window.__golden?.render(P, o, z), {
         P: rec.params,
         o: opts,
+        z: zoom,
       });
       /** @type {any} */
-      const r2 = await gpu.page.evaluate(({ P, o }) => window.__golden?.render(P, o), {
+      const r2 = await gpu.page.evaluate(({ P, o, z }) => window.__golden?.render(P, o, z), {
         P: rec.params,
         o: opts,
+        z: zoom,
       });
       const a1 = G.alphaFromBase64(r1.alpha, r1.width, r1.height);
       const h1 = G.alphaHash(a1);
@@ -207,7 +210,7 @@ async function compareAll(G, node) {
         );
     }
     // the engine's own hand, for information
-    const own = node.renderCpu(rec.params);
+    const own = node.renderCpu(rec.params, {}, zoom);
     const ownCmp = G.compareMeasures(refM, G.measure(own.alpha));
     row.ownHand = ownCmp;
     console.log(

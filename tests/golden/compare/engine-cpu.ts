@@ -78,9 +78,10 @@ export class CpuGolden {
     for (const a of this.atlases) this.renderer.addAtlas(a);
   }
 
-  render(P: Params, opts: SceneOptions = {}): RenderResult {
+  /** `zoom`: the reference's ZOOM at capture (1, or 2 for the zoom camera). */
+  render(P: Params, opts: SceneOptions = {}, zoom = 1): RenderResult {
     const t0 = performance.now();
-    const view = new CpuStipple(buildScene(P, this.meta, opts)).view(cameraOf(P));
+    const view = new CpuStipple(buildScene(P, this.meta, opts)).view(cameraOf(P, zoom));
     this.renderer.setLayers(view.layers);
     this.renderer.drawInk();
     const ink = this.renderer.ink;

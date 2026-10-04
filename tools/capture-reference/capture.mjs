@@ -14,10 +14,12 @@
  *   node tools/capture-reference/capture.mjs --extra tests/golden/extra-cases.json [--verify]
  *   node tools/capture-reference/capture.mjs --reroll [--out dir] [--only …]
  *   --verify  capture again into a temporary folder and compare pixel hashes with the manifest.
- *   --extra   capture the cases of a file ({ cases: [{ preset, variant, overrides }] }): a preset
- *             with parameter overrides set after it (and after the seed), named
- *             <preset-slug>--<variant>__s<seed>__<camera>. They are added to (or replaced in) the
- *             existing manifest, which records the file.
+ *   --extra   capture the cases of a file ({ cameras?, cases: [{ preset, variant, overrides }] }): a
+ *             preset with parameter overrides set after it (and after the seed), named
+ *             <preset-slug>--<variant>__s<seed>__<camera>, at the file's cameras (home and orbit
+ *             by default; "zoom" is home at zoom 2, through __GEN.zoom). They are added to (or
+ *             replaced in) the existing manifest, which records the file.
+ *   --cameras capture only these cameras (comma-separated), e.g. --cameras zoom.
  *   --reroll  for calibration (ADR 0013): every preset at the home camera and again at az + 0.3°,
  *             which in v21 re-rolls the stipple when dust lanes are on (reference notes 20.1).
  *             Written to tests/golden/actual/reroll/ by default (not committed), with no manifest.
@@ -56,6 +58,11 @@ export const SEEDS = [7, 4242];
 /** Cameras: the preset's own view, then an orbit of 35° round the axis and 20° of tilt. */
 export const CAMERAS = /** @type {const} */ (['home', 'orbit']);
 export const ORBIT = { az: 35, incl: 20 };
+/**
+ * The zoom camera of --extra (open question Q8): the home view at zoom 2 (v21's ZOOM, so
+ * VIEW.scale = 168, app23.js:L1227), set up from a fresh preset.
+ */
+export const ZOOM_CAMERA = 2;
 /** The re-roll camera of --reroll: a 0.3° orbit (ADR 0013). */
 export const REROLL = { az: 0.3 };
 /** A few presets also captured on the Chalkboard surface. */
@@ -144,12 +151,13 @@ async function captureJob(browser, url, job, out) {
   const results = [];
   for (const camera of job.cameras) {
     const state = await page.evaluate(
-      ({ preset, seed, camera, orbit, overrides, reroll }) => {
+      ({ preset, seed, camera, orbit, overrides, reroll, zoom }) => {
         const G = /** @type {any} */ (window).__GEN;
-        if (camera === 'home') {
+        if (camera === 'home' || camera === 'zoom') {
           G.preset(preset);
           G.set({ seed });
           if (overrides) G.set(overrides);
+          if (camera === 'zoom') G.zoom(zoom);
         } else if (camera === 'reroll') {
           const P = G.P();
           G.set({ az: (P.az || 0) + reroll.az });
@@ -178,6 +186,7 @@ async function captureJob(browser, url, job, out) {
         orbit: ORBIT,
         overrides: job.overrides ?? null,
         reroll: REROLL,
+        zoom: ZOOM_CAMERA,
       },
     );
     const base = job.variant ? `${slug(job.preset)}--${slug(job.variant)}` : slug(job.preset);
@@ -195,12 +204,13 @@ async function captureJob(browser, url, job, out) {
       surface: job.chalk ? 'chalkboard' : 'paper',
       ...(job.variant ? { variant: job.variant, overrides: job.overrides } : {}),
       sequence:
-        camera === 'home'
+        camera === 'home' || camera === 'zoom'
           ? [
               `load page (theme ${job.chalk ? 'dark' : 'light'})`,
               `__GEN.preset(${JSON.stringify(job.preset)})`,
               `__GEN.set({ seed: ${job.seed} })`,
               ...(job.overrides ? [`__GEN.set(${JSON.stringify(job.overrides)})`] : []),
+              ...(camera === 'zoom' ? [`__GEN.zoom(${String(ZOOM_CAMERA)})`] : []),
             ]
           : camera === 'reroll'
             ? ['after home', `__GEN.set({ az: az + ${REROLL.az} })`]
@@ -208,7 +218,7 @@ async function captureJob(browser, url, job, out) {
                 'after home',
                 `__GEN.set({ az: az + ${ORBIT.az}, incl: clamp(incl + ${ORBIT.incl}, 0, 180) })`,
               ],
-      zoom: 1,
+      zoom: camera === 'zoom' ? ZOOM_CAMERA : 1,
       canvas: state.canvas,
       stats: state.stats,
       hand: state.hand,
@@ -243,17 +253,28 @@ async function main() {
   const only = opt('--only')
     ?.split(',')
     .map((s) => s.trim());
+  const onlyCameras = opt('--cameras')
+    ?.split(',')
+    .map((s) => s.trim());
   const names = Object.keys(presets).filter((n) => !only || only.includes(n));
   /** @type {Job[]} */
   let jobs;
   if (extraFile) {
-    /** @type {{ cases: { preset: string, variant: string, overrides: Record<string, unknown> }[] }} */
+    /** @type {{ cameras?: string[], cases: { preset: string, variant: string, overrides: Record<string, unknown> }[] }} */
     const extra = JSON.parse(readFileSync(resolve(ROOT, extraFile), 'utf8'));
+    const cams = (extra.cameras ?? [...CAMERAS]).filter(
+      (c) => !onlyCameras || onlyCameras.includes(c),
+    );
+    for (const c of cams)
+      if (!['home', 'orbit', 'zoom'].includes(c)) throw new Error(`unknown camera ${c}`);
+    // orbit is reached from home, so it needs home captured first in the same page
+    if (cams.includes('orbit') && !cams.includes('home'))
+      throw new Error('the orbit camera needs the home camera');
     jobs = extra.cases
       .filter((c) => !only || only.includes(c.preset))
       .flatMap((c) => {
         if (!presets[c.preset]) throw new Error(`unknown preset ${c.preset}`);
-        return SEEDS.map((seed) => ({ ...c, seed, chalk: false, cameras: CAMERAS }));
+        return SEEDS.map((seed) => ({ ...c, seed, chalk: false, cameras: cams }));
       });
   } else if (reroll) {
     jobs = names.flatMap((preset) =>
@@ -315,6 +336,7 @@ async function main() {
     ...(r.variant ? { variant: r.variant, overrides: r.overrides } : {}),
     seed: r.seed,
     camera: r.camera,
+    ...(r.zoom !== 1 ? { zoom: r.zoom } : {}),
     surface: r.surface,
     inkPixelSha256: r.inkPixelSha256,
     stats: r.stats,
@@ -339,6 +361,7 @@ async function main() {
     ]);
     manifest.extra = {
       file: extraFile,
+      cameras: { zoom: `home at zoom ${String(ZOOM_CAMERA)} (__GEN.zoom)` },
       generated: new Date().toISOString(),
       browser: { name: 'chromium', version, args: BROWSER_ARGS, deviceScaleFactor: 1 },
     };
