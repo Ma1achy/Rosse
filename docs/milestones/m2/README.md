@@ -20,7 +20,7 @@ Stipple-only variants (below), home camera, taken with `node tools/gpu-test/side
 - The dust optical-depth cull does change which marks show as you orbit an edge-on dusty galaxy. That is intended: it is occlusion along the line of sight, view-dependent in v21 and in ADR 0010. What orbiting never changes is which samples exist.
 - `model/parts`: the drawn core (a bitmap; `Disc, no arms` has one).
 - v21 parity, as open question Q13 recommends: `RMAX` is 240 (`// v21 parity:` in `model/galaxy.ts`), so nothing is truncated at 4.2.
-- The page: a preset menu and a seed; `?preset=…&seed=…&variant=stipple`. It presents a frame first and reads the counts back afterwards, outside the frame queue. `window.__rosse` records the preset and seed actually drawn, and the controls wrap on a 390 px screen. Wiring the page to the cache tiers (it re-samples on every draw) is M3's.
+- The page: a preset menu and a seed; `?preset=…&seed=…&variant=stipple`. It presents a frame first and reads the counts back afterwards, outside the frame queue, once per drawn scene: surface toggles and resizes reuse them and do not call `mapAsync`. `window.__rosse` records the preset and seed actually drawn, and the controls fit a 320 px screen. Wiring the page to the cache tiers (it re-samples on every draw) is M3's.
 
 ### Not yet (later milestones)
 
@@ -34,7 +34,7 @@ The breathing room matters for dot counts. With `starMix` 0.6, v21 clears 2,000�
 
 ## The acceptance cases
 
-Roadmap M2: `Smooth, round`, `Cigar-shaped` and `Disc, no arms` with `lines: 0, knots: 0, envelope: 0`. v21 also draws ink this milestone does not have, so the extra captures (`tests/golden/extra-cases.json`) set three more overrides. These are recorded in ADR 0015 as awaiting the owner's sign-off:
+Roadmap M2: `Smooth, round`, `Cigar-shaped` and `Disc, no arms` with `lines: 0, knots: 0, envelope: 0`. v21 also draws ink this milestone does not have, so the extra captures (`tests/golden/extra-cases.json`) set three more overrides. They are proposed in ADR 0016, awaiting the owner's sign-off:
 
 - **`starMix: 0`**: drawn stars among the dots, which are vector marks;
 - **`field: 0`**: the deep field, vector drawings;
@@ -55,9 +55,9 @@ Parity, WebGPU against v21. The CPU engine gives the same values within the stri
 - **widths:** ±10%;
 - **radii r25, r50, r90:** ±4.1%, ±4.6%, ±5.1% (spiral) or ±3.7%, ±5.6%, ±9.0% (smooth);
 - **outer ink:** ±1.6 or ±1.9 points;
-- **axis ratio q:** ±0.037 or ±0.057; **inner q:** ±0.044 or ±0.039;
-- **pa:** ±3.8° or ±4.5°, gated only where v21's q < 0.8;
-- **counts:** as ADR 0015 item 4.
+- **axis ratio q, inner q:** per preset where calibrated (±0.030–0.047 and ±0.031–0.062 for the spirals; Smooth, round ±0.067, ±0.032; Cigar ±0.047, ±0.039; Radio jet ±0.041, ±0.044), otherwise the family's ±0.037, ±0.044 or ±0.057, ±0.039;
+- **pa:** |Δpa| ≤ paA / (ε − ε₀) with ε = (1 − q²)/(1 + q²) of v21's drawing, paA 1.27° (spiral) or 1.37° (smooth) and ε₀ the preset's noise floor of ε (0.034–0.068), ungated beyond 90°. For example, it allows 2.3° at q 0.50, about 9° at q 0.83, 45–55° for `Radio jet` (q 0.92–0.93), and leaves the near-round `Smooth, round` (q ≥ 0.95) ungated;
+- **counts:** as ADR 0015 item 4: 0 in both only where the parameters make a class impossible (knots with `knots: 0`, sparkle stars with `sparkle: 0`, drawn stars with `starMix: 0`).
 
 `Disc, no arms` and `Grand design` are spirals. (b) is reported, not gated.
 
@@ -96,7 +96,7 @@ Parity, WebGPU against v21. The CPU engine gives the same values within the stri
 
 Counts:
 
-- **Sparkle stars:** 0–2 against 0–3 pass by the Poisson allowance, which expects about 0.5 for `Disc, no arms`. The 22–26 against 25–30 for the arms case are within ±10%.
+- **Sparkle stars:** 0–2 against 0–3 pass by the Poisson allowance, which expects about 0.5 for `Disc, no arms`. A class v21 drew none of gets the same allowance unless the parameters make it impossible. The 22–26 against 25–30 for the arms case are within ±10%.
 - **Drawn-star gate** (full captures, CPU engine, v21's variation): 12/12 pass. These are:
   - `Smooth, round` 774/720 and 749/756;
   - `Cigar-shaped` 805/714 and 775/781;
@@ -126,6 +126,11 @@ Getting there needed `sin`, `cos` and the stipple's Gaussian built from `+ − �
 
 - **`armProfile`:** evaluated verbatim from app23.js:L127–144 with the same variation, over a 48 × 90 grid of R × θ on 7 configurations: Grand design, Barred spiral, Flocculent (with lattice noise), Tightly wound, Loose, Hand-drawn arms, and 6 wide arms. The largest difference is 6.4 × 10⁻⁶.
 - **The offline replay of v21's `makeVariation`:** it reproduces every hand recorded from v21's page, and v21's `mulberry32` stream itself.
+- **Our own `makeVariation` against the replay** (`tests/unit/variation-distribution.test.ts`), because the goldens now draw v21's variation and no longer exercise ours. Over 2,000 seeds, for `Grand design` and for `Flocculent` with `patchy` 0.5, it compares:
+  - the mean and standard deviation of every numeric field, within 4 standard errors (using the measured kurtosis for the standard deviation);
+  - the histograms of `ns`, `nc`, `nd`, the number of pens and whole-sheet hands, by a two-sample χ² test at the 0.1% level.
+
+  A 14% change of `lop`'s scale fails it.
 
 ## Calibration (ADR 0015)
 
@@ -143,32 +148,40 @@ Sources of "the same galaxy, other dots", per family (`tests/golden/calibration.
 | merger | v21 re-roll | 0.929–0.975 | 0.986–0.997 | | | | | | |
 | lens | v21 re-roll | 0.873–0.976 | 0.972–0.995 | | | | | | |
 
-Thresholds are 1.5 × p95 of the engine re-draws, with two exceptions. Ink and widths keep ADR 0013's ±5% and ±10% as floors. (b′) is gated at p5 − 0.02. The pa threshold is computed only over pairs where the reference's q < 0.8. At σ = 4 px (b) scores re-draws as low as real changes of structure (spiral re-draws 0.35–0.58 against 35° orbits 0.32–0.48), which is why it is no longer gated.
+Thresholds are 1.5 × p95 of the engine re-draws, with two exceptions. Ink and widths keep ADR 0013's ±5% and ±10% as floors. (b′) is gated at p5 − 0.02. The axis ratios are calibrated per preset (at least 8 re-draws each), because near-round galaxies are noisier in q: the family-wide ±0.057 for smooth galaxies came from `Smooth, round` and let `Radio jet` with `bulgeFlat` 0.9 → 1.0 (Δq 0.055) pass; at its own ±0.041 it fails. The position angle's ε₀ is 1.5 × p95 of the change of ellipticity between re-draws (per preset), and paA is 1.5 × p95 of |Δpa| · (ε − ε₀) over the family's pairs above ε₀. At σ = 4 px (b) scores re-draws as low as real changes of structure (spiral re-draws 0.35–0.58 against 35° orbits 0.32–0.48), which is why it is no longer gated.
 
 ### Negative controls
 
 Each control changes one thing and is re-keyed, then evaluated against the thresholds above. A control counts where it changes the drawing: a disc's thickness needs a disc, a position angle or orbit needs an axis ratio below 0.8, and the bulge controls need a bulge of at least 0.3.
 
-| control | spiral: caught | smooth: caught | its median effect, where missed, against the re-draw noise (p95) |
+| control | spiral: caught | smooth: caught | median effect where missed, against the median re-draw (p95 in brackets) |
 | --- | ---: | ---: | --- |
 | pa +30°, −30° | 22/22, 22/22 | 8/8, 8/8 | |
+| pa +90° | 40/40 | 20/32 | missed only on `Smooth, round` (q 0.95–0.99), which has no position angle; every `Radio jet`, `Shell galaxy` and `Cigar-shaped` turn is caught |
 | 35° orbit | 22/22 | 8/8 | |
 | dot size × 1.3 | 40/40 | 32/32 | |
-| truncation at 4.2 units | 40/40 | 1/32 | smooth: r90 3.9% against 6.0%, outer 0.9 pt against 1.3; the halo beyond 4.2 units is 0.2% of a smooth galaxy's dots |
-| `bulgeSize` × 1.5 | 4/24 | 20/20 | spiral (bulge 0.3–0.4): r25 1.1% against 2.7%, ink 3.0% against 2.2%, inner q 0.011 against 0.029 |
-| `bulgeFlat` +0.15 | 2/24 | 12/12 | spiral: inner q 0.012 against 0.029 |
-| `bulgeFlat` −0.15 | 3/24 | 12/24 | smooth, missed only on `Smooth, round` (incl 10–30°): seen nearly face-on, flattening along the line of sight barely shows; q 0.034 against 0.038 |
-| halo off | 8/40 | 7/32 | spiral: r25 1.6% against 2.7%; smooth: r50 1.5% against 3.7%, q 0.017 against 0.038 (halo 0.10–0.25, 2.4–5.9% of the proposals, spread thinly over the plate) |
-| `thick` × 3 | 15/40 (the edge-on views but one, and about half at incl 50–65°) | — | spiral, at incl 30–45°: q 0.022 against 0.024, inner q 0.018 against 0.029 |
+| truncation at 4.2 units | 40/40 | 1/32 | smooth: r90 3.9% against 1.8% (6.0%); the halo beyond 4.2 units is 0.2% of a smooth galaxy's dots |
+| `bulgeSize` × 1.5 | 4/24 | 20/20 | spiral (bulge 0.3–0.4): ink 3.0% against 0.6% (2.2%), q 0.013 against 0.008 (0.024) |
+| `bulgeFlat` +0.1 | — | 20/20 | (Sérsic galaxies) |
+| `bulgeFlat` +0.15 | 1/24 | 12/12 | spiral: inner q 0.012 against 0.009 (0.029) |
+| `bulgeFlat` −0.15 | 3/24 | 12/24 | smooth, missed only on `Smooth, round` (incl 10–30°), seen nearly face-on: q 0.034 against 0.013 (0.038) |
+| halo off | 7/40 | 8/32 | spiral: ink 1.4% against 0.6% (2.2%), r25 1.6% against 0.8% (2.7%); smooth: ink 1.9% against 0.9% (3.2%), q 0.017 against 0.013 (0.038) |
+| `thick` × 3 | 15/40 (the edge-on views but one, and about half at incl 50–65°) | — | spiral: ink 1.8% against 0.6% (2.2%), q 0.022 against 0.008 (0.024), inner q 0.018 against 0.009 (0.029) |
 
-The structure gate catches every control whose effect exceeds the noise of re-drawing the dots. These cases were missed by v21 parity before review and are now caught:
+The structure gate catches every control whose effect on some measure exceeds that measure's band. These cases were missed by v21 parity before review and are now caught:
 
 - `Cigar-shaped` made rounder (`bulgeFlat` +0.15);
 - a bigger smooth bulge;
+- `Radio jet` made round (`bulgeFlat` 0.9 → 1.0) or turned by 90°;
 - every truncation at 4.2 of a disc;
-- every turn of the sky and orbit.
+- every turn of the sky and orbit of a galaxy that is not round.
 
-The misses are effects smaller than that noise, as the last column shows. A single drawing of 9,500 dots cannot show them, whatever the measure. They are listed per configuration in `calibration.json`.
+The misses are listed per configuration in `calibration.json`. Several of them move a measure by 2–5 times its median re-draw noise, for example `thick` × 3 (ink 0.018 against 0.006, q 0.022 against 0.008), `bulgeSize` × 1.5 (ink 0.030 against 0.006) and halo off. But no single measure leaves its 1.5 × p95 band, so they are **not caught at these per-measure gates**.
+
+**Future work** (ADR 0015), neither implemented in M2:
+
+- compare v21 with the mean of K re-keyed renders, which shrinks each measure's own noise by about √K;
+- a joint gate: a Mahalanobis distance over the measures with their re-draw covariance, or a same-sign rule across several measures.
 
 ## Checks
 

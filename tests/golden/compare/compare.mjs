@@ -54,9 +54,6 @@ if (!existsSync(manifestPath)) {
   process.exit(1);
 }
 
-/** The position angle is gated only where the reference's axis ratio is below this. */
-const PA_BELOW_Q = 0.8;
-
 /** Presets whose full captures carry the drawn-star count gate. */
 const RSTAR_GATE = ['Smooth, round', 'Cigar-shaped', 'Disc, no arms'];
 
@@ -192,7 +189,13 @@ async function compareAll(G, node) {
     let pass = true;
     for (const e of engines) {
       const cmp = G.compareMeasures(refM, e.measures);
-      const ev = G.evaluate(cmp, refCounts, G.engineCounts(e.counts), parity);
+      const ev = G.evaluate(
+        cmp,
+        refCounts,
+        G.engineCounts(e.counts),
+        parity,
+        G.impossibleClasses(rec.params),
+      );
       row[`parity_${e.engine}`] = {
         ...cmp,
         pass: ev.pass,
@@ -262,7 +265,12 @@ async function compareAll(G, node) {
     const r = node.renderCpu(rec.params, { variation: node.v21Variation(rec.params) });
     const ref = rec.stats.rstars;
     const ours = r.counts.rstars;
-    const allowed = G.countAllowance(ref, ours, node.parity(rec.preset));
+    const allowed = G.countAllowance(
+      ref,
+      ours,
+      node.parity(rec.preset),
+      G.impossibleClasses(rec.params).has('rstars'),
+    );
     const ok = Math.abs(ours - ref) <= allowed;
     if (!ok) gateFails++;
     results.push({
@@ -336,18 +344,19 @@ async function calibrate(G, node) {
     'Radio jet',
     'Shell galaxy',
   ];
-  /** @type {{ preset: string, family: string, params: any }[]} */
+  /** @type {{ preset: string, base: string, family: string, params: any }[]} */
   const cases = [];
   for (const preset of presets)
     for (const seed of [7, 4242])
       for (const camera of ['home', 'orbit']) {
         const rec = node.record(`${manifestSlug(preset)}__s${seed}__${camera}`);
-        cases.push({ preset, family: G.goldenFamily(preset), params: rec.params });
+        cases.push({ preset, base: preset, family: G.goldenFamily(preset), params: rec.params });
       }
   for (const c of manifest.captures.filter((/** @type {any} */ x) => x.variant)) {
     const rec = node.record(c.name);
     cases.push({
       preset: `${rec.preset} (${c.variant})`,
+      base: rec.preset,
       family: G.goldenFamily(rec.preset),
       params: rec.params,
     });
@@ -409,8 +418,7 @@ async function calibrate(G, node) {
     ['outerAbs', (/** @type {any} */ c) => Math.abs(c.outerDiff)],
     ['qAbs', (/** @type {any} */ c) => Math.abs(c.qDiff)],
     ['qInnerAbs', (/** @type {any} */ c) => Math.abs(c.qInnerDiff)],
-    // the position angle only where the reference has one (axis ratio below PA_BELOW_Q)
-    ['paAbs', (/** @type {any} */ c) => (c.ref.q < PA_BELOW_Q ? Math.abs(c.paDiff) : NaN)],
+    ['paAbs', (/** @type {any} */ c) => Math.abs(c.paDiff)],
   ]);
   const stats = (/** @type {any[]} */ list) =>
     Object.fromEntries(
@@ -434,7 +442,6 @@ async function calibrate(G, node) {
       // the drawn stars of a disc galaxy (about 1,000–1,100 of ~11,000 proposals) are a binomial
       // draw too: ±3% there is under one standard deviation of the difference of two draws
       poissonBelow: 2000,
-      paBelowQ: PA_BELOW_Q,
     };
     if (!list.length) {
       parity[family] = {
@@ -449,7 +456,8 @@ async function calibrate(G, node) {
         outer: 0.03,
         q: 0.05,
         qInner: 0.05,
-        pa: 10,
+        paA: 2,
+        paEps0: 0.05,
         provisional: true,
       };
       numbers[family] = { v21Reroll: v21.pairs[family]?.length ? stats(v21.pairs[family]) : null };
@@ -472,14 +480,33 @@ async function calibrate(G, node) {
       outer: spread(s, 'outerAbs', 0.003),
       q: spread(s, 'qAbs', 0.005),
       qInner: spread(s, 'qInnerAbs', 0.005),
-      pa: spread(s, 'paAbs', 1),
+      ...positionAngle(list),
     };
+    // per-preset axis-ratio tolerances: near-round galaxies are noisier in q than flat ones, so
+    // a family-wide value would be too wide for the flat ones (ADR 0015)
+    /** @type {Record<string, any>} */
+    const byPreset = {};
+    for (const preset of [...new Set(list.map((c) => c.preset))]) {
+      const mine = list.filter((c) => c.preset === preset);
+      if (mine.length < 8) continue;
+      const ps = stats(mine);
+      byPreset[preset] = {
+        q: spread(ps, 'qAbs', 0.005),
+        qInner: spread(ps, 'qInnerAbs', 0.005),
+        // the preset's own noise floor of the ellipticity (a smooth Sérsic profile is far quieter
+        // than a galaxy with a sparse halo); the family's paA
+        paEps0: Math.max(0.01, positionAngle(mine).paEps0),
+      };
+    }
+    parity[family].byPreset = byPreset;
     // the negative controls against these thresholds
     /** @type {Record<string, any>} */
     const ctl = {};
     for (const [name, list2] of Object.entries(eng.controls[family] ?? {})) {
       const rows = list2.map((/** @type {any} */ x) => {
-        const ev = G.evaluate(x.c, {}, {}, parity[family]);
+        const preset = /** @type {string} */ (x.config).replace(/ \(.*\)| s\d+ incl.*/g, '');
+        const { byPreset: bp, ...fam } = parity[family];
+        const ev = G.evaluate(x.c, {}, {}, { ...fam, ...(bp[preset] ?? {}) });
         return { config: x.config, failed: !ev.pass, by: ev.failures.map((f) => f.split(' (')[0]) };
       });
       ctl[name] = {
@@ -510,8 +537,8 @@ async function calibrate(G, node) {
       outer: 0.002,
       q: 0.003,
       qInner: 0.003,
-      pa: 1,
-      paBelowQ: PA_BELOW_Q,
+      paA: 0.1,
+      paEps0: 0,
       counts: 0.001,
       countsSmall: 0.001,
       poisson: 0,
@@ -541,6 +568,29 @@ async function calibrate(G, node) {
           `${family.padEnd(7)} ${name.padEnd(16)} detected ${x.detected}/${x.applicable}${x.missed.length ? `  missed: ${x.missed.join(', ')}` : ''}`,
         );
   console.log(JSON.stringify(parity, null, 1));
+}
+
+/**
+ * The position-angle tolerance's parameters (thresholds.ts `paTolerance`), fitted from re-draws:
+ * paEps0 is 1.5 × the 95th percentile of the change of ellipticity ε = (1 − q²)/(1 + q²) between
+ * re-draws (below it the axis is noise), and paA 1.5 × the 95th percentile of |Δpa| · (ε − paEps0)
+ * over the pairs above it, so that |Δpa| ≤ paA / (ε − paEps0).
+ *
+ * @param {any[]} list
+ */
+function positionAngle(list) {
+  const eps = (/** @type {number} */ q) => (1 - q * q) / (1 + q * q);
+  const p95 = (/** @type {number[]} */ xs) => {
+    const s = xs.slice().sort((a, b) => a - b);
+    return s[Math.max(0, Math.ceil(0.95 * s.length) - 1)] ?? 0;
+  };
+  const ceil3 = (/** @type {number} */ x) => Math.ceil(x * 1000) / 1000;
+  const paEps0 = ceil3(1.5 * p95(list.map((c) => Math.abs(eps(c.render.q) - eps(c.ref.q)))));
+  const above = list.filter((c) => eps(c.ref.q) > paEps0);
+  const paA = ceil3(
+    Math.max(0.5, 1.5 * p95(above.map((c) => Math.abs(c.paDiff) * (eps(c.ref.q) - paEps0)))),
+  );
+  return { paA, paEps0 };
 }
 
 /** @param {string} s */

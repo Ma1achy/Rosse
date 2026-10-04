@@ -27,13 +27,14 @@ import { reportHtml } from './report';
 import {
   countAllowance,
   evaluate,
+  impossibleClasses,
   type Evaluation,
   type ThresholdFile,
   type Thresholds,
 } from './thresholds';
 import { v21Variation } from './v21';
 
-export { compareMeasures, countAllowance, evaluate, measure };
+export { compareMeasures, countAllowance, evaluate, impossibleClasses, measure };
 export type { Comparison, Evaluation, Grey, ImageMeasures, Thresholds };
 
 export interface CaptureRecord {
@@ -122,10 +123,12 @@ export class GoldenNode {
     return v21Variation(P, this.cpu.meta);
   }
 
+  /** The family's parity thresholds, with the preset's own where calibrated (axis ratios). */
   parity(preset: string): Thresholds {
     const t = this.thresholds.parity[goldenFamily(preset)];
     if (!t) throw new Error(`no parity thresholds for ${preset}`);
-    return t;
+    const { byPreset, ...family } = t;
+    return { ...family, ...(byPreset?.[preset] ?? {}) };
   }
 
   writeReport(
@@ -150,11 +153,11 @@ export class GoldenNode {
    * that applies to the configuration, re-keyed, against key 0.
    */
   calibrateEngine(
-    cases: { preset: string; family: string; params: Params }[],
+    cases: { preset: string; base: string; family: string; params: Params }[],
     keys: number,
     log: (s: string) => void,
   ) {
-    const pairs: Record<string, Comparison[]> = {};
+    const pairs: Record<string, (Comparison & { preset: string })[]> = {};
     const controls: Record<string, Record<string, { config: string; c: Comparison }[]>> = {};
     for (const c of cases) {
       const variation = this.v21Variation(c.params);
@@ -165,7 +168,11 @@ export class GoldenNode {
           variation,
           placementKey: (c.params.seed + k * 7_919_000) >>> 0,
         });
-        (pairs[c.family] ??= []).push(compareMeasures(base, measure(r.alpha)));
+        // tagged with the preset, for the per-preset axis-ratio tolerances
+        (pairs[c.family] ??= []).push({
+          ...compareMeasures(base, measure(r.alpha)),
+          preset: c.base,
+        });
       }
       const config = `${c.preset} s${String(c.params.seed)} incl ${String(c.params.incl)}`;
       for (const ctl of NEGATIVE_CONTROLS) {
@@ -188,7 +195,7 @@ export class GoldenNode {
 
   /** Calibration, source (i): v21's own re-roll pairs (capture tool --reroll). */
   calibrateReroll(dir: string, log: (s: string) => void) {
-    const pairs: Record<string, Comparison[]> = {};
+    const pairs: Record<string, (Comparison & { preset: string })[]> = {};
     if (!existsSync(dir)) return { pairs, used: 0 };
     let used = 0;
     for (const f of readdirSync(dir).filter((x) => x.endsWith('__home.json'))) {
@@ -207,7 +214,7 @@ export class GoldenNode {
         measure(readPngAlpha(join(dir, `${base}__home.ink.png`))),
         measure(readPngAlpha(join(dir, `${base}__reroll.ink.png`))),
       );
-      (pairs[goldenFamily(a.preset)] ??= []).push(c);
+      (pairs[goldenFamily(a.preset)] ??= []).push({ ...c, preset: a.preset });
       log(`  v21 re-roll ${base}: ssim ${c.ssim.toFixed(3)}`);
     }
     return { pairs, used };
@@ -250,6 +257,16 @@ export const NEGATIVE_CONTROLS: {
   return [
     { name: 'pa +30°', applies: notRound, params: (P) => ({ ...P, pa: P.pa + 30 }) },
     { name: 'pa −30°', applies: notRound, params: (P) => ({ ...P, pa: P.pa - 30 }) },
+    {
+      name: 'pa +90°',
+      applies: () => true,
+      params: (P) => ({ ...P, pa: P.pa + 90 }),
+    },
+    {
+      name: 'bulgeFlat +0.1',
+      applies: (P) => P.bulge >= 0.95 && P.bulgeFlat <= 0.9,
+      params: (P) => ({ ...P, bulgeFlat: P.bulgeFlat + 0.1 }),
+    },
     {
       name: 'bulgeFlat +0.15',
       applies: (P) => P.bulge >= 0.3 && P.bulgeFlat + 0.15 <= 1,

@@ -25,6 +25,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0013](adr/0013-golden-image-metric.md) | Goldens are compared on total ink, SSIM of blurred density maps, stroke-width distribution and mark counts. Thresholds are calibrated from "same galaxy, other dots" pairs (v21's re-roll and the new engine's placement streams). The engine against its own goldens on SwiftShader is bit-exact. |
 | [0014](adr/0014-one-kernel-two-backends.md) | _Proposed:_ hand-written WGSL plus TypeScript twins with parity tests, with TypeGPU re-evaluated in M1. |
 | [0015](adr/0015-golden-metric-as-calibrated-in-m2.md) | The golden metric as calibrated in M2: coarse density SSIM plus a moment and extent test as the structure gate, band-mean widths, Poisson-aware counts, comparisons drawn with v21's replayed variation, and negative controls. Supersedes 0013 in part. |
+| [0016](adr/0016-m2-acceptance-overrides.md) | _Proposed:_ the extra overrides of the M2 stipple-only acceptance captures (`starMix`, `field`, `fgstars`; `jet` for `Radio jet`; `vary`, `dustScribble` for the arms case). |
 
 ## Modules
 

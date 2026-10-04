@@ -66,7 +66,9 @@ export function v21Variation(P: Params, meta: DrawingsMeta): Variation {
   const dust: Variation['dust'] = [];
   const nd = Math.round(v * r() * 5);
   for (let d = 0; d < nd; d++) dust.push({ R: 0.8 + 2 * r(), th: r() * 6.28, s: 0.18 + 0.3 * r() });
-  // the hand: v21 groups sizes by source with a plain object, so its key order is insertion order
+  // the hand: v21 groups sizes by source in a plain object and lists its keys; their order is
+  // insertion order only because the keys are not integer-like ("DG-1", "DOT-8"…): integer-like
+  // keys would come first, in numeric order. A Map keeps insertion order for any key.
   const bySrc = new Map<string, number[]>();
   meta.dots.src.forEach((s, i) => {
     let a = bySrc.get(s);

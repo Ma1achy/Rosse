@@ -41,9 +41,9 @@ So the metric (ADR 0013, as calibrated in M2 by ADR 0015) compares what must mat
 | b. fine structure (reported, not gated) | SSIM of density maps: σ = 4 px, downsampled 4× to 200², 7 × 7 windows with ink | — | — |
 | b′. structure | the same SSIM on coarse density maps: σ = 16 px, downsampled 8× to 100² | ≥ 0.88 / ≥ 0.91 | ≥ 0.98 |
 | c. pen weight | stroke widths from the distance transform of α ≥ 0.5 (α upsampled 4×) on its medial axis: band means of the 40th–60th ("median") and 85th–95th ("p90") percentiles | ±10% / ±10% | ±2% |
-| d. mark counts | per class (dots, knots, stars, drawn stars), engine statistics vs `__GEN.stats()` | 0 where v21 has 0; else ±3% (±10% under 100), or 3·√(v21 + engine) below 2,000 | ±0.1% |
+| d. mark counts | per class (dots, knots, stars, drawn stars), engine statistics vs `__GEN.stats()` | 0 in both where the parameters make the class impossible; else ±3% (±10% under 100), or 3·√(v21 + engine) below 2,000 (v21 drawing none included) | ±0.1% |
 | e. self-regression | WebGPU vs its own goldens (`engine-hashes.json`), SwiftShader; and twice in a row | — | bit-exact |
-| f. moments and extent | about the plate centre: radii holding 25%, 50%, 90% of the ink; ink beyond v21's r90; axis ratio within v21's r90 and r50; position angle where v21's axis ratio < 0.8 | r25 ±4.1% / ±3.7%, r50 ±4.6% / ±5.6%, r90 ±5.1% / ±9.0%, outer ±1.6 / ±1.9 points, q ±0.037 / ±0.057, inner q ±0.044 / ±0.039, pa ±3.8° / ±4.5° | ±0.5%, ±0.2 points, ±0.003, ±1° |
+| f. moments and extent | about the plate centre: radii holding 25%, 50%, 90% of the ink; ink beyond v21's r90; axis ratio within v21's r90 and r50; position angle | r25 ±4.1% / ±3.7%, r50 ±4.6% / ±5.6%, r90 ±5.1% / ±9.0%, outer ±1.6 / ±1.9 points; q and inner q per preset (family ±0.037, ±0.044 / ±0.057, ±0.039); pa ≤ paA / (ε − ε₀), ε the ellipticity of v21's drawing, paA 1.27° / 1.37°, ε₀ per preset, ungated when that exceeds 90° | ±0.5%, ±0.2 points, ±0.003, pa ≤ 0.1° / ε |
 
 The values are in `thresholds.json` (merger, lens, star and artefact are provisional until their engines land), the numbers behind them in `calibration.json`, and the reasoning in ADR 0015 and `docs/milestones/m2/README.md`.
 

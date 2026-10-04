@@ -167,18 +167,141 @@
           "max": 0.0413
         },
         "paAbs": {
-          "n": 66,
+          "n": 120,
           "min": 0.0296,
-          "p5": 0.0406,
-          "median": 0.976,
-          "p95": 2.551,
-          "max": 3.4126
+          "p5": 0.1068,
+          "median": 1.3867,
+          "p95": 9.1491,
+          "max": 22.0624
         }
       },
       "negativeControls": {
+        "pa +90°": {
+          "applicable": 40,
+          "detected": 40,
+          "missed": [],
+          "ssim": {
+            "n": 40,
+            "min": 0.1899,
+            "p5": 0.2593,
+            "median": 0.3726,
+            "p95": 0.4642,
+            "max": 0.5014
+          },
+          "ssimCoarse": {
+            "n": 40,
+            "min": 0.446,
+            "p5": 0.4542,
+            "median": 0.6639,
+            "p95": 0.8216,
+            "max": 0.8482
+          },
+          "inkAbs": {
+            "n": 40,
+            "min": 0.0001,
+            "p5": 0.0004,
+            "median": 0.0062,
+            "p95": 0.0154,
+            "max": 0.0229
+          },
+          "medianAbs": {
+            "n": 40,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.0053,
+            "p95": 0.0244,
+            "max": 0.0321
+          },
+          "p90Abs": {
+            "n": 40,
+            "min": 0.0001,
+            "p5": 0.0006,
+            "median": 0.009,
+            "p95": 0.0271,
+            "max": 0.0449
+          },
+          "r25Abs": {
+            "n": 40,
+            "min": 0.001,
+            "p5": 0.0019,
+            "median": 0.008,
+            "p95": 0.031,
+            "max": 0.0523
+          },
+          "r50Abs": {
+            "n": 40,
+            "min": 0.0001,
+            "p5": 0.0005,
+            "median": 0.0073,
+            "p95": 0.0219,
+            "max": 0.0513
+          },
+          "r90Abs": {
+            "n": 40,
+            "min": 0.001,
+            "p5": 0.0011,
+            "median": 0.0096,
+            "p95": 0.0287,
+            "max": 0.0343
+          },
+          "outerAbs": {
+            "n": 40,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.0025,
+            "p95": 0.0092,
+            "max": 0.0101
+          },
+          "qAbs": {
+            "n": 40,
+            "min": 0.0003,
+            "p5": 0.0004,
+            "median": 0.0088,
+            "p95": 0.032,
+            "max": 0.0457
+          },
+          "qInnerAbs": {
+            "n": 40,
+            "min": 0.0002,
+            "p5": 0.0008,
+            "median": 0.0097,
+            "p95": 0.0265,
+            "max": 0.0339
+          },
+          "paAbs": {
+            "n": 40,
+            "min": 77.3276,
+            "p5": 79.1078,
+            "median": 88.5077,
+            "p95": 89.7755,
+            "max": 89.9605
+          },
+          "firstFailures": [
+            {
+              "config": "Grand design s7 incl 30",
+              "failed": true,
+              "by": ["coarse ssim 0.7768", "position angle 88.86°"]
+            },
+            {
+              "config": "Barred spiral s7 incl 30",
+              "failed": true,
+              "by": ["coarse ssim 0.8094", "position angle -89.00°"]
+            },
+            {
+              "config": "Flocculent s7 incl 30",
+              "failed": true,
+              "by": ["coarse ssim 0.7496", "position angle 79.11°"]
+            },
+            {
+              "config": "Tightly wound s7 incl 30",
+              "failed": true,
+              "by": ["coarse ssim 0.7975"]
+            }
+          ]
+        },
         "halo off": {
           "applicable": 40,
-          "detected": 8,
+          "detected": 7,
           "missed": [
             "Grand design s7 incl 30",
             "Flocculent s7 incl 30",
@@ -189,6 +312,7 @@
             "Grand design (stipple-arms) s4242 incl 30",
             "Grand design s7 incl 50",
             "Barred spiral s7 incl 50",
+            "Flocculent s7 incl 50",
             "Tightly wound s7 incl 50",
             "Ringed s7 incl 50",
             "Disc, no arms s7 incl 65",
@@ -302,12 +426,12 @@
             "max": 0.046
           },
           "paAbs": {
-            "n": 22,
+            "n": 40,
             "min": 0.0173,
             "p5": 0.1013,
-            "median": 0.5371,
-            "p95": 2.5552,
-            "max": 5.4546
+            "median": 1.2477,
+            "p95": 7.4674,
+            "max": 12.3961
           },
           "firstFailures": [
             {
@@ -425,12 +549,12 @@
             "max": 0.0378
           },
           "paAbs": {
-            "n": 22,
+            "n": 40,
             "min": 0.0668,
             "p5": 0.1174,
-            "median": 0.7317,
-            "p95": 2.953,
-            "max": 7.7006
+            "median": 1.4596,
+            "p95": 8.9172,
+            "max": 11.8578
           },
           "firstFailures": [
             {
@@ -446,7 +570,13 @@
             {
               "config": "Flocculent s7 incl 30",
               "failed": true,
-              "by": ["coarse ssim 0.7657", "r50 -6.34%", "r90 -11.20%", "outer ink -5.42%"]
+              "by": [
+                "coarse ssim 0.7657",
+                "r50 -6.34%",
+                "r90 -11.20%",
+                "outer ink -5.42%",
+                "axis ratio -0.0356"
+              ]
             },
             {
               "config": "Tightly wound s7 incl 30",
@@ -468,11 +598,10 @@
             "Disc, no arms (stipple) s11 incl 45",
             "Disc, no arms (stipple) s4242 incl 45",
             "Grand design (stipple-arms) s4242 incl 30",
-            "Grand design s7 incl 50",
-            "Barred spiral s7 incl 50",
+            "Flocculent s7 incl 50",
             "Tightly wound s7 incl 50",
+            "Edge-on with dust s7 incl 108",
             "Disc, no arms (stipple) s11 incl 65",
-            "Grand design s4242 incl 30",
             "Barred spiral s4242 incl 30",
             "Flocculent s4242 incl 30",
             "Tightly wound s4242 incl 30",
@@ -483,6 +612,7 @@
             "Barred spiral s4242 incl 50",
             "Tightly wound s4242 incl 50",
             "Ringed s4242 incl 50",
+            "Disc, no arms s4242 incl 65",
             "Edge-on with dust s4242 incl 108"
           ],
           "ssim": {
@@ -574,12 +704,12 @@
             "max": 0.0702
           },
           "paAbs": {
-            "n": 22,
-            "min": 0.1062,
-            "p5": 0.1071,
-            "median": 0.74,
-            "p95": 3.6996,
-            "max": 5.3606
+            "n": 40,
+            "min": 0.04,
+            "p5": 0.1062,
+            "median": 1.3398,
+            "p95": 10.0809,
+            "max": 13.7104
           },
           "firstFailures": [
             {
@@ -697,12 +827,12 @@
             "max": 0.0649
           },
           "paAbs": {
-            "n": 22,
+            "n": 40,
             "min": 0.144,
-            "p5": 0.2374,
-            "median": 0.7383,
-            "p95": 2.7195,
-            "max": 5.813
+            "p5": 0.1561,
+            "median": 1.4026,
+            "p95": 10.6555,
+            "max": 12.8623
           },
           "firstFailures": [
             {
@@ -758,11 +888,12 @@
         },
         "bulgeFlat +0.15": {
           "applicable": 24,
-          "detected": 2,
+          "detected": 1,
           "missed": [
             "Tightly wound s7 incl 30",
             "Ringed s7 incl 30",
             "Disc, no arms s7 incl 45",
+            "Edge-on with dust s7 incl 88",
             "Disc, no arms (stipple) s11 incl 45",
             "Disc, no arms (stipple) s4242 incl 45",
             "Tightly wound s7 incl 50",
@@ -872,12 +1003,12 @@
             "max": 0.0584
           },
           "paAbs": {
-            "n": 14,
+            "n": 24,
             "min": 0.2265,
-            "p5": 0.2265,
-            "median": 0.6315,
-            "p95": 2.0934,
-            "max": 2.0934
+            "p5": 0.2527,
+            "median": 1.4128,
+            "p95": 12.1953,
+            "max": 12.3138
           },
           "firstFailures": [
             {
@@ -897,8 +1028,8 @@
             },
             {
               "config": "Edge-on with dust s7 incl 88",
-              "failed": true,
-              "by": ["inner axis ratio 0.0584"]
+              "failed": false,
+              "by": []
             }
           ]
         },
@@ -1017,12 +1148,12 @@
             "max": 0.0408
           },
           "paAbs": {
-            "n": 14,
+            "n": 24,
             "min": 0.1663,
-            "p5": 0.1663,
-            "median": 0.532,
-            "p95": 2.4285,
-            "max": 2.4285
+            "p5": 0.2161,
+            "median": 1.335,
+            "p95": 11.857,
+            "max": 12.0436
           },
           "firstFailures": [
             {
@@ -1161,12 +1292,12 @@
             "max": 0.0527
           },
           "paAbs": {
-            "n": 14,
+            "n": 24,
             "min": 0.1358,
-            "p5": 0.1358,
-            "median": 0.7996,
-            "p95": 2.1681,
-            "max": 2.1681
+            "p5": 0.2591,
+            "median": 1.654,
+            "p95": 8.4025,
+            "max": 11.8311
           },
           "firstFailures": [
             {
@@ -1187,7 +1318,7 @@
             {
               "config": "Edge-on with dust s7 incl 88",
               "failed": true,
-              "by": ["ink 6.39%", "r25 5.76%", "inner axis ratio 0.0527"]
+              "by": ["ink 6.39%", "r25 5.76%"]
             }
           ]
         },
@@ -1295,7 +1426,13 @@
             {
               "config": "Edge-on with dust s7 incl 88",
               "failed": true,
-              "by": ["coarse ssim 0.6638", "r25 6.84%", "r50 5.06%", "position angle 29.60°"]
+              "by": [
+                "coarse ssim 0.6638",
+                "r25 6.84%",
+                "r50 5.06%",
+                "axis ratio -0.0311",
+                "position angle 29.60°"
+              ]
             },
             {
               "config": "Grand design s7 incl 50",
@@ -1418,7 +1555,12 @@
             {
               "config": "Edge-on with dust s7 incl 88",
               "failed": true,
-              "by": ["coarse ssim 0.6678", "r25 5.96%", "position angle -30.42°"]
+              "by": [
+                "coarse ssim 0.6678",
+                "r25 5.96%",
+                "axis ratio -0.0313",
+                "position angle -30.42°"
+              ]
             },
             {
               "config": "Grand design s7 incl 50",
@@ -1549,7 +1691,8 @@
                 "r90 -10.15%",
                 "outer ink -3.16%",
                 "axis ratio 0.1499",
-                "inner axis ratio 0.1282"
+                "inner axis ratio 0.1282",
+                "position angle 3.55°"
               ]
             },
             {
@@ -1562,8 +1705,7 @@
                 "r25 -16.95%",
                 "r50 -17.90%",
                 "axis ratio -0.3702",
-                "inner axis ratio -0.2187",
-                "position angle -5.55°"
+                "inner axis ratio -0.2187"
               ]
             },
             {
@@ -1589,8 +1731,7 @@
                 "r25 -12.29%",
                 "r50 -9.02%",
                 "axis ratio -0.2633",
-                "inner axis ratio -0.2011",
-                "position angle 4.58°"
+                "inner axis ratio -0.2011"
               ]
             }
           ]
@@ -1686,12 +1827,12 @@
           "max": 0.0125
         },
         "paAbs": {
-          "n": 6,
+          "n": 32,
           "min": 0.0003,
-          "p5": 0.0003,
-          "median": 0.1695,
-          "p95": 0.4013,
-          "max": 0.4013
+          "p5": 0.0097,
+          "median": 0.2019,
+          "p95": 0.9041,
+          "max": 0.9266
         }
       }
     },
@@ -1786,15 +1927,151 @@
           "max": 0.0398
         },
         "paAbs": {
-          "n": 24,
+          "n": 96,
           "min": 0.0279,
-          "p5": 0.1246,
-          "median": 0.9673,
-          "p95": 3.0264,
-          "max": 3.277
+          "p5": 0.2885,
+          "median": 6.6413,
+          "p95": 78.9652,
+          "max": 89.7922
         }
       },
       "negativeControls": {
+        "pa +90°": {
+          "applicable": 32,
+          "detected": 20,
+          "missed": [
+            "Smooth, round s7 incl 10",
+            "Smooth, round (stipple) s11 incl 10",
+            "Smooth, round (stipple) s4242 incl 10",
+            "Smooth, round s7 incl 30",
+            "Smooth, round (stipple) s11 incl 30",
+            "Smooth, round (stipple) s4242 incl 30",
+            "Smooth, round s4242 incl 10",
+            "Smooth, round (stipple) s3 incl 10",
+            "Smooth, round (stipple) s7 incl 10",
+            "Smooth, round s4242 incl 30",
+            "Smooth, round (stipple) s3 incl 30",
+            "Smooth, round (stipple) s7 incl 30"
+          ],
+          "ssim": {
+            "n": 32,
+            "min": 0.456,
+            "p5": 0.4593,
+            "median": 0.502,
+            "p95": 0.644,
+            "max": 0.6472
+          },
+          "ssimCoarse": {
+            "n": 32,
+            "min": 0.6231,
+            "p5": 0.6389,
+            "median": 0.9121,
+            "p95": 0.9577,
+            "max": 0.9584
+          },
+          "inkAbs": {
+            "n": 32,
+            "min": 0,
+            "p5": 0.0001,
+            "median": 0.0053,
+            "p95": 0.0286,
+            "max": 0.0295
+          },
+          "medianAbs": {
+            "n": 32,
+            "min": 0,
+            "p5": 0,
+            "median": 0.003,
+            "p95": 0.0124,
+            "max": 0.0157
+          },
+          "p90Abs": {
+            "n": 32,
+            "min": 0.0012,
+            "p5": 0.0021,
+            "median": 0.0134,
+            "p95": 0.0484,
+            "max": 0.0508
+          },
+          "r25Abs": {
+            "n": 32,
+            "min": 0.0006,
+            "p5": 0.001,
+            "median": 0.0058,
+            "p95": 0.0247,
+            "max": 0.027
+          },
+          "r50Abs": {
+            "n": 32,
+            "min": 0.0003,
+            "p5": 0.0006,
+            "median": 0.0148,
+            "p95": 0.0363,
+            "max": 0.0371
+          },
+          "r90Abs": {
+            "n": 32,
+            "min": 0.0015,
+            "p5": 0.0016,
+            "median": 0.0123,
+            "p95": 0.0432,
+            "max": 0.0505
+          },
+          "outerAbs": {
+            "n": 32,
+            "min": 0.0002,
+            "p5": 0.0006,
+            "median": 0.0026,
+            "p95": 0.0111,
+            "max": 0.0118
+          },
+          "qAbs": {
+            "n": 32,
+            "min": 0,
+            "p5": 0.0004,
+            "median": 0.018,
+            "p95": 0.0271,
+            "max": 0.0295
+          },
+          "qInnerAbs": {
+            "n": 32,
+            "min": 0.003,
+            "p5": 0.003,
+            "median": 0.0128,
+            "p95": 0.0286,
+            "max": 0.0291
+          },
+          "paAbs": {
+            "n": 32,
+            "min": 8.3209,
+            "p5": 15.633,
+            "median": 80.9873,
+            "p95": 89.9236,
+            "max": 89.9312
+          },
+          "firstFailures": [
+            {
+              "config": "Smooth, round s7 incl 10",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Cigar-shaped s7 incl 88",
+              "failed": true,
+              "by": ["coarse ssim 0.6419", "position angle 89.68°"]
+            },
+            {
+              "config": "Radio jet s7 incl 88",
+              "failed": true,
+              "by": ["position angle -82.77°"]
+            },
+            {
+              "config": "Shell galaxy s7 incl 88",
+              "failed": true,
+              "by": ["coarse ssim 0.8859", "position angle -84.45°"]
+            }
+          ]
+        },
         "bulgeFlat −0.15": {
           "applicable": 24,
           "detected": 12,
@@ -1901,12 +2178,12 @@
             "max": 0.0866
           },
           "paAbs": {
-            "n": 0,
-            "min": 0,
-            "p5": 0,
-            "median": 0,
-            "p95": 0,
-            "max": 0
+            "n": 24,
+            "min": 5.5265,
+            "p5": 5.9035,
+            "median": 9.8255,
+            "p95": 81.4462,
+            "max": 86.7199
           },
           "firstFailures": [
             {
@@ -1927,7 +2204,7 @@
             {
               "config": "Radio jet (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["axis ratio -0.0817", "inner axis ratio -0.0409"]
+              "by": ["axis ratio -0.0817"]
             }
           ]
         },
@@ -2024,12 +2301,12 @@
             "max": 0.0348
           },
           "paAbs": {
-            "n": 8,
+            "n": 20,
             "min": 0.0653,
             "p5": 0.0653,
-            "median": 0.3804,
-            "p95": 1.6125,
-            "max": 1.6125
+            "median": 6.4806,
+            "p95": 60.3707,
+            "max": 61.3176
           },
           "firstFailures": [
             {
@@ -2056,7 +2333,7 @@
         },
         "halo off": {
           "applicable": 32,
-          "detected": 7,
+          "detected": 8,
           "missed": [
             "Radio jet s7 incl 88",
             "Shell galaxy s7 incl 88",
@@ -2074,7 +2351,6 @@
             "Cigar-shaped s4242 incl 88",
             "Radio jet s4242 incl 88",
             "Shell galaxy s4242 incl 88",
-            "Cigar-shaped (stipple) s7 incl 88",
             "Radio jet (stipple) s7 incl 88",
             "Smooth, round (stipple) s7 incl 10",
             "Cigar-shaped s4242 incl 108",
@@ -2173,12 +2449,12 @@
             "max": 0.0303
           },
           "paAbs": {
-            "n": 8,
+            "n": 32,
             "min": 0.0027,
-            "p5": 0.0027,
-            "median": 0.2105,
-            "p95": 1.8677,
-            "max": 1.8677
+            "p5": 0.0629,
+            "median": 11.3879,
+            "p95": 83.911,
+            "max": 89.164
           },
           "firstFailures": [
             {
@@ -2189,7 +2465,7 @@
             {
               "config": "Cigar-shaped s7 incl 88",
               "failed": true,
-              "by": ["ink -5.34%"]
+              "by": ["ink -5.34%", "axis ratio -0.0487"]
             },
             {
               "config": "Radio jet s7 incl 88",
@@ -2328,12 +2604,12 @@
             "max": 0.0309
           },
           "paAbs": {
-            "n": 8,
+            "n": 32,
             "min": 0.1013,
-            "p5": 0.1013,
-            "median": 0.2607,
-            "p95": 1.8037,
-            "max": 1.8037
+            "p5": 0.1113,
+            "median": 9.9817,
+            "p95": 78.3357,
+            "max": 84.1086
           },
           "firstFailures": [
             {
@@ -2451,12 +2727,12 @@
             "max": 0.072
           },
           "paAbs": {
-            "n": 8,
-            "min": 0.0565,
+            "n": 32,
+            "min": 0.034,
             "p5": 0.0565,
-            "median": 0.2749,
-            "p95": 1.6081,
-            "max": 1.6081
+            "median": 9.4801,
+            "p95": 74.5393,
+            "max": 82.9172
           },
           "firstFailures": [
             {
@@ -2759,6 +3035,129 @@
             }
           ]
         },
+        "bulgeFlat +0.1": {
+          "applicable": 20,
+          "detected": 20,
+          "missed": [],
+          "ssim": {
+            "n": 20,
+            "min": 0.4802,
+            "p5": 0.4802,
+            "median": 0.5135,
+            "p95": 0.6124,
+            "max": 0.6185
+          },
+          "ssimCoarse": {
+            "n": 20,
+            "min": 0.9241,
+            "p5": 0.9241,
+            "median": 0.9338,
+            "p95": 0.9468,
+            "max": 0.9483
+          },
+          "inkAbs": {
+            "n": 20,
+            "min": 0.0021,
+            "p5": 0.0021,
+            "median": 0.0177,
+            "p95": 0.0899,
+            "max": 0.09
+          },
+          "medianAbs": {
+            "n": 20,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0038,
+            "p95": 0.0136,
+            "max": 0.0175
+          },
+          "p90Abs": {
+            "n": 20,
+            "min": 0.0008,
+            "p5": 0.0008,
+            "median": 0.0133,
+            "p95": 0.0482,
+            "max": 0.0523
+          },
+          "r25Abs": {
+            "n": 20,
+            "min": 0.0037,
+            "p5": 0.0037,
+            "median": 0.0157,
+            "p95": 0.0271,
+            "max": 0.0282
+          },
+          "r50Abs": {
+            "n": 20,
+            "min": 0.0022,
+            "p5": 0.0022,
+            "median": 0.0185,
+            "p95": 0.0358,
+            "max": 0.0359
+          },
+          "r90Abs": {
+            "n": 20,
+            "min": 0.009,
+            "p5": 0.009,
+            "median": 0.017,
+            "p95": 0.0343,
+            "max": 0.0346
+          },
+          "outerAbs": {
+            "n": 20,
+            "min": 0.0021,
+            "p5": 0.0021,
+            "median": 0.004,
+            "p95": 0.0082,
+            "max": 0.0093
+          },
+          "qAbs": {
+            "n": 20,
+            "min": 0.0273,
+            "p5": 0.0273,
+            "median": 0.0729,
+            "p95": 0.0831,
+            "max": 0.0849
+          },
+          "qInnerAbs": {
+            "n": 20,
+            "min": 0.0105,
+            "p5": 0.0105,
+            "median": 0.0332,
+            "p95": 0.0765,
+            "max": 0.0822
+          },
+          "paAbs": {
+            "n": 20,
+            "min": 0.3196,
+            "p5": 0.3196,
+            "median": 11.316,
+            "p95": 88.6055,
+            "max": 89.5396
+          },
+          "firstFailures": [
+            {
+              "config": "Cigar-shaped s7 incl 88",
+              "failed": true,
+              "by": ["ink 5.49%", "axis ratio 0.0584", "inner axis ratio 0.0822"]
+            },
+            {
+              "config": "Radio jet s7 incl 88",
+              "failed": true,
+              "by": ["axis ratio 0.0805", "position angle 41.85°"]
+            },
+            {
+              "config": "Shell galaxy s7 incl 88",
+              "failed": true,
+              "by": ["axis ratio 0.0783"]
+            },
+            {
+              "config": "Cigar-shaped (stipple) s4242 incl 88",
+              "failed": true,
+              "by": ["ink 8.99%", "axis ratio 0.0756"]
+            }
+          ]
+        },
         "bulgeFlat +0.15": {
           "applicable": 12,
           "detected": 12,
@@ -2852,12 +3251,12 @@
             "max": 0.1113
           },
           "paAbs": {
-            "n": 8,
+            "n": 12,
             "min": 0.1136,
             "p5": 0.1136,
-            "median": 1.0028,
-            "p95": 1.723,
-            "max": 1.723
+            "median": 1.3483,
+            "p95": 62.9618,
+            "max": 62.9618
           },
           "firstFailures": [
             {
@@ -2868,7 +3267,7 @@
             {
               "config": "Shell galaxy s7 incl 88",
               "failed": true,
-              "by": ["axis ratio 0.0996"]
+              "by": ["axis ratio 0.0996", "position angle 22.22°"]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88",
@@ -3096,12 +3495,12 @@
           "max": 0.0101
         },
         "paAbs": {
-          "n": 4,
+          "n": 9,
           "min": 0.0498,
           "p5": 0.0498,
-          "median": 0.0526,
-          "p95": 0.2588,
-          "max": 0.2588
+          "median": 0.2455,
+          "p95": 3.5399,
+          "max": 3.5399
         }
       }
     },
@@ -3196,12 +3595,12 @@
           "max": 0.0045
         },
         "paAbs": {
-          "n": 17,
+          "n": 18,
           "min": 0.16,
           "p5": 0.16,
           "median": 0.3309,
-          "p95": 1.2455,
-          "max": 1.2455
+          "p95": 1.8926,
+          "max": 1.8926
         }
       }
     },
@@ -3296,12 +3695,12 @@
           "max": 0.0191
         },
         "paAbs": {
-          "n": 1,
+          "n": 12,
           "min": 0.051,
           "p5": 0.051,
-          "median": 0.051,
-          "p95": 0.051,
-          "max": 0.051
+          "median": 1.6602,
+          "p95": 7.8328,
+          "max": 7.8328
         }
       }
     },

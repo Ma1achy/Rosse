@@ -385,6 +385,8 @@ async function start(): Promise<void> {
   })();
   let drawnBy: Engine | null = null;
   let drawn: typeof wanted | null = null;
+  /** the scene whose counts were last read back, and that read */
+  let counted: { engine: Engine; scene: typeof wanted; read: Promise<MarkCounts> } | null = null;
   // frames are shown one after another, never concurrently
   let queue = Promise.resolve();
   /** frames scheduled and not yet started (0 or 1), and the most there have ever been */
@@ -438,8 +440,16 @@ async function start(): Promise<void> {
       maxQueued,
     };
     window.__rosse = rosse;
-    // the counts, after the frame and outside the queue
-    void e.counts().then(
+    // The counts, after the frame and outside the queue, read back only once per drawn scene:
+    // a surface toggle or a resize shows the same scene and reuses them (no mapAsync).
+    if (!counted || counted.engine !== e || counted.scene !== shown) {
+      const read = e.counts();
+      counted = { engine: e, scene: shown, read };
+      read.catch(() => {
+        if (counted?.read === read) counted = null;
+      });
+    }
+    void counted.read.then(
       (c) => {
         if (drawn !== shown) return;
         rosse.counts = c;
