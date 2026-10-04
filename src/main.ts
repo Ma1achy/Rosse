@@ -11,25 +11,32 @@
  * everything rebuilt; if that fails, or a frame fails for another reason, the page carries on
  * with the CPU engine.
  *
+ * The plate orbits, rolls and zooms as v21's does (src/ui/orbit.ts). A camera move re-runs only
+ * the view tier (ADR 0010), and moves are coalesced: at most one frame waits in the queue, drawn
+ * on the next animation frame with the latest camera. Changing the preset resets the angles to the
+ * preset's; the seed keeps them; the zoom is kept, as in v21.
+ *
  * URL parameters: `preset`, `seed`, `variant=stipple` (the M2 golden overrides: no lines, knots,
- * envelope, drawn stars, deep field or foreground stars), `backend=cpu|webgpu`, `present=copy`.
+ * envelope, drawn stars, deep field or foreground stars), `zoom`, `backend=cpu|webgpu`,
+ * `present=copy`.
  */
 import type { Params } from './core/params';
 import { PRESET_NAMES, presetParams } from './core/presets';
 import { CpuRenderer } from './fallback';
-import { CpuStipple } from './fallback/stipple';
+import { CpuStippleTiers } from './fallback/stipple';
 import { Gpu, detectBackend, type Backend } from './gpu/device';
 import { readTexture } from './gpu/readback';
 import { BuiltAssets, type AtlasData, type AtlasName, type ImageData8 } from './marks/atlas';
 import { coreInstances } from './model/parts';
-import { buildScene, drawingsMeta, type MarkCounts } from './model/scene';
+import { drawingsMeta, type MarkCounts } from './model/scene';
 import type { DrawingsMeta } from './model/variation';
 import { GpuRenderer, type FrameSize } from './render/frame';
 import type { InkLayer } from './render/layers';
 import { PLATE_UNITS } from './render/sample-scene';
 import { GpuStipple } from './render/stipple';
 import { SURFACES, type SurfaceName } from './render/surface';
-import { cameraOf } from './view/camera';
+import { attachOrbit, type OrbitState } from './ui/orbit';
+import { cameraOf, clampZoom } from './view/camera';
 
 declare global {
   interface Window {
@@ -42,6 +49,12 @@ declare global {
       preset: string;
       seed: number;
       counts: MarkCounts | null;
+      /** the camera drawn: the parameters' angles and the page's zoom */
+      camera: OrbitState;
+      /** how many times the model and view tiers have run on this engine (ADR 0010) */
+      tiers: { model: number; view: number };
+      /** the most frames ever waiting in the queue at once (the orbit coalesces to one) */
+      maxQueued: number;
     };
   }
 }
@@ -66,9 +79,9 @@ interface Scene {
   meta: DrawingsMeta;
 }
 
-/** The drawn core, a CPU-placed part (model/parts.ts). */
-function coreLayer(P: Params, meta: DrawingsMeta): InkLayer[] {
-  const cores = coreInstances(P, meta, cameraOf(P));
+/** The drawn core, a CPU-placed part (model/parts.ts), placed per view. */
+function coreLayer(P: Params, meta: DrawingsMeta, zoom: number): InkLayer[] {
+  const cores = coreInstances(P, meta, cameraOf(P, zoom));
   return cores.length ? [{ kind: 'sprites', atlas: 'cores', gain: 1, instances: cores }] : [];
 }
 
@@ -76,8 +89,13 @@ interface Engine {
   backend: Backend;
   /** the size the engine draws at now */
   size(): FrameSize;
-  /** Model and view tiers for these parameters, then the ink. Resolves to the mark counts. */
-  draw(P: Params): Promise<MarkCounts>;
+  /**
+   * The model and view tiers these parameters and zoom need (only the view tier when just the
+   * camera moved, ADR 0010), then the ink. Resolves to the mark counts.
+   */
+  draw(P: Params, zoom: number): Promise<MarkCounts>;
+  /** how many times each tier has run */
+  tierRuns(): { model: number; view: number };
   /** Composites onto the surface and shows it. Rejects if the frame could not be shown. */
   present(surface: SurfaceName): Promise<void>;
   /** A new plate size or DPR: re-inks at that size, keeping the drawings loaded. */
@@ -125,15 +143,17 @@ function cpuEngine(scene: Scene, size: FrameSize): Engine {
     r.drawInk();
     canvas.width = canvas.height = r.width;
   };
+  const stipple = new CpuStippleTiers(scene.meta);
   return {
     backend: 'cpu',
     size: () => r.size,
-    draw(P) {
-      const view = new CpuStipple(buildScene(P, scene.meta)).view(cameraOf(P));
-      r.setLayers(view.layers);
+    draw(P, zoom) {
+      const { view, work } = stipple.frame(P, zoom);
+      if (work.view) r.setLayers(view.layers);
       ink();
       return Promise.resolve(view.counts);
     },
+    tierRuns: () => ({ ...stipple.tiers.runs }),
     present(surface) {
       const out = r.present(SURFACES[surface]);
       ctx.putImageData(new ImageData(out, r.width, r.height), 0, 0);
@@ -170,8 +190,10 @@ async function gpuEngine(
     const lostDevices = new WeakSet<GPUDevice>();
     let renderer: GpuRenderer | null = null;
     let stipple: GpuStipple | null = null;
-    /** the parameters drawn last, redrawn on a new device */
-    let drawn: Params | null = null;
+    /** the parameters and zoom drawn last, redrawn on a new device */
+    let drawn: { P: Params; zoom: number } | null = null;
+    /** tier runs on earlier devices */
+    const pastRuns = { model: 0, view: 0 };
     let out: GPUTexture | null = null;
     /** the output texture (copy mode) and canvas, at the renderer's size */
     const fitOutput = (r: GpuRenderer) => {
@@ -189,27 +211,30 @@ async function gpuEngine(
     const build = (device: GPUDevice, s: FrameSize) => {
       void device.lost.then(() => lostDevices.add(device));
       renderer?.destroy();
-      stipple?.destroy();
+      if (stipple) {
+        pastRuns.model += stipple.tiers.runs.model;
+        pastRuns.view += stipple.tiers.runs.view;
+        stipple.destroy();
+      }
       const r = new GpuRenderer(device, s, scene.paper);
       renderer = r;
       stipple = GpuStipple.create(device);
       scene.atlases.forEach((a) => {
         r.addAtlas(a);
       });
-      if (drawn) inkScene(drawn);
+      if (drawn) inkScene(drawn.P, drawn.zoom);
       if (ctxGpu) ctxGpu.configure({ device, format, alphaMode: 'opaque' });
       fitOutput(r);
     };
-    /** model and view tiers on the GPU, then the ink */
-    const inkScene = (P: Params) => {
+    /** the tiers that changed, on the GPU, then the ink */
+    const inkScene = (P: Params, zoom: number) => {
       const r = current();
       const st = stipple;
       if (!st) throw new Error('no stipple passes');
-      st.setScene(buildScene(P, scene.meta));
-      st.setView(cameraOf(P));
-      r.setLayers([...st.layers(), ...coreLayer(P, scene.meta)]);
+      const work = st.frame(P, zoom, scene.meta);
+      if (work.view) r.setLayers([...st.layers(), ...coreLayer(P, scene.meta, zoom)]);
       r.drawInk();
-      drawn = P;
+      drawn = { P, zoom };
       return st;
     };
     build(gpu.device, size);
@@ -225,8 +250,8 @@ async function gpuEngine(
     return {
       backend: 'webgpu',
       size: () => current().size,
-      async draw(P) {
-        const st = inkScene(P);
+      async draw(P, zoom) {
+        const st = inkScene(P, zoom);
         // the counts for the line under the plate: a read-back, off the frame path
         return (await st.readCounts()).counts;
       },
@@ -246,6 +271,10 @@ async function gpuEngine(
           throw new Error('the device was lost during the frame');
         // a frame is on screen: the recovery budget counts losses in a row
         gpu.markHealthy();
+      },
+      tierRuns() {
+        const now = stipple?.tiers.runs ?? { model: 0, view: 0 };
+        return { model: pastRuns.model + now.model, view: pastRuns.view + now.view };
       },
       resize(s) {
         // keep the atlases and pipelines: a new ink target, batches and composite uniforms
@@ -321,6 +350,8 @@ async function start(): Promise<void> {
     }),
   };
   const params0 = () => presetParams(preset, seed, stippleOnly ? STIPPLE_ONLY : {});
+  /** the page's zoom (v21's ZOOM: not a parameter, a view input) */
+  let zoom = clampZoom(Number(params.get('zoom') ?? 1) || 1);
 
   /** the surface the toggle asks for; the plate catches up with it in show() */
   let surface: SurfaceName = 'paper';
@@ -328,13 +359,17 @@ async function start(): Promise<void> {
   let wantedSize = plateSize(plateCanvas());
   let frames = 0;
   let engine: Engine | undefined;
-  /** the parameters wanted, and the engine and parameters last drawn */
+  /** the parameters and zoom wanted, and the engine, parameters and zoom last drawn */
   let wantedP = params0();
   let drawnBy: Engine | null = null;
   let drawnP: Params | null = null;
+  let drawnZoom = zoom;
   let counts: MarkCounts | null = null;
   // frames are shown one after another, never concurrently
   let queue = Promise.resolve();
+  /** frames scheduled and not yet started, and the most there have ever been */
+  let queued = 0;
+  let maxQueued = 0;
 
   const report = (e: unknown) => {
     console.error(e);
@@ -344,18 +379,23 @@ async function start(): Promise<void> {
     console.warn('Switching to the CPU engine:', why);
     engine?.destroy();
     engine = cpuEngine(scene, wantedSize);
+    bindOrbit();
     schedule();
   };
   const show = async () => {
+    queued--;
+    frameRequested = false;
     const e = engine;
     if (!e) return; // the first frame will pick up the current surface and size
     const wanted = surface;
     try {
-      if (drawnBy !== e || drawnP !== wantedP) {
+      if (drawnBy !== e || drawnP !== wantedP || drawnZoom !== zoom) {
         const P = wantedP;
-        counts = await e.draw(P);
+        const z = zoom;
+        counts = await e.draw(P, z);
         drawnBy = e;
         drawnP = P;
+        drawnZoom = z;
         if (stats) {
           const n = (x: number) => x.toLocaleString('en-GB');
           stats.textContent = `${n(counts.dots)} dots · ${n(counts.knots)} knots · ${n(counts.stars)} stars`;
@@ -378,13 +418,42 @@ async function start(): Promise<void> {
       preset,
       seed,
       counts,
+      camera: { az: drawnP.az || 0, incl: drawnP.incl, pa: drawnP.pa, zoom: drawnZoom },
+      tiers: e.tierRuns(),
+      maxQueued,
     };
     document.documentElement.dataset.backend = e.backend;
     if (note) note.textContent = e.backend === 'cpu' ? 'drawn on the CPU' : '';
   };
   function schedule() {
+    queued++;
+    maxQueued = Math.max(maxQueued, queued);
     queue = queue.then(show).catch(report);
   }
+  /**
+   * A camera move: one frame on the next animation frame, unless one is already requested or
+   * waiting in the queue (it will draw the latest camera when it starts).
+   */
+  let frameRequested = false;
+  function requestFrame() {
+    if (frameRequested) return;
+    frameRequested = true;
+    requestAnimationFrame(schedule);
+  }
+
+  // orbit, roll and zoom (v21's controls); re-attached when a new engine replaces the canvas
+  let detachOrbit: (() => void) | null = null;
+  const bindOrbit = () => {
+    detachOrbit?.();
+    detachOrbit = attachOrbit(plateCanvas(), {
+      get: () => ({ az: wantedP.az || 0, incl: wantedP.incl, pa: wantedP.pa, zoom }),
+      set: (c) => {
+        wantedP = { ...wantedP, az: c.az, incl: c.incl, pa: c.pa };
+        zoom = c.zoom;
+        requestFrame();
+      },
+    });
+  };
 
   // the toggle works from the start: a click before the first frame sets the surface it shows
   document.querySelectorAll<HTMLButtonElement>('button[data-surface]').forEach((b) => {
@@ -405,21 +474,16 @@ async function start(): Promise<void> {
   seedInput.addEventListener('change', () => {
     seed = Math.min(9999, Math.max(1, Math.round(Number(seedInput.value)) || 1));
     seedInput.value = String(seed);
-    wantedP = params0();
+    // a new seed keeps the camera
+    wantedP = { ...params0(), az: wantedP.az, incl: wantedP.incl, pa: wantedP.pa };
     schedule();
   });
 
   // redraw when the plate's CSS width or the device pixel ratio changes, as v21 does; resizes
-  // are coalesced to one per animation frame and applied in the frame queue
-  let resizePending = false;
+  // are coalesced with camera moves (requestFrame) and applied in the frame queue
   const resized = () => {
     wantedSize = plateSize(plateCanvas());
-    if (resizePending) return;
-    resizePending = true;
-    requestAnimationFrame(() => {
-      resizePending = false;
-      schedule();
-    });
+    requestFrame();
   };
   const plateBox = plateCanvas().parentElement;
   if (plateBox) new ResizeObserver(resized).observe(plateBox);
@@ -451,6 +515,7 @@ async function start(): Promise<void> {
           return cpuEngine(scene, wantedSize);
         })
       : cpuEngine(scene, wantedSize);
+  bindOrbit();
   schedule();
   await queue;
 }
