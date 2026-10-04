@@ -15,8 +15,18 @@ import { bufferWithData } from '../gpu/buffers';
 import { INSTANCE_LAYOUT } from '../marks/instance';
 import { CLASS_COUNT } from '../model/classes';
 import { packGalaxy } from '../model/galaxy';
-import { STIPPLE_LAYERS, markCounts, type GalaxyScene, type MarkCounts } from '../model/scene';
-import { packView, viewDesc, type Camera } from '../view/camera';
+import {
+  STIPPLE_LAYERS,
+  buildScene,
+  markCounts,
+  type GalaxyScene,
+  type MarkCounts,
+  type SceneOptions,
+} from '../model/scene';
+import type { Params } from '../core/params';
+import type { DrawingsMeta } from '../model/variation';
+import { cameraOf, packView, viewDesc, type Camera } from '../view/camera';
+import { TierState, type TierWork } from './tiers';
 import { SAMPLE_LAYOUT } from '../fallback/kernels/stipple';
 import { BLOCK_STRIDE, blockCount, classCapacity } from '../fallback/kernels/scan';
 import type { GpuSpriteLayer } from './layers';
@@ -63,6 +73,8 @@ interface ModelBuffers {
 export class GpuStipple {
   private model: ModelBuffers | null = null;
   private scene: GalaxyScene | null = null;
+  /** what `frame` last built (ADR 0010) */
+  readonly tiers = new TierState();
 
   private constructor(
     readonly device: GPUDevice,
@@ -86,8 +98,42 @@ export class GpuStipple {
     return new GpuStipple(device, { stipple, project, local, blocks, scatter });
   }
 
+  /**
+   * One frame's compute work, by tier (src/render/tiers.ts): the model tier (scene description
+   * and stipple samples) only when a model parameter changed or the inclination crossed an `incE`
+   * bucket; the view tier (projection, culls, compaction) when the camera or zoom moved.
+   */
+  frame(P: Params, zoom: number, meta: DrawingsMeta, opts: SceneOptions = {}): TierWork {
+    return this.tiers.run(
+      { P, zoom, modelKey: JSON.stringify(opts) },
+      {
+        model: () => {
+          this.loadScene(buildScene(P, meta, opts));
+        },
+        view: () => {
+          this.setView(cameraOf(P, zoom));
+        },
+      },
+    );
+  }
+
+  /** The model tier's sample buffer (tests: it must survive a camera move). */
+  get samplesBuffer(): GPUBuffer | null {
+    return this.model?.samples ?? null;
+  }
+
+  /** The scene the model tier holds. */
+  get current(): GalaxyScene | null {
+    return this.scene;
+  }
+
   /** Model tier: uploads the scene description and samples the stipple. */
   setScene(scene: GalaxyScene): void {
+    this.tiers.invalidate();
+    this.loadScene(scene);
+  }
+
+  private loadScene(scene: GalaxyScene): void {
     this.destroyModel();
     this.scene = scene;
     const d = this.device;
@@ -308,6 +354,7 @@ export class GpuStipple {
   }
 
   destroy(): void {
+    this.tiers.invalidate();
     this.destroyModel();
   }
 }
