@@ -15,6 +15,7 @@
  * - `present`: the plates mode.
  * - `model`: everything else.
  */
+import { inclBucket } from '../view/camera';
 import { DEF, PARAM_KEYS, type ParamKey, type Params } from './params';
 
 export type Tier = 'model' | 'view' | 'present';
@@ -215,25 +216,11 @@ export function tierOf(key: ParamKey): Tier {
   return SCHEMA[key].tier;
 }
 
-const RANK: Record<Tier, number> = { model: 0, view: 1, present: 2 };
+export const RANK: Record<Tier, number> = { model: 0, view: 1, present: 2 };
 
-/**
- * The reference's `incE()` (app23.js:L856): the inclination folded into 0–90°.
- */
-export function incE(incl: number): number {
-  let i = ((incl % 360) + 360) % 360;
-  if (i > 180) i = 360 - i;
-  return i > 90 ? 180 - i : i;
-}
-
-/** The `incE()` thresholds at which the reference switches structure (reference notes 5.1). */
-export const INCL_THRESHOLDS = [70, 72, 74, 78, 80] as const;
-
-/** Which side of each `incE()` threshold `incl` is on: part of the model tier's key (ADR 0010). */
-export function inclBucket(incl: number): number {
-  const e = incE(incl);
-  return INCL_THRESHOLDS.filter((t) => e > t).length;
-}
+// incE and its buckets live with the camera (src/view/camera.ts); re-exported for the schema's
+// users. camera.ts imports only types from core, so there is no cycle at run time.
+export { INCL_THRESHOLDS, incE, inclBucket } from '../view/camera';
 
 /**
  * The highest tier that must be rebuilt when going from `a` to `b` (null when nothing changed).

@@ -16,6 +16,7 @@
     "test:watch": "vitest",
     "test:gpu": "node tools/gpu-test/run.mjs",
     "vectors": "node tools/rng-vectors.mjs",
+    "vectors:camera": "node tools/camera-vectors.mjs",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",

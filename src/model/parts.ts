@@ -7,7 +7,7 @@
  * arcs, shells, tails, trails, the sky, hatching, arrows, bubbles, jets and streams.
  */
 import type { Params } from '../core/params';
-import { incE } from '../core/schema';
+import { incE } from '../view/camera';
 import type { Instance } from '../marks/instance';
 import { PLATE, UNIT_SCALE, type Camera } from '../view/camera';
 import type { DrawingsMeta } from './variation';
