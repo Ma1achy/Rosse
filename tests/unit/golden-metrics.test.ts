@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  bandMean,
   blur,
   compareMeasures,
   densityMap,
@@ -161,5 +162,17 @@ describe('golden metric (ADR 0013)', () => {
     expect(evaluate(c, { knots: 50 }, { knots: 54 }, t).pass).toBe(true);
     expect(evaluate(c, { stars: 3 }, { stars: 0 }, t).pass).toBe(true);
     expect(evaluate(c, { stars: 3 }, { stars: 0 }, { ...t, poisson: 0 }).pass).toBe(false);
+  });
+});
+
+describe('band means', () => {
+  it('move continuously where a single order statistic jumps', () => {
+    const make = (share: number) =>
+      Float32Array.from({ length: 1000 }, (_, i) => (i < share * 1000 ? 2 : 2.236)).sort();
+    expect(quantile(make(0.49), 0.5) / quantile(make(0.51), 0.5)).toBeCloseTo(1.118, 3);
+    expect(
+      Math.abs(bandMean(make(0.49), 0.4, 0.6) / bandMean(make(0.51), 0.4, 0.6) - 1),
+    ).toBeLessThan(0.03);
+    expect(bandMean([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 0.4, 0.6)).toBe(5.5);
   });
 });

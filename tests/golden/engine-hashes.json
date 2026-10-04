@@ -1,0 +1,18 @@
+{
+  "about": "The new engine's own goldens (ADR 0013 test e): SHA-256 of the 8-bit ink alpha of each required case, WebGPU on SwiftShader in Chromium. Written by npm run golden -- --update-engine.",
+  "adapter": "google / swiftshader",
+  "hashes": {
+    "cigar-shaped--stipple__s4242__home": "4adefb4f6c47007dcd7611de1631aff4dc28068eddeb9a549eaa0be93966bdd0",
+    "cigar-shaped--stipple__s4242__orbit": "5b228aeb825431ec7d0aefef7dd0ab126b843433a431fb4dc7da599c28c2c716",
+    "cigar-shaped--stipple__s7__home": "ffdf5db43ce52c08deb68f3afff2da1b73ab7fe7ba23ad8e44f801e52ff5cbfe",
+    "cigar-shaped--stipple__s7__orbit": "c4bf15aacc7da3e11dea2003d70f767052af2eda85f353b5af7fa6153cc79e46",
+    "disc-no-arms--stipple__s4242__home": "0c994ac60a9d4e878360f95f216a0092513d5677fa7bcab2f171644e463b55b5",
+    "disc-no-arms--stipple__s4242__orbit": "d65e1476d6f14bca65ad290625f50932ae05ce1e8f32e72abf881f2bb977e891",
+    "disc-no-arms--stipple__s7__home": "3c20df96d438a03c7601271341efaf57dc921eac446e223f95a2e86327cff114",
+    "disc-no-arms--stipple__s7__orbit": "c02704becc846d7f44c0a18a9764235ea3a86cb521225929909f6ee8d100ab9d",
+    "smooth-round--stipple__s4242__home": "4866b5d706a46b70cce7cf9d79641eb081d4c490247dfc9c9257b90e09e095d4",
+    "smooth-round--stipple__s4242__orbit": "89f3dd16106e358beafce1f071eea57cb6b62caf7a8bf940bf155c698fdb8f7d",
+    "smooth-round--stipple__s7__home": "dd257eb47cdda2f3831f72e571f238dfc5ecc4f6f1a7ef830768aea65ab3defc",
+    "smooth-round--stipple__s7__orbit": "e4123776fc631389e9a9552b42c8e594b5b07a97402589069c7e4b230335f060"
+  }
+}

@@ -5,7 +5,7 @@
  * b. structure: SSIM between density maps (α blurred with a Gaussian of σ = 4 plate px,
  *    downsampled 4×, SSIM over 7 × 7 windows);
  * c. pen weight: stroke widths from the Euclidean distance transform of the mask α ≥ 0.5, sampled
- *    on its medial axis, ×2: median and 90th percentile;
+ *    on its medial axis, ×2: median and 90th percentile (as band means, see `bandMean`);
  * d. mark counts (compared in ./thresholds.ts).
  *
  * plus (b′), added in M2: the same SSIM on a coarse density map (σ = 16 px, downsampled 8×). The
@@ -284,7 +284,24 @@ export function strokeWidths(a: Gray, factor = 4): StrokeWidths {
       if (ridge) out.push((2 * d) / factor);
     }
   const widths = Float32Array.from(out).sort();
-  return { widths, median: quantile(widths, 0.5), p90: quantile(widths, 0.9) };
+  return { widths, median: bandMean(widths, 0.4, 0.6), p90: bandMean(widths, 0.85, 0.95) };
+}
+
+/**
+ * The mean of the values between two quantiles: the "median" of (c) is the mean of the 40th–60th
+ * percentiles, and the "p90" the mean of the 85th–95th. Distances on a pixel grid take few values
+ * (a third of the medial-axis widths of a stipple are exactly 2.000 px, the next values being
+ * 2.062 and 2.236), so a single order statistic jumps by 6–12% when the share at one value moves
+ * across 50%; a band mean moves continuously with the distribution (M2 calibration).
+ */
+export function bandMean(sorted: ArrayLike<number>, lo: number, hi: number): number {
+  const n = sorted.length;
+  if (!n) return 0;
+  const a = Math.min(n - 1, Math.floor(lo * n));
+  const b = Math.max(a + 1, Math.min(n, Math.ceil(hi * n)));
+  let s = 0;
+  for (let i = a; i < b; i++) s += sorted[i] ?? 0;
+  return s / (b - a);
 }
 
 /** Quantile of sorted values (nearest rank); 0 for an empty list. */
