@@ -21,10 +21,11 @@ import {
   type MarkCounts,
   type SceneOptions,
 } from '../../../src/model/scene';
+import type { VectorSheet } from '../../../src/marks/vector';
 import { cameraOf } from '../../../src/view/camera';
 import { gray, type Gray } from './metrics';
 
-export const ATLASES: AtlasName[] = ['dots', 'knots', 'stars', 'cores'];
+export const ATLASES: AtlasName[] = ['dots', 'knots', 'stars', 'cores', 'pieces', 'strokes'];
 
 export function loadAtlases(root: string): AtlasData[] {
   const dir = join(root, 'assets-built');
@@ -35,18 +36,31 @@ export function loadAtlases(root: string): AtlasData[] {
   });
 }
 
-export function metaOf(atlases: AtlasData[]) {
+/** A packed vector sheet (M4: the pen lines). */
+export function loadVector(root: string, name: string): VectorSheet {
+  const dir = join(root, 'assets-built');
+  const index = JSON.parse(readFileSync(join(dir, 'index.json'), 'utf8')) as BuiltIndex;
+  const e = index.vectors[name];
+  if (!e) throw new Error(`vector sheet ${name} not packed`);
+  return JSON.parse(readFileSync(join(dir, e.file), 'utf8')) as VectorSheet;
+}
+
+export function metaOf(atlases: AtlasData[], penlines?: VectorSheet) {
   const by = (n: string) => {
     const a = atlases.find((x) => x.name === n);
     if (!a) throw new Error(`atlas ${n} missing`);
     return a;
   };
-  return drawingsMeta({
-    dots: by('dots'),
-    knots: by('knots'),
-    stars: by('stars'),
-    cores: by('cores'),
-  });
+  return drawingsMeta(
+    {
+      dots: by('dots'),
+      knots: by('knots'),
+      stars: by('stars'),
+      cores: by('cores'),
+      strokes: by('strokes'),
+    },
+    penlines,
+  );
 }
 
 /** α of a premultiplied ink buffer (RGBA f32), rounded to 8 bits. */
@@ -70,7 +84,7 @@ export class CpuGolden {
 
   constructor(root: string) {
     this.atlases = loadAtlases(root);
-    this.meta = metaOf(this.atlases);
+    this.meta = metaOf(this.atlases, loadVector(root, 'penlines'));
     this.renderer = new CpuRenderer(
       { plateCss: 800, dpr: 1 },
       { width: 1, height: 1, data: new Uint8Array(4) },

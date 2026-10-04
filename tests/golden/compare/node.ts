@@ -10,7 +10,9 @@ import { PNG } from 'pngjs';
 import type { Params } from '../../../src/core/params';
 import { presetFamily, presetParams } from '../../../src/core/presets';
 import type { MarkCounts } from '../../../src/model/scene';
+import type { SceneOptions } from '../../../src/model/scene';
 import { CpuGolden } from './engine-cpu';
+import { referenceChoices, type ReferenceChoices } from './reference-variation';
 import {
   alphaFromRgba8,
   compareMeasures,
@@ -54,6 +56,14 @@ export function goldenFamily(preset: string): string {
     'Shell galaxy',
   ];
   return smooth.includes(preset) ? 'smooth' : 'spiral';
+}
+
+/**
+ * Whether a required case draws with the reference's variation (M4 on: the 'ribbons' variant).
+ * The M2 stipple-only cases keep the engine's own, so their results and engine hashes stand.
+ */
+export function usesReferenceVariation(variant: string | undefined): boolean {
+  return variant === 'ribbons';
 }
 
 /** v21's statistics and ours, as the classes test (d) compares. */
@@ -104,8 +114,20 @@ export class GoldenNode {
     return readPngAlpha(join(this.root, 'tests/golden/reference', `${name}.ink.png`));
   }
 
-  renderCpu(P: Params, opts: { hand?: number[]; placementKey?: number } = {}, zoom = 1) {
+  renderCpu(P: Params, opts: SceneOptions = {}, zoom = 1) {
     return this.cpu.render(P, opts, zoom);
+  }
+
+  /** v21's own variation and stroke choices for these parameters (./reference-variation.ts). */
+  referenceChoices(P: Params): ReferenceChoices {
+    const m = this.cpu.meta;
+    const knots = this.cpu.atlases.find((a) => a.name === 'knots');
+    return referenceChoices(this.root, P, {
+      dotsSrc: m.dots.src,
+      dotsSize: m.dots.size,
+      knotsSrc: (knots?.meta.src ?? []) as string[],
+      strokesKind: m.strokes?.kind ?? [],
+    });
   }
 
   parity(preset: string): Thresholds {

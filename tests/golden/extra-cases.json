@@ -1,5 +1,5 @@
 {
-  "about": "Extra reference captures (npm run capture:reference -- --extra tests/golden/extra-cases.json). Each is a preset with overrides set after the preset and the seed. 'stipple' is the M2 acceptance variant (docs/roadmap.md): lines, knots and envelope off as the roadmap says, and also the drawn stars among the dots (starMix), the deep field (field) and the foreground stars (fgstars), which are vector or sky marks that arrive in later milestones; with them on, v21's plate holds ink the M2 engine does not draw yet. trails is already 0 in these presets. Cameras: home, orbit (az + 35°, incl + 20°) and, from M3, zoom: home at zoom 2 (v21's ZOOM through __GEN.zoom(2), so VIEW.scale = 168), the zoom camera of open question Q8.",
+  "about": "Extra reference captures (npm run capture:reference -- --extra tests/golden/extra-cases.json). Each is a preset with overrides set after the preset and the seed. 'stipple' is the M2 acceptance variant (docs/roadmap.md): lines, knots and envelope off as the roadmap says, and also the drawn stars among the dots (starMix), the deep field (field) and the foreground stars (fgstars), which are vector or sky marks that arrive in later milestones; with them on, v21's plate holds ink the M2 engine does not draw yet. trails is already 0 in these presets. Cameras: home, orbit (az + 35°, incl + 20°) and, from M3, zoom: home at zoom 2 (v21's ZOOM through __GEN.zoom(2), so VIEW.scale = 168), the zoom camera of open question Q8. From M4, the 'ribbons' variant: the M4 presets (docs/roadmap.md) with what M4 does not draw switched off: starMix 0 (drawn stars among the stipple, vector sstars; ring knots and clumps keep theirs, classified and counted but not drawn), field 0 (the deep field), fgstars 0 (foreground stars), bubbles 0 (rings drawings at the clumps, vector), whole 0 and envelope 0 (whole drawings and envelopes, vector; already 0 in these presets). Barred spiral draws its bar and ring as ribbons (barStyle and ringStyle 'ribbon') instead of the vector drawings of its default style. Lines, knots, dust lanes, hatching, carving lines (Dusty spiral), the drawn core and the hand wobble (Hand wobble) stay on.",
   "cameras": ["home", "orbit", "zoom"],
   "cases": [
     {
@@ -36,6 +36,92 @@
         "starMix": 0,
         "field": 0,
         "fgstars": 0
+      }
+    },
+    {
+      "preset": "Grand design",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      }
+    },
+    {
+      "preset": "Barred spiral",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon"
+      }
+    },
+    {
+      "preset": "Flocculent",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      }
+    },
+    {
+      "preset": "Tightly wound",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      }
+    },
+    {
+      "preset": "Loose, open arms",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      }
+    },
+    {
+      "preset": "Dusty spiral",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      }
+    },
+    {
+      "preset": "Hand wobble",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
       }
     }
   ]

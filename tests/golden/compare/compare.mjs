@@ -26,6 +26,8 @@
  *                     ../calibration.json (ADR 0013); needs tests/golden/actual/reroll/ from
  *                     `npm run capture:reference -- --reroll` for the v21 source
  *   --no-gpu          the CPU engine only (no browser)
+ *   --only a,b        only the cases whose name contains one of these (for working on a few; the
+ *                     run then checks fewer than the required set)
  *   --report-all      a report for every case, not only failing ones
  *   --update-engine   write ../engine-hashes.json from this run (the engine's own goldens)
  */
@@ -119,7 +121,11 @@ async function compareAll(G, node) {
   const useGpu = !flag('--no-gpu');
   const gpu = useGpu ? await gpuPage() : null;
   if (gpu) console.log(`WebGPU adapter: ${gpu.adapter}`);
-  const required = manifest.captures.filter((/** @type {any} */ c) => c.variant);
+  const onlyIdx = args.indexOf('--only');
+  const only = onlyIdx >= 0 ? (args[onlyIdx + 1] ?? '').split(',') : null;
+  const required = manifest.captures.filter(
+    (/** @type {any} */ c) => c.variant && (!only || only.some((o) => c.name.includes(o))),
+  );
   const informational = flag('--all')
     ? manifest.captures.filter((/** @type {any} */ c) => !c.variant && c.surface === 'paper')
     : [];
@@ -140,7 +146,13 @@ async function compareAll(G, node) {
   for (const c of [...required, ...informational]) {
     const isRequired = !!c.variant;
     const rec = node.record(c.name);
-    const opts = rec.hand?.length ? { hand: rec.hand } : {};
+    // the reference's hand, and from M4 (the 'ribbons' cases) the reference's variation and stroke
+    // choices: the arms' phases, spurs, clumps and strokes are discrete random choices, like the
+    // hand (reference-variation.ts)
+    const opts = {
+      ...(rec.hand?.length ? { hand: rec.hand } : {}),
+      ...(G.usesReferenceVariation(c.variant) ? node.referenceChoices(rec.params) : {}),
+    };
     const ref = node.reference(c.name);
     const refM = G.measure(ref);
     const refCounts = G.countsOf(rec.stats);
