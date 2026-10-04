@@ -393,6 +393,78 @@
       "pageErrors": 0
     },
     {
+      "name": "cigar-shaped__s4242__home",
+      "preset": "Cigar-shaped",
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "8b7f817766ffc37cabff461ae229811cf404e959e83e4e74183963e5bebec2c9",
+      "stats": {
+        "rstars": 781,
+        "dots": 5651,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 44,
+        "ms": 62
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "cigar-shaped__s4242__orbit",
+      "preset": "Cigar-shaped",
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "d1f3c2cbdb5ec994958d2cf16888ba49ec5bf12079a2f7d68c2ea63f947b0cc4",
+      "stats": {
+        "rstars": 781,
+        "dots": 6115,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 46,
+        "ms": 60
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "cigar-shaped__s7__home",
+      "preset": "Cigar-shaped",
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "0e0f58264e1ca5194535b54701240e92388baabad152791b6f388fd2c4c49de5",
+      "stats": {
+        "rstars": 714,
+        "dots": 5956,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 52,
+        "ms": 62
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "cigar-shaped__s7__orbit",
+      "preset": "Cigar-shaped",
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "e6e82ae59397bc53b936ec24f6bd0ab547109511c42098b7ec89a2713bf27b6b",
+      "stats": {
+        "rstars": 714,
+        "dots": 6478,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 43,
+        "ms": 54
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "cigar-shaped--stipple__s4242__home",
       "preset": "Cigar-shaped",
       "variant": "stipple",
@@ -463,6 +535,7 @@
       "zoom": 2,
       "surface": "paper",
       "inkPixelSha256": "1d7c411dab5f98783998342f05bb5612582acd1dcd5d9a7ed4c6aa505c7d56b8",
+      "captured": "2026-10-04T03:00:17.480Z",
       "stats": {
         "rstars": 0,
         "dots": 9500,
@@ -470,7 +543,7 @@
         "stars": 0,
         "curves": 0,
         "used": 1,
-        "ms": 15
+        "ms": 7
       },
       "pageErrors": 0
     },
@@ -545,6 +618,7 @@
       "zoom": 2,
       "surface": "paper",
       "inkPixelSha256": "f8adf0c94381786f119a20ccf14f30609b20888d11004c0c2f83a9a5b74a1cc9",
+      "captured": "2026-10-04T03:00:17.511Z",
       "stats": {
         "rstars": 0,
         "dots": 9500,
@@ -552,79 +626,7 @@
         "stars": 0,
         "curves": 0,
         "used": 1,
-        "ms": 8
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "cigar-shaped__s4242__home",
-      "preset": "Cigar-shaped",
-      "seed": 4242,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "8b7f817766ffc37cabff461ae229811cf404e959e83e4e74183963e5bebec2c9",
-      "stats": {
-        "rstars": 781,
-        "dots": 5651,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 44,
-        "ms": 62
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "cigar-shaped__s4242__orbit",
-      "preset": "Cigar-shaped",
-      "seed": 4242,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "d1f3c2cbdb5ec994958d2cf16888ba49ec5bf12079a2f7d68c2ea63f947b0cc4",
-      "stats": {
-        "rstars": 781,
-        "dots": 6115,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 46,
-        "ms": 60
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "cigar-shaped__s7__home",
-      "preset": "Cigar-shaped",
-      "seed": 7,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "0e0f58264e1ca5194535b54701240e92388baabad152791b6f388fd2c4c49de5",
-      "stats": {
-        "rstars": 714,
-        "dots": 5956,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 52,
-        "ms": 62
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "cigar-shaped__s7__orbit",
-      "preset": "Cigar-shaped",
-      "seed": 7,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "e6e82ae59397bc53b936ec24f6bd0ab547109511c42098b7ec89a2713bf27b6b",
-      "stats": {
-        "rstars": 714,
-        "dots": 6478,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 43,
-        "ms": 54
+        "ms": 11
       },
       "pageErrors": 0
     },
@@ -697,6 +699,78 @@
         "curves": 0,
         "used": 62,
         "ms": 102
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms__s4242__home",
+      "preset": "Disc, no arms",
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "d2a9e520773ea551196ffd6544dfe5029c6224b9615c652914e44d0c6d25eb22",
+      "stats": {
+        "rstars": 1055,
+        "dots": 8217,
+        "knots": 0,
+        "stars": 0,
+        "curves": 2,
+        "used": 58,
+        "ms": 65
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms__s4242__orbit",
+      "preset": "Disc, no arms",
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "de68b15fa885cdba11cdb3a3a80bfa002c1901c4bc51b0f81c9bb3de4129f1ef",
+      "stats": {
+        "rstars": 1055,
+        "dots": 8028,
+        "knots": 0,
+        "stars": 0,
+        "curves": 2,
+        "used": 53,
+        "ms": 99
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms__s7__home",
+      "preset": "Disc, no arms",
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "63263d40497e168879cf0c723d84bfcbaf8e817e9fe2b8310519fb9ce3aab023",
+      "stats": {
+        "rstars": 1016,
+        "dots": 8011,
+        "knots": 0,
+        "stars": 0,
+        "curves": 2,
+        "used": 52,
+        "ms": 91
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms__s7__orbit",
+      "preset": "Disc, no arms",
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "74e9a386f0c794a551b5df1abefbe8e1fcbf431244b7a463a36c898f3634f96c",
+      "stats": {
+        "rstars": 1016,
+        "dots": 7732,
+        "knots": 0,
+        "stars": 0,
+        "curves": 2,
+        "used": 56,
+        "ms": 74
       },
       "pageErrors": 0
     },
@@ -879,6 +953,7 @@
       "zoom": 2,
       "surface": "paper",
       "inkPixelSha256": "97e89a7c859da1ca9b853bcfd148358a862aef9e3d4455d7499758c0f4d5cfa1",
+      "captured": "2026-10-04T03:00:27.755Z",
       "stats": {
         "rstars": 0,
         "dots": 9469,
@@ -886,7 +961,7 @@
         "stars": 3,
         "curves": 0,
         "used": 5,
-        "ms": 8
+        "ms": 12
       },
       "pageErrors": 0
     },
@@ -961,6 +1036,7 @@
       "zoom": 2,
       "surface": "paper",
       "inkPixelSha256": "8757b576e4268ba9c7718297951869dde530cc5e0d364d1b9e342e6e125f7cdc",
+      "captured": "2026-10-04T03:00:27.276Z",
       "stats": {
         "rstars": 0,
         "dots": 9442,
@@ -968,79 +1044,7 @@
         "stars": 1,
         "curves": 0,
         "used": 3,
-        "ms": 8
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "disc-no-arms__s4242__home",
-      "preset": "Disc, no arms",
-      "seed": 4242,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "d2a9e520773ea551196ffd6544dfe5029c6224b9615c652914e44d0c6d25eb22",
-      "stats": {
-        "rstars": 1055,
-        "dots": 8217,
-        "knots": 0,
-        "stars": 0,
-        "curves": 2,
-        "used": 58,
-        "ms": 65
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "disc-no-arms__s4242__orbit",
-      "preset": "Disc, no arms",
-      "seed": 4242,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "de68b15fa885cdba11cdb3a3a80bfa002c1901c4bc51b0f81c9bb3de4129f1ef",
-      "stats": {
-        "rstars": 1055,
-        "dots": 8028,
-        "knots": 0,
-        "stars": 0,
-        "curves": 2,
-        "used": 53,
-        "ms": 99
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "disc-no-arms__s7__home",
-      "preset": "Disc, no arms",
-      "seed": 7,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "63263d40497e168879cf0c723d84bfcbaf8e817e9fe2b8310519fb9ce3aab023",
-      "stats": {
-        "rstars": 1016,
-        "dots": 8011,
-        "knots": 0,
-        "stars": 0,
-        "curves": 2,
-        "used": 52,
-        "ms": 91
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "disc-no-arms__s7__orbit",
-      "preset": "Disc, no arms",
-      "seed": 7,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "74e9a386f0c794a551b5df1abefbe8e1fcbf431244b7a463a36c898f3634f96c",
-      "stats": {
-        "rstars": 1016,
-        "dots": 7732,
-        "knots": 0,
-        "stars": 0,
-        "curves": 2,
-        "used": 56,
-        "ms": 74
+        "ms": 11
       },
       "pageErrors": 0
     },
@@ -1261,6 +1265,114 @@
       "pageErrors": 0
     },
     {
+      "name": "grand-design__s4242__home",
+      "preset": "Grand design",
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "27af9cb1e9208fd90000992466eca30e227ad8163eba99162fb6aa67cfe124f9",
+      "stats": {
+        "rstars": 1519,
+        "dots": 7527,
+        "knots": 151,
+        "stars": 16,
+        "curves": 3,
+        "used": 89,
+        "ms": 1607
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design__s4242__orbit",
+      "preset": "Grand design",
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "19318459fd14b7d2b3cd37254d627fa9fd59504c11d1a1fc38480f223f98a81f",
+      "stats": {
+        "rstars": 1486,
+        "dots": 7350,
+        "knots": 149,
+        "stars": 14,
+        "curves": 3,
+        "used": 92,
+        "ms": 149
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design__s7__home",
+      "preset": "Grand design",
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "a8701ac1520c824c1dc145e153d8e0c01217a274a8eaa88d86d57384042a4d1f",
+      "stats": {
+        "rstars": 1570,
+        "dots": 8133,
+        "knots": 136,
+        "stars": 18,
+        "curves": 4,
+        "used": 90,
+        "ms": 414
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design__s7__home__chalk",
+      "preset": "Grand design",
+      "seed": 7,
+      "camera": "home",
+      "surface": "chalkboard",
+      "inkPixelSha256": "993f3e60e0509868f25e7311311aa4dd37861add661dc7d67d58c8f0ac511f5a",
+      "stats": {
+        "rstars": 1570,
+        "dots": 8133,
+        "knots": 136,
+        "stars": 18,
+        "curves": 4,
+        "used": 90,
+        "ms": 400
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design__s7__orbit",
+      "preset": "Grand design",
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "30a9b754c697d43d5fbe91e336c9188b282a840eddfdec85d029f403866320fc",
+      "stats": {
+        "rstars": 1568,
+        "dots": 7810,
+        "knots": 137,
+        "stars": 20,
+        "curves": 4,
+        "used": 91,
+        "ms": 509
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design__s7__orbit__chalk",
+      "preset": "Grand design",
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "chalkboard",
+      "inkPixelSha256": "3adf716146ac6ea041d4fa8eb64ddeda9eedfa8347ba6a3929498cf798038005",
+      "stats": {
+        "rstars": 1568,
+        "dots": 7810,
+        "knots": 137,
+        "stars": 20,
+        "curves": 4,
+        "used": 91,
+        "ms": 368
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "grand-design--stipple-arms__s4242__home",
       "preset": "Grand design",
       "variant": "stipple-arms",
@@ -1373,114 +1485,6 @@
         "curves": 0,
         "used": 42,
         "ms": 29
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "grand-design__s4242__home",
-      "preset": "Grand design",
-      "seed": 4242,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "27af9cb1e9208fd90000992466eca30e227ad8163eba99162fb6aa67cfe124f9",
-      "stats": {
-        "rstars": 1519,
-        "dots": 7527,
-        "knots": 151,
-        "stars": 16,
-        "curves": 3,
-        "used": 89,
-        "ms": 1607
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "grand-design__s4242__orbit",
-      "preset": "Grand design",
-      "seed": 4242,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "19318459fd14b7d2b3cd37254d627fa9fd59504c11d1a1fc38480f223f98a81f",
-      "stats": {
-        "rstars": 1486,
-        "dots": 7350,
-        "knots": 149,
-        "stars": 14,
-        "curves": 3,
-        "used": 92,
-        "ms": 149
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "grand-design__s7__home",
-      "preset": "Grand design",
-      "seed": 7,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "a8701ac1520c824c1dc145e153d8e0c01217a274a8eaa88d86d57384042a4d1f",
-      "stats": {
-        "rstars": 1570,
-        "dots": 8133,
-        "knots": 136,
-        "stars": 18,
-        "curves": 4,
-        "used": 90,
-        "ms": 414
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "grand-design__s7__home__chalk",
-      "preset": "Grand design",
-      "seed": 7,
-      "camera": "home",
-      "surface": "chalkboard",
-      "inkPixelSha256": "993f3e60e0509868f25e7311311aa4dd37861add661dc7d67d58c8f0ac511f5a",
-      "stats": {
-        "rstars": 1570,
-        "dots": 8133,
-        "knots": 136,
-        "stars": 18,
-        "curves": 4,
-        "used": 90,
-        "ms": 400
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "grand-design__s7__orbit",
-      "preset": "Grand design",
-      "seed": 7,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "30a9b754c697d43d5fbe91e336c9188b282a840eddfdec85d029f403866320fc",
-      "stats": {
-        "rstars": 1568,
-        "dots": 7810,
-        "knots": 137,
-        "stars": 20,
-        "curves": 4,
-        "used": 91,
-        "ms": 509
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "grand-design__s7__orbit__chalk",
-      "preset": "Grand design",
-      "seed": 7,
-      "camera": "orbit",
-      "surface": "chalkboard",
-      "inkPixelSha256": "3adf716146ac6ea041d4fa8eb64ddeda9eedfa8347ba6a3929498cf798038005",
-      "stats": {
-        "rstars": 1568,
-        "dots": 7810,
-        "knots": 137,
-        "stars": 20,
-        "curves": 4,
-        "used": 91,
-        "ms": 368
       },
       "pageErrors": 0
     },
@@ -3213,6 +3217,78 @@
       "pageErrors": 0
     },
     {
+      "name": "radio-jet__s4242__home",
+      "preset": "Radio jet",
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "d3d7c659e144621f33c8fd8d724c0b4c8339c4a353864ef793a20268bd9e8245",
+      "stats": {
+        "rstars": 424,
+        "dots": 10058,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 43,
+        "ms": 57
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "radio-jet__s4242__orbit",
+      "preset": "Radio jet",
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "e316e781e5a5606637998aa9494cc1dd142962107abc4fa4814e7f2c582b5e08",
+      "stats": {
+        "rstars": 424,
+        "dots": 10056,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 47,
+        "ms": 110
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "radio-jet__s7__home",
+      "preset": "Radio jet",
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "05e9442a4dc71af20d8a0ef8b7a0e029887ef3eb5e1e25e4a650d6d122394503",
+      "stats": {
+        "rstars": 401,
+        "dots": 9045,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 56,
+        "ms": 77
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "radio-jet__s7__orbit",
+      "preset": "Radio jet",
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "d48766455e195972e69d1936554f97818476f770b03b7d1348ef03ee9b8804cb",
+      "stats": {
+        "rstars": 401,
+        "dots": 9037,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 46,
+        "ms": 51
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "radio-jet--stipple__s4242__home",
       "preset": "Radio jet",
       "variant": "stipple",
@@ -3321,78 +3397,6 @@
         "curves": 0,
         "used": 1,
         "ms": 7
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "radio-jet__s4242__home",
-      "preset": "Radio jet",
-      "seed": 4242,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "d3d7c659e144621f33c8fd8d724c0b4c8339c4a353864ef793a20268bd9e8245",
-      "stats": {
-        "rstars": 424,
-        "dots": 10058,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 43,
-        "ms": 57
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "radio-jet__s4242__orbit",
-      "preset": "Radio jet",
-      "seed": 4242,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "e316e781e5a5606637998aa9494cc1dd142962107abc4fa4814e7f2c582b5e08",
-      "stats": {
-        "rstars": 424,
-        "dots": 10056,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 47,
-        "ms": 110
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "radio-jet__s7__home",
-      "preset": "Radio jet",
-      "seed": 7,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "05e9442a4dc71af20d8a0ef8b7a0e029887ef3eb5e1e25e4a650d6d122394503",
-      "stats": {
-        "rstars": 401,
-        "dots": 9045,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 56,
-        "ms": 77
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "radio-jet__s7__orbit",
-      "preset": "Radio jet",
-      "seed": 7,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "d48766455e195972e69d1936554f97818476f770b03b7d1348ef03ee9b8804cb",
-      "stats": {
-        "rstars": 401,
-        "dots": 9037,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 46,
-        "ms": 51
       },
       "pageErrors": 0
     },
@@ -3613,6 +3617,78 @@
       "pageErrors": 0
     },
     {
+      "name": "smooth-round__s4242__home",
+      "preset": "Smooth, round",
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "a8330999a5120d811354ef1073cd7ebde73ad59e598b9ede2acbe5ac21c3ebfb",
+      "stats": {
+        "rstars": 756,
+        "dots": 7578,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 44,
+        "ms": 61
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round__s4242__orbit",
+      "preset": "Smooth, round",
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "8e1ced20b3bee919b2a198fd809920898ea1f734c7cec5d8dc0334fba3c92485",
+      "stats": {
+        "rstars": 756,
+        "dots": 7569,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 39,
+        "ms": 58
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round__s7__home",
+      "preset": "Smooth, round",
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "c5f79bad04c26a5074807728747cca172ec085ad30a6ee95e2e96de55f02ddb4",
+      "stats": {
+        "rstars": 720,
+        "dots": 7785,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 50,
+        "ms": 55
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round__s7__orbit",
+      "preset": "Smooth, round",
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "e48c62f783c08094975d6f5e32fc60897fe836847a4d940c7699e2b838f8edc2",
+      "stats": {
+        "rstars": 720,
+        "dots": 7774,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 50,
+        "ms": 79
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "smooth-round--stipple__s11__home",
       "preset": "Smooth, round",
       "variant": "stipple",
@@ -3791,6 +3867,7 @@
       "zoom": 2,
       "surface": "paper",
       "inkPixelSha256": "2d97148c344be03bb492cb1a98986068ddaeb90d5b7fe91a498afb289601cc73",
+      "captured": "2026-10-04T03:00:17.451Z",
       "stats": {
         "rstars": 0,
         "dots": 9500,
@@ -3798,7 +3875,7 @@
         "stars": 0,
         "curves": 0,
         "used": 1,
-        "ms": 12
+        "ms": 13
       },
       "pageErrors": 0
     },
@@ -3873,6 +3950,7 @@
       "zoom": 2,
       "surface": "paper",
       "inkPixelSha256": "62f4b7d8e0be3c54917fbd7519cc8118e6a738539dc21cabd847bf04b9cd955a",
+      "captured": "2026-10-04T03:00:16.864Z",
       "stats": {
         "rstars": 0,
         "dots": 9500,
@@ -3880,79 +3958,7 @@
         "stars": 0,
         "curves": 0,
         "used": 1,
-        "ms": 6
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "smooth-round__s4242__home",
-      "preset": "Smooth, round",
-      "seed": 4242,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "a8330999a5120d811354ef1073cd7ebde73ad59e598b9ede2acbe5ac21c3ebfb",
-      "stats": {
-        "rstars": 756,
-        "dots": 7578,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 44,
-        "ms": 61
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "smooth-round__s4242__orbit",
-      "preset": "Smooth, round",
-      "seed": 4242,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "8e1ced20b3bee919b2a198fd809920898ea1f734c7cec5d8dc0334fba3c92485",
-      "stats": {
-        "rstars": 756,
-        "dots": 7569,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 39,
-        "ms": 58
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "smooth-round__s7__home",
-      "preset": "Smooth, round",
-      "seed": 7,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "c5f79bad04c26a5074807728747cca172ec085ad30a6ee95e2e96de55f02ddb4",
-      "stats": {
-        "rstars": 720,
-        "dots": 7785,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 50,
-        "ms": 55
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "smooth-round__s7__orbit",
-      "preset": "Smooth, round",
-      "seed": 7,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "e48c62f783c08094975d6f5e32fc60897fe836847a4d940c7699e2b838f8edc2",
-      "stats": {
-        "rstars": 720,
-        "dots": 7774,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 50,
-        "ms": 79
+        "ms": 24
       },
       "pageErrors": 0
     },
@@ -4319,19 +4325,48 @@
   ],
   "extra": {
     "file": "tests/golden/extra-cases.json",
-    "generated": "2026-10-04T01:16:33.157Z",
-    "browser": {
-      "name": "chromium",
-      "version": "141.0.7390.37",
-      "args": [
-        "--use-angle=swiftshader",
-        "--enable-unsafe-swiftshader"
-      ],
-      "deviceScaleFactor": 1
-    },
     "cameras": {
+      "home": "the preset's own incl, az, pa",
+      "orbit": "az + 35°, incl + 20° (clamped), from home",
       "zoom": "home at zoom 2 (__GEN.zoom)"
     },
-    "zoomGenerated": "2026-10-04T01:06:10.683Z"
+    "runs": {
+      "home": {
+        "generated": "2026-10-04T01:16:33.157Z",
+        "browser": {
+          "name": "chromium",
+          "version": "141.0.7390.37",
+          "args": [
+            "--use-angle=swiftshader",
+            "--enable-unsafe-swiftshader"
+          ],
+          "deviceScaleFactor": 1
+        }
+      },
+      "orbit": {
+        "generated": "2026-10-04T01:16:33.157Z",
+        "browser": {
+          "name": "chromium",
+          "version": "141.0.7390.37",
+          "args": [
+            "--use-angle=swiftshader",
+            "--enable-unsafe-swiftshader"
+          ],
+          "deviceScaleFactor": 1
+        }
+      },
+      "zoom": {
+        "generated": "2026-10-04T03:00:28.115Z",
+        "browser": {
+          "name": "chromium",
+          "version": "141.0.7390.37",
+          "args": [
+            "--use-angle=swiftshader",
+            "--enable-unsafe-swiftshader"
+          ],
+          "deviceScaleFactor": 1
+        }
+      }
+    }
   }
 }

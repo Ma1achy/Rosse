@@ -226,12 +226,46 @@ async function captureJob(browser, url, job, out) {
       params: state.P,
       pageErrors: errors.slice(),
       inkPixelSha256: pixelHash(ink),
+      captured: new Date().toISOString(),
     };
     writeFileSync(join(out, `${name}.json`), JSON.stringify(record, null, 2) + '\n');
     results.push(record);
   }
   await context.close();
   return results;
+}
+
+/**
+ * The manifest's record of the --extra runs: per camera, when it was last captured and with which
+ * browser. A run that captures only some cameras (`--cameras zoom`) updates only theirs; each
+ * capture also carries its own `captured` time. A manifest from before this record existed (one
+ * `generated` for the whole file, from a run of home and orbit) is carried over as those cameras'
+ * run, by this function, not by hand.
+ *
+ * @param {any} previous the manifest's `extra`, if any
+ * @param {string} file
+ * @param {any[]} records this run's captures
+ * @param {string} version the browser's version
+ */
+function extraProvenance(previous, file, records, version) {
+  /** @type {Record<string, { generated: string, browser: unknown }>} */
+  const runs = { ...(previous?.runs ?? {}) };
+  if (previous?.generated && !previous.runs)
+    for (const camera of CAMERAS)
+      runs[camera] = { generated: previous.generated, browser: previous.browser };
+  const now = new Date().toISOString();
+  const browser = { name: 'chromium', version, args: BROWSER_ARGS, deviceScaleFactor: 1 };
+  for (const camera of new Set(records.map((r) => String(r.camera))))
+    runs[camera] = { generated: now, browser };
+  return {
+    file,
+    cameras: {
+      home: "the preset's own incl, az, pa",
+      orbit: `az + ${String(ORBIT.az)}°, incl + ${String(ORBIT.incl)}° (clamped), from home`,
+      zoom: `home at zoom ${String(ZOOM_CAMERA)} (__GEN.zoom)`,
+    },
+    runs: Object.fromEntries(Object.entries(runs).sort(([a], [b]) => a.localeCompare(b))),
+  };
 }
 
 async function main() {
@@ -351,6 +385,7 @@ async function main() {
     ...(r.zoom !== 1 ? { zoom: r.zoom } : {}),
     surface: r.surface,
     inkPixelSha256: r.inkPixelSha256,
+    ...(r.captured ? { captured: r.captured } : {}),
     stats: r.stats,
     pageErrors: r.pageErrors.length,
   });
@@ -371,12 +406,7 @@ async function main() {
       ...manifest.captures.filter((/** @type {any} */ c) => !names.has(c.name)),
       ...records.map(entry),
     ]);
-    manifest.extra = {
-      file: extraFile,
-      cameras: { zoom: `home at zoom ${String(ZOOM_CAMERA)} (__GEN.zoom)` },
-      generated: new Date().toISOString(),
-      browser: { name: 'chromium', version, args: BROWSER_ARGS, deviceScaleFactor: 1 },
-    };
+    manifest.extra = extraProvenance(manifest.extra, extraFile, records, version);
     writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
     console.log(`${records.length} extra captures added to ${manifestPath}`);
     return;
