@@ -16,17 +16,23 @@ import { composite, createInkBuffer, rasteriseSprites, type InkBuffer } from './
 export * from './raster';
 
 export class CpuRenderer {
-  readonly width: number;
-  readonly height: number;
-  readonly pxPerUnit: number;
-  readonly ink: InkBuffer;
+  width = 0;
+  height = 0;
+  pxPerUnit = 1;
+  ink!: InkBuffer;
   private readonly atlases = new Map<AtlasName, AtlasData>();
   private layers: readonly InkLayer[] = [];
 
   constructor(
-    readonly size: { plateCss: number; dpr: number },
+    public size: { plateCss: number; dpr: number },
     readonly paper: ImageData8,
   ) {
+    this.resize(size);
+  }
+
+  /** A new plate size or DPR: a new ink buffer (call drawInk() after). */
+  resize(size: { plateCss: number; dpr: number }): void {
+    this.size = size;
     this.width = Math.round(size.plateCss * size.dpr);
     this.height = this.width;
     this.pxPerUnit = this.width / PLATE_UNITS;
@@ -53,7 +59,11 @@ export class CpuRenderer {
 
   /** The ink over `surface`, as RGBA8 bytes (width × height × 4). */
   present(surface: Surface, out = new Uint8ClampedArray(this.width * this.height * 4)) {
-    composite(this.ink, { surface, paper: this.paper, dpr: this.size.dpr }, out);
+    composite(
+      this.ink,
+      { surface, paper: this.paper, dpr: this.size.dpr, plateCss: this.size.plateCss },
+      out,
+    );
     return out;
   }
 }

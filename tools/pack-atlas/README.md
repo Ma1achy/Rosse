@@ -2,7 +2,7 @@
 
 `npm run prepare-assets` converts the bitmap sheets in `assets/drawings/bitmap/` into GPU-ready texture-array data: one r8 layer per cell (ink is the sheets' alpha), with a full mip chain per layer, and `strokes` as 60 layers of 512 × 64. It also writes the plate's paper texture (`assets/embedded-other/rosse_000_asset.png`, the image in v21's `.plate` CSS) as raw RGBA8. See ADR 0006.
 
-Output goes to `assets-built/`, which is generated and not committed. Vite serves it as its public directory, and `npm run dev` and `npm run build` run the packer first. The run is skipped when `assets-built/index.json` already matches the sources (by SHA-256) and the packer version; `--force` rebuilds. The sources in `assets/` are never modified.
+Output goes to `assets-built/`, which is generated and not committed. Vite serves it as its public directory, and `npm run dev` and `npm run build` run the packer first. The run is skipped when `assets-built/index.json` already matches the sources and the packer's own code (by SHA-256) and the packer version, and every output file exists; `--force` rebuilds. The sources in `assets/` are never modified.
 
 ## Format
 

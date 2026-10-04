@@ -21,10 +21,10 @@ All notable changes to this project are documented here. The format follows [Kee
   - `core/rng` and `shaders/common/rng.wgsl`: the counter-based RNG of ADR 0004 (pcg4d keyed by seed, stream, index and draw), named streams in `core/streams`, and shared vectors in `tests/vectors/rng.json`.
   - Struct-layout tests: the TS descriptions of `Instance` and the sprite and composite uniforms checked against the WGSL with `wgsl_reflect`.
   - `tools/pack-atlas` (`npm run prepare-assets`): bitmap sheets to r8 layers with per-layer, coverage-preserving mips in `assets-built/`; `marks/atlas` uploads them as texture arrays, split where a sheet exceeds `maxTextureArrayLayers`.
-  - The sprite pipeline (instanced quads, the reference's smoothstep ink edge, premultiplied, no MSAA) into an rgba16float ink target, and the composite onto Paper and Chalkboard reproducing v21's CSS blends.
+  - The sprite pipeline (instanced quads, the reference's smoothstep ink edge, premultiplied, no MSAA) into an rgba16float ink target, and the composite onto Paper (multiply) and Chalkboard (soft-light) with the plate's inset rim and vignette, reproducing v21's CSS.
   - `fallback/raster` and `CpuRenderer`: the software rasteriser and composite, f32 twins of the GPU passes, runnable in Node.
-  - The page: the plate with one dot and a few more marks, a Paper/Chalkboard switch, and the CPU engine where WebGPU is missing (`?backend=cpu` forces it).
-  - `npm run test:gpu`: Playwright and Chromium with WebGPU on SwiftShader, run in CI. RNG vectors bit-exact on the GPU; the one-mark render test (CPU raster against GPU raster, within 1/255); the composite against Chromium's rendering of the reference CSS.
+  - The page: the plate with one dot and a few more marks, a Paper/Chalkboard switch, the CPU engine where WebGPU is missing or fails (`?backend=cpu` forces it), and redrawing on resize and DPR change (DPR capped at 2, as v21).
+  - `npm run test:gpu`: Playwright and Chromium with WebGPU on SwiftShader, run in CI. RNG vectors bit-exact on the GPU; the one-mark render test (CPU raster against GPU raster, within 1/255); an L-shaped cell checking orientation on both engines; the composite against screenshots of v21's own empty plate (within 2/255).
   - `npm run screenshots`, and screenshots in `docs/milestones/m1/`.
   - The TypeGPU evaluation of ADR 0014 (`docs/notes/typegpu-evaluation.md`): it recommends staying with hand-written WGSL and TypeScript twins.
 
@@ -37,7 +37,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Changed
 
 - New binaries are committed as ordinary blobs (no LFS rules) and kept small.
-- ADR 0007: the Paper field colour is `#e6dece`, the value v21's CSS uses.
+- ADR 0007: Paper is the field `#e6dece` with the paper texture in `multiply` (not `overlay`, which applies only to a dark theme v21 never sets), plus the plate's inset rim; Chalkboard adds a 60 px inset vignette. The DPR cap of 2 is recorded.
 
 ### Removed
 

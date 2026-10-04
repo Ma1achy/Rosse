@@ -35,7 +35,9 @@ describe('pack-atlas', () => {
     for (const l of chain) {
       const n = l.width * l.height;
       expect(sum(l.data.subarray(n, 2 * n))).toBe(0);
-      expect(sum(l.data.subarray(0, n)) / n).toBeCloseTo(sum(src.subarray(0, 64)) / 64, 0);
+      // total ink, scaled by area, is kept to within rounding (half a level per texel)
+      const total = (sum(l.data.subarray(0, n)) * 64) / n;
+      expect(Math.abs(total - sum(src.subarray(0, 64)))).toBeLessThanOrEqual((0.5 * 64) / n + 1e-9);
     }
   });
 
@@ -89,5 +91,7 @@ describe('atlas', () => {
     const a = atlasFromBytes('dots', entry, new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
     expect([...(a.levels[1]?.data ?? [])]).toEqual([8, 9]);
     expect(() => atlasFromBytes('dots', entry, new Uint8Array(9))).toThrow(/short/);
+    const bad = { ...entry, levels: [{ width: 2, height: 2, offset: 0, byteLength: 4 }] };
+    expect(() => atlasFromBytes('dots', bad, new Uint8Array(10))).toThrow(/level 0/);
   });
 });

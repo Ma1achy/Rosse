@@ -74,6 +74,10 @@ export class Gpu {
   private deviceListeners = new Set<(device: GPUDevice) => void>();
   private failureListeners = new Set<(error: unknown) => void>();
   private destroyed = false;
+  private recovering = false;
+  /** devices this object destroyed itself; any other loss, even reason 'destroyed', is recovered */
+  private readonly ownDestroys = new WeakSet<GPUDevice>();
+  /** recoveries since the last healthy frame */
   private recoveries = 0;
 
   private constructor(
@@ -81,13 +85,23 @@ export class Gpu {
     public adapter: GPUAdapter,
     public device: GPUDevice,
     readonly maxRecoveries: number,
+    readonly backoffMs: number,
   ) {
     this.watch(device);
   }
 
-  static async create(nav: GpuNavigator = globalThis.navigator, maxRecoveries = 3): Promise<Gpu> {
+  /**
+   * @param maxRecoveries how many device recreations in a row (without a healthy frame between,
+   *   see `markHealthy`) before giving up
+   * @param backoffMs the wait before the first recreation, doubled for each further attempt
+   */
+  static async create(
+    nav: GpuNavigator = globalThis.navigator,
+    maxRecoveries = 3,
+    backoffMs = 100,
+  ): Promise<Gpu> {
     const { adapter, device } = await requestDevice(nav);
-    return new Gpu(nav, adapter, device, maxRecoveries);
+    return new Gpu(nav, adapter, device, maxRecoveries, backoffMs);
   }
 
   /** Called with each new device after a loss. Returns an unsubscribe function. */
@@ -102,20 +116,33 @@ export class Gpu {
     return () => this.failureListeners.delete(fn);
   }
 
-  /** Resets the recovery count once a frame has rendered on the new device. */
+  /**
+   * Call after a frame has been presented on the current device: the recovery budget is
+   * `maxRecoveries` losses in a row, not per page.
+   */
   markHealthy(): void {
     this.recoveries = 0;
   }
 
+  private gone(): boolean {
+    return this.destroyed;
+  }
+
   destroy(): void {
     this.destroyed = true;
-    this.device.destroy();
+    this.destroyDevice(this.device);
+  }
+
+  private destroyDevice(device: GPUDevice): void {
+    this.ownDestroys.add(device);
+    device.destroy();
   }
 
   private watch(device: GPUDevice): void {
     void device.lost.then((info) => {
-      if (this.destroyed || info.reason === 'destroyed' || device !== this.device) return;
-      console.warn(`WebGPU device lost: ${info.message}`);
+      // a device we destroyed ourselves is not a loss; one destroyed by anyone else is
+      if (this.destroyed || this.ownDestroys.has(device) || device !== this.device) return;
+      console.warn(`WebGPU device lost (${info.reason}): ${info.message}`);
       void this.recover();
     });
     device.addEventListener('uncapturederror', (e) => {
@@ -124,24 +151,55 @@ export class Gpu {
   }
 
   private async recover(): Promise<void> {
-    while (this.recoveries < this.maxRecoveries && !this.destroyed) {
-      this.recoveries++;
-      try {
-        const { adapter, device } = await requestDevice(this.nav);
-        this.adapter = adapter;
-        this.device = device;
-        this.watch(device);
-        this.deviceListeners.forEach((fn) => {
-          fn(device);
-        });
+    if (this.recovering) return;
+    this.recovering = true;
+    try {
+      while (this.recoveries < this.maxRecoveries && !this.destroyed) {
+        const wait = this.backoffMs * 2 ** this.recoveries;
+        this.recoveries++;
+        if (wait > 0)
+          await new Promise((r) => {
+            setTimeout(r, wait);
+          });
+        // gone() is a call, so it is re-read: destroy() may have run while we waited
+        if (this.gone()) return;
+        let next: { adapter: GPUAdapter; device: GPUDevice };
+        try {
+          next = await requestDevice(this.nav);
+        } catch (e) {
+          console.warn('WebGPU device recreation failed:', e);
+          continue;
+        }
+        if (this.gone()) {
+          // destroy() was called while we waited: the new device belongs to nobody
+          this.destroyDevice(next.device);
+          return;
+        }
+        this.adapter = next.adapter;
+        this.device = next.device;
+        try {
+          this.deviceListeners.forEach((fn) => {
+            fn(next.device);
+          });
+        } catch (e) {
+          // a listener could not rebuild on the new device: drop it and try again
+          console.warn('Rebuilding on the new WebGPU device failed:', e);
+          this.destroyDevice(next.device);
+          continue;
+        }
+        this.watch(next.device);
         return;
-      } catch (e) {
-        console.warn('WebGPU device recreation failed:', e);
       }
+      if (!this.destroyed)
+        this.failureListeners.forEach((fn) => {
+          try {
+            fn(new Error('WebGPU device lost and could not be recreated'));
+          } catch (e) {
+            console.error('A WebGPU failure listener threw:', e);
+          }
+        });
+    } finally {
+      this.recovering = false;
     }
-    if (!this.destroyed)
-      this.failureListeners.forEach((fn) => {
-        fn(new Error('WebGPU device lost and could not be recreated'));
-      });
   }
 }
