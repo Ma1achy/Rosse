@@ -39,7 +39,7 @@ src/gpu/         device, buffers, pipelines, resource lifetimes per tier
 src/render/      frame orchestration, layer order, surface, palette
 src/shaders/     WGSL: common/ (rng, math, camera, instance), compute/, render/
 src/fallback/    the CPU engine: kernel twins and a software rasteriser
-src/ui/          the page (M11)
+src/ui/          the page (M11); the catalogue browser, real galaxies and exports (M12)
 ```
 
 `view/` and `render/` are additions to the suggested layout. Camera maths is used by every stage and both engines, so it is not GPU plumbing. Draw order and surfaces are policy, while `gpu/` is mechanism. `fallback/` holds the CPU engine of ADR 0011.
