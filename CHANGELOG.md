@@ -15,6 +15,7 @@ All notable changes to this project are documented here. The format follows [Kee
   - `npm run golden`: the metric of ADR 0013 (`tests/golden/compare/`: density maps, SSIM, stroke widths from the distance transform, counts, HTML reports), WebGPU on SwiftShader and the CPU engine against v21, and the CPU engine against WebGPU; `--calibrate` writes `tests/golden/thresholds.json` and `calibration.json`.
   - `tools/capture-reference`: `--extra` (preset plus overrides, added to the manifest; the capture records v21's hand) and `--reroll` (v21's 0.3° re-roll pairs); 12 stipple-only captures of `Smooth, round`, `Cigar-shaped` and `Disc, no arms`.
   - `npm run test:gpu`: the stipple kernels on the GPU against their CPU twins (L1).
+  - After review (ADR 0015, superseding ADR 0013 in part): a moment and extent test (radii, outer ink, axis ratios, position angle) and the coarse SSIM as the structure gate; negative controls in the calibration; Poisson-aware counts that require 0 where v21 has 0; comparisons drawn with v21's variation replayed offline (`tests/golden/compare/v21.ts`), checked against v21's own `armProfile` and recorded hands; 16 more stipple-only captures (`Radio jet`, `Grand design` with arms, two-pen and three-pen seeds) and a drawn-star count gate; the page presents before reading counts back.
 
 - M1, paper and one mark:
   - `gpu/device`: adapter and device request with the adapter's texture-array and buffer limits, device-loss recovery, and `detectBackend()` choosing WebGPU or the CPU engine.
