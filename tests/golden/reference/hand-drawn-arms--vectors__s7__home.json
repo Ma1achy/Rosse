@@ -5,16 +5,12 @@
   "camera": "home",
   "surface": "paper",
   "variant": "vectors",
-  "overrides": {
-    "starMix": 0,
-    "field": 0,
-    "fgstars": 0
-  },
+  "overrides": {},
   "sequence": [
     "load page (theme light)",
     "__GEN.preset(\"Hand-drawn arms\")",
     "__GEN.set({ seed: 7 })",
-    "__GEN.set({\"starMix\":0,\"field\":0,\"fgstars\":0})"
+    "__GEN.set({})"
   ],
   "zoom": 1,
   "canvas": [
@@ -22,13 +18,13 @@
     800
   ],
   "stats": {
-    "rstars": 0,
-    "dots": 9216,
+    "rstars": 1509,
+    "dots": 7152,
     "knots": 115,
-    "stars": 20,
+    "stars": 14,
     "curves": 0,
-    "used": 60,
-    "ms": 2833
+    "used": 100,
+    "ms": 3324
   },
   "hand": [
     17,
@@ -134,7 +130,7 @@
     "lens": 0,
     "shells": 0,
     "tail": 0,
-    "fgstars": 0,
+    "fgstars": 0.3,
     "trails": 0,
     "arrow": 0,
     "plates": "ink",
@@ -173,9 +169,9 @@
     "ovArtefact": "none",
     "mTime": 1,
     "az": 0,
-    "starMix": 0,
+    "starMix": 0.6,
     "dustScribble": 0.5,
-    "field": 0,
+    "field": 0.3,
     "dustLines": 0,
     "bubbles": 0.4,
     "streams": 0,
@@ -209,6 +205,6 @@
     "shellStars": 6000
   },
   "pageErrors": [],
-  "inkPixelSha256": "f2a352bf7d8e231dd7d1997673b719caab1262b2c2f0782f0d92c558770dc36d",
-  "captured": "2026-10-06T12:34:47.091Z"
+  "inkPixelSha256": "5d9ae8cecf39c606c258770bbcdbc2e28eaadca380d65c4360f71fc2f0b2cd9a",
+  "captured": "2026-10-06T17:29:07.030Z"
 }

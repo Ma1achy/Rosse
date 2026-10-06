@@ -6,9 +6,6 @@
   "surface": "paper",
   "variant": "ribbons",
   "overrides": {
-    "starMix": 0,
-    "field": 0,
-    "fgstars": 0,
     "bubbles": 0,
     "whole": 0,
     "envelope": 0,
@@ -25,13 +22,13 @@
     800
   ],
   "stats": {
-    "rstars": 9,
-    "dots": 9309,
-    "knots": 132,
-    "stars": 11,
+    "rstars": 1624,
+    "dots": 4927,
+    "knots": 138,
+    "stars": 16,
     "curves": 5,
-    "used": 61,
-    "ms": 121
+    "used": 102,
+    "ms": 731
   },
   "hand": [
     65,
@@ -91,7 +88,7 @@
     "lens": 0,
     "shells": 0,
     "tail": 0,
-    "fgstars": 0,
+    "fgstars": 0.3,
     "trails": 0,
     "arrow": 0,
     "plates": "ink",
@@ -130,9 +127,9 @@
     "ovArtefact": "none",
     "mTime": 1,
     "az": 35,
-    "starMix": 0,
+    "starMix": 0.6,
     "dustScribble": 0.5,
-    "field": 0,
+    "field": 0.3,
     "dustLines": 0,
     "bubbles": 0,
     "streams": 0,
@@ -166,6 +163,6 @@
     "shellStars": 6000
   },
   "pageErrors": [],
-  "inkPixelSha256": "1a96916cae5fe80c774bb87400047d1f2e94fdb91c4031d7fb3877923b29d1d1",
-  "captured": "2026-10-06T11:00:29.947Z"
+  "inkPixelSha256": "049dbee173df5e59804f3f7895078090ddb8e99841a31dfa6159da6b906cbee5",
+  "captured": "2026-10-06T17:26:20.915Z"
 }
