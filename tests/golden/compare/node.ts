@@ -36,7 +36,11 @@ import {
   type ThresholdFile,
   type Thresholds,
 } from './thresholds';
-import { v21Variation } from './v21';
+import { mulberry32, v21Variation } from './v21';
+import { v21MergerPicks } from './v21-merger';
+import { mergerGalaxyParams } from '../../../src/sim/merger';
+import { strokeIndex, strokePools } from '../../../src/marks/strokes';
+import { mwarpPool } from '../../../src/model/merger';
 import { v21PartPicks } from './v21-parts';
 
 export { compareMeasures, countAllowance, evaluate, impossibleClasses, measure };
@@ -128,13 +132,64 @@ export class GoldenNode {
    * M4 v21's stroke choices and noise field, and from M5 v21's part picks at this zoom (ADR 0021).
    */
   referenceOptions(P: Params, zoom = 1): SceneOptions {
+    if (P.merger) return this.mergerOptions(P);
     const variation = this.v21Variation(P);
     return {
+      ...(P.shellsOn ? { shells: this.shellOptions(P) } : {}),
       variation,
       curvePicks: this.v21CurvePicks(P, variation),
       noise: this.v21Noise(P.seed),
       partPicks: v21PartPicks(P, variation, this.cpu.meta, zoom),
     };
+  }
+
+  /**
+   * A merger drawn with v21's draws (M8, ADR 0040): the galaxy-level picks of its initial
+   * conditions and of `mergerGalaxyParams`, the main picture's variation, and each galaxy's own
+   * variation, stroke choices, noise and part picks (replayed for the galaxy's own parameters); and
+   * `mWarp`'s two whole drawings. The test stars' own draws are the engine's.
+   */
+  mergerOptions(P: Params): SceneOptions {
+    const picks = v21MergerPicks(this.root, P);
+    const meta = this.cpu.meta;
+    const galaxy = [0, 1].map((g) => {
+      const Pg = { ...P, ...mergerGalaxyParams(P, g as 0 | 1, picks) } as Params;
+      const V = this.v21Variation(Pg);
+      return {
+        variation: V,
+        curvePicks: this.v21CurvePicks(Pg, V),
+        noise: this.v21Noise(Pg.seed),
+        // v21's parts for a galaxy built at the plate's centre: no streams, so the zoom is moot
+        partPicks: v21PartPicks(Pg, V, meta, 1),
+      };
+    }) as [SceneOptions, SceneOptions];
+    let mwarp: [number, number] | undefined;
+    if (P.mWarp) {
+      const wpool = mwarpPool(meta.vectors?.whole?.type ?? []);
+      const rw2 = mulberry32(P.seed * 211 + 7);
+      const pick = () => wpool[Math.floor(rw2() * wpool.length)] as number;
+      mwarp = [pick(), pick()];
+    }
+    return {
+      ...(P.shellsOn ? { shells: this.shellOptions(P) } : {}),
+      merger: {
+        picks,
+        variation: this.v21Variation(P),
+        galaxy,
+        ...(mwarp ? { mwarp } : {}),
+      },
+    };
+  }
+
+  /**
+   * v21's draws of the shells' arcs: the stroke row of each, from `mulberry32(seed · 5 + 17)` in
+   * order (`shellArcs`, app23.js:L750). There are at most six arcs.
+   */
+  shellOptions(P: Params): { strokes: number[] } {
+    const kinds = this.cpu.meta.strokes?.kind ?? [];
+    const pools = strokePools(kinds);
+    const r = mulberry32(P.seed * 5 + 17);
+    return { strokes: Array.from({ length: 6 }, () => strokeIndex('faint', pools, r())) };
   }
 
   /** v21's own noise corners for a seed (./v21-noise.ts), as plain arrays (they cross to the page). */

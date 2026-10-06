@@ -17,6 +17,9 @@ import {
 } from '../../../src/model/scene';
 import { GpuRenderer } from '../../../src/render/frame';
 import { GpuStipple } from '../../../src/render/stipple';
+import { GpuMerger } from '../../../src/render/merger';
+import { GpuShells } from '../../../src/render/shells';
+import { buildShellScene } from '../../../src/model/shells';
 import { cameraOf } from '../../../src/view/camera';
 
 export interface GoldenRender {
@@ -86,16 +89,49 @@ async function main(): Promise<void> {
   const renderer = new GpuRenderer(device, { plateCss: 800, dpr: 1 }, paper);
   for (const a of atlases) renderer.addAtlas(a);
   const stipple = GpuStipple.create(device);
+  const merger = GpuMerger.create(device);
+  const shells = GpuShells.create(device);
   const info = adapter.info;
   window.__golden = {
     adapter: [info.vendor, info.architecture, info.description].filter(Boolean).join(' / '),
     async render(P, opts, zoom = 1) {
       const t0 = performance.now();
-      const scene = buildScene(P, meta, opts);
-      const cam = cameraOf(P, zoom);
-      stipple.setScene(scene);
-      stipple.setView(cam);
-      renderer.setLayers(stipple.inkLayers());
+      let layers;
+      let readCounts: () => Promise<{ counts: MarkCounts }>;
+      if (P.merger) {
+        // a merger (M8): the simulation, then each galaxy carried by its tides
+        const { merger: mopts, placementKey, shells: sopts } = opts;
+        await merger.build(P, meta, {
+          ...mopts,
+          ...(sopts ? { shells: sopts } : {}),
+          ...(placementKey !== undefined ? { placementKey } : {}),
+        });
+        merger.view(zoom);
+        layers = merger.inkLayers();
+        readCounts = () => merger.readCounts();
+      } else {
+        const scene = buildScene(P, meta, opts);
+        stipple.setScene(scene);
+        stipple.setView(cameraOf(P, zoom));
+        layers = stipple.inkLayers();
+        readCounts = () => stipple.readCounts();
+        if (P.shellsOn && stipple.current) {
+          // the simulated shells (M8): the satellite's dots and the arcs, which ignore the camera
+          await shells.build(
+            buildShellScene(P, meta, stipple.current.variation, {
+              ...opts.shells,
+              ...(opts.placementKey !== undefined ? { placementKey: opts.placementKey } : {}),
+            }),
+          );
+          shells.view(zoom);
+          layers = [...layers, ...shells.layers()];
+          readCounts = async () => {
+            const r = await stipple.readCounts();
+            return { counts: { ...r.counts, dots: r.counts.dots + shells.count } };
+          };
+        }
+      }
+      renderer.setLayers(layers);
       renderer.drawInk();
       const half = new Uint16Array((await readTexture(device, renderer.ink, 8)).buffer);
       const n = renderer.width * renderer.height;
@@ -104,7 +140,7 @@ async function main(): Promise<void> {
         const a = halfToFloat(half[i * 4 + 3] ?? 0);
         alpha[i] = Math.round(Math.min(1, Math.max(0, a)) * 255);
       }
-      const { counts } = await stipple.readCounts();
+      const { counts } = await readCounts();
       return {
         alpha: base64(alpha),
         width: renderer.width,
