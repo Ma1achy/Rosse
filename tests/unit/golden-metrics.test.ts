@@ -18,7 +18,13 @@ import {
   totalInk,
   type Grey,
 } from '../../tests/golden/compare/metrics';
-import { countAllowance, evaluate, type Thresholds } from '../../tests/golden/compare/thresholds';
+import {
+  countAllowance,
+  evaluate,
+  impossibleClasses,
+  paTolerance,
+  type Thresholds,
+} from '../../tests/golden/compare/thresholds';
 
 /** A plate with anti-aliased discs (coverage by 4×4 supersampling). */
 function discs(w: number, h: number, list: [number, number, number][]): Grey {
@@ -158,8 +164,8 @@ describe('golden metric (ADR 0013)', () => {
       outer: 0.03,
       q: 0.05,
       qInner: 0.05,
-      pa: 10,
-      paBelowQ: 0.8,
+      paA: 2,
+      paEps0: 0.04,
       counts: 0.03,
       countsSmall: 0.1,
       poisson: 3,
@@ -174,14 +180,23 @@ describe('golden metric (ADR 0013)', () => {
     expect(evaluate(c, { knots: 50 }, { knots: 54 }, t).pass).toBe(true);
     expect(evaluate(c, { stars: 3 }, { stars: 0 }, t).pass).toBe(true);
     expect(evaluate(c, { stars: 3 }, { stars: 0 }, { ...t, poisson: 0 }).pass).toBe(false);
-    // none in the reference: none allowed
-    expect(evaluate(c, { stars: 0 }, { stars: 1 }, t).pass).toBe(false);
-    expect(countAllowance(0, 3, t)).toBe(0);
+    // none in the reference: the Poisson allowance, unless the parameters make the class impossible
+    expect(evaluate(c, { stars: 0 }, { stars: 1 }, t).pass).toBe(true);
+    expect(evaluate(c, { stars: 0 }, { stars: 1 }, t, new Set(['stars'])).pass).toBe(false);
+    expect(countAllowance(0, 3, t)).toBeCloseTo(3 * Math.sqrt(3), 6);
+    expect(countAllowance(0, 3, t, true)).toBe(0);
+    expect([...impossibleClasses({ knots: 0, sparkle: 0.02, starMix: 0 })].sort()).toEqual([
+      'knots',
+      'rstars',
+    ]);
+    // the position angle: tight for an elongated reference, ungated for a round one
+    expect(paTolerance(0.5, t)).toBeCloseTo(2 / (0.6 - 0.04), 6);
+    expect(paTolerance(0.99, t)).toBe(Infinity);
     // the effective widths: 3 √(ref + render) below 1,000, the relative tolerance above
     expect(countAllowance(720, 774, t)).toBeCloseTo(3 * Math.sqrt(1494), 6);
     expect(countAllowance(9500, 9500, t)).toBeCloseTo(285, 6);
     expect(countAllowance(1016, 1082, t)).toBeCloseTo(30.48, 6);
-  });
+  }, 30_000);
 
   it('measures extent and shape: radii, outer ink, axis ratio, position angle', () => {
     const round = blobDots(6000, 6, 400, 400, 30, 800);
@@ -208,7 +223,8 @@ describe('golden metric (ADR 0013)', () => {
     expect(mo.pa).toBeCloseTo(30, 0);
     expect(radiusAt(extentOf(g, 200, 200), 1)).toBeLessThan(81);
     expect(inkBeyond(extentOf(g, 200, 200), 40)).toBeGreaterThan(0.3);
-  });
+    // several 800² renders measured in full: seconds, and more under load
+  }, 30_000);
 });
 
 describe('band means', () => {

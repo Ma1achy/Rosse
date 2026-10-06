@@ -37,10 +37,21 @@ These are the stipple-only variants, taken with `node tools/gpu-test/side-by-sid
 | 1028 | `incE() < 80` | the drawn core | M2 (built) |
 | 1029 | `incE() > 70` | the core's dotted style | M2 (built) |
 | 1031 | `incE() > 78` | the core flattened to 0.55 | M5 |
+| 1000 | `P.bulgeFlat * Math.max(ci(), 0.05) < 0.5` (raw cos i, not `incE`) | whole-drawing type `smooth:elongated` (only for kind auto, bulge ≥ 0.95) | M5 |
+| 788 | `P.lines * (P.incl - 72) / 18` (continuous) | the midplane stroke's alpha: a **view-tier input**, not a switch | M4 |
+
+**Inclination and the model tier (review fix, [ADR 0017](../../adr/0017-model-tier-key-is-a-structure-signature.md)).** The `incE` buckets alone were not a sufficient model key:
+
+- L1000 switches on the raw cos i. `Smooth, round` (bulgeFlat 0.95) changes its whole drawing at 58.2°, inside bucket 0, and 30° differs from 150°.
+- The model tier's key is now `structureKey(P)`: the answer of every discrete inclination switch (the 12 `incE` tests, and L1000 under its own guard). `dirtyTier` rebuilds the model when it changes.
+- Every other use of the inclination (23, among them L788's alpha, the flattenings by `max(bulgeFlat, cos i)` and the dust optical depth) is listed in `INCL_CONTINUOUS` as a view-tier input.
+- `tests/unit/camera.test.ts` scans `app23.js`, and every `P.incl`, `ci()` and `incE()` must be in one of the two lists.
+
+This clarifies ADR 0010's "the `incE` bucket" without changing its tiers.
 
 - **The view tier (ADR 0010), driven by the schema.** `render/tiers.ts` decides what each frame rebuilds:
   - `dirtyTier` reads the tier tags of the changed parameters;
-  - a model parameter, or an inclination that crosses a bucket, rebuilds the model tier and everything after it;
+  - a model parameter, or an inclination that changes the structure signature (`structureKey`, ADR 0017), rebuilds the model tier and everything after it;
   - the camera, `mTime` or the zoom re-runs only the view tier;
   - a stage that throws invalidates the state, so the next frame rebuilds everything.
 
@@ -56,28 +67,38 @@ These are the stipple-only variants, taken with `node tools/gpu-test/side-by-sid
   - `touch-action: none`, the grab cursor, `tabIndex` 0, and no context menu.
 
   `tests/unit/orbit.test.ts` runs v21's own `orbit()` block, cut from `app23.js`, on a stand-in canvas and sends it and ours the same event sequences. After every event, az, incl, pa, zoom, the cursor and `preventDefault` are identical.
-- **Frames.** Camera moves and resizes go through M1's frame queue via `requestFrame`, which requests one animation frame. While a frame is requested or waiting, further moves only update the wanted camera, so at most one frame ever waits. Changing the preset resets the angles, a new seed keeps them, and the zoom persists, as in v21.
+- **Frames.** Every frame request goes through M1's frame queue via `schedule()`: camera moves, resizes, surface toggles, preset and seed changes, and engine switches. It coalesces: with a frame already waiting it returns, and the waiting frame draws the latest state when it starts, so at most one frame ever waits. Camera moves and resizes also wait for the next animation frame (`requestFrame`). The orbit check interleaves 9 surface toggles and a seed change with a drag and still sees at most one waiting. Changing the preset resets the angles, a new seed keeps them, and the zoom persists, as in v21.
+- **URL camera** (`ui/url.ts`): `?az`, `?incl`, `?pa` and `?zoom`. An empty or non-numeric value is absent, so `?incl=` keeps the preset's inclination. Values are brought into range as the controls do, so `?zoom=0` becomes 0.15. Unit-tested.
+- **Accessibility:** the plate has an accessible name with the key hints and keeps the focus across an engine switch. `orbit.ts` documents the v21 quirks kept on purpose: there is no `lostpointercapture` handler; Ctrl with + or − is swallowed by the plate; the wheel ignores `deltaMode`.
 
 ## Acceptance
 
 ### Goldens: both cameras plus zoom, M2 set
 
-The six zoom captures come from `npm run capture:reference -- --extra tests/golden/extra-cases.json --cameras zoom`. They show the home view at zoom 2 through v21's `__GEN.zoom(2)`, which gives `VIEW.scale` = 168, and are recorded as `"zoom": 2`. `--verify` reproduces all 18 extra captures bit for bit. v21's counts at zoom 2 equal those at home, because zoom changes nothing in v21's stipple stream for these presets.
+The six zoom captures were made with `npm run capture:reference -- --extra tests/golden/extra-cases.json --cameras zoom`. Each shows the home view at zoom 2, set through v21's `__GEN.zoom(2)`, which makes `VIEW.scale` 168, and is recorded as `"zoom": 2`. Only the cases that list seeds under `zoom` in `extra-cases.json` get a zoom capture: the three M2 stipple presets at seeds 7 and 4242. `--verify` reproduces all 34 extra captures bit for bit. At zoom 2, v21's counts are the same as at home.
 
-| case (zoom 2) | ink | SSIM | coarse SSIM | median width | p90 width | dots (ours/v21) | sparkle stars | result |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| smooth-round s7 | +1.1% | 0.530 | 0.945 (CPU 0.946) | +0.2% | +2.3% | 9,500/9,500 | 0/0 | pass |
-| smooth-round s4242 | −0.3% | 0.536 | 0.943 | −0.4% | −2.7% | 9,500/9,500 | 0/0 | pass |
-| cigar-shaped s7 | +1.0% | 0.587 | 0.952 | +0.3% | −1.8% | 9,500/9,500 | 0/0 | pass |
-| cigar-shaped s4242 | −0.3% | 0.592 | 0.953 | +0.1% | −0.1% | 9,500/9,500 | 0/0 | pass |
-| disc-no-arms s7 | −1.3% | 0.327 | 0.885 | −1.1% | −0.2% | 9,355/9,442 (−0.9%) | 0/1 | pass |
-| disc-no-arms s4242 | +0.9% | 0.330 | 0.904 | +0.9% (CPU +1.0%) | +0.3% | 9,500/9,469 (+0.3%) | 0/3 | pass |
+The table shows the results after merging M2's round-1 fixes: the metric of ADR 0015 and v21's variation replayed. All numbers are WebGPU; the CPU engine gives the same to the last digit, except a p90 width of 0.0% for `Disc, no arms` s4242 and a coarse SSIM of 0.946 for `Smooth, round` s7. Fine SSIM (b) is not gated any more. The moment and extent gate compares r25, r50 and r90 (relative), the outer ink and q (axis ratio, whole and inner, as differences) and the position angle. The position angle is gated only where q < 0.8.
 
-- **`npm run golden`: 18/18 required cases pass**: the 12 home and orbit cases of M2, unchanged, and the 6 zoom cases. They pass on WebGPU and on the CPU engine, at the family thresholds calibrated in M2 (smooth: SSIM ≥ 0.36, coarse ≥ 0.89; spiral, which includes `Disc, no arms`: ≥ 0.29, ≥ 0.87).
-- **CPU against WebGPU (L1, strict):** pass on all 18. At zoom the ink differs by at most 0.0%, SSIM and coarse SSIM are 1.000, and widths are within 0.1%, with identical counts.
+| case (zoom 2) | ink | (b′) coarse | median | p90 | r25 | r50 | r90 | outer | Δq | Δq inner | Δpa | dots (ours/v21) | result |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| smooth-round s7 | +1.1% | 0.945 | +0.2% | +2.3% | −1.1% | −0.3% | +1.5% | +0.004 | −0.013 | −0.006 | (q 0.99: not gated) | 9,500/9,500 | pass |
+| smooth-round s4242 | −0.3% | 0.943 | −0.4% | −2.7% | +0.0% | +2.1% | +1.3% | +0.004 | +0.014 | −0.010 | (q 0.98: not gated) | 9,500/9,500 | pass |
+| cigar-shaped s7 | +1.0% | 0.952 | +0.3% | −1.8% | +0.9% | +0.5% | −1.5% | −0.003 | +0.020 | +0.013 | +0.1° | 9,500/9,500 | pass |
+| cigar-shaped s4242 | −0.3% | 0.953 | +0.1% | −0.1% | −0.8% | −0.8% | −1.1% | −0.003 | −0.001 | −0.002 | −1.6° | 9,500/9,500 | pass |
+| disc-no-arms s7 | −0.5% | 0.898 | −0.5% | +0.8% | −2.2% | −2.0% | −1.0% | −0.006 | −0.014 | +0.013 | +0.0° | 9,459/9,442 | pass |
+| disc-no-arms s4242 | −0.0% | 0.909 | +1.2% | +0.1% | −1.3% | −1.3% | −1.4% | −0.008 | −0.015 | −0.026 | −1.7° | 9,472/9,469 | pass |
+
+The thresholds are from `tests/golden/thresholds.json`, as M2 calibrated them:
+
+- smooth: r25 ±3.7%, r50 ±5.6%, r90 ±9.0%, outer ±0.019, q ±0.057, q inner ±0.039, pa ±4.5°, coarse ≥ 0.91;
+- spiral, which includes `Disc, no arms`: r25 ±4.1%, r50 ±4.6%, r90 ±5.1%, outer ±0.016, q ±0.037, q inner ±0.044, pa ±3.8°, coarse ≥ 0.88.
+
+The tightest margins at zoom are both `Disc, no arms`: q inner for s4242 (−0.026 against ±0.044) and r50 for s7 (−2.0% against ±4.6%).
+
+- **`npm run golden`: 34/34 required cases pass**, on WebGPU and on the CPU engine: M2's 28 home and orbit cases and the 6 zoom cases. The 12/12 drawn-star gates also pass.
+- **CPU against WebGPU (L1, strict):** every case passes. At zoom, ink, widths and moments agree to within 0.0%, coarse SSIM is 1.000, and the counts are identical.
 - **L0:** two WebGPU renders are identical on every case.
-- **(e) against `engine-hashes.json`:** the 12 M2 cases are identical, after the camera refactor in WGSL. The 6 zoom hashes were added.
-- The tightest margin is `Disc, no arms` s7 at zoom 2, with coarse SSIM 0.885 against 0.87. At zoom 2 the plate shows the inner 2.4 units only, so the coarse map holds fewer independent structures.
+- **(e) against `engine-hashes.json`:** M2's 28 hashes are identical under the merged engine. Six zoom hashes were added. The `Disc, no arms` zoom hashes changed from M3's first run because M2 now draws with v21's replayed variation.
 
 ### Orbiting changes no model buffer (hashes)
 
@@ -121,12 +142,19 @@ On SwiftShader the sprite ink pass dominates: it rasterises about 10,000 quads a
 - **The `incE` uses** are listed and bucketed, but only the two core uses (L1028, L1029) have consumers. The rest arrive with M4 and M5, and the bucket rebuild is ready for them. As in v21, a threshold has no hysteresis. Orbiting back and forth across 72–80° rebuilds the model at each crossing, which shows as a change of structure, not a re-roll (the roadmap's "flicker" risk). No consumer exists yet to judge whether hysteresis would be wanted.
 - **`toView`, `orient`, `scenePoint`, `srcNow` and `perspective`** are built and checked against v21 but unused until the sky (M7) and the lens (M9). The home orientation as a saved parameter (divergence 2) comes with them.
 - **The counts line under the plate** still awaits a read-back of the indirect arguments after each frame (as in M2). It does not block the GPU and is only for the statistics line. Moving it fully off the frame path, or reading it only when the counts can change, is left to M10.
+- **Zoom-dependent inputs still to come, all view-tier.** Zoom never rebuilds the model, so when these land they must be computed in the view tier, not baked into model buffers:
+  - the drawn stars' size factor `ZL = (VIEW.scale / 84)^0.45` (L183);
+  - the lane radius `LR` (L194);
+  - the dust clouds' and hatching's `zf` (L936, L947);
+  - the breathing-room grid round bright stars, which is in screen pixels.
+
+  v21 computes all of them inside `generate`, `dustClouds` and `dustLanes`, which re-run on every zoom. Here they must be view-tier culls and expansions over the stored model.
 - **`setLayers` on every view frame** re-creates the sprite batches' small uniform buffers (6 layers). It is cheap, but it could be kept across view frames in M10.
 
 ## Checks
 
 - `npm run lint`, `typecheck` and `build`: pass.
-- `npm run test`: 117 tests. New this milestone: camera 7, orbit 10, tiers 7.
+- `npm run test`: 128 tests, all passing after the M2 merge. M3 added 24 of them: camera 7, orbit 10, tiers 7.
 - `npm run validate:wgsl`: 18 files valid.
 - `npm run test:gpu`: 6/6 pass (one mark, RNG vectors, stipple kernels, tiers, surface, orbit).
-- `npm run golden`: 204/204 captures intact; 18/18 required cases pass.
+- `npm run golden`: 220/220 captures intact; 34/34 required cases and 12/12 drawn-star gates pass.

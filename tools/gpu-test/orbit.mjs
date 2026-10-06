@@ -64,12 +64,18 @@ export async function orbitCheck(browser, url) {
         for (let i = 0; i < d.length; i++) h = Math.imul(h ^ (d[i] ?? 0), 16777619) >>> 0;
         return h.toString(16);
       });
-    /** waits until the frame on the plate shows camera `want` */
+    /**
+     * waits until the frame on the plate shows camera `want` and its counts have been read back
+     * (the page reads them after presenting, outside the frame queue)
+     */
     const settle = async (/** @type {Record<string, number>} */ want) => {
       await page.waitForFunction(
         ({ want, tol }) => {
-          const c = /** @type {any} */ (window.__rosse?.camera);
-          return !!c && Object.entries(want).every(([k, v]) => Math.abs(c[k] - v) <= tol);
+          const r = window.__rosse;
+          const c = /** @type {any} */ (r?.camera);
+          return (
+            !!c && !!r?.counts && Object.entries(want).every(([k, v]) => Math.abs(c[k] - v) <= tol)
+          );
         },
         { want, tol: TOL },
         { timeout: 120_000 },
@@ -83,6 +89,7 @@ export async function orbitCheck(browser, url) {
       if (now === frames) break;
       frames = now;
     }
+    await page.waitForFunction(() => !!window.__rosse?.counts, undefined, { timeout: 120_000 });
     const s0 = await state();
     const before = await pixels();
     const box = await page.locator('#plate').boundingBox();
@@ -162,8 +169,50 @@ export async function orbitCheck(browser, url) {
     if (s4.tiers.model !== s0.tiers.model) fail(`${tag} the model tier ran during orbit or zoom`);
     if (s4.maxQueued > 1) fail(`${tag} ${String(s4.maxQueued)} frames waited in the queue at once`);
     if (s4.backend !== backend) fail(`${tag} drawn by ${String(s4.backend)}`);
+
+    // 4. a drag with surface toggles and a seed change between its moves: every change goes
+    // through the one coalescing schedule(), so no more than one frame ever waits
+    await page.mouse.move(cx, cy);
+    await page.mouse.down();
+    let want4 = { az: s4.camera.az, incl: s4.camera.incl };
+    let prev4 = [cx, cy];
+    for (let k = 1; k <= 18; k++) {
+      const p = [cx - 7 * k, cy - 3 * k];
+      await page.mouse.move(p[0] ?? 0, p[1] ?? 0);
+      want4 = v21Drag(want4, (p[0] ?? 0) - (prev4[0] ?? 0), (p[1] ?? 0) - (prev4[1] ?? 0));
+      prev4 = p;
+      if (k % 2)
+        await page.evaluate((k) => {
+          const b = document.querySelector(
+            `button[data-surface="${k % 4 === 1 ? 'chalk' : 'paper'}"]`,
+          );
+          if (b instanceof HTMLButtonElement) b.click();
+        }, k);
+      if (k === 10)
+        await page.evaluate(() => {
+          const s = document.getElementById('seed');
+          if (!(s instanceof HTMLInputElement)) return;
+          s.value = '8';
+          s.dispatchEvent(new Event('change'));
+        });
+    }
+    await page.mouse.up();
+    await settle(want4);
+    await page.waitForFunction(
+      () => window.__rosse?.seed === 8 && window.__rosse.surface === 'chalk',
+      undefined,
+      { timeout: 120_000 },
+    );
+    const s5 = await state();
+    lines.push(
+      `${tag} drag with 9 surface toggles and a seed change: az ${s5.camera.az.toFixed(4)} (v21 ${want4.az.toFixed(4)}), incl ${s5.camera.incl.toFixed(4)} (v21 ${want4.incl.toFixed(4)}); most frames queued ${String(s5.maxQueued)}; model tier ${String(s4.tiers.model)} → ${String(s5.tiers.model)} (the seed)`,
+    );
+    if (s5.maxQueued > 1)
+      fail(`${tag} ${String(s5.maxQueued)} frames waited in the queue at once (toggles)`);
+    if (s5.tiers.model !== s4.tiers.model + 1)
+      fail(`${tag} the seed change should rebuild the model once`);
     for (const e of errors) fail(`${tag} page error: ${e}`);
-    data[backend] = { s0, s1, s2, s3, s4, want };
+    data[backend] = { s0, s1, s2, s3, s4, s5, want };
     await page.close();
   }
   return {

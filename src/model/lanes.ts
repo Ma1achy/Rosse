@@ -87,7 +87,13 @@ export function dustLanes(
         let step = 0;
         for (let x = -2.8; x <= 2.8; x += 0.055, step++) {
           const dens = Math.exp(-Math.abs(x) / 1.5);
-          const n = vnoise(x * 1.9 + frac(P.seed * 0.1), row * 3.1, P.seed, NoiseSalt.laneEdge, field);
+          const n = vnoise(
+            x * 1.9 + frac(P.seed * 0.1),
+            row * 3.1,
+            P.seed,
+            NoiseSalt.laneEdge,
+            field,
+          );
           const a: Vec3 = [x, 0, zo];
           if (row === 1) pts.push(a);
           const r = new Draws(P.seed, Stream.dust, DustIndex.edge + 1000 * row + step);
@@ -148,7 +154,13 @@ export function dustLanes(
           const R2 = R + 0.05;
           const th2 = armPhaseCpu(P, V, R2, k) + off - (0.12 + 0.04 * Math.sin(R2 * 3 + k));
           const b: Vec3 = [R2 * Math.cos(th2) + lx * R, R2 * Math.sin(th2) + ly * R, 0];
-          const n = vnoise(R * 2.1 + k * 5.3, 7 + frac(P.seed * 0.01), P.seed, NoiseSalt.laneArm, field);
+          const n = vnoise(
+            R * 2.1 + k * 5.3,
+            7 + frac(P.seed * 0.01),
+            P.seed,
+            NoiseSalt.laneArm,
+            field,
+          );
           if (n > keep) continue; // dust is patchy
           pts.push(a);
           const r = new Draws(P.seed, Stream.dust, DustIndex.arms + 1000 * k + step);

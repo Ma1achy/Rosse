@@ -11,8 +11,8 @@
     "outer": 0.002,
     "q": 0.003,
     "qInner": 0.003,
-    "pa": 1,
-    "paBelowQ": 0.8,
+    "paA": 0.1,
+    "paEps0": 0,
     "counts": 0.001,
     "countsSmall": 0.001,
     "poisson": 0,
@@ -24,25 +24,61 @@
       "countsSmall": 0.1,
       "poisson": 3,
       "poissonBelow": 2000,
-      "paBelowQ": 0.8,
       "ink": 0.05,
-      "ssimCoarse": 0.89,
+      "ssimCoarse": 0.88,
       "median": 0.1,
       "p90": 0.1,
-      "r25": 0.042,
-      "r50": 0.042,
-      "r90": 0.048,
+      "r25": 0.041,
+      "r50": 0.046,
+      "r90": 0.051,
       "outer": 0.016,
-      "q": 0.038,
-      "qInner": 0.041,
-      "pa": 3.786
+      "q": 0.037,
+      "qInner": 0.044,
+      "paA": 1.265,
+      "paEps0": 0.042,
+      "byPreset": {
+        "Grand design": {
+          "q": 0.038,
+          "qInner": 0.033,
+          "paEps0": 0.045
+        },
+        "Barred spiral": {
+          "q": 0.034,
+          "qInner": 0.031,
+          "paEps0": 0.037
+        },
+        "Flocculent": {
+          "q": 0.032,
+          "qInner": 0.045,
+          "paEps0": 0.034
+        },
+        "Tightly wound": {
+          "q": 0.047,
+          "qInner": 0.054,
+          "paEps0": 0.054
+        },
+        "Ringed": {
+          "q": 0.035,
+          "qInner": 0.046,
+          "paEps0": 0.038
+        },
+        "Disc, no arms": {
+          "q": 0.04,
+          "qInner": 0.036,
+          "paEps0": 0.051
+        },
+        "Edge-on with dust": {
+          "q": 0.03,
+          "qInner": 0.062,
+          "paEps0": 0.034
+        }
+      }
     },
     "smooth": {
       "counts": 0.03,
       "countsSmall": 0.1,
       "poisson": 3,
       "poissonBelow": 2000,
-      "paBelowQ": 0.8,
       "ink": 0.05,
       "ssimCoarse": 0.91,
       "median": 0.1,
@@ -53,14 +89,36 @@
       "outer": 0.019,
       "q": 0.057,
       "qInner": 0.039,
-      "pa": 4.54
+      "paA": 1.374,
+      "paEps0": 0.061,
+      "byPreset": {
+        "Smooth, round": {
+          "q": 0.067,
+          "qInner": 0.032,
+          "paEps0": 0.068
+        },
+        "Cigar-shaped": {
+          "q": 0.047,
+          "qInner": 0.039,
+          "paEps0": 0.061
+        },
+        "Radio jet": {
+          "q": 0.041,
+          "qInner": 0.044,
+          "paEps0": 0.043
+        },
+        "Shell galaxy": {
+          "q": 0.042,
+          "qInner": 0.049,
+          "paEps0": 0.047
+        }
+      }
     },
     "merger": {
       "counts": 0.03,
       "countsSmall": 0.1,
       "poisson": 3,
       "poissonBelow": 2000,
-      "paBelowQ": 0.8,
       "ink": 0.05,
       "ssimCoarse": 0.85,
       "median": 0.1,
@@ -71,7 +129,8 @@
       "outer": 0.03,
       "q": 0.05,
       "qInner": 0.05,
-      "pa": 10,
+      "paA": 2,
+      "paEps0": 0.05,
       "provisional": true
     },
     "lens": {
@@ -79,7 +138,6 @@
       "countsSmall": 0.1,
       "poisson": 3,
       "poissonBelow": 2000,
-      "paBelowQ": 0.8,
       "ink": 0.05,
       "ssimCoarse": 0.85,
       "median": 0.1,
@@ -90,7 +148,8 @@
       "outer": 0.03,
       "q": 0.05,
       "qInner": 0.05,
-      "pa": 10,
+      "paA": 2,
+      "paEps0": 0.05,
       "provisional": true
     },
     "star": {
@@ -98,7 +157,6 @@
       "countsSmall": 0.1,
       "poisson": 3,
       "poissonBelow": 2000,
-      "paBelowQ": 0.8,
       "ink": 0.05,
       "ssimCoarse": 0.85,
       "median": 0.1,
@@ -109,7 +167,8 @@
       "outer": 0.03,
       "q": 0.05,
       "qInner": 0.05,
-      "pa": 10,
+      "paA": 2,
+      "paEps0": 0.05,
       "provisional": true
     },
     "artefact": {
@@ -117,7 +176,6 @@
       "countsSmall": 0.1,
       "poisson": 3,
       "poissonBelow": 2000,
-      "paBelowQ": 0.8,
       "ink": 0.05,
       "ssimCoarse": 0.85,
       "median": 0.1,
@@ -128,44 +186,9 @@
       "outer": 0.03,
       "q": 0.05,
       "qInner": 0.05,
-      "pa": 10,
+      "paA": 2,
+      "paEps0": 0.05,
       "provisional": true
-    },
-    "spiral@zoom": {
-      "counts": 0.03,
-      "countsSmall": 0.1,
-      "poisson": 3,
-      "poissonBelow": 2000,
-      "paBelowQ": 0.8,
-      "ink": 0.05,
-      "ssimCoarse": 0.85,
-      "median": 0.1,
-      "p90": 0.1,
-      "r25": 0.059,
-      "r50": 0.043,
-      "r90": 0.027,
-      "outer": 0.017,
-      "q": 0.042,
-      "qInner": 0.052,
-      "pa": 3.575
-    },
-    "smooth@zoom": {
-      "counts": 0.03,
-      "countsSmall": 0.1,
-      "poisson": 3,
-      "poissonBelow": 2000,
-      "paBelowQ": 0.8,
-      "ink": 0.05,
-      "ssimCoarse": 0.9,
-      "median": 0.1,
-      "p90": 0.1,
-      "r25": 0.035,
-      "r50": 0.033,
-      "r90": 0.073,
-      "outer": 0.021,
-      "q": 0.045,
-      "qInner": 0.035,
-      "pa": 3.115
     }
   }
 }

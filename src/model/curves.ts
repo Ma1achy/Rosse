@@ -226,7 +226,8 @@ export function curves(
       ],
       w: w * 0.8,
       k: pick(P.dust > 0.3 ? 'faint' : P.stroke, at(CurveIndex.edgeOn)),
-      a: edgeOnAlpha(P.lines, incl),
+      // the alpha is the view tier's (ribUniform): the model holds no continuous inclination
+      a: 1,
       taper: false,
       stretch: true,
       edgeAlpha: true,

@@ -39,7 +39,11 @@ export function smWarp(
   const s0 = f(WOBBLE_SCALE);
   const xs = f(x * s0);
   const ys = f(y * s0);
-  const nx = f(vnoise(f(xs + f(3.1)), f(ys + f(7.7)), WOBBLE_KEY, NoiseSalt.wobbleX, field) - f(0.5));
-  const ny = f(vnoise(f(xs + f(11.3)), f(ys - f(2.9)), WOBBLE_KEY, NoiseSalt.wobbleY, field) - f(0.5));
+  const nx = f(
+    vnoise(f(xs + f(3.1)), f(ys + f(7.7)), WOBBLE_KEY, NoiseSalt.wobbleX, field) - f(0.5),
+  );
+  const ny = f(
+    vnoise(f(xs + f(11.3)), f(ys - f(2.9)), WOBBLE_KEY, NoiseSalt.wobbleY, field) - f(0.5),
+  );
   return [f(x + f(d0 * nx)), f(y + f(d0 * ny))];
 }

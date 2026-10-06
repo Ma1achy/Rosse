@@ -10,12 +10,12 @@
  *
  * Tiers (ADR 0010): a change marks its tier and every tier below it dirty.
  * - `view`: the camera (`incl`, `az`, `pa`, `winding`) and the merger timeline `mTime`. An `incl`
- *   change that crosses one of the reference's `incE()` thresholds also dirties the model; see
- *   `inclBucket`.
+ *   change that changes a discrete switch of structure also dirties the model; see
+ *   `structureKey` in src/view/camera.ts (ADR 0017).
  * - `present`: the plates mode.
  * - `model`: everything else.
  */
-import { inclBucket } from '../view/camera';
+import { structureKey } from '../view/camera';
 import { DEF, PARAM_KEYS, type ParamKey, type Params } from './params';
 
 export type Tier = 'model' | 'view' | 'present';
@@ -216,11 +216,11 @@ export function tierOf(key: ParamKey): Tier {
   return SCHEMA[key].tier;
 }
 
-export const RANK: Record<Tier, number> = { model: 0, view: 1, present: 2 };
+const RANK: Record<Tier, number> = { model: 0, view: 1, present: 2 };
 
 // incE and its buckets live with the camera (src/view/camera.ts); re-exported for the schema's
 // users. camera.ts imports only types from core, so there is no cycle at run time.
-export { INCL_THRESHOLDS, incE, inclBucket } from '../view/camera';
+export { incE, inclBucket } from '../view/camera';
 
 /**
  * The highest tier that must be rebuilt when going from `a` to `b` (null when nothing changed).
@@ -231,7 +231,8 @@ export function dirtyTier(a: Params, b: Params): Tier | null {
   for (const k of PARAM_KEYS) {
     if (a[k] === b[k]) continue;
     let t = tierOf(k);
-    if (k === 'incl' && inclBucket(a.incl) !== inclBucket(b.incl)) t = 'model';
+    // a switch of structure on the inclination (incE thresholds, L1000's cos i): the model
+    if (k === 'incl' && structureKey(a) !== structureKey(b)) t = 'model';
     if (best === null || RANK[t] < RANK[best]) best = t;
   }
   return best;

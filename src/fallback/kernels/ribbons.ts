@@ -273,12 +273,7 @@ export function placePiece(
   const ny = f(tx / tl);
   const tap = taper ? f(f(1.1) - f(f(f(0.45) * sPos) / tot)) : 1;
   const off = f(f(f(pcy - f(H / 2)) * kpx) * tap);
-  const [px, py] = smWarp(
-    f(x + f(nx * off)),
-    f(y + f(ny * off)),
-    rib.wobble ?? 0,
-    M.R.noise,
-  );
+  const [px, py] = smWarp(f(x + f(nx * off)), f(y + f(ny * off)), rib.wobble ?? 0, M.R.noise);
   const size = f(f(pcs * kpx) * tap);
   const cs = tl0 === 0 ? 1 : f(tx / tl);
   const sn = tl0 === 0 ? 0 : f(ty / tl);

@@ -11,7 +11,7 @@ import { hasDustCulls } from '../../src/model/ribbons';
 import { buildScene } from '../../src/model/scene';
 import type { DrawingsMeta } from '../../src/model/variation';
 import { TierState, tierWork } from '../../src/render/tiers';
-import { inclBucket } from '../../src/view/camera';
+import { structureKey } from '../../src/view/camera';
 
 /**
  * ADR 0010: the schema's tier tags drive invalidation, and they are true. A camera move inside
@@ -63,12 +63,30 @@ function moves(P: Params): { what: string; P: Params; zoom: number }[] {
     { what: 'mTime 0.7', P: { ...P, mTime: 0.7 }, zoom: 1 },
   ];
   for (const d of [-9, -3.15, 2.7, 9, 180 - 2 * P.incl])
-    if (inclBucket(P.incl + d) === inclBucket(P.incl) && P.incl + d >= 0 && P.incl + d <= 180)
+    if (
+      structureKey({ ...P, incl: P.incl + d }) === structureKey(P) &&
+      P.incl + d >= 0 &&
+      P.incl + d <= 180
+    )
       list.push({ what: `incl ${String(P.incl + d)}`, P: { ...P, incl: P.incl + d }, zoom: 1 });
   return list;
 }
 
 describe('tier invalidation (ADR 0010)', () => {
+  it('present parameters (plates) leave the scene description unchanged', () => {
+    for (const name of ['Grand design', 'Disc, no arms', 'Smooth, round']) {
+      const P = presetParams(name, 7);
+      expect(tierOf('plates')).toBe('present');
+      const h0 = sceneHash(P);
+      for (const plates of ['ink', 'slip', 'colour'])
+        expect(sceneHash({ ...P, plates }), `${name}: plates ${plates}`).toBe(h0);
+      expect(tierWork({ P, zoom: 1 }, { P: { ...P, plates: 'colour' }, zoom: 1 })).toEqual({
+        model: false,
+        view: false,
+      });
+    }
+  });
+
   it('follows the schema: model, view (camera, mTime, zoom), present', () => {
     const P = presetParams('Grand design', 7);
     for (const k of PARAM_KEYS) {
@@ -162,7 +180,7 @@ describe('the CPU engine: orbiting changes no model buffer (hashes)', () => {
       }
       expect(eng.tiers.runs.model).toBe(1);
       // across a bucket: the model is rebuilt, once
-      const across = { ...P, incl: inclBucket(P.incl) === inclBucket(75) ? 30 : 75 };
+      const across = { ...P, incl: structureKey({ ...P, incl: 75 }) === structureKey(P) ? 30 : 75 };
       expect(eng.frame(across, 1).work).toEqual({ model: true, view: true });
       expect(eng.frame({ ...across, az: 3 }, 1).work).toEqual({ model: false, view: true });
       expect(eng.tiers.runs.model).toBe(2);

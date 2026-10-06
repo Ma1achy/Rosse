@@ -20,7 +20,7 @@ import { markGroups } from '../../src/model/clumps';
 import { buildScene, drawingsMeta } from '../../src/model/scene';
 import { atlasFromBytes, type BuiltIndex } from '../../src/marks/atlas';
 import type { VectorSheet } from '../../src/marks/vector';
-import { cameraOf, incE, project, viewDesc } from '../../src/view/camera';
+import { cameraOf, incE, project, structureKey, viewDesc } from '../../src/view/camera';
 import { v21Variation } from '../golden/compare/v21';
 import { v21CurvePicks, v21Lines } from '../golden/compare/v21-curves';
 import { v21NoiseTables } from '../golden/compare/v21-noise';
@@ -220,6 +220,37 @@ describe('the ribbon kernels (CPU)', () => {
       expect(rv.nPieces).toBe(base);
       expect(rv.nPieces).toBeLessThanOrEqual(R.pieceCap);
     }
+  });
+
+  it('the line-work is model-tier data keyed by the structure signature only (ADR 0017)', () => {
+    // inclinations with the same structureKey give identical buffers; the thresholds the
+    // line-work reads (incE > 72, > 74, <= 74, > 80: L201, L207, L950, L960, L965, L788) are
+    // all structure predicates
+    const bytes = (b: ArrayBuffer | ArrayBufferView) =>
+      Buffer.from(b instanceof ArrayBuffer ? b : b.buffer).toString('base64');
+    const sig = (incl: number) => {
+      const P = presetParams('Edge-on with dust', 7, { incl, dustLines: 0.6, ring: 0.3 });
+      const R = buildScene(P, M).ribbons;
+      return [bytes(R.points3), bytes(R.curveBuf), bytes(R.hatchBuf), bytes(R.carve)].join('|');
+    };
+    const pairs: [number, number][] = [
+      [81, 99],
+      [85, 89.5],
+      [75, 77.5],
+      [73, 73.9],
+      [20, 60],
+      [120, 160],
+    ];
+    for (const [a, b] of pairs) {
+      const same =
+        structureKey({ incl: a, kind: 'auto', bulge: 0.3, bulgeFlat: 0.8 }) ===
+        structureKey({ incl: b, kind: 'auto', bulge: 0.3, bulgeFlat: 0.8 });
+      expect(same, `${String(a)} ${String(b)}`).toBe(true);
+      expect(sig(a), `${String(a)} ${String(b)}`).toBe(sig(b));
+    }
+    // and across a threshold the structure changes
+    expect(sig(73)).not.toBe(sig(75));
+    expect(sig(79)).not.toBe(sig(81));
   });
 
   it('the edge-on stroke takes its alpha from the raw inclination (v21 parity, L788)', () => {

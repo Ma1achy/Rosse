@@ -4,16 +4,20 @@
   "hashes": {
     "cigar-shaped--stipple__s4242__home": "4adefb4f6c47007dcd7611de1631aff4dc28068eddeb9a549eaa0be93966bdd0",
     "cigar-shaped--stipple__s4242__orbit": "5b228aeb825431ec7d0aefef7dd0ab126b843433a431fb4dc7da599c28c2c716",
+    "cigar-shaped--stipple__s4242__zoom": "e59ed8aaf867bbfa018e49eae0d1024189ea93c5eab755b34e126219291fb045",
     "cigar-shaped--stipple__s7__home": "ffdf5db43ce52c08deb68f3afff2da1b73ab7fe7ba23ad8e44f801e52ff5cbfe",
     "cigar-shaped--stipple__s7__orbit": "c4bf15aacc7da3e11dea2003d70f767052af2eda85f353b5af7fa6153cc79e46",
+    "cigar-shaped--stipple__s7__zoom": "afc4d7a88bb1fe3b02c5763f46ad9e601a2ed8f6f1b54e2267d0e4791e010dd6",
     "disc-no-arms--stipple__s11__home": "433d5fa439aab44d2ecf9f967a043752a359e89b9a4ba7e8b387f7c8dfba726f",
     "disc-no-arms--stipple__s11__orbit": "0f471a78c02f2ccd3bfd78b7ccfc20453712119a09a09924e2f7b7b46e73ad7b",
     "disc-no-arms--stipple__s3__home": "277e1d4e0356f3aacd811e8e81ec358768b549c0d6d1fa77e1185cf59e47b626",
     "disc-no-arms--stipple__s3__orbit": "b5f892768585bb1c1c1d92e06a6a6859f15f3dd621640c401486a2a1c439a93d",
     "disc-no-arms--stipple__s4242__home": "7871e6f47567aade282e49aa5ac012441304934309b0be9de7c26b5f0b8eb34a",
     "disc-no-arms--stipple__s4242__orbit": "9d62f0690c4f4636aa7588237a8a94b80626bdd7e2a29cfe66b842e8e930c936",
+    "disc-no-arms--stipple__s4242__zoom": "2c5f88a65817fb817306b4a6102c7696c7b6129f40fe55d13bd25b92ff500f65",
     "disc-no-arms--stipple__s7__home": "98fbb5ea3894589292eb1f82bbe6c3074ec7dc13954905310e9f950fd9f72935",
     "disc-no-arms--stipple__s7__orbit": "12d2d282d876fcc9e2f3e5706a7fcce2fdd9f49241e376b1fea48dcc643d9aab",
+    "disc-no-arms--stipple__s7__zoom": "3979ce9eafa82cb1c2c9fc12b45d86a49dd3d6359386697fae5c97bf147fe86e",
     "grand-design--stipple-arms__s4242__home": "27be8ee0e795887a09fa54cd034de2a0c141144dbd985d1c5d427ea38e28eaba",
     "grand-design--stipple-arms__s4242__orbit": "8f7fa640177d35db4ec859683719c94e0f612af533ca6369abe2861066e31ace",
     "grand-design--stipple-arms__s7__home": "4e7f4e72b877d0fcd552baade68464cb4cd72154f9beee6eab997aa317681d98",
@@ -28,7 +32,9 @@
     "smooth-round--stipple__s3__orbit": "17725b1ea5f98c2c791798e70246baa2bba5aca09157f2c64c15eb0e86c95d9e",
     "smooth-round--stipple__s4242__home": "4866b5d706a46b70cce7cf9d79641eb081d4c490247dfc9c9257b90e09e095d4",
     "smooth-round--stipple__s4242__orbit": "89f3dd16106e358beafce1f071eea57cb6b62caf7a8bf940bf155c698fdb8f7d",
+    "smooth-round--stipple__s4242__zoom": "1e312c5b7ce0ba7a50d073b17a4b71e0a3442d13f6f0a2be29b4980b5cc36f6e",
     "smooth-round--stipple__s7__home": "dd257eb47cdda2f3831f72e571f238dfc5ecc4f6f1a7ef830768aea65ab3defc",
-    "smooth-round--stipple__s7__orbit": "e4123776fc631389e9a9552b42c8e594b5b07a97402589069c7e4b230335f060"
+    "smooth-round--stipple__s7__orbit": "e4123776fc631389e9a9552b42c8e594b5b07a97402589069c7e4b230335f060",
+    "smooth-round--stipple__s7__zoom": "3355d7c9f23e0771c36813fab9dce8a706b8e03a0a5b64e9c14564c939bf126b"
   }
 }

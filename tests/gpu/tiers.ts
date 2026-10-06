@@ -22,7 +22,7 @@ import type { DrawingsMeta } from '../../src/model/variation';
 import { GpuRenderer } from '../../src/render/frame';
 import type { InkLayer } from '../../src/render/layers';
 import { GpuStipple } from '../../src/render/stipple';
-import { cameraOf, inclBucket } from '../../src/view/camera';
+import { cameraOf, structureKey } from '../../src/view/camera';
 import { adapterName, device, run } from './harness';
 
 const STIPPLE_ONLY = { lines: 0, knots: 0, envelope: 0, starMix: 0, field: 0, fgstars: 0 };
@@ -42,10 +42,15 @@ function moves(P: Params): { what: string; P: Params; zoom: number }[] {
     { what: 'winding', P: { ...P, winding: -P.winding }, zoom: 1 },
     { what: 'zoom 2', P, zoom: 2 },
     { what: 'zoom 12', P, zoom: 12 },
+    { what: 'zoom 0.15', P, zoom: 0.15 },
     { what: 'mTime', P: { ...P, mTime: 0.7 }, zoom: 1 },
   ];
   for (const d of [-3.15, 2.7, 180 - 2 * P.incl])
-    if (inclBucket(P.incl + d) === inclBucket(P.incl) && P.incl + d >= 0 && P.incl + d <= 180)
+    if (
+      structureKey({ ...P, incl: P.incl + d }) === structureKey(P) &&
+      P.incl + d >= 0 &&
+      P.incl + d <= 180
+    )
       list.push({
         what: `incl ${(P.incl + d).toFixed(2)}`,
         P: { ...P, incl: P.incl + d },
@@ -117,7 +122,17 @@ run('tiers: orbiting changes no model buffer (GPU), and the orbit frame cost', a
     const st = GpuStipple.create(dev);
     await frame(st, P, 1);
     const buf = st.samplesBuffer;
-    const h0 = await sha(await st.readSamples());
+    /** every model-tier buffer, hashed */
+    const modelHash = async () => {
+      const m = await st.readModel();
+      const parts = await Promise.all(
+        (['galaxy', 'shape', 'pool', 'dotBase', 'samples'] as const).map(
+          async (k) => `${k} ${await sha(m[k])}`,
+        ),
+      );
+      return parts.join(', ');
+    };
+    const h0 = await modelHash();
     const pos0 = await sha((await st.readProjected()).instances);
     const n0 = Array.from((await st.readCounts()).perClass);
     const bad: string[] = [];
@@ -127,8 +142,8 @@ run('tiers: orbiting changes no model buffer (GPU), and the orbit frame cost', a
       const { work } = await frame(st, m.P, m.zoom);
       if (work.model || !work.view) bad.push(`${m.what}: ran ${JSON.stringify(work)}`);
       if (st.samplesBuffer !== buf) bad.push(`${m.what}: a new sample buffer`);
-      const h = await sha(await st.readSamples());
-      if (h !== h0) bad.push(`${m.what}: samples hash ${h} ≠ ${h0}`);
+      const h = await modelHash();
+      if (h !== h0) bad.push(`${m.what}: model buffers ${h} ≠ ${h0}`);
       const pos = await sha((await st.readProjected()).instances);
       if (pos !== pos0) moved++;
       else if (m.what !== 'mTime') bad.push(`${m.what}: the marks did not move`);
@@ -139,7 +154,7 @@ run('tiers: orbiting changes no model buffer (GPU), and the orbit frame cost', a
     }
     if (st.tiers.runs.model !== 1) bad.push(`model ran ${String(st.tiers.runs.model)} times`);
     // across a bucket
-    const across = { ...P, incl: inclBucket(P.incl) === inclBucket(75) ? 30 : 75 };
+    const across = { ...P, incl: structureKey({ ...P, incl: 75 }) === structureKey(P) ? 30 : 75 };
     const a1 = (await frame(st, across, 1)).work;
     const a2 = (await frame(st, { ...across, az: 3 }, 1)).work;
     if (!a1.model || a2.model || st.tiers.runs.model !== 2)
@@ -169,7 +184,7 @@ run('tiers: orbiting changes no model buffer (GPU), and the orbit frame cost', a
     const ok = bad.length === 0;
     if (!ok) pass = false;
     lines.push(
-      `${ok ? 'ok  ' : 'FAIL'} ${name}: ${String(ms.length)} camera moves in one bucket, samples ${h0} unchanged, marks moved in ${String(moved)}; ` +
+      `${ok ? 'ok  ' : 'FAIL'} ${name}: ${String(ms.length)} camera moves with one structure, model buffers unchanged (${h0}), marks moved in ${String(moved)}; ` +
         `orbit frame ${median(orbit).toFixed(1)} ms (compute ${median(orbitCompute).toFixed(1)}), parameter change ${median(param).toFixed(1)} ms (compute ${median(paramCompute).toFixed(1)}), ink ${median(ink).toFixed(1)} ms (medians of 15, SwiftShader)`,
     );
     for (const b of bad) lines.push(`      ${b}`);
