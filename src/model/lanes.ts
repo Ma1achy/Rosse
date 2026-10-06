@@ -59,33 +59,100 @@ export const DustIndex = {
   arms: 4000,
   /** carving line li: `lines + li` */
   lines: 900,
-  /** hatch h's drawing: `tiles + h` */
+  /**
+   * Retired (M4 review): hatch h's drawing was `tiles + h`, so a change of `dustScribble` or `ring`
+   * re-rolled every later hatch's pen line. Each hatch now draws its pen line from its own step's
+   * stream, after its other numbers. Never reuse.
+   */
   tiles: 100000,
 } as const;
+
+/**
+ * The lanes' discrete random choices, given rather than drawn (ADR 0018): the golden runner passes
+ * v21's own (tests/golden/compare/v21-curves.ts `v21DustPicks`), as it does the strokes, so that
+ * the comparison's hatches and carving lines are v21's and only the dots differ.
+ */
+export interface DustPicks {
+  /**
+   * The numbers of v21's lane stream (`mulberry32(seed·733 + 29)`), in the order dustLanes uses
+   * them: each uniform as drawn, each Gaussian as `gauss(r)` returned it. The engine's loops draw
+   * in v21's order (row, ring, arm steps; offset, angle, length, feather), so they line up.
+   */
+  lane: number[];
+  /** each hatch's pen line, in the order the hatches are made (v21's `rrL`) */
+  tiles: number[];
+  /** each carving line's pen line (v21's `rd`) */
+  lines: number[];
+}
+
+/** The random numbers of one lane step. */
+interface StepDraws {
+  f32(): number;
+  gauss(): number;
+}
+
+/** A given sequence of numbers (`DustPicks.lane`), drawn in order whatever the step. */
+class Sequence implements StepDraws {
+  private i = 0;
+  constructor(private readonly xs: readonly number[]) {}
+  private next(): number {
+    const x = this.xs[this.i++];
+    if (x === undefined) throw new Error('dust picks: the lane sequence ran out');
+    return x;
+  }
+  f32(): number {
+    return this.next();
+  }
+  gauss(): number {
+    return this.next();
+  }
+}
 
 /** The hatching's pen scale (app23.js:L1048). */
 export const HATCH_PEN = 0.38;
 /** The hatching's flattening (app23.js:L1048). */
 export const HATCH_FLAT = 0.28;
 
+/**
+ * `key`: the key of the lanes' draws, the placement key (the seed by default), so that a re-draw
+ * (ADR 0013, 0018) re-draws the hatches' offsets, angles, lengths and pen lines with the dots,
+ * and keeps which hatches the noise lays down. `picks`: v21's choices instead (ADR 0018).
+ */
 export function dustLanes(
   P: Params,
   V: Variation,
   penlines: VectorSheet | undefined,
   incl: number,
   field?: NoiseField | null,
+  key: number = P.seed,
+  picks?: DustPicks,
 ): DustLanes {
   const hatches: Hatch[] = [];
   const pts: Vec3[] = [];
   const e = incE(incl);
+  const seq = picks ? new Sequence(picks.lane) : null;
+  const step = (index: number): StepDraws => seq ?? new Draws(key >>> 0, Stream.dust, index);
+  // each hatch's pen line (app23.js:L1048): v21's, or drawn from the step's own stream after its
+  // other numbers, so that a hatch's drawing does not depend on how many hatches came before it
+  const nPen = penlines?.n ?? 0;
+  let made = 0;
+  const pen = (r: StepDraws): number => {
+    if (!nPen) return 0;
+    if (picks) {
+      const t = picks.tiles[made++];
+      if (t === undefined) throw new Error('dust picks: fewer pen lines than hatches');
+      return Math.min(nPen - 1, t);
+    }
+    return Math.min(nPen - 1, Math.floor(r.f32() * nPen));
+  };
   if ((P.dustScribble > 0.02 || P.ring > 0.1) && P.bulge < 0.9 && !P.merger && !P.irr) {
     const keep = 0.3 + 0.55 * Math.max(P.dustScribble, P.ring > 0.1 ? 0.5 : 0);
     if (e > 74) {
       // the edge-on midplane: three rows of hatches, thickest at the centre
       for (let row = 0; row < 3; row++) {
         const zo = (row - 1) * 0.022;
-        let step = 0;
-        for (let x = -2.8; x <= 2.8; x += 0.055, step++) {
+        let s = 0;
+        for (let x = -2.8; x <= 2.8; x += 0.055, s++) {
           const dens = Math.exp(-Math.abs(x) / 1.5);
           const n = vnoise(
             x * 1.9 + frac(P.seed * 0.1),
@@ -96,25 +163,20 @@ export function dustLanes(
           );
           const a: Vec3 = [x, 0, zo];
           if (row === 1) pts.push(a);
-          const r = new Draws(P.seed, Stream.dust, DustIndex.edge + 1000 * row + step);
-          if (n > keep * (0.4 + 0.8 * dens) || r.f32() > 0.85) continue;
-          hatches.push({
-            a,
-            b: [x + 0.1, 0, zo],
-            offN: 0,
-            offY: r.gauss() * 1.2,
-            offF: 0,
-            dAng: r.gauss() * 0.08,
-            len: (10 + 9 * r.f32()) * (0.6 + 0.6 * dens),
-            tile: 0,
-          });
+          if (n > keep * (0.4 + 0.8 * dens)) continue;
+          const r = step(DustIndex.edge + 1000 * row + s);
+          if (r.f32() > 0.85) continue;
+          const offY = r.gauss() * 1.2;
+          const dAng = r.gauss() * 0.08;
+          const len = (10 + 9 * r.f32()) * (0.6 + 0.6 * dens);
+          hatches.push({ a, b: [x + 0.1, 0, zo], offN: 0, offY, offF: 0, dAng, len, tile: pen(r) });
         }
       }
     }
     if (P.ring > 0.1 && e <= 74) {
       // a hatched dust lane just inside the ring
-      let step = 0;
-      for (let tr0 = 0; tr0 < 6.2832; tr0 += 0.07, step++) {
+      let s = 0;
+      for (let tr0 = 0; tr0 < 6.2832; tr0 += 0.07, s++) {
         const Rr = P.ringR * 0.9;
         const nr = vnoise(
           Math.cos(tr0) * 2.6 + 11,
@@ -126,16 +188,18 @@ export function dustLanes(
         if (nr > keep * 1.05) continue;
         const a: Vec3 = [Rr * Math.cos(tr0), Rr * Math.sin(tr0), 0];
         pts.push(a);
-        const r = new Draws(P.seed, Stream.dust, DustIndex.ring + step);
+        const r = step(DustIndex.ring + s);
+        const dAng = r.gauss() * 0.08;
+        const len = 9 + 8 * r.f32();
         hatches.push({
           a,
           b: [Rr * Math.cos(tr0 + 0.05), Rr * Math.sin(tr0 + 0.05), 0],
           offN: 0,
           offY: 0,
           offF: 0,
-          dAng: r.gauss() * 0.08,
-          len: 9 + 8 * r.f32(),
-          tile: 0,
+          dAng,
+          len,
+          tile: pen(r),
         });
       }
     }
@@ -147,8 +211,8 @@ export function dustLanes(
         const va = V.arms[k % V.arms.length];
         const Rend = (va ? va.rmax : 2.1) * 0.95;
         const off = (2 * Math.PI * k) / P.arms;
-        let step = 0;
-        for (let R = 0.45; R <= Rend; R += 0.035 + 0.02 * R, step++) {
+        let s = 0;
+        for (let R = 0.45; R <= Rend; R += 0.035 + 0.02 * R, s++) {
           const th = armPhaseCpu(P, V, R, k) + off - (0.12 + 0.04 * Math.sin(R * 3 + k));
           const a: Vec3 = [R * Math.cos(th) + lx * R, R * Math.sin(th) + ly * R, 0];
           const R2 = R + 0.05;
@@ -163,43 +227,31 @@ export function dustLanes(
           );
           if (n > keep) continue; // dust is patchy
           pts.push(a);
-          const r = new Draws(P.seed, Stream.dust, DustIndex.arms + 1000 * k + step);
-          hatches.push({
-            a,
-            b,
-            offN: r.gauss() * 2.2,
-            offY: 0,
-            offF: 0,
-            dAng: r.gauss() * 0.07,
-            len: 9 + 9 * r.f32(),
-            tile: 0,
-          });
+          const r = step(DustIndex.arms + 1000 * k + s);
+          const offN = r.gauss() * 2.2;
+          const dAng = r.gauss() * 0.07;
+          const len = 9 + 9 * r.f32();
+          // the hatch's pen line next, before the feather's numbers, so that it does not depend
+          // on `dustScribble` either (v21's order otherwise; v21 draws pen lines on their own
+          // stream, so a replay takes nothing from the lane sequence here)
+          hatches.push({ a, b, offN, offY: 0, offF: 0, dAng, len, tile: pen(r) });
           if (r.f32() < 0.14 * P.dustScribble) {
             // a feather: a short wisp crossing outward
             const fa = (r.f32() < 0.5 ? 1 : -1) * (1.0 + 0.4 * r.f32());
             const fl = 8 + 8 * r.f32();
-            hatches.push({ a, b, offN: 0, offY: 0, offF: fl * 0.45, dAng: fa, len: fl, tile: 0 });
+            const tile = pen(r);
+            hatches.push({ a, b, offN: 0, offY: 0, offF: fl * 0.45, dAng: fa, len: fl, tile });
           }
         }
       }
     }
   }
-  // each hatch: one of the pen lines, picked on its own index (app23.js:L1048)
-  const nPen = penlines?.n ?? 0;
-  hatches.forEach((h, i) => {
-    h.tile = nPen
-      ? Math.min(
-          nPen - 1,
-          Math.floor(new Draws(P.seed, Stream.dust, DustIndex.tiles + i).f32() * nPen),
-        )
-      : 0;
-  });
   if (!nPen) hatches.length = 0;
   return {
     hatches,
     pts,
     laneR: 3.5 + 3 * P.dustScribble,
-    lines: dustLines(P, V, penlines, incl),
+    lines: dustLines(P, V, penlines, incl, key, picks?.lines),
   };
 }
 
@@ -213,14 +265,20 @@ export function dustLines(
   V: Variation,
   penlines: VectorSheet | undefined,
   incl: number,
+  key: number = P.seed,
+  picks?: readonly number[],
 ): Vec3[][] {
   const out: Vec3[][] = [];
   if (!(P.dustLines > 0.02 && P.bulge < 0.95) || !penlines?.n) return out;
   const edge = incE(incl) > 72;
   const lanes = edge ? 1 : Math.min(3, P.arms);
   for (let li = 0; li < lanes; li++) {
-    const r = new Draws(P.seed, Stream.dust, DustIndex.lines + li);
-    const pi = Math.min(penlines.n - 1, Math.floor(r.f32() * penlines.n));
+    // the pen line: v21's (`picks`), or drawn on the placement key, so that re-draws vary it
+    const pi = Math.min(
+      penlines.n - 1,
+      picks?.[li] ??
+        Math.floor(new Draws(key >>> 0, Stream.dust, DustIndex.lines + li).f32() * penlines.n),
+    );
     const rec = penlines.vec[pi];
     const fl = rec ? longestLine(rec) : null;
     if (!fl) continue;

@@ -46,6 +46,8 @@ const BASE: [string, Params][] = [
   ['Dusty spiral s7 (carving lines)', presetParams('Dusty spiral', 7, M4)],
   ['Hand wobble s7 (the wobble)', presetParams('Hand wobble', 7, M4)],
   ['Edge-on with dust s7 (midplane stroke and hatching)', presetParams('Edge-on with dust', 7)],
+  // no stipple samples at all: the line-work must still be drawn (QA D1, minimum binding sizes)
+  ['Grand design s7, no stipple', presetParams('Grand design', 7, { ...M4, stipple: 0, vary: 0 })],
   [
     'every curve: outline, tail, ribbon ring and bar, carving lines',
     presetParams('Grand design', 99, {

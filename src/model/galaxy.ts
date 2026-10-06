@@ -10,7 +10,7 @@
 import type { Params } from '../core/params';
 import type { StructLayout } from '../marks/instance';
 import { dotSprite, penWeights, type DrawingsMeta, type Variation } from './variation';
-import { GROUP_STRIDE, markGroups, type MarkGroup } from './clumps';
+import { GROUP_STRIDE, markGroups, type MarkGroup, type RingKnotPick } from './clumps';
 import { packNoise, type NoiseField } from '../core/noise';
 
 const f = Math.fround;
@@ -167,7 +167,17 @@ export function proposalCount(P: Params): number {
   return Math.round(P.stars * P.stipple * (1 + 0.28 * (P.starMix || 0)));
 }
 
-export function describeGalaxy(P: Params, V: Variation, meta: DrawingsMeta): GalaxyDesc {
+/**
+ * `opts.key`: the placement key (the seed by default), which keys the stipple's sampling and the
+ * groups' own draws; `opts.ringKnots`: v21's ring-knot clusters (ADR 0018).
+ */
+export function describeGalaxy(
+  P: Params,
+  V: Variation,
+  meta: DrawingsMeta,
+  opts: { key?: number; ringKnots?: readonly RingKnotPick[] } = {},
+): GalaxyDesc {
+  const key = (opts.key ?? P.seed) >>> 0;
   const wb = P.bulge;
   const wh = P.halo * 0.25;
   const wbar = P.bar * 0.4 * (1 - P.bulge);
@@ -190,7 +200,7 @@ export function describeGalaxy(P: Params, V: Variation, meta: DrawingsMeta): Gal
     n_knot_pool: KNOT_POOL,
     n_star_tiles: meta.stars.count,
     flags: (armsOn ? GalaxyFlag.armsOn : 0) | (sersic ? GalaxyFlag.sersic : 0),
-    key: P.seed >>> 0,
+    key,
     n_groups: 0,
     c_bulge: f(wb),
     c_halo: f(wb + wh),
@@ -225,7 +235,7 @@ export function describeGalaxy(P: Params, V: Variation, meta: DrawingsMeta): Gal
     rmax: f(RMAX),
     n_extra: 0,
   };
-  const groupList = markGroups(P, V);
+  const groupList = markGroups(P, V, key, opts.ringKnots);
   const packed = packGroups(groupList);
   g.n_groups = groupList.length;
   g.n_extra = packed.total;

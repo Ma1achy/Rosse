@@ -16,8 +16,10 @@ import {
   ssim,
   strokeWidths,
   totalInk,
+  type Comparison,
   type Grey,
 } from '../../tests/golden/compare/metrics';
+import { meanComparison, meanCounts } from '../../tests/golden/compare/node';
 import {
   countAllowance,
   evaluate,
@@ -185,6 +187,10 @@ describe('golden metric (ADR 0013)', () => {
     expect(evaluate(c, { stars: 0 }, { stars: 1 }, t, new Set(['stars'])).pass).toBe(false);
     expect(countAllowance(0, 3, t)).toBeCloseTo(3 * Math.sqrt(3), 6);
     expect(countAllowance(0, 3, t, true)).toBe(0);
+    // ring knots and clumps make knots whatever `knots` says
+    expect([...impossibleClasses({ knots: 0, sparkle: 0.02, starMix: 0 }, true)]).toEqual([
+      'rstars',
+    ]);
     expect([...impossibleClasses({ knots: 0, sparkle: 0.02, starMix: 0 })].sort()).toEqual([
       'knots',
       'rstars',
@@ -236,5 +242,49 @@ describe('band means', () => {
       Math.abs(bandMean(make(0.49), 0.4, 0.6) / bandMean(make(0.51), 0.4, 0.6) - 1),
     ).toBeLessThan(0.03);
     expect(bandMean([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 0.4, 0.6)).toBe(5.5);
+  });
+});
+
+describe('the mean of K draws (ADR 0018)', () => {
+  const base = (over: Partial<Comparison>): Comparison => ({
+    inkRel: 0,
+    ssim: 0.5,
+    ssimCoarse: 0.9,
+    medianRel: 0,
+    p90Rel: 0,
+    r25Rel: 0,
+    r50Rel: 0,
+    r90Rel: 0,
+    outerDiff: 0,
+    qDiff: 0,
+    qInnerDiff: 0,
+    paDiff: 0,
+    ref: { ink: 1, median: 2, p90: 3, r50: 50, r90: 90, q: 0.5, pa: 10 },
+    render: { ink: 1, median: 2, p90: 3, r50: 50, r90: 90, q: 0.5, pa: 10 },
+    ...over,
+  });
+  it('averages each measure, and the position angles on the axis', () => {
+    const m = meanComparison([
+      base({ r50Rel: 0.06, ssimCoarse: 0.9, paDiff: 89 }),
+      base({ r50Rel: 0.0, ssimCoarse: 0.94, paDiff: -89 }),
+    ]);
+    expect(m.r50Rel).toBeCloseTo(0.03, 12);
+    expect(m.ssimCoarse).toBeCloseTo(0.92, 12);
+    // 89° and −89° are 2° apart on the axis: their mean is ±90°, not 0
+    expect(Math.abs(m.paDiff)).toBeCloseTo(90, 9);
+    expect(m.ref).toEqual(base({}).ref);
+  });
+  it('one draw is itself; counts are averaged per class', () => {
+    const one = base({ r50Rel: 0.07 });
+    expect(meanComparison([one])).toBe(one);
+    expect(
+      meanCounts([
+        { dots: 10, knots: 1 },
+        { dots: 14, knots: 2 },
+      ]),
+    ).toEqual({
+      dots: 12,
+      knots: 1.5,
+    });
   });
 });
