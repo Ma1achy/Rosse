@@ -32,7 +32,7 @@
     "stars": 22,
     "curves": 4,
     "used": 46,
-    "ms": 31
+    "ms": 75
   },
   "hand": [
     9,
@@ -213,5 +213,6 @@
     "shellStars": 6000
   },
   "pageErrors": [],
-  "inkPixelSha256": "a179189f1cc361c59b419817a5a03d16343c38845bd4d1d0b8285f5aa55248bd"
+  "inkPixelSha256": "a179189f1cc361c59b419817a5a03d16343c38845bd4d1d0b8285f5aa55248bd",
+  "captured": "2026-10-06T11:01:35.340Z"
 }
