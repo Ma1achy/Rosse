@@ -29,13 +29,18 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0017](adr/0017-model-tier-key-is-a-structure-signature.md) | The model tier's inclination key is a structure signature: every discrete inclination switch in v21 (the `incE` thresholds and L1000's cos i test); every other use of the inclination is a view-tier input. Clarifies 0010. |
 | [0021](adr/0021-goldens-drawn-with-v21s-part-picks.md) | _Proposed:_ the goldens draw the parts with v21's part picks, replayed from `mulberry32(seed · 57 + 3)` and checked against v21's own `parts()`; the engine's own picks are tested by their distributions. Extends 0015 item 5. |
 | [0022](adr/0022-m5-acceptance-overrides.md) | _Proposed:_ the overrides of the M5 acceptance captures (`starMix`, `field`, `fgstars`; the drawn shells for `Shell galaxy`). |
+| [0030](adr/0030-overlays-take-an-explicit-home-orientation.md) | Overlays (a foreground star, an artefact) take an explicit home orientation, the camera they are placed at, in place of v21's `homeFor`: the open question Q3, option (b). |
+| [0031](adr/0031-m7-golden-cases-and-retired-overrides.md) | M7's golden cases (stars, artefacts, layered scenes, the deep field, no overrides), and the retirement of the `starMix`, `field` and `fgstars` overrides of M2 to M5, whose captures are made again. |
+| [0032](adr/0032-stars-artefacts-and-the-sky-on-the-gpu.md) | The drawn stars are a dynamic vector set fed by the stipple's compaction; the marks of a star or an artefact are slots appended to the stipple's; the sky's catalogue is the model tier and its view is culled, drawn and bounded per view. |
+| [0033](adr/0033-v21-parity-in-the-stars-and-the-sky.md) | The loops, quirks and limits of `starSprites` and `buildSky` that are reproduced (`// v21 parity`). |
 
 ## Modules
 
 ```
 src/core/        parameters (typed DEF), schema (ranges, tiers), presets, the CPU half of the RNG
 src/model/       scene description for a galaxy: variation, component weights, arm and spur
-                 coefficients, part placement; the sky catalogue
+                 coefficients, part placement; the stars and artefacts (stars.ts), the sky
+                 catalogue (sky.ts), dynamic vector sets (dynvec.ts)
 src/view/        the camera: one rotation for project / rotFwd / rotInv / toView, perspective
 src/sim/         merger (core track, snapshots), lens (halos, solver driver), shells
 src/marks/       bitmap sheets → texture arrays; vector records → segment, dot and blob buffers;
@@ -79,7 +84,7 @@ Nothing produced on the GPU is read back on the frame path. Counts flow into ind
 These are intended changes in behaviour, each confirmed or rejected by the owner (docs/open-questions.md):
 
 1. **Orbiting keeps the marks.** In v21, orbiting with dust lanes on re-rolls the stipple (reference notes, flagged item 1). Here a camera move never changes which marks exist.
-2. **The home orientation is a parameter.** v21 remembers the camera at which lensed sources and overlays were first placed (`homeFor`), which makes a render depend on navigation history. Here it is explicit and saved.
+2. **The home orientation is a parameter.** v21 remembers the camera at which lensed sources and overlays were first placed (`homeFor`), which makes a render depend on navigation history. Here it is explicit and saved. Built for overlays in M7 (`SceneOptions.home`, ADR 0030); lensed sources follow in M9.
 3. **No mip bleed.** Each drawing has its own mip chain, so small dots no longer pick up ink from neighbouring cells.
 4. **Round pen ends.** Capsule ribbons have round caps and joins. v21's quads extend 0.9 of the width past each end and rely on MSAA. The spike measured capsules as closer to a real pen stroke (ADR 0006).
 5. **Integer-lattice value noise** replaces the `sin`-hash noise, so flocculence, patchiness and dust gaps are the same on every machine. The patterns differ from v21's, but their statistics do not.

@@ -28,6 +28,8 @@ In v21, with dust lanes on (the default), turning the camera even 0.3° re-draws
 
 ### Q3. The home orientation of lensed sources and overlays
 
+**Answered for overlays in M7 (option b, ADR 0030):** the home is `SceneOptions.home`; lensed sources follow in M9.
+
 v21 fixes them in 3D at the camera seen _the first time_ a lens or overlay key appears, so the same parameters render differently depending on navigation history.
 
 - (a) Reproduce the hidden history.

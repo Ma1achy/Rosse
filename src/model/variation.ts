@@ -37,7 +37,7 @@ export interface DrawingsMeta {
   knots: { count: number; src?: readonly string[] };
   stars: { count: number; src?: readonly string[] };
   /** the foreground stars' bitmap sheet (M7) */
-  fgstars?: { count: number };
+  fgstars?: { count: number; src?: readonly string[] };
   cores: { kind: readonly string[]; style: readonly string[]; src?: readonly string[] };
   /** the strokes sheet (M4): without it no curves are drawn */
   strokes?: StrokesMeta;

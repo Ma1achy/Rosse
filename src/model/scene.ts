@@ -251,7 +251,7 @@ export function drawingsMeta(
     dots: { meta: Record<string, unknown[]> };
     knots: { layers: number; meta?: Record<string, unknown[]> };
     stars: { layers: number; meta?: Record<string, unknown[]> };
-    fgstars?: { layers: number };
+    fgstars?: { layers: number; meta?: Record<string, unknown[]> };
     cores: { meta: Record<string, unknown[]> };
     strokes?: { meta: Record<string, unknown[]>; levels: { width: number; height: number }[] };
   },
@@ -285,7 +285,14 @@ export function drawingsMeta(
       count: atlases.stars.layers,
       ...(atlases.stars.meta?.src ? { src: atlases.stars.meta.src as string[] } : {}),
     },
-    ...(atlases.fgstars ? { fgstars: { count: atlases.fgstars.layers } } : {}),
+    ...(atlases.fgstars
+      ? {
+          fgstars: {
+            count: atlases.fgstars.layers,
+            ...(atlases.fgstars.meta?.src ? { src: atlases.fgstars.meta.src as string[] } : {}),
+          },
+        }
+      : {}),
     cores: {
       ...(atlases.cores.meta.src ? { src: atlases.cores.meta.src as string[] } : {}),
       kind: atlases.cores.meta.kind as string[],

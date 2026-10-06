@@ -20,8 +20,8 @@
  * bubbles, arcs, shells, the tail, trails, the jet and the streams, expanded on the GPU), the
  * drawn core and the nuclear spiral, with the engine's own picks.
  *
- * URL parameters: `preset`, `seed`, `variant=stipple` (the M2 golden overrides: no lines, knots,
- * envelope, drawn stars, deep field or foreground stars), `variant=ribbons` (the M4 overrides),
+ * URL parameters: `preset`, `seed`, `variant=stipple` (the M2 golden overrides: no lines, knots or
+ * envelope), `variant=ribbons` (the M4 overrides),
  * `variant=vectors` (the M5 overrides), `az`, `incl`, `pa`, `zoom`, `backend=cpu|webgpu`,
  * `present=copy`.
  */
@@ -40,7 +40,7 @@ import { GpuStipple } from './render/stipple';
 import { SURFACES, type SurfaceName } from './render/surface';
 import { attachOrbit, type OrbitState } from './ui/orbit';
 import { parseUrlView } from './ui/url';
-import { PLATE } from './view/camera';
+import { PLATE, cameraOf, orientationOf, type Orientation } from './view/camera';
 
 declare global {
   interface Window {
@@ -67,26 +67,23 @@ const ATLASES: AtlasName[] = ['dots', 'knots', 'stars', 'cores', 'fgstars', 'pie
 /** v21 caps the device pixel ratio at 2 (app23.js:L1224). */
 const MAX_DPR = 2;
 
-/** The M2 golden overrides (tests/golden/extra-cases.json). */
+/**
+ * The M2 golden overrides (tests/golden/extra-cases.json). The drawn stars, the deep field and the
+ * foreground stars they once switched off are drawn since M7 (ADR 0031).
+ */
 const STIPPLE_ONLY: Partial<Params> = {
   lines: 0,
   knots: 0,
   envelope: 0,
-  starMix: 0,
-  field: 0,
-  fgstars: 0,
 };
 
 /**
- * The M4 golden overrides (tests/golden/extra-cases.json, variant `ribbons`): no drawn stars among
- * the stipple, deep field, foreground stars, bubbles, whole drawings or envelopes (vector and sky
- * marks of later milestones); `Barred spiral` draws its bar and ring as ribbons.
+ * The M4 golden overrides (tests/golden/extra-cases.json, variant `ribbons`): no bubbles, whole
+ * drawings or envelopes (vector parts M5 draws and these cases leave to its own); `Barred spiral`
+ * draws its bar and ring as ribbons.
  */
 function ribbonsOnly(preset: string): Partial<Params> {
   return {
-    starMix: 0,
-    field: 0,
-    fgstars: 0,
     bubbles: 0,
     whole: 0,
     envelope: 0,
@@ -95,15 +92,11 @@ function ribbonsOnly(preset: string): Partial<Params> {
 }
 
 /**
- * The M5 golden overrides (tests/golden/extra-cases.json, variant `vectors`): no drawn stars among
- * the stipple, deep field or foreground stars (M7); `Shell galaxy` draws its drawn shells instead
- * of its simulated ones (M8).
+ * The M5 golden overrides (tests/golden/extra-cases.json, variant `vectors`): `Shell galaxy` draws
+ * its drawn shells instead of its simulated ones (M8).
  */
 function vectorsOnly(preset: string): Partial<Params> {
   return {
-    starMix: 0,
-    field: 0,
-    fgstars: 0,
     ...(preset === 'Shell galaxy' ? { shellsOn: 0, shells: 1 } : {}),
   };
 }
@@ -122,7 +115,7 @@ interface Engine {
    * The model and view tiers these parameters and zoom need (only the view tier when just the
    * camera moved, ADR 0010), then the ink.
    */
-  draw(P: Params, zoom: number): void;
+  draw(P: Params, zoom: number, home: Orientation): void;
   /** how many times each tier has run */
   tierRuns(): { model: number; view: number };
   /**
@@ -189,8 +182,8 @@ function cpuEngine(scene: Scene, size: FrameSize): Engine {
   return {
     backend: 'cpu',
     size: () => r.size,
-    draw(P, zoom) {
-      const { view, work } = stipple.frame(P, zoom);
+    draw(P, zoom, home) {
+      const { view, work } = stipple.frame(P, zoom, { home });
       if (work.view) r.setLayers(view.layers);
       ink();
       counts = view.counts;
@@ -234,7 +227,7 @@ async function gpuEngine(
     let renderer: GpuRenderer | null = null;
     let stipple: GpuStipple | null = null;
     /** the parameters and zoom drawn last, redrawn on a new device */
-    let drawn: { P: Params; zoom: number } | null = null;
+    let drawn: { P: Params; zoom: number; home: Orientation } | null = null;
     /** tier runs on earlier devices */
     const pastRuns = { model: 0, view: 0 };
     let out: GPUTexture | null = null;
@@ -265,20 +258,20 @@ async function gpuEngine(
       scene.atlases.forEach((a) => {
         r.addAtlas(a);
       });
-      if (drawn) inkScene(drawn.P, drawn.zoom);
+      if (drawn) inkScene(drawn.P, drawn.zoom, drawn.home);
       if (ctxGpu) ctxGpu.configure({ device, format, alphaMode: 'opaque' });
       fitOutput(r);
     };
     /** the tiers that changed, on the GPU, then the ink */
-    const inkScene = (P: Params, zoom: number) => {
+    const inkScene = (P: Params, zoom: number, home: Orientation) => {
       const r = current();
       const st = stipple;
       if (!st) throw new Error('no stipple passes');
-      const work = st.frame(P, zoom, scene.meta);
+      const work = st.frame(P, zoom, scene.meta, { home });
       // every layer in scene() order: line-work, drawn parts, stipple, streams, cores
       if (work.view) r.setLayers(st.inkLayers());
       r.drawInk();
-      drawn = { P, zoom };
+      drawn = { P, zoom, home };
       return st;
     };
     build(gpu.device, size);
@@ -294,8 +287,8 @@ async function gpuEngine(
     return {
       backend: 'webgpu',
       size: () => current().size,
-      draw(P, zoom) {
-        inkScene(P, zoom);
+      draw(P, zoom, home) {
+        inkScene(P, zoom, home);
       },
       tierRuns() {
         const now = stipple?.tiers.runs ?? { model: 0, view: 0 };
@@ -424,7 +417,9 @@ async function start(): Promise<void> {
     const P = params0();
     const { az = P.az, incl = P.incl, pa = P.pa, zoom = 1 } = urlView;
     // zoom is the page's (v21's ZOOM: not a parameter, a view input)
-    return { P: { ...P, az, incl, pa }, preset, zoom };
+    const start = { ...P, az, incl, pa };
+    // the overlays' home orientation (open question Q3): the camera the page starts at
+    return { P: start, preset, zoom, home: orientationOf(cameraOf(start)) };
   })();
   let drawnBy: Engine | null = null;
   let drawn: typeof wanted | null = null;
@@ -455,7 +450,7 @@ async function start(): Promise<void> {
     const wantedSurface = surface;
     try {
       if (drawnBy !== e || drawn !== wanted) {
-        e.draw(wanted.P, wanted.zoom);
+        e.draw(wanted.P, wanted.zoom, wanted.home);
         drawnBy = e;
         drawn = wanted;
       }
@@ -557,7 +552,9 @@ async function start(): Promise<void> {
 
   select.addEventListener('change', () => {
     preset = select.value;
-    wanted = { P: params0(), preset, zoom: wanted.zoom };
+    // a new preset is placed at its own orientation, which becomes the overlays' home
+    const P = params0();
+    wanted = { P, preset, zoom: wanted.zoom, home: orientationOf(cameraOf(P)) };
     schedule();
   });
   seedInput.addEventListener('change', () => {
@@ -565,7 +562,9 @@ async function start(): Promise<void> {
     seedInput.value = String(seed);
     // a new seed keeps the camera
     const { az, incl, pa } = wanted.P;
-    wanted = { P: { ...params0(), az, incl, pa }, preset, zoom: wanted.zoom };
+    // (v21 re-homes its overlays when the seed changes: the camera it keeps is their home)
+    const P = { ...params0(), az, incl, pa };
+    wanted = { P, preset, zoom: wanted.zoom, home: orientationOf(cameraOf(P)) };
     schedule();
   });
 

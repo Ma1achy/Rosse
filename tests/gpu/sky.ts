@@ -94,10 +94,16 @@ run('deep field and foreground stars (GPU = CPU, L1)', async () => {
       const scene = buildScene(P, meta);
       const camera = cameraOf(P, zoom);
       st.setScene(scene);
+      // the cost of a view: the passes of the whole scene, to the end of the queue (SwiftShader)
+      const t0 = performance.now();
       st.setView(camera);
+      await dev.queue.onSubmittedWorkDone();
+      const gpuMs = performance.now() - t0;
       const g = await st.sky.readBack();
       const gv = await st.sky.vectors.readBack();
+      const t1 = performance.now();
       const cv = new CpuStipple(scene).view(camera);
+      const cpuMs = performance.now() - t1;
       const c = cv.sky;
       const bad: string[] = [];
       let maxPos = 0;
@@ -175,9 +181,9 @@ run('deep field and foreground stars (GPU = CPU, L1)', async () => {
       const ok = bad.length === 0;
       if (!ok) pass = false;
       lines.push(
-        `${ok ? 'ok  ' : 'FAIL'} ${label}: ${String(c.visible.length)} galaxies, ${String(c.nDots)} dots, ${String(cv.skyDrawings?.nCaps ?? 0)} capsules, ${String(c.nFg)} foreground stars; max |Δ| ${maxPos.toExponential(2)} px; raster max |Δ| ${maxPx.toFixed(5)} over ${String(inked)} inked px${ok ? '' : `; ${bad.slice(0, 4).join('; ')}`}`,
+        `${ok ? 'ok  ' : 'FAIL'} ${label}: ${String(c.visible.length)} galaxies, ${String(c.nDots)} dots, ${String(cv.skyDrawings?.nCaps ?? 0)} capsules, ${String(c.nFg)} foreground stars; view ${gpuMs.toFixed(0)} ms (GPU), ${cpuMs.toFixed(0)} ms (CPU); max |Δ| ${maxPos.toExponential(2)} px; raster max |Δ| ${maxPx.toFixed(5)} over ${String(inked)} inked px${ok ? '' : `; ${bad.slice(0, 4).join('; ')}`}`,
       );
-      data[label] = { maxPos, maxPx, bad, inked };
+      data[label] = { maxPos, maxPx, bad, inked, gpuMs, cpuMs };
     }
   lines.push(
     `worst: |Δ| ${worstPos.toExponential(2)} px (≤ ${String(POS_TOL)}), raster ${worstPx.toFixed(5)} (≤ 1/255); compared ${String(totals.galaxies)} galaxies, ${String(totals.dots)} dots, ${String(totals.caps)} capsules, ${String(totals.fg)} foreground stars`,

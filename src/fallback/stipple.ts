@@ -36,6 +36,7 @@ import { packStarJobs, starJobs } from '../model/stars';
 import { runStarMarks } from './kernels/star-marks';
 import { wobbleAmplitude } from '../view/warp';
 import { runSky, skyInputs, type SkyOut } from './kernels/sky';
+import type { PackedVectors } from '../marks/vector';
 import { Cls } from '../model/classes';
 import { classCapacity, compact } from './kernels/scan';
 import { runStipple } from './kernels/stipple';
@@ -121,6 +122,18 @@ export function lineLayers(rv: RibbonView, M: RibbonModel): InkLayer[] {
       instances: instanceList(rv.pieces, rv.piecesU, rv.nPieces),
     });
   return out;
+}
+
+/** The sheet and tile of each of the deep field's rows (for the used-drawings count). */
+function skyDrawingRows(sky: SkyOut, lib: PackedVectors): { atlas: string; tile: number }[] {
+  const order = Object.entries(lib.first).sort((a, b) => a[1] - b[1]);
+  const u = new Uint32Array(sky.rows);
+  return Array.from({ length: sky.nRows }, (_, k) => {
+    const d = u[k * 24 + 16] ?? 0;
+    let at = order[0] ?? ['arms', 0];
+    for (const e of order) if (e[1] <= d) at = e;
+    return { atlas: at[0], tile: d - at[1] };
+  });
 }
 
 /** The placed drawings' layers (line ink): capsules, dots, blobs. */
@@ -331,12 +344,29 @@ export class CpuStipple {
         ...rv.hdotsU
           .subarray(0, R.nHDots * INSTANCE_WORDS)
           .filter((_, k) => k % INSTANCE_WORDS === 2),
+        ...(skyOut
+          ? Array.from(
+              { length: skyOut.nDots },
+              (_, j) => skyOut.dotsU[j * INSTANCE_WORDS + 2] ?? 0,
+            )
+          : []),
       ],
       knots: [...tiles(stipple, 'knots'), ...tiles(streams, 'knots')],
       stars: tiles(stipple, 'stars'),
       cores,
       strokes: R.curves.map((c) => c.k),
       rows: vv.rows,
+      extra: [
+        // the drawn stars (L190) and the deep field's galaxies (L905)
+        ...Array.from({ length: counts[Cls.rstar] ?? 0 }, (_, j) => ({
+          atlas: 'sstars',
+          tile: out[(Cls.rstar * cap + j) * INSTANCE_WORDS + 2] ?? 0,
+        })),
+        ...(skyOut ? skyDrawingRows(skyOut, VD.lib) : []),
+      ],
+      fgstars: skyOut
+        ? Array.from({ length: skyOut.nFg }, (_, j) => skyOut.fgU[j * INSTANCE_WORDS + 2] ?? 0)
+        : [],
       penlines: [
         ...R.lanes.hatches.map((h) => h.tile),
         ...VD.parts.picks.streams.map((s) => s.tile),
