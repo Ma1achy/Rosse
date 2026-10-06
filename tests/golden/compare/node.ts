@@ -377,7 +377,7 @@ export const NEGATIVE_CONTROLS: {
     },
     {
       name: 'timeline 0.5',
-      applies: (P) => !!P.merger && (P.mTime === 1 || P.mTime === undefined),
+      applies: (P) => !!P.merger && P.mTime === 1,
       params: (P) => ({ ...P, mTime: 0.5 }),
     },
     {
