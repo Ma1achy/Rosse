@@ -354,6 +354,32 @@ export const NEGATIVE_CONTROLS: {
   return [
     { name: 'pa +30°', applies: notRound, params: (P) => ({ ...P, pa: P.pa + 30 }) },
     { name: 'pa −30°', applies: notRound, params: (P) => ({ ...P, pa: P.pa - 30 }) },
+    // a merger's own controls (M8): the encounter changed, which must change the picture
+    {
+      name: 'stage +0.7',
+      applies: (P) => !!P.merger && P.mStage + 0.7 <= 6,
+      params: (P) => ({ ...P, mStage: P.mStage + 0.7 }),
+    },
+    {
+      name: 'stage −0.7',
+      applies: (P) => !!P.merger && P.mStage - 0.7 >= -1.5,
+      params: (P) => ({ ...P, mStage: P.mStage - 0.7 }),
+    },
+    {
+      name: 'mass ratio ∓0.3',
+      applies: (P) => !!P.merger && P.mRatio >= 0.5,
+      params: (P) => ({ ...P, mRatio: P.mRatio - 0.3 }),
+    },
+    {
+      name: 'closest approach +0.8',
+      applies: (P) => !!P.merger && P.mPeri + 0.8 <= 3,
+      params: (P) => ({ ...P, mPeri: P.mPeri + 0.8 }),
+    },
+    {
+      name: 'timeline 0.5',
+      applies: (P) => !!P.merger && (P.mTime === 1 || P.mTime === undefined),
+      params: (P) => ({ ...P, mTime: 0.5 }),
+    },
     {
       name: 'pa +90°',
       applies: () => true,
@@ -361,29 +387,34 @@ export const NEGATIVE_CONTROLS: {
     },
     {
       name: 'bulgeFlat +0.1',
-      applies: (P) => P.bulge >= 0.95 && P.bulgeFlat <= 0.9,
+      applies: (P) => !P.merger && P.bulge >= 0.95 && P.bulgeFlat <= 0.9,
       params: (P) => ({ ...P, bulgeFlat: P.bulgeFlat + 0.1 }),
     },
     {
       name: 'bulgeFlat +0.15',
-      applies: (P) => P.bulge >= 0.3 && P.bulgeFlat + 0.15 <= 1,
+      applies: (P) => !P.merger && P.bulge >= 0.3 && P.bulgeFlat + 0.15 <= 1,
       params: (P) => ({ ...P, bulgeFlat: P.bulgeFlat + 0.15 }),
     },
     {
       name: 'bulgeFlat −0.15',
-      applies: (P) => P.bulge >= 0.3 && P.bulgeFlat - 0.15 >= 0.3,
+      applies: (P) => !P.merger && P.bulge >= 0.3 && P.bulgeFlat - 0.15 >= 0.3,
       params: (P) => ({ ...P, bulgeFlat: P.bulgeFlat - 0.15 }),
     },
     {
       name: 'bulgeSize ×1.5',
-      applies: (P) => P.bulge >= 0.3 && !sersic(P),
+      applies: (P) => !P.merger && P.bulge >= 0.3 && !sersic(P),
       params: (P) => ({ ...P, bulgeSize: P.bulgeSize * 1.5 }),
     },
-    { name: 'halo off', applies: (P) => P.halo > 0, params: (P) => ({ ...P, halo: 0 }) },
-    { name: 'RMAX 4.2', applies: () => true, scene: { rmax: 4.2 } },
+    {
+      name: 'halo off',
+      applies: (P) => !P.merger && P.halo > 0,
+      params: (P) => ({ ...P, halo: 0 }),
+    },
+    { name: 'RMAX 4.2', applies: (P) => !P.merger, scene: { rmax: 4.2 } },
     {
       name: 'thick ×3',
-      applies: (P) => P.bulge < 0.95 && Math.abs(Math.cos((P.incl * Math.PI) / 180)) < 0.9,
+      applies: (P) =>
+        !P.merger && P.bulge < 0.95 && Math.abs(Math.cos((P.incl * Math.PI) / 180)) < 0.9,
       params: (P) => ({ ...P, thick: P.thick * 3 }),
     },
     { name: 'dot size ×1.3', applies: () => true, scene: { dotScale: 1.3 } },

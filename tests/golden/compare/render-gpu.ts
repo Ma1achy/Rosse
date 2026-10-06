@@ -100,9 +100,10 @@ async function main(): Promise<void> {
       let readCounts: () => Promise<{ counts: MarkCounts }>;
       if (P.merger) {
         // a merger (M8): the simulation, then each galaxy carried by its tides
-        const { merger: mopts, placementKey, shells: sopts } = opts;
+        const { merger: mopts, placementKey, shells: sopts, dotScale } = opts;
         await merger.build(P, meta, {
           ...mopts,
+          ...(dotScale !== undefined ? { dotScale } : {}),
           ...(sopts ? { shells: sopts } : {}),
           ...(placementKey !== undefined ? { placementKey } : {}),
         });

@@ -61,6 +61,8 @@ export interface MergerSceneOptions {
    * structural choice (the calibration of ADR 0015). The seed by default.
    */
   placementKey?: number;
+  /** calibration only (negative controls, ADR 0015): every dot's quad scaled by this */
+  dotScale?: number;
   /** the simulated shells of `P.shellsOn`, drawn over the merged scene (app23.js:L1266) */
   shells?: ShellSceneOptions;
 }
@@ -111,6 +113,7 @@ export function buildMergerScene(
   })) as [Params, Params];
   const galaxies = [0, 1].map((g) =>
     buildScene(galaxyParams[g] as Params, meta, {
+      ...(opts.dotScale !== undefined ? { dotScale: opts.dotScale } : {}),
       ...(opts.placementKey !== undefined
         ? { placementKey: (opts.placementKey + g * 7919) >>> 0 }
         : {}),
@@ -120,6 +123,9 @@ export function buildMergerScene(
   ) as [GalaxyScene, GalaxyScene];
 
   const { pool, dotBase } = handArrays(P, variation, meta);
+  if (opts.dotScale !== undefined)
+    for (let i = 0; i < dotBase.length; i++)
+      dotBase[i] = Math.fround((dotBase[i] as number) * (opts.dotScale ?? 1));
 
   let mwarp: MWarpDesc | null = null;
   if (P.mWarp) {

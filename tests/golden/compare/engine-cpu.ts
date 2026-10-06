@@ -106,9 +106,10 @@ export class CpuGolden {
   render(P: Params, opts: SceneOptions = {}, zoom = 1): RenderResult {
     const t0 = performance.now();
     if (P.merger) {
-      const { merger: mopts, placementKey, shells } = opts;
+      const { merger: mopts, placementKey, shells, dotScale } = opts;
       const m = new CpuMerger(P, this.meta, {
         ...mopts,
+        ...(dotScale !== undefined ? { dotScale } : {}),
         ...(shells ? { shells } : {}),
         ...(placementKey !== undefined ? { placementKey } : {}),
       });

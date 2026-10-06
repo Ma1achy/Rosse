@@ -64,11 +64,14 @@ export function impossibleClasses(P: {
   knots: number;
   sparkle: number;
   starMix: number;
+  merger?: number;
 }): Set<string> {
   const out = new Set<string>();
   if (!(P.knots > 0)) out.add('knots');
   if (!(P.sparkle > 0)) out.add('stars');
-  if (!(P.starMix > 0.01)) out.add('rstars');
+  // a merger's galaxies keep the drawn stars of their clumps, and a knot in a tidal tail has a
+  // bright one whatever `starMix` says (mergerSprites, app23.js:L522–524)
+  if (!(P.starMix > 0.01) && !P.merger) out.add('rstars');
   return out;
 }
 
