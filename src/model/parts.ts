@@ -623,6 +623,8 @@ export function coreInstances(
   nuclear?: number | null,
 ): Instance[] {
   const e = incE(cam.incl);
+  // a star or an artefact has no galaxy, so no core (render(), app23.js:L1230 empties them)
+  if (P.subject !== 'galaxy') return [];
   if (!(P.bulge > 0.03 && P.bulge < 0.97) || (P.sersicN > 0 && P.bulge >= 0.95) || e >= 80)
     return [];
   const n = meta.cores.kind.filter((k) => k === 'core').length;

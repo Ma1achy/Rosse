@@ -32,6 +32,9 @@ import { cameraOf, viewDesc, type Camera } from '../view/camera';
 import { INSTANCE_WORDS, runProject } from './kernels/project';
 import { breatheRoom } from './kernels/breathe';
 import { dynView, rstarRows } from '../model/dynvec';
+import { packStarJobs, starJobs } from '../model/stars';
+import { runStarMarks } from './kernels/star-marks';
+import { wobbleAmplitude } from '../view/warp';
 import { Cls } from '../model/classes';
 import { classCapacity, compact } from './kernels/scan';
 import { runStipple } from './kernels/stipple';
@@ -164,7 +167,11 @@ export class CpuStipple {
   view(cam: Camera): CpuStippleView {
     const n = this.samples.n;
     const { P, galaxy, ribbons: R } = this.scene;
-    const V = viewDesc(cam, galaxy.g.dust, n, classCapacity(n));
+    // the marks of a star or an artefact follow the stipple's samples (M7)
+    const sj = this.scene.stars ? starJobs(this.scene.stars, P, cam, this.scene.home) : null;
+    const nStar = sj?.nSlots ?? 0;
+    const nTot = n + nStar;
+    const V = viewDesc(cam, galaxy.g.dust, n, classCapacity(nTot));
     const rv = runRibbons(this.lines, V, ribUniform(R, cam, P, galaxy.g.n_dot_pool));
     const culls = {
       c: cullsUniform(R, cam, P, galaxy.g.key),
@@ -172,11 +179,35 @@ export class CpuStipple {
       carve: R.carve,
       noise: galaxy.noise,
     };
-    const p = runProject(V, this.samples, culls);
+    const p = runProject(V, this.samples, culls, nStar);
+    if (sj && nStar) {
+      const jb = packStarJobs(sj.jobs);
+      runStarMarks(
+        {
+          jobsF: new Float32Array(jb),
+          jobsU: new Uint32Array(jb),
+          u: {
+            n_jobs: sj.jobs.length,
+            n_slots: nStar,
+            key: galaxy.g.key,
+            n_dot_pool: galaxy.g.n_dot_pool,
+            pen_dot: galaxy.g.pen_dot,
+            wobble: wobbleAmplitude(P.distort),
+            out_base: n,
+          },
+          pool: galaxy.pool,
+          dotBase: galaxy.dotBase,
+          noise: galaxy.noise,
+        },
+        p.classes,
+        p.f32,
+        p.u32,
+      );
+    }
     // the breathing room round bright drawn stars: a pure view filter (app23.js:L275–281)
     const cleared =
       galaxy.g.star_mix > 0.01 ? breatheRoom(p.classes, galaxy.g.n, p.f32, this.samples.u32) : 0;
-    const { out, counts, cap } = compact(p.classes, n, p.u32);
+    const { out, counts, cap } = compact(p.classes, nTot, p.u32);
     const outF = new Float32Array(out.buffer);
     const list = (cls: number): Instance[] => {
       const k = counts[cls] ?? 0;

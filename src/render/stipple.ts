@@ -14,6 +14,7 @@ import stippleWgsl from '../shaders/compute/stipple.wgsl';
 import projectWgsl from '../shaders/compute/project.wgsl';
 import scanWgsl from '../shaders/compute/scan.wgsl';
 import breatheWgsl from '../shaders/compute/breathe.wgsl';
+import starMarksWgsl from '../shaders/compute/star-marks.wgsl';
 import { bufferWithData } from '../gpu/buffers';
 import { INSTANCE_LAYOUT } from '../marks/instance';
 import { CLASS_COUNT, Cls } from '../model/classes';
@@ -36,9 +37,11 @@ import {
 } from '../model/scene';
 import type { Params } from '../core/params';
 import type { DrawingsMeta } from '../model/variation';
-import { cameraOf, packView, viewDesc, type Camera } from '../view/camera';
+import { ZOOM_MAX, cameraOf, packView, viewDesc, type Camera } from '../view/camera';
 import { TierState, type TierWork } from './tiers';
 import { SAMPLE_LAYOUT } from '../fallback/kernels/stipple';
+import { STAR_JOB_LAYOUT, STAR_UNIFORM_LAYOUT, packStarJobs, starJobs } from '../model/stars';
+import { wobbleAmplitude } from '../view/warp';
 import { BLOCK_STRIDE, blockCount, classCapacity } from '../fallback/kernels/scan';
 import type { GpuSpriteLayer, InkLayer } from './layers';
 
@@ -55,9 +58,16 @@ function pipeline(device: GPUDevice, code: string, entryPoint: string, label: st
 
 /** Model-tier buffers, sized for one scene. */
 interface ModelBuffers {
+  /** the stipple's samples */
   n: number;
+  /** the largest number of slots the compaction sees: the samples and the stars' marks at the top zoom */
+  nTot: number;
   cap: number;
   blocks: number;
+  /** the marks of a star or an artefact (M7): their jobs and uniform, and the pass that makes them */
+  starJobs: GPUBuffer;
+  starU: GPUBuffer;
+  starGroup: GPUBindGroup | null;
   galaxy: GPUBuffer;
   shape: GPUBuffer;
   pool: GPUBuffer;
@@ -124,6 +134,7 @@ export class GpuStipple {
       scatter: GPUComputePipeline;
       brightKeys: GPUComputePipeline;
       clear: GPUComputePipeline;
+      starMarks: GPUComputePipeline;
     },
     /** the line-work (M4) */
     readonly ribbons: GpuRibbons,
@@ -134,7 +145,7 @@ export class GpuStipple {
   ) {}
 
   static create(device: GPUDevice): GpuStipple {
-    const [stipple, extra, project, local, blocks, scatter, brightKeys, clear] = [
+    const [stipple, extra, project, local, blocks, scatter, brightKeys, clear, starMarks] = [
       pipeline(device, stippleWgsl, 'main', 'stipple.wgsl'),
       pipeline(device, stippleWgsl, 'extra', 'stipple.wgsl'),
       pipeline(device, projectWgsl, 'main', 'project.wgsl'),
@@ -143,10 +154,11 @@ export class GpuStipple {
       pipeline(device, scanWgsl, 'scatter', 'scan.wgsl'),
       pipeline(device, breatheWgsl, 'bright_keys', 'breathe.wgsl'),
       pipeline(device, breatheWgsl, 'clear', 'breathe.wgsl'),
+      pipeline(device, starMarksWgsl, 'star_marks', 'star-marks.wgsl'),
     ];
     return new GpuStipple(
       device,
-      { stipple, extra, project, local, blocks, scatter, brightKeys, clear },
+      { stipple, extra, project, local, blocks, scatter, brightKeys, clear, starMarks },
       GpuRibbons.create(device),
       GpuVectors.create(device),
       GpuStarSet.create(device),
@@ -201,10 +213,13 @@ export class GpuStipple {
     // every sample: the proposals, then the ring knots' and clumps' marks
     const n = sampleCount(G);
     const nExtra = G.g.n_extra;
-    const cap = classCapacity(n);
-    const blocks = blockCount(n);
+    // the marks of a star or an artefact follow the samples in the compaction's buffers
+    const nTot = n + scene.starSlots;
+    const cap = classCapacity(nTot);
+    const blocks = blockCount(nTot);
+    // at least one element of the largest struct bound (a star or an artefact has no samples)
     const buf = (size: number, usage: number, label: string) =>
-      d.createBuffer({ label, size: Math.max(16, size), usage });
+      d.createBuffer({ label, size: Math.max(64, size), usage });
     // COPY_SRC: the tier tests read the model buffers back (never on the frame path)
     const SRC = GPUBufferUsage.COPY_SRC;
     const galaxy = bufferWithData(d, packGalaxy(G.g), GPUBufferUsage.UNIFORM | SRC, 'galaxy');
@@ -221,12 +236,30 @@ export class GpuStipple {
     const scan = bufferWithData(
       d,
       new Uint32Array([n, cap, blocks, 0]),
-      GPUBufferUsage.UNIFORM,
+      GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
       'scan',
     );
-    const projected = buf(n * INSTANCE_LAYOUT.size, STORAGE | GPUBufferUsage.COPY_SRC, 'projected');
-    const classes = buf(n * 4, STORAGE | GPUBufferUsage.COPY_SRC, 'classes');
-    const rank = buf(n * 4, STORAGE, 'rank');
+    const projected = buf(
+      nTot * INSTANCE_LAYOUT.size,
+      STORAGE | GPUBufferUsage.COPY_SRC,
+      'projected',
+    );
+    const classes = buf(nTot * 4, STORAGE | GPUBufferUsage.COPY_SRC, 'classes');
+    const rank = buf(nTot * 4, STORAGE, 'rank');
+    const jobCap = scene.stars
+      ? starJobs(scene.stars, scene.P, { ...cameraOf(scene.P), zoom: ZOOM_MAX }, scene.home).jobs
+          .length
+      : 0;
+    const starJobsBuf = buf(
+      jobCap * STAR_JOB_LAYOUT.size,
+      STORAGE | GPUBufferUsage.COPY_DST,
+      'star jobs',
+    );
+    const starU = buf(
+      STAR_UNIFORM_LAYOUT.size,
+      GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      'star uniform',
+    );
     const blockTotals = buf(blocks * 8, STORAGE, 'block totals');
     const blockOffsets = buf(blocks * BLOCK_STRIDE * 4, STORAGE, 'block offsets');
     const args = buf(
@@ -268,8 +301,22 @@ export class GpuStipple {
     const P = this.pipes;
     this.model = {
       n,
+      nTot,
       cap,
       blocks,
+      starJobs: starJobsBuf,
+      starU,
+      starGroup: scene.stars
+        ? group(P.starMarks, [
+            [0, starU],
+            [1, starJobsBuf],
+            [2, pool],
+            [3, dotBase],
+            [4, projected],
+            [5, classes],
+            [30, noise],
+          ])
+        : null,
       galaxy,
       shape,
       pool,
@@ -412,7 +459,35 @@ export class GpuStipple {
     const d = this.device;
     const { P: params, galaxy } = this.scene;
     this.stars.setView(params, galaxy.g.key, galaxy.g.n_dot_pool);
+    // the marks of a star or an artefact for this view, after the samples (M7)
+    const sj = this.scene.stars ? starJobs(this.scene.stars, params, cam, this.scene.home) : null;
+    const nStar = sj?.nSlots ?? 0;
+    const nTot = m.n + nStar;
+    this.nStarSlots = nStar;
+    if (nTot > m.nTot) throw new Error('star marks beyond their capacity');
     d.queue.writeBuffer(m.view, 0, packView(viewDesc(cam, galaxy.g.dust, m.n, m.cap)));
+    d.queue.writeBuffer(m.scan, 0, new Uint32Array([nTot, m.cap, blockCount(nTot), 0]));
+    if (sj && nStar) {
+      d.queue.writeBuffer(m.starJobs, 0, packStarJobs(sj.jobs));
+      d.queue.writeBuffer(
+        m.starU,
+        0,
+        packStruct(STAR_UNIFORM_LAYOUT, {
+          n_jobs: sj.jobs.length,
+          n_slots: nStar,
+          key: galaxy.g.key,
+          n_dot_pool: galaxy.g.n_dot_pool,
+          pen_dot: galaxy.g.pen_dot,
+          wobble: wobbleAmplitude(params.distort),
+          out_base: m.n,
+          pad0: 0,
+          pad1: 0,
+          pad2: 0,
+          pad3: 0,
+          pad4: 0,
+        }),
+      );
+    }
     d.queue.writeBuffer(
       m.culls,
       0,
@@ -439,6 +514,12 @@ export class GpuStipple {
     pass.setPipeline(P.project);
     pass.setBindGroup(0, m.groups.project);
     pass.dispatchWorkgroups(Math.ceil(m.n / 64) || 1);
+    if (m.starGroup && nStar) {
+      // the marks of a star or an artefact, after the samples
+      pass.setPipeline(P.starMarks);
+      pass.setBindGroup(0, m.starGroup);
+      pass.dispatchWorkgroups(Math.ceil(nStar / 64));
+    }
     if (m.room.on) {
       // the breathing room round bright drawn stars: their own compaction, then the clearing
       const r = m.room;
@@ -460,13 +541,13 @@ export class GpuStipple {
     }
     pass.setPipeline(P.local);
     pass.setBindGroup(0, m.groups.local);
-    pass.dispatchWorkgroups(m.blocks);
+    pass.dispatchWorkgroups(blockCount(nTot));
     pass.setPipeline(P.blocks);
     pass.setBindGroup(0, m.groups.blocks);
     pass.dispatchWorkgroups(1);
     pass.setPipeline(P.scatter);
     pass.setBindGroup(0, m.groups.scatter);
-    pass.dispatchWorkgroups(Math.ceil(m.n / 64) || 1);
+    pass.dispatchWorkgroups(Math.ceil(nTot / 64) || 1);
     this.ribbons.encodeExpand(pass);
     this.vectors.encode(pass);
     this.stars.encode(pass);
@@ -476,6 +557,8 @@ export class GpuStipple {
 
   /** the camera of the last view (the cores are placed for it) */
   private camera: Camera | null = null;
+  /** the star marks' slots of the last view */
+  private nStarSlots = 0;
 
   /**
    * Every ink layer of the galaxy, in the reference's order (scene(), app23.js:L1289–1301): the
@@ -602,6 +685,36 @@ export class GpuStipple {
     return { classes, instances: await this.read(m.projected, m.n * INSTANCE_LAYOUT.size) };
   }
 
+  /** Test only: the marks of stars and artefacts of the last view, class and instance per slot. */
+  async readStarMarks(): Promise<{ classes: Uint32Array; instances: Float32Array; n: number }> {
+    const m = this.need();
+    const k = this.nStarSlots;
+    if (!k) return { classes: new Uint32Array(0), instances: new Float32Array(0), n: 0 };
+    const ib = INSTANCE_LAYOUT.size;
+    const classes = new Uint32Array(await this.readAt(m.classes, m.n * 4, Math.max(1, k) * 4));
+    const instances = new Float32Array(
+      await this.readAt(m.projected, m.n * ib, Math.max(1, k) * ib),
+    );
+    return { classes, instances, n: k };
+  }
+
+  private async readAt(src: GPUBuffer, offset: number, size: number): Promise<ArrayBuffer> {
+    const d = this.device;
+    const bytes = Math.max(16, Math.ceil(size / 4) * 4);
+    const dst = d.createBuffer({
+      size: bytes,
+      usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+    });
+    const enc = d.createCommandEncoder();
+    enc.copyBufferToBuffer(src, offset, dst, 0, bytes);
+    d.queue.submit([enc.finish()]);
+    await dst.mapAsync(GPUMapMode.READ);
+    const copy = dst.getMappedRange().slice(0);
+    dst.unmap();
+    dst.destroy();
+    return copy;
+  }
+
   async readInstances(): Promise<{ out: ArrayBuffer; cap: number }> {
     const m = this.need();
     return { out: await this.read(m.out, CLASS_COUNT * m.cap * INSTANCE_LAYOUT.size), cap: m.cap };
@@ -633,6 +746,8 @@ export class GpuStipple {
       m.blockOffsets,
       m.args,
       m.out,
+      m.starJobs,
+      m.starU,
       m.room.uniform,
       m.room.scan,
       m.room.keys,

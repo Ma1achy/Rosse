@@ -243,17 +243,21 @@ export function projectSample(
   return cls;
 }
 
-/** Runs the kernel over every sample. */
+/**
+ * Runs the kernel over every sample. `extra` slots follow the samples in the instance and class
+ * buffers, for the marks of stars and artefacts (./star-marks.ts); they start as class NONE.
+ */
 export function runProject(
   V: ViewDesc,
   samples: { f32: Float32Array; u32: Uint32Array; n: number },
   C: CullsDesc = noCulls(),
+  extra = 0,
 ): { classes: Uint32Array; f32: Float32Array; u32: Uint32Array } {
   const n = samples.n;
-  const buf = new ArrayBuffer(Math.max(1, n) * INSTANCE_WORDS * 4);
+  const buf = new ArrayBuffer(Math.max(1, n + extra) * INSTANCE_WORDS * 4);
   const instF = new Float32Array(buf);
   const instU = new Uint32Array(buf);
-  const classes = new Uint32Array(Math.max(1, n));
+  const classes = new Uint32Array(Math.max(1, n + extra)).fill(Cls.none);
   for (let i = 0; i < n; i++)
     classes[i] = projectSample(i, V, samples.f32, samples.u32, instF, instU, C);
   return { classes, f32: instF, u32: instU };

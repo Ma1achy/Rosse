@@ -17,6 +17,8 @@ import type { CurvePicks } from './curves';
 import { packNoise, type NoiseTable } from '../core/noise';
 import { describeGalaxy, rstarBound, type GalaxyDesc } from './galaxy';
 import { sheetStrides, type DynSpec } from './dynvec';
+import { describeStars, starSlotCapacity, type StarPicks, type StarsDesc } from './stars';
+import { cameraOf, orientationOf, type Orientation } from '../view/camera';
 import { describeRibbons, type RibbonDesc } from './ribbons';
 import { makeVariation, type DrawingsMeta, type Variation } from './variation';
 
@@ -31,6 +33,16 @@ export interface GalaxyScene {
   meta: DrawingsMeta;
   /** the drawn stars' rows (M7): their capacity and the slots each owns (src/model/dynvec.ts) */
   rstars: DynSpec;
+  /** a star or an artefact, and the overlays (M7); null when the parameters draw none */
+  stars: StarsDesc | null;
+  /** the most mark slots the stars' marks can take (at the largest zoom): buffer sizes */
+  starSlots: number;
+  /**
+   * The home orientation of the overlays (open question Q3, option b): the camera they were placed
+   * at, which the camera then moves round. v21 remembers it from navigation history (`homeFor`);
+   * here it is a parameter, by default the camera of the parameters the scene is built from.
+   */
+  home: Orientation;
 }
 
 export interface SceneOptions {
@@ -64,22 +76,69 @@ export interface SceneOptions {
    * patchiness, the lanes' gaps and the hand wobble follow v21's pattern, as the variation does.
    */
   noise?: NoiseTable[];
+  /**
+   * Draw the stars and artefacts with these choices (src/model/stars.ts `StarPicks`): the golden
+   * runner passes v21's own, replayed from `starSprites` (tests/golden/compare/v21-stars.ts).
+   */
+  starPicks?: StarPicks;
+  /**
+   * The overlays' home orientation (the camera they are placed at). The default is the
+   * orientation of the parameters, which pins an overlay to the plate: a page that orbits passes
+   * the orientation of the preset it started from, and the golden runner the capture's home.
+   */
+  home?: Orientation;
   /** Calibration only (negative controls, ADR 0015): a truncation radius in place of RMAX. */
   rmax?: number;
   /** Calibration only (negative controls): every dot's quad scaled by this. */
   dotScale?: number;
 }
 
-export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {}): GalaxyScene {
+/**
+ * A star or an artefact has no galaxy (render(), app23.js:L1229–1230: `generate` and `curves` are
+ * not called, and the galaxy's own parts are emptied): the parameters of everything a galaxy
+ * draws, off. The sky, the trails, cosmic rays, the arrow, the jet and the streams stay.
+ */
+export function withoutGalaxy(P: Params): Params {
+  return {
+    ...P,
+    stars: 0,
+    arms: 0,
+    irr: 0,
+    ring: 0,
+    bar: 0,
+    bulge: 0,
+    sersicN: 0,
+    lines: 0,
+    dust: 0,
+    dustLines: 0,
+    dustScribble: 0,
+    outline: 0,
+    tail: 0,
+    lens: 0,
+    shells: 0,
+    shellsOn: 0,
+    envelope: 0,
+    whole: 0,
+    nuclear: 0,
+    bubbles: 0,
+    merger: 0,
+    lensOn: 0,
+    companions: P.companions,
+  };
+}
+
+export function buildScene(P0: Params, meta: DrawingsMeta, opts: SceneOptions = {}): GalaxyScene {
+  const P = P0;
+  const Pg = P.subject === 'galaxy' ? P : withoutGalaxy(P);
   const variation = opts.variation ?? makeVariation(P, meta);
-  const galaxy = describeGalaxy(P, variation, meta);
+  const galaxy = describeGalaxy(Pg, variation, meta);
   if (opts.noise) galaxy.noise = packNoise(opts.noise);
   if (opts.placementKey !== undefined) galaxy.g.key = opts.placementKey >>> 0;
   if (opts.rmax !== undefined) galaxy.g.rmax = Math.fround(opts.rmax);
   if (opts.dotScale !== undefined)
     galaxy.dotBase = galaxy.dotBase.map((x) => Math.fround(x * (opts.dotScale ?? 1)));
   const ribbons = describeRibbons(
-    P,
+    Pg,
     variation,
     meta.strokes,
     meta.penlines,
@@ -87,13 +146,29 @@ export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {
     opts.curvePicks,
     galaxy.noise,
   );
-  const vectors = describeVectors(P, variation, meta, P.incl, opts.partPicks);
+  const vectors = describeVectors(Pg, variation, meta, P.incl, opts.partPicks);
+  const stars = describeStars(P, variation, meta, opts.starPicks, galaxy.g.key);
+  const home = opts.home ?? orientationOf(cameraOf(P));
   const strides = sheetStrides(vectors.lib, ['sstars']);
   const rstars: DynSpec = {
-    rows: strides.strideCaps + strides.strideDots + strides.strideBlobs ? rstarBound(galaxy) : 0,
+    rows:
+      strides.strideCaps + strides.strideDots + strides.strideBlobs
+        ? rstarBound(galaxy) + (stars?.nDrawn ?? 0)
+        : 0,
     ...strides,
   };
-  return { P, variation, galaxy, ribbons, vectors, meta, rstars };
+  return {
+    P,
+    variation,
+    galaxy,
+    ribbons,
+    vectors,
+    meta,
+    rstars,
+    stars,
+    starSlots: stars ? starSlotCapacity(stars, P, home) : 0,
+    home,
+  };
 }
 
 /**
