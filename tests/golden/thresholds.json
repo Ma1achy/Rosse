@@ -29,39 +29,49 @@
       "ssimCoarse": 0.89,
       "median": 0.1,
       "p90": 0.1,
-      "r25": 0.027,
+      "r25": 0.028,
       "r50": 0.029,
       "r90": 0.055,
       "outer": 0.016,
-      "q": 0.033,
+      "q": 0.034,
       "qInner": 0.041,
-      "paA": 0.851,
+      "paA": 0.866,
       "paEps0": 0.039,
       "byPreset": {
         "Grand design": {
-          "q": 0.034,
-          "qInner": 0.027,
-          "paEps0": 0.039
+          "q": 0.036,
+          "qInner": 0.039,
+          "paEps0": 0.044
         },
         "Barred spiral": {
           "q": 0.033,
-          "qInner": 0.026,
+          "qInner": 0.025,
           "paEps0": 0.037
         },
         "Flocculent": {
-          "q": 0.036,
-          "qInner": 0.028,
-          "paEps0": 0.044
+          "q": 0.039,
+          "qInner": 0.031,
+          "paEps0": 0.049
         },
         "Tightly wound": {
-          "q": 0.027,
+          "q": 0.02,
           "qInner": 0.043,
-          "paEps0": 0.032
+          "paEps0": 0.022
+        },
+        "Ringed": {
+          "q": 0.039,
+          "qInner": 0.037,
+          "paEps0": 0.047
         },
         "Disc, no arms": {
           "q": 0.026,
-          "qInner": 0.04,
+          "qInner": 0.041,
           "paEps0": 0.031
+        },
+        "Edge-on with dust": {
+          "q": 0.025,
+          "qInner": 0.045,
+          "paEps0": 0.032
         },
         "Dusty spiral": {
           "q": 0.044,
@@ -70,7 +80,7 @@
         },
         "Loose, open arms": {
           "q": 0.024,
-          "qInner": 0.019,
+          "qInner": 0.027,
           "paEps0": 0.03
         },
         "Hand wobble": {
@@ -89,29 +99,34 @@
       "ssimCoarse": 0.91,
       "median": 0.1,
       "p90": 0.1,
-      "r25": 0.029,
-      "r50": 0.045,
+      "r25": 0.031,
+      "r50": 0.041,
       "r90": 0.077,
-      "outer": 0.019,
-      "q": 0.047,
+      "outer": 0.017,
+      "q": 0.046,
       "qInner": 0.034,
-      "paA": 1.225,
-      "paEps0": 0.06,
+      "paA": 1.015,
+      "paEps0": 0.051,
       "byPreset": {
-        "Cigar-shaped": {
-          "q": 0.049,
-          "qInner": 0.023,
-          "paEps0": 0.063
-        },
-        "Radio jet": {
-          "q": 0.02,
-          "qInner": 0.04,
-          "paEps0": 0.022
-        },
         "Smooth, round": {
           "q": 0.047,
-          "qInner": 0.018,
+          "qInner": 0.026,
           "paEps0": 0.049
+        },
+        "Cigar-shaped": {
+          "q": 0.046,
+          "qInner": 0.034,
+          "paEps0": 0.06
+        },
+        "Radio jet": {
+          "q": 0.026,
+          "qInner": 0.034,
+          "paEps0": 0.028
+        },
+        "Shell galaxy": {
+          "q": 0.048,
+          "qInner": 0.038,
+          "paEps0": 0.052
         }
       }
     },
@@ -200,33 +215,38 @@
       "ssimCoarse": 0.85,
       "median": 0.1,
       "p90": 0.1,
-      "r25": 0.045,
-      "r50": 0.026,
-      "r90": 0.029,
-      "outer": 0.011,
-      "q": 0.04,
+      "r25": 0.048,
+      "r50": 0.033,
+      "r90": 0.025,
+      "outer": 0.012,
+      "q": 0.037,
       "qInner": 0.031,
-      "paA": 0.968,
-      "paEps0": 0.045,
+      "paA": 0.939,
+      "paEps0": 0.041,
       "byPreset": {
         "Grand design": {
-          "q": 0.037,
+          "q": 0.036,
           "qInner": 0.034,
           "paEps0": 0.041
         },
         "Flocculent": {
-          "q": 0.057,
-          "qInner": 0.027,
-          "paEps0": 0.06
+          "q": 0.054,
+          "qInner": 0.026,
+          "paEps0": 0.057
         },
         "Barred spiral": {
           "q": 0.046,
-          "qInner": 0.023,
+          "qInner": 0.028,
           "paEps0": 0.05
         },
+        "Disc, no arms": {
+          "q": 0.04,
+          "qInner": 0.045,
+          "paEps0": 0.045
+        },
         "Tightly wound": {
-          "q": 0.034,
-          "qInner": 0.016,
+          "q": 0.033,
+          "qInner": 0.02,
           "paEps0": 0.036
         }
       }
@@ -237,18 +257,29 @@
       "poisson": 3,
       "poissonBelow": 2000,
       "ink": 0.05,
-      "ssimCoarse": 0.91,
+      "ssimCoarse": 0.9,
       "median": 0.1,
       "p90": 0.1,
-      "r25": 0.03,
+      "r25": 0.037,
       "r50": 0.041,
-      "r90": 0.069,
-      "outer": 0.018,
-      "q": 0.03,
-      "qInner": 0.046,
+      "r90": 0.044,
+      "outer": 0.012,
+      "q": 0.035,
+      "qInner": 0.039,
       "paA": 0.863,
       "paEps0": 0.039,
-      "byPreset": {}
+      "byPreset": {
+        "Cigar-shaped": {
+          "q": 0.038,
+          "qInner": 0.039,
+          "paEps0": 0.049
+        },
+        "Smooth, round": {
+          "q": 0.031,
+          "qInner": 0.046,
+          "paEps0": 0.032
+        }
+      }
     },
     "lines": {
       "counts": 0.03,
@@ -263,11 +294,11 @@
       "r50": 0.064,
       "r90": 0.132,
       "outer": 0.02,
-      "q": 0.036,
-      "qInner": 0.043,
-      "paA": 1.661,
-      "paEps0": 0.045,
-      "heldOut": 43,
+      "q": 0.041,
+      "qInner": 0.053,
+      "paA": 1.651,
+      "paEps0": 0.052,
+      "heldOut": 56,
       "byPreset": {}
     },
     "layered": {

@@ -199,7 +199,8 @@ describe('incE uses and buckets', () => {
     expect(inclBucket(80)).not.toBe(inclBucket(79.99));
     expect(inclBucket(80)).not.toBe(inclBucket(80.01));
     expect(inclBucket(100)).toBe(inclBucket(80));
-  });
+    // about 21,700 inclinations through every use: 2.7 s alone, over the default 5 s under load
+  }, 60_000);
 });
 
 describe('every use of the inclination in app23.js is classified (ADR 0017)', () => {

@@ -1,0 +1,782 @@
+{
+  "about": "ADR 0018's evidence, from the calibration's shards (test-results/calibration-shard-*.json): spread, per family and K, of the mean-of-K statistic of a re-draw against a stand-in for v21 (the 95th percentile of |Δ| of r50, r25 and ink; the ratio of r50's to K = 1 and its theoretical value √((1 + 1/K)/2)); and the negative controls' detection cells with the K = 6 thresholds against the same measurements as single draws (K = 1). Written by tools/m4-summary.mjs calibration.",
+  "keys": 6,
+  "standIns": 3,
+  "controls": {
+    "configurations": 73,
+    "ofConfigurations": 142
+  },
+  "configurations": 226,
+  "spread": {
+    "spiral": {
+      "configurations": 204,
+      "byK": {
+        "1": {
+          "p95AbsR50": 0.028,
+          "p95AbsR25": 0.0241,
+          "p95AbsInk": 0.0191,
+          "ratioR50ToK1": 1,
+          "theory": 1
+        },
+        "2": {
+          "p95AbsR50": 0.0191,
+          "p95AbsR25": 0.0222,
+          "p95AbsInk": 0.0199,
+          "ratioR50ToK1": 0.6814,
+          "theory": 0.866
+        },
+        "3": {
+          "p95AbsR50": 0.0192,
+          "p95AbsR25": 0.0212,
+          "p95AbsInk": 0.0203,
+          "ratioR50ToK1": 0.6854,
+          "theory": 0.8165
+        },
+        "4": {
+          "p95AbsR50": 0.0193,
+          "p95AbsR25": 0.019,
+          "p95AbsInk": 0.0195,
+          "ratioR50ToK1": 0.691,
+          "theory": 0.7906
+        },
+        "5": {
+          "p95AbsR50": 0.0183,
+          "p95AbsR25": 0.0177,
+          "p95AbsInk": 0.0188,
+          "ratioR50ToK1": 0.6555,
+          "theory": 0.7746
+        },
+        "6": {
+          "p95AbsR50": 0.0193,
+          "p95AbsR25": 0.0183,
+          "p95AbsInk": 0.0187,
+          "ratioR50ToK1": 0.6889,
+          "theory": 0.7638
+        }
+      }
+    },
+    "spiral@zoom": {
+      "configurations": 90,
+      "byK": {
+        "1": {
+          "p95AbsR50": 0.0359,
+          "p95AbsR25": 0.0413,
+          "p95AbsInk": 0.0261,
+          "ratioR50ToK1": 1,
+          "theory": 1
+        },
+        "2": {
+          "p95AbsR50": 0.0252,
+          "p95AbsR25": 0.0365,
+          "p95AbsInk": 0.022,
+          "ratioR50ToK1": 0.7023,
+          "theory": 0.866
+        },
+        "3": {
+          "p95AbsR50": 0.0247,
+          "p95AbsR25": 0.0337,
+          "p95AbsInk": 0.0199,
+          "ratioR50ToK1": 0.6875,
+          "theory": 0.8165
+        },
+        "4": {
+          "p95AbsR50": 0.0223,
+          "p95AbsR25": 0.0322,
+          "p95AbsInk": 0.0192,
+          "ratioR50ToK1": 0.6196,
+          "theory": 0.7906
+        },
+        "5": {
+          "p95AbsR50": 0.021,
+          "p95AbsR25": 0.0329,
+          "p95AbsInk": 0.0193,
+          "ratioR50ToK1": 0.5835,
+          "theory": 0.7746
+        },
+        "6": {
+          "p95AbsR50": 0.0214,
+          "p95AbsR25": 0.032,
+          "p95AbsInk": 0.0196,
+          "ratioR50ToK1": 0.5947,
+          "theory": 0.7638
+        }
+      }
+    },
+    "smooth": {
+      "configurations": 96,
+      "byK": {
+        "1": {
+          "p95AbsR50": 0.0384,
+          "p95AbsR25": 0.0196,
+          "p95AbsInk": 0.03,
+          "ratioR50ToK1": 1,
+          "theory": 1
+        },
+        "2": {
+          "p95AbsR50": 0.0287,
+          "p95AbsR25": 0.0193,
+          "p95AbsInk": 0.0265,
+          "ratioR50ToK1": 0.7465,
+          "theory": 0.866
+        },
+        "3": {
+          "p95AbsR50": 0.028,
+          "p95AbsR25": 0.0182,
+          "p95AbsInk": 0.0271,
+          "ratioR50ToK1": 0.7282,
+          "theory": 0.8165
+        },
+        "4": {
+          "p95AbsR50": 0.0239,
+          "p95AbsR25": 0.0181,
+          "p95AbsInk": 0.0246,
+          "ratioR50ToK1": 0.6229,
+          "theory": 0.7906
+        },
+        "5": {
+          "p95AbsR50": 0.0255,
+          "p95AbsR25": 0.0209,
+          "p95AbsInk": 0.0244,
+          "ratioR50ToK1": 0.6631,
+          "theory": 0.7746
+        },
+        "6": {
+          "p95AbsR50": 0.0271,
+          "p95AbsR25": 0.0203,
+          "p95AbsInk": 0.0231,
+          "ratioR50ToK1": 0.7067,
+          "theory": 0.7638
+        }
+      }
+    },
+    "smooth@zoom": {
+      "configurations": 36,
+      "byK": {
+        "1": {
+          "p95AbsR50": 0.028,
+          "p95AbsR25": 0.0299,
+          "p95AbsInk": 0.0249,
+          "ratioR50ToK1": 1,
+          "theory": 1
+        },
+        "2": {
+          "p95AbsR50": 0.0236,
+          "p95AbsR25": 0.0305,
+          "p95AbsInk": 0.025,
+          "ratioR50ToK1": 0.8421,
+          "theory": 0.866
+        },
+        "3": {
+          "p95AbsR50": 0.0209,
+          "p95AbsR25": 0.0282,
+          "p95AbsInk": 0.0229,
+          "ratioR50ToK1": 0.7464,
+          "theory": 0.8165
+        },
+        "4": {
+          "p95AbsR50": 0.0262,
+          "p95AbsR25": 0.0266,
+          "p95AbsInk": 0.0208,
+          "ratioR50ToK1": 0.9369,
+          "theory": 0.7906
+        },
+        "5": {
+          "p95AbsR50": 0.0238,
+          "p95AbsR25": 0.0265,
+          "p95AbsInk": 0.021,
+          "ratioR50ToK1": 0.8494,
+          "theory": 0.7746
+        },
+        "6": {
+          "p95AbsR50": 0.0271,
+          "p95AbsR25": 0.0246,
+          "p95AbsInk": 0.0201,
+          "ratioR50ToK1": 0.9689,
+          "theory": 0.7638
+        }
+      }
+    },
+    "lines": {
+      "configurations": 252,
+      "byK": {
+        "1": {
+          "p95AbsR50": 0.0386,
+          "p95AbsR25": 0.0646,
+          "p95AbsInk": 0.0293,
+          "ratioR50ToK1": 1,
+          "theory": 1
+        },
+        "2": {
+          "p95AbsR50": 0.0263,
+          "p95AbsR25": 0.0478,
+          "p95AbsInk": 0.0214,
+          "ratioR50ToK1": 0.6798,
+          "theory": 0.866
+        },
+        "3": {
+          "p95AbsR50": 0.0251,
+          "p95AbsR25": 0.064,
+          "p95AbsInk": 0.0224,
+          "ratioR50ToK1": 0.6501,
+          "theory": 0.8165
+        },
+        "4": {
+          "p95AbsR50": 0.0268,
+          "p95AbsR25": 0.0531,
+          "p95AbsInk": 0.022,
+          "ratioR50ToK1": 0.6951,
+          "theory": 0.7906
+        },
+        "5": {
+          "p95AbsR50": 0.0266,
+          "p95AbsR25": 0.0513,
+          "p95AbsInk": 0.0218,
+          "ratioR50ToK1": 0.6875,
+          "theory": 0.7746
+        },
+        "6": {
+          "p95AbsR50": 0.026,
+          "p95AbsR25": 0.0467,
+          "p95AbsInk": 0.0207,
+          "ratioR50ToK1": 0.6733,
+          "theory": 0.7638
+        }
+      }
+    }
+  },
+  "controlCells": [
+    {
+      "family": "spiral",
+      "control": "pa +90°",
+      "applicable": 34,
+      "detectedK1": 34,
+      "detectedK6": 34
+    },
+    {
+      "family": "spiral",
+      "control": "halo off",
+      "applicable": 34,
+      "detectedK1": 4,
+      "detectedK6": 5
+    },
+    {
+      "family": "spiral",
+      "control": "RMAX 4.2",
+      "applicable": 34,
+      "detectedK1": 34,
+      "detectedK6": 34
+    },
+    {
+      "family": "spiral",
+      "control": "thick ×3",
+      "applicable": 34,
+      "detectedK1": 8,
+      "detectedK6": 9
+    },
+    {
+      "family": "spiral",
+      "control": "dot size ×1.3",
+      "applicable": 34,
+      "detectedK1": 34,
+      "detectedK6": 34
+    },
+    {
+      "family": "spiral",
+      "control": "pa +30°",
+      "applicable": 17,
+      "detectedK1": 17,
+      "detectedK6": 17
+    },
+    {
+      "family": "spiral",
+      "control": "pa −30°",
+      "applicable": 17,
+      "detectedK1": 17,
+      "detectedK6": 17
+    },
+    {
+      "family": "spiral",
+      "control": "orbit 35°",
+      "applicable": 17,
+      "detectedK1": 17,
+      "detectedK6": 17
+    },
+    {
+      "family": "spiral",
+      "control": "bulgeFlat +0.15",
+      "applicable": 15,
+      "detectedK1": 0,
+      "detectedK6": 1
+    },
+    {
+      "family": "spiral",
+      "control": "bulgeFlat −0.15",
+      "applicable": 15,
+      "detectedK1": 0,
+      "detectedK6": 1
+    },
+    {
+      "family": "spiral",
+      "control": "bulgeSize ×1.5",
+      "applicable": 15,
+      "detectedK1": 0,
+      "detectedK6": 0
+    },
+    {
+      "family": "smooth",
+      "control": "pa +30°",
+      "applicable": 6,
+      "detectedK1": 6,
+      "detectedK6": 6
+    },
+    {
+      "family": "smooth",
+      "control": "pa −30°",
+      "applicable": 6,
+      "detectedK1": 6,
+      "detectedK6": 6
+    },
+    {
+      "family": "smooth",
+      "control": "pa +90°",
+      "applicable": 17,
+      "detectedK1": 12,
+      "detectedK6": 12
+    },
+    {
+      "family": "smooth",
+      "control": "bulgeFlat +0.1",
+      "applicable": 12,
+      "detectedK1": 11,
+      "detectedK6": 12
+    },
+    {
+      "family": "smooth",
+      "control": "bulgeFlat +0.15",
+      "applicable": 7,
+      "detectedK1": 7,
+      "detectedK6": 7
+    },
+    {
+      "family": "smooth",
+      "control": "bulgeSize ×1.5",
+      "applicable": 11,
+      "detectedK1": 11,
+      "detectedK6": 11
+    },
+    {
+      "family": "smooth",
+      "control": "halo off",
+      "applicable": 17,
+      "detectedK1": 3,
+      "detectedK6": 2
+    },
+    {
+      "family": "smooth",
+      "control": "RMAX 4.2",
+      "applicable": 17,
+      "detectedK1": 1,
+      "detectedK6": 4
+    },
+    {
+      "family": "smooth",
+      "control": "dot size ×1.3",
+      "applicable": 17,
+      "detectedK1": 17,
+      "detectedK6": 17
+    },
+    {
+      "family": "smooth",
+      "control": "orbit 35°",
+      "applicable": 6,
+      "detectedK1": 6,
+      "detectedK6": 6
+    },
+    {
+      "family": "smooth",
+      "control": "bulgeFlat −0.15",
+      "applicable": 11,
+      "detectedK1": 6,
+      "detectedK6": 6
+    },
+    {
+      "family": "spiral@zoom",
+      "control": "pa +90°",
+      "applicable": 17,
+      "detectedK1": 17,
+      "detectedK6": 17
+    },
+    {
+      "family": "spiral@zoom",
+      "control": "halo off",
+      "applicable": 17,
+      "detectedK1": 4,
+      "detectedK6": 4
+    },
+    {
+      "family": "spiral@zoom",
+      "control": "RMAX 4.2",
+      "applicable": 17,
+      "detectedK1": 5,
+      "detectedK6": 4
+    },
+    {
+      "family": "spiral@zoom",
+      "control": "thick ×3",
+      "applicable": 17,
+      "detectedK1": 1,
+      "detectedK6": 1
+    },
+    {
+      "family": "spiral@zoom",
+      "control": "dot size ×1.3",
+      "applicable": 17,
+      "detectedK1": 17,
+      "detectedK6": 17
+    },
+    {
+      "family": "spiral@zoom",
+      "control": "pa +30°",
+      "applicable": 2,
+      "detectedK1": 2,
+      "detectedK6": 2
+    },
+    {
+      "family": "spiral@zoom",
+      "control": "pa −30°",
+      "applicable": 2,
+      "detectedK1": 2,
+      "detectedK6": 2
+    },
+    {
+      "family": "spiral@zoom",
+      "control": "bulgeFlat +0.15",
+      "applicable": 5,
+      "detectedK1": 1,
+      "detectedK6": 1
+    },
+    {
+      "family": "spiral@zoom",
+      "control": "bulgeFlat −0.15",
+      "applicable": 5,
+      "detectedK1": 0,
+      "detectedK6": 0
+    },
+    {
+      "family": "spiral@zoom",
+      "control": "bulgeSize ×1.5",
+      "applicable": 5,
+      "detectedK1": 1,
+      "detectedK6": 1
+    },
+    {
+      "family": "spiral@zoom",
+      "control": "orbit 35°",
+      "applicable": 2,
+      "detectedK1": 2,
+      "detectedK6": 2
+    },
+    {
+      "family": "smooth@zoom",
+      "control": "pa +90°",
+      "applicable": 5,
+      "detectedK1": 3,
+      "detectedK6": 4
+    },
+    {
+      "family": "smooth@zoom",
+      "control": "bulgeFlat +0.1",
+      "applicable": 4,
+      "detectedK1": 3,
+      "detectedK6": 3
+    },
+    {
+      "family": "smooth@zoom",
+      "control": "bulgeFlat +0.15",
+      "applicable": 3,
+      "detectedK1": 3,
+      "detectedK6": 3
+    },
+    {
+      "family": "smooth@zoom",
+      "control": "bulgeFlat −0.15",
+      "applicable": 3,
+      "detectedK1": 2,
+      "detectedK6": 2
+    },
+    {
+      "family": "smooth@zoom",
+      "control": "halo off",
+      "applicable": 5,
+      "detectedK1": 0,
+      "detectedK6": 0
+    },
+    {
+      "family": "smooth@zoom",
+      "control": "RMAX 4.2",
+      "applicable": 5,
+      "detectedK1": 0,
+      "detectedK6": 0
+    },
+    {
+      "family": "smooth@zoom",
+      "control": "dot size ×1.3",
+      "applicable": 5,
+      "detectedK1": 5,
+      "detectedK6": 5
+    },
+    {
+      "family": "smooth@zoom",
+      "control": "pa +30°",
+      "applicable": 2,
+      "detectedK1": 2,
+      "detectedK6": 2
+    },
+    {
+      "family": "smooth@zoom",
+      "control": "pa −30°",
+      "applicable": 2,
+      "detectedK1": 2,
+      "detectedK6": 2
+    },
+    {
+      "family": "smooth@zoom",
+      "control": "bulgeSize ×1.5",
+      "applicable": 3,
+      "detectedK1": 3,
+      "detectedK6": 3
+    },
+    {
+      "family": "smooth@zoom",
+      "control": "orbit 35°",
+      "applicable": 2,
+      "detectedK1": 2,
+      "detectedK6": 2
+    }
+  ],
+  "vsPrevious": {
+    "lowerDetection": [
+      {
+        "family": "spiral",
+        "control": "halo off",
+        "before": "11/68",
+        "now": "5/34"
+      },
+      {
+        "family": "spiral",
+        "control": "thick ×3",
+        "before": "19/68",
+        "now": "9/34"
+      },
+      {
+        "family": "spiral",
+        "control": "bulgeFlat +0.15",
+        "before": "2/28",
+        "now": "1/15"
+      },
+      {
+        "family": "spiral",
+        "control": "bulgeFlat −0.15",
+        "before": "3/28",
+        "now": "1/15"
+      },
+      {
+        "family": "spiral",
+        "control": "bulgeSize ×1.5",
+        "before": "4/28",
+        "now": "0/15"
+      },
+      {
+        "family": "smooth",
+        "control": "halo off",
+        "before": "8/32",
+        "now": "2/17"
+      },
+      {
+        "family": "spiral@zoom",
+        "control": "RMAX 4.2",
+        "before": "8/30",
+        "now": "4/17"
+      },
+      {
+        "family": "spiral@zoom",
+        "control": "thick ×3",
+        "before": "4/30",
+        "now": "1/17"
+      },
+      {
+        "family": "spiral@zoom",
+        "control": "bulgeFlat −0.15",
+        "before": "2/12",
+        "now": "0/5"
+      },
+      {
+        "family": "spiral@zoom",
+        "control": "bulgeSize ×1.5",
+        "before": "5/12",
+        "now": "1/5"
+      },
+      {
+        "family": "smooth@zoom",
+        "control": "bulgeFlat +0.1",
+        "before": "7/8",
+        "now": "3/4"
+      },
+      {
+        "family": "smooth@zoom",
+        "control": "halo off",
+        "before": "7/12",
+        "now": "0/5"
+      },
+      {
+        "family": "smooth@zoom",
+        "control": "RMAX 4.2",
+        "before": "2/12",
+        "now": "0/5"
+      }
+    ],
+    "thresholdsRaised": [
+      {
+        "family": "spiral",
+        "measure": "r90",
+        "before": 0.048,
+        "now": 0.055
+      },
+      {
+        "family": "smooth@zoom",
+        "measure": "r25",
+        "before": 0.035,
+        "now": 0.037
+      },
+      {
+        "family": "smooth@zoom",
+        "measure": "r50",
+        "before": 0.033,
+        "now": 0.041
+      },
+      {
+        "family": "smooth@zoom",
+        "measure": "qInner",
+        "before": 0.035,
+        "now": 0.039
+      }
+    ]
+  },
+  "totals": {
+    "cells": 44,
+    "cellsNotWorse": 42,
+    "detectedK1": 328,
+    "detectedK6": 335,
+    "applicable": 538
+  },
+  "thresholdsK6": {
+    "spiral": {
+      "ink": 0.05,
+      "ssimCoarse": 0.89,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.028,
+      "r50": 0.029,
+      "r90": 0.055,
+      "outer": 0.016,
+      "q": 0.034,
+      "qInner": 0.041
+    },
+    "smooth": {
+      "ink": 0.05,
+      "ssimCoarse": 0.91,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.031,
+      "r50": 0.041,
+      "r90": 0.077,
+      "outer": 0.017,
+      "q": 0.046,
+      "qInner": 0.034
+    },
+    "merger": {
+      "ink": 0.05,
+      "ssimCoarse": 0.85,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.1,
+      "r50": 0.1,
+      "r90": 0.1,
+      "outer": 0.03,
+      "q": 0.05,
+      "qInner": 0.05
+    },
+    "lens": {
+      "ink": 0.05,
+      "ssimCoarse": 0.85,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.1,
+      "r50": 0.1,
+      "r90": 0.1,
+      "outer": 0.03,
+      "q": 0.05,
+      "qInner": 0.05
+    },
+    "star": {
+      "ink": 0.05,
+      "ssimCoarse": 0.85,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.1,
+      "r50": 0.1,
+      "r90": 0.1,
+      "outer": 0.03,
+      "q": 0.05,
+      "qInner": 0.05
+    },
+    "artefact": {
+      "ink": 0.05,
+      "ssimCoarse": 0.85,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.1,
+      "r50": 0.1,
+      "r90": 0.1,
+      "outer": 0.03,
+      "q": 0.05,
+      "qInner": 0.05
+    },
+    "spiral@zoom": {
+      "ink": 0.05,
+      "ssimCoarse": 0.85,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.048,
+      "r50": 0.033,
+      "r90": 0.025,
+      "outer": 0.012,
+      "q": 0.037,
+      "qInner": 0.031
+    },
+    "smooth@zoom": {
+      "ink": 0.05,
+      "ssimCoarse": 0.9,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.037,
+      "r50": 0.041,
+      "r90": 0.044,
+      "outer": 0.012,
+      "q": 0.035,
+      "qInner": 0.039
+    },
+    "lines": {
+      "ink": 0.05,
+      "ssimCoarse": 0.96,
+      "median": 0.1,
+      "p90": 0.138,
+      "r25": 0.128,
+      "r50": 0.064,
+      "r90": 0.132,
+      "outer": 0.02,
+      "q": 0.041,
+      "qInner": 0.053
+    }
+  }
+}
