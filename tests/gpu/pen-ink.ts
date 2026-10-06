@@ -11,12 +11,12 @@
  *   ONE / ONE_MINUS_SRC_ALPHA, exactly as v21's page draws them, on the same SwiftShader.
  *
  * The measure is Σα / Σ segment length (px of ink per px of centreline), and the engine's ink per
- * length against v21's. Gated where the pen is at least a pixel wide (ps ≥ 0.6: whole drawings,
- * arms, rings, bars, envelopes, the jet, bubbles): within ±10%. Below that (ps 0.42, the deep
- * field's drawings, M7; ps 0.38, the dust hatching, M4) the ratio is reported, not gated: the
- * capsule coverage model is shared with M4's hatching (one function per engine: `fs_capsule`,
- * `rasteriseCapsules`), and its sub-pixel behaviour is being decided by M4 (QA found 18–41% too
- * much ink at w ≈ 0.46 px). When that lands, the gate covers every pen scale.
+ * length against v21's, gated at every pen scale the parts and the hatching use (ps 1, 0.6, 0.42,
+ * 0.38) within ±5%. The pen lines are v21's quads unioned per sample (ADR 0019): the same quads, the
+ * same four samples per pixel, one coverage function per engine (`fs_pen_mask` and `fs_pen_resolve` in
+ * render/ribbon.wgsl, `rasteriseCapsules` in src/fallback/raster.ts) shared by the hatching and
+ * every placed drawing. Before ADR 0019 the capsules of ADR 0006 ran 9–16% heavy below one pixel of
+ * pen.
  */
 import { CAPSULE_WORDS } from '../../src/model/ribbons';
 import { BuiltAssets } from '../../src/marks/atlas';
@@ -25,9 +25,7 @@ import { GpuRenderer } from '../../src/render/frame';
 import { adapterName, device, halfToFloat, readTexture, run } from './harness';
 
 const PEN = 2.4;
-/** Gated pen scales: at least about a pixel of pen. */
-const GATE_PS = 0.6;
-const TOL = 0.1;
+const TOL = 0.05;
 
 interface Config {
   name: string;
@@ -240,11 +238,10 @@ run("pen ink per length against v21's quads", async () => {
     buf.destroy();
     const theirs = v21Ink(gl, prog, v21Triangles(seg, w));
     const ratio = ours / theirs;
-    const gated = c.ps >= GATE_PS;
-    const ok = !gated || Math.abs(ratio - 1) <= TOL;
+    const ok = Math.abs(ratio - 1) <= TOL;
     if (!ok) pass = false;
     lines.push(
-      `${ok ? (gated ? 'ok  ' : 'info') : 'FAIL'} ${c.name}: w ${w.toFixed(3)} px, ${String(n)} segments, ${(len / Math.max(1, n)).toFixed(2)} px each; ink per length ${(ours / len).toFixed(3)} against v21's ${(theirs / len).toFixed(3)} (2w = ${(2 * w).toFixed(3)}): ${((ratio - 1) * 100).toFixed(1)}%${gated ? ` (±${String(TOL * 100)}%)` : ' (not gated: sub-pixel pen, M4)'}`,
+      `${ok ? 'ok  ' : 'FAIL'} ${c.name}: w ${w.toFixed(3)} px, ${String(n)} segments, ${(len / Math.max(1, n)).toFixed(2)} px each; ink per length ${(ours / len).toFixed(3)} against v21's ${(theirs / len).toFixed(3)} (2w = ${(2 * w).toFixed(3)}): ${((ratio - 1) * 100).toFixed(1)}% (±${String(TOL * 100)}%)`,
     );
     data[c.name] = { w, segments: n, length: len, ours, v21: theirs, ratio };
   }

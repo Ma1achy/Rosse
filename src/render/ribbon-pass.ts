@@ -1,7 +1,9 @@
 /**
- * The ribbon pipelines (ADR 0007): textured stroke ribbons and pen-line capsules, pulled from
- * buffers written by compute/ribbons.wgsl, into the ink target. Shader: render/ribbon.wgsl.
- * Premultiplied, blend ONE / ONE_MINUS_SRC_ALPHA, no MSAA; six vertices per segment.
+ * The ribbon pipelines (ADR 0007): textured stroke ribbons and pen lines, pulled from buffers
+ * written by compute/ribbons.wgsl, into the ink target. Shader: render/ribbon.wgsl. Premultiplied,
+ * blend ONE / ONE_MINUS_SRC_ALPHA, no MSAA; six vertices per segment. Pen lines (the dust
+ * hatching) are v21's overlap quads unioned per sample (ADR 0019): a coverage pass into their own
+ * rgba8unorm target (one channel per sample, MAX blending), then a resolve over the ink.
  */
 import ribbonWgsl from '../shaders/render/ribbon.wgsl';
 import { bufferWithData, packStruct } from '../gpu/buffers';
@@ -33,11 +35,21 @@ const BLEND: GPUBlendState = {
   alpha: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha', operation: 'add' },
 };
 
+/** The pen lines' coverage target: one channel per sample (ADR 0019). */
+export const PEN_MASK_FORMAT: GPUTextureFormat = 'rgba8unorm';
+
+const MAX: GPUBlendState = {
+  color: { srcFactor: 'one', dstFactor: 'one', operation: 'max' },
+  alpha: { srcFactor: 'one', dstFactor: 'one', operation: 'max' },
+};
+
 export class RibbonPipeline {
   readonly ribbon: GPURenderPipeline;
-  readonly capsule: GPURenderPipeline;
+  readonly penMask: GPURenderPipeline;
+  readonly penResolve: GPURenderPipeline;
   readonly ribbonLayout: GPUBindGroupLayout;
   readonly capsuleLayout: GPUBindGroupLayout;
+  readonly resolveLayout: GPUBindGroupLayout;
   readonly sampler: GPUSampler;
 
   constructor(readonly device: GPUDevice) {
@@ -67,16 +79,37 @@ export class RibbonPipeline {
         { binding: 4, visibility: GPUShaderStage.VERTEX, buffer: { type: 'read-only-storage' } },
       ],
     });
-    const make = (layout: GPUBindGroupLayout, vs: string, fs: string, label: string) =>
+    this.resolveLayout = device.createBindGroupLayout({
+      label: 'pen resolve',
+      entries: [
+        uniform,
+        {
+          binding: 5,
+          visibility: GPUShaderStage.FRAGMENT,
+          texture: { sampleType: 'float', viewDimension: '2d' },
+        },
+      ],
+    });
+    const make = (
+      layout: GPUBindGroupLayout,
+      vs: string,
+      fs: string,
+      label: string,
+      target: GPUColorTargetState = { format: INK_FORMAT, blend: BLEND },
+    ) =>
       device.createRenderPipeline({
         label,
         layout: device.createPipelineLayout({ bindGroupLayouts: [layout] }),
         vertex: { module, entryPoint: vs },
-        fragment: { module, entryPoint: fs, targets: [{ format: INK_FORMAT, blend: BLEND }] },
+        fragment: { module, entryPoint: fs, targets: [target] },
         primitive: { topology: 'triangle-list' },
       });
     this.ribbon = make(this.ribbonLayout, 'vs_ribbon', 'fs_ribbon', 'ribbon');
-    this.capsule = make(this.capsuleLayout, 'vs_capsule', 'fs_capsule', 'capsule');
+    this.penMask = make(this.capsuleLayout, 'vs_capsule', 'fs_pen_mask', 'pen mask', {
+      format: PEN_MASK_FORMAT,
+      blend: MAX,
+    });
+    this.penResolve = make(this.resolveLayout, 'vs_pen_resolve', 'fs_pen_resolve', 'pen resolve');
     this.sampler = device.createSampler({
       magFilter: 'linear',
       minFilter: 'linear',
@@ -203,35 +236,70 @@ export class RibbonBatch {
 }
 
 /**
- * One layer of pen-line capsules: `count` of them, or, with `indirect`, as many as its draw
- * arguments [6·n, 1, 0, 0] say (a compaction's output, `count` being the buffer's capacity).
+ * One layer of pen lines (ADR 0019): `prepass` unions its quads per sample into the layer's own
+ * coverage target, outside the ink pass; `encode` resolves that coverage over the ink. It draws
+ * `count` quads, or, with `indirect`, as many as its draw arguments [6·n, 1, 0, 0] say (a
+ * compaction's output, `count` being the buffer's capacity). Each pass of the plates has its own
+ * uniforms (ink, gain, offset), made on first use; the coverage target is shared, because the
+ * prepass and the resolve of one pass run one after the other.
  */
 export class CapsuleBatch {
-  private readonly groups: PassGroups<GPUBindGroup>;
+  private readonly mask: GPUTexture;
+  private readonly maskView: GPUTextureView;
+  private readonly groups: PassGroups<{ sources: GPUBindGroup[]; resolve: GPUBindGroup }>;
+  private readonly sources: { count: number; indirect?: GPUBuffer }[];
+  readonly count: number;
 
   constructor(
     private readonly pipe: RibbonPipeline,
-    buffer: GPUBuffer,
-    readonly count: number,
+    sources: { buffer: GPUBuffer; count: number; indirect?: GPUBuffer | undefined }[],
     opts: DrawOpts,
-    private readonly indirect?: GPUBuffer,
   ) {
+    const d = pipe.device;
+    this.sources = sources.map((s) => ({
+      count: s.count,
+      ...(s.indirect ? { indirect: s.indirect } : {}),
+    }));
+    this.count = sources.reduce((n, s) => n + s.count, 0);
+    this.mask = d.createTexture({
+      label: 'pen-line coverage',
+      size: [Math.max(1, opts.targetWidth), Math.max(1, opts.targetHeight)],
+      format: PEN_MASK_FORMAT,
+      usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
+    });
+    this.maskView = this.mask.createView();
     this.groups = new PassGroups(opts, (o) => {
-      const uniforms = drawUniforms(pipe.device, o, null, 'capsule uniforms');
-      const group = pipe.device.createBindGroup({
-        layout: pipe.capsuleLayout,
-        entries: [
-          { binding: 0, resource: { buffer: uniforms } },
-          { binding: 4, resource: { buffer } },
-        ],
-      });
-      return { uniforms, group };
+      const uniforms = drawUniforms(d, o, null, 'pen-line uniforms');
+      return {
+        uniforms,
+        group: {
+          sources: sources.map((s) =>
+            d.createBindGroup({
+              layout: pipe.capsuleLayout,
+              entries: [
+                { binding: 0, resource: { buffer: uniforms } },
+                { binding: 4, resource: { buffer: s.buffer } },
+              ],
+            }),
+          ),
+          resolve: d.createBindGroup({
+            layout: pipe.resolveLayout,
+            entries: [
+              { binding: 0, resource: { buffer: uniforms } },
+              { binding: 5, resource: this.maskView },
+            ],
+          }),
+        },
+      };
     });
   }
 
   /** The batch as the frame's `Batch` methods (its pop is the caller's). */
   bind() {
     return {
+      prepass: (encoder: GPUCommandEncoder, style: PassStyle) => {
+        this.prepass(encoder, style);
+      },
       encode: (pass: GPURenderPassEncoder, style: PassStyle) => {
         this.encode(pass, style);
       },
@@ -241,15 +309,33 @@ export class CapsuleBatch {
     };
   }
 
+  prepass(encoder: GPUCommandEncoder, style: PassStyle = KEY_STYLE): void {
+    const g = this.groups.get(style);
+    const pass = encoder.beginRenderPass({
+      label: 'pen-line coverage',
+      colorAttachments: [
+        { view: this.maskView, loadOp: 'clear', storeOp: 'store', clearValue: [0, 0, 0, 0] },
+      ],
+    });
+    pass.setPipeline(this.pipe.penMask);
+    this.sources.forEach((s, i) => {
+      if (!s.count) return;
+      pass.setBindGroup(0, g.sources[i]);
+      if (s.indirect) pass.drawIndirect(s.indirect, 0);
+      else pass.draw(s.count * 6);
+    });
+    pass.end();
+  }
+
   encode(pass: GPURenderPassEncoder, style: PassStyle = KEY_STYLE): void {
     if (!this.count) return;
-    pass.setPipeline(this.pipe.capsule);
-    pass.setBindGroup(0, this.groups.get(style));
-    if (this.indirect) pass.drawIndirect(this.indirect, 0);
-    else pass.draw(this.count * 6);
+    pass.setPipeline(this.pipe.penResolve);
+    pass.setBindGroup(0, this.groups.get(style).resolve);
+    pass.draw(3);
   }
 
   destroy(): void {
     this.groups.destroy();
+    this.mask.destroy();
   }
 }

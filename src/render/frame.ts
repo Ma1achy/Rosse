@@ -28,6 +28,8 @@ import type { Surface } from './surface';
 interface Batch {
   /** the population the colour plate inks it as */
   pop: NonNullable<InkLayer['pop']>;
+  /** work outside the ink pass, before this layer (the pen lines' coverage, ADR 0019) */
+  prepass?(encoder: GPUCommandEncoder, style: PassStyle): void;
   encode(pass: GPURenderPassEncoder, style: PassStyle): void;
   destroy(): void;
 }
@@ -114,7 +116,11 @@ export class GpuRenderer {
       if (l.kind === 'gpu-capsules')
         return {
           pop,
-          ...new CapsuleBatch(this.ribbons, l.buffer, l.count, opts, l.indirect).bind(),
+          ...new CapsuleBatch(
+            this.ribbons,
+            [{ buffer: l.buffer, count: l.count, indirect: l.indirect }, ...(l.more ?? [])],
+            opts,
+          ).bind(),
         };
       if (l.kind === 'capsules' || l.kind === 'ribbons')
         throw new Error('the WebGPU engine draws GPU ribbon buffers only');
@@ -141,26 +147,42 @@ export class GpuRenderer {
 
   /**
    * Inks every layer, in order, into the ink target, once per pass of the plates (the reference's
-   * scene(), app23.js:L1302–1307). The default is the key ink on Paper, one pass.
+   * scene(), app23.js:L1302–1307). The default is the key ink on Paper, one pass. A layer with a
+   * prepass (the pen lines) ends the ink pass, runs its own, and the ink pass resumes (load) for
+   * it and the layers after it.
    */
   drawInk(look: InkLook = DEFAULT_LOOK): void {
     this.plates = look.plates;
     const encoder = this.device.createCommandEncoder({ label: 'ink' });
-    const pass = encoder.beginRenderPass({
-      label: 'ink',
-      colorAttachments: [
-        {
-          view: this.inkView,
-          loadOp: 'clear',
-          storeOp: 'store',
-          clearValue: [0, 0, 0, 0],
-        },
-      ],
-    });
+    let cleared = false;
+    const begin = () => {
+      const pass = encoder.beginRenderPass({
+        label: 'ink',
+        colorAttachments: [
+          {
+            view: this.inkView,
+            loadOp: cleared ? 'load' : 'clear',
+            storeOp: 'store',
+            clearValue: [0, 0, 0, 0],
+          },
+        ],
+      });
+      cleared = true;
+      return pass;
+    };
+    let pass: GPURenderPassEncoder | null = null;
     for (const p of platePasses(look.plates, look.palette))
-      for (const b of this.batches)
-        b.encode(pass, { ink: p.inkOf(b.pop), gain: p.gain, off: p.off });
-    pass.end();
+      for (const b of this.batches) {
+        const style = { ink: p.inkOf(b.pop), gain: p.gain, off: p.off };
+        if (b.prepass) {
+          pass?.end();
+          pass = null;
+          b.prepass(encoder, style);
+        }
+        pass ??= begin();
+        b.encode(pass, style);
+      }
+    (pass ?? begin()).end();
     this.device.queue.submit([encoder.finish()]);
   }
 

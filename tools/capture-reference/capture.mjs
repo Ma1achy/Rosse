@@ -24,8 +24,9 @@
  *   --only    presets, comma-separated, or separated by | when a name holds a comma
  *             (--only "Grand design|Loose, open arms").
  *   --cameras capture only these cameras (comma-separated), e.g. --cameras zoom.
- *   --variant with --extra, capture only the cases of these variants (comma-separated), e.g.
- *             --variant vectors.
+ *   --variants  with --extra: only the cases of these variants (comma-separated).
+ *             A case with `"calibration": true` is captured and recorded as such: the golden
+ *             runner calibrates on it and does not gate it (held-out seeds, ADR 0018).
  *   --reroll  for calibration (ADR 0013): every preset at the home camera and again at az + 0.3°,
  *             which in v21 re-rolls the stipple when dust lanes are on (reference notes 20.1).
  *             Written to tests/golden/actual/reroll/ by default (not committed), with no manifest.
@@ -112,7 +113,7 @@ function serve() {
 
 /**
  * @typedef {{ preset: string, seed: number, chalk: boolean, variant?: string,
- *   overrides?: Record<string, unknown>, cameras: readonly string[] }} Job
+ *   overrides?: Record<string, unknown>, calibration?: boolean, cameras: readonly string[] }} Job
  */
 
 /**
@@ -209,6 +210,7 @@ async function captureJob(browser, url, job, out) {
       camera,
       surface: job.chalk ? 'chalkboard' : 'paper',
       ...(job.variant ? { variant: job.variant, overrides: job.overrides } : {}),
+      ...(job.calibration ? { calibration: true } : {}),
       sequence:
         camera === 'home' || camera === 'zoom'
           ? [
@@ -302,7 +304,8 @@ async function main() {
   if (extraFile) {
     /**
      * @type {{ cameras?: string[], cases: { preset: string, variant: string,
-     *   overrides: Record<string, unknown>, seeds?: number[], zoom?: number[], chalk?: boolean }[] }}
+     *   overrides: Record<string, unknown>, seeds?: number[], zoom?: number[],
+     *   calibration?: boolean, chalk?: boolean }[] }}
      */
     const extra = JSON.parse(readFileSync(resolve(ROOT, extraFile), 'utf8'));
     const fileCams = extra.cameras ?? [...CAMERAS];
@@ -318,7 +321,7 @@ async function main() {
         throw new Error('the orbit camera needs the home camera');
       return cams;
     };
-    const variants = opt('--variant')
+    const variants = opt('--variants')
       ?.split(',')
       .map((s) => s.trim());
     jobs = extra.cases
@@ -389,6 +392,7 @@ async function main() {
     name: r.name,
     preset: r.preset,
     ...(r.variant ? { variant: r.variant, overrides: r.overrides } : {}),
+    ...(r.calibration ? { calibration: true } : {}),
     seed: r.seed,
     camera: r.camera,
     ...(r.zoom !== 1 ? { zoom: r.zoom } : {}),

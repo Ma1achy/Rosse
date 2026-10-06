@@ -14,7 +14,10 @@ import type { Params } from '../../src/core/params';
 import { presetParams } from '../../src/core/presets';
 import { ribbonModel, runRibbons } from '../../src/fallback/kernels/ribbons';
 import { CURVE_STATE_WORDS, CurveFlag, ribUniform } from '../../src/model/ribbons';
-import { curves } from '../../src/model/curves';
+import { curves, edgeOnAlpha } from '../../src/model/curves';
+import { CpuRenderer } from '../../src/fallback';
+import { createInkBuffer, rasteriseCapsules } from '../../src/fallback/raster';
+import { CpuStipple, lineLayers } from '../../src/fallback/stipple';
 import { dustLanes } from '../../src/model/lanes';
 import { markGroups } from '../../src/model/clumps';
 import { buildScene, drawingsMeta } from '../../src/model/scene';
@@ -22,7 +25,7 @@ import { atlasFromBytes, type BuiltIndex } from '../../src/marks/atlas';
 import type { VectorSheet } from '../../src/marks/vector';
 import { cameraOf, incE, project, structureKey, viewDesc } from '../../src/view/camera';
 import { v21Variation } from '../golden/compare/v21';
-import { v21CurvePicks, v21Lines } from '../golden/compare/v21-curves';
+import { v21CurvePicks, v21DustPicks, v21Lines, v21RingKnots } from '../golden/compare/v21-curves';
 import { v21NoiseTables } from '../golden/compare/v21-noise';
 
 const ROOT = resolve(import.meta.dirname, '../..');
@@ -64,6 +67,12 @@ const CASES: [string, Params][] = [
   ['Edge-on with dust s7 (incl 88)', presetParams('Edge-on with dust', 7)],
   ['Grand design s7 at incl 99', presetParams('Grand design', 7, { ...M4, incl: 99 })],
   ['Flocculent s4242', presetParams('Flocculent', 4242, M4)],
+  ['Disc, no arms s7 (outline)', presetParams('Disc, no arms', 7, M4)],
+  ['Ringed s4242 (outline)', presetParams('Ringed', 4242, M4)],
+  [
+    'Grand design s7 with a tail',
+    presetParams('Grand design', 7, { ...M4, tail: 0.6, outline: 0.5 }),
+  ],
 ];
 
 describe('curves against v21 (app23.js:L768–800)', () => {
@@ -81,8 +90,6 @@ describe('curves against v21 (app23.js:L768–800)', () => {
         expect(c.k).toBe(t.k);
         expect(c.w).toBeCloseTo(t.w, 12);
         expect(c.pts.length).toBe(t.pts.length);
-        // outline and tail angles are drawn from each engine's own stream
-        if (c.role === 'outline' || c.role === 'tail') return;
         let worst = 0;
         c.pts.forEach((p, j) => {
           const q = t.pts[j] ?? [0, 0, 0];
@@ -120,6 +127,75 @@ describe('dust lanes against v21 (app23.js:L944–985)', () => {
           expect(theirs.strokes.length).toBeGreaterThanOrEqual(theirs.pts.length);
         }
       });
+});
+
+describe("with v21's dust choices (ADR 0018), the hatches are v21's", () => {
+  for (const [name, P] of CASES)
+    for (const zoom of [1, 2])
+      it(`${name}, zoom ${String(zoom)}`, () => {
+        const V = v21Variation(P, M);
+        const field = packNoise(v21NoiseTables(ROOT, P.seed));
+        const picks = v21DustPicks(ROOT, P, V, KINDS, penlines.n);
+        const ours = dustLanes(P, V, penlines, P.incl, field, P.seed, picks);
+        const theirs = v21Lines(ROOT, P, V, KINDS, zoom).lanes().strokes;
+        const cam = cameraOf(P, zoom);
+        expect(ours.hatches).toHaveLength(theirs.length);
+        expect(ours.hatches.map((h) => h.tile)).toEqual(picks.tiles);
+        let worst = 0;
+        let worstAng = 0;
+        ours.hatches.forEach((h, i) => {
+          // the view tier's layout (src/fallback/kernels/ribbons.ts hatchFrame), in f64
+          const q = project(h.a, cam);
+          const q2 = project(h.b, cam);
+          const a0 = Math.atan2(q2[1] - q[1], q2[0] - q[0]);
+          const ang = a0 + h.dAng;
+          const x = q[0] - Math.sin(a0) * h.offN * zoom + Math.cos(ang) * h.offF * zoom;
+          const y =
+            q[1] + Math.cos(a0) * h.offN * zoom + h.offY * zoom + Math.sin(ang) * h.offF * zoom;
+          const t = theirs[i] ?? [0, 0, 0, 0];
+          worst = Math.max(
+            worst,
+            Math.hypot(x - (t[0] ?? 0), y - (t[1] ?? 0)),
+            Math.abs(h.len * zoom - (t[3] ?? 0)),
+          );
+          const dA = Math.abs(ang - (t[2] ?? 0)) % (2 * Math.PI);
+          worstAng = Math.max(worstAng, Math.min(dA, 2 * Math.PI - dA));
+        });
+        expect(worst).toBeLessThan(1e-6);
+        expect(worstAng).toBeLessThan(1e-9);
+      });
+});
+
+describe('the dust choices are keyed by the placement key (ADR 0018)', () => {
+  const P = presetParams('Dusty spiral', 4242, M4);
+  const V = v21Variation(P, M);
+  const field = packNoise(v21NoiseTables(ROOT, P.seed));
+  it('a re-draw keeps which hatches exist and re-draws their numbers and pen lines', () => {
+    const a = dustLanes(P, V, penlines, P.incl, field);
+    const b = dustLanes(P, V, penlines, P.incl, field, P.seed + 7_919_000);
+    expect(b.pts).toEqual(a.pts);
+    const main = (l: typeof a) => l.hatches.filter((h) => h.offF === 0);
+    expect(main(b).map((h) => h.a)).toEqual(main(a).map((h) => h.a));
+    expect(main(b).map((h) => h.len)).not.toEqual(main(a).map((h) => h.len));
+    expect(b.hatches.map((h) => h.tile)).not.toEqual(a.hatches.map((h) => h.tile));
+  });
+  it("a hatch's pen line does not depend on the hatches before it (review m2)", () => {
+    const a = dustLanes(P, V, penlines, P.incl, field);
+    // fewer hatches before the arms' (no ring lane), more patches on the arms
+    const b = dustLanes({ ...P, dustScribble: P.dustScribble + 0.1 }, V, penlines, P.incl, field);
+    const at = (l: typeof a) =>
+      new Map(l.hatches.filter((h) => h.offF === 0).map((h) => [h.a.join(), h]));
+    const A = at(a);
+    let shared = 0;
+    for (const [k, h] of at(b)) {
+      const g = A.get(k);
+      if (!g) continue;
+      shared++;
+      expect([h.tile, h.dAng, h.offN]).toEqual([g.tile, g.dAng, g.offN]);
+    }
+    expect(shared).toBeGreaterThan(20);
+    expect(b.hatches.length).toBeGreaterThan(a.hatches.length);
+  });
 });
 
 /** v21's own `vnoise` (app23.js:L73–75), cut out and evaluated as written. */
@@ -197,6 +273,49 @@ describe('ring knots and clumps (app23.js:L282–297)', () => {
     // no drawn stars in clumps with starMix 0
     expect(clumps.every((c) => c.rstars === 0)).toBe(true);
   });
+
+  it("v21's clusters (ADR 0018) are placed as given; the placement key re-draws the engine's", () => {
+    const P = presetParams('Barred spiral', 7, M4);
+    const V = v21Variation(P, M);
+    const picks = v21RingKnots(ROOT, P, V, KINDS);
+    expect(picks).toHaveLength(Math.round(6 + 10 * P.ring));
+    const g = markGroups(P, V, P.seed, picks).filter((x) => x.kind === 0);
+    g.forEach((x, i) => {
+      const p = picks[i];
+      if (!p) throw new Error('missing');
+      expect(x.count).toBe(p.count);
+      expect(x.c[0]).toBeCloseTo(p.R * Math.cos(p.t), 12);
+      expect(x.c[1]).toBeCloseTo(p.R * Math.sin(p.t), 12);
+    });
+    const own = markGroups(P, V).filter((x) => x.kind === 0);
+    const again = markGroups(P, V, P.seed + 7_919_000).filter((x) => x.kind === 0);
+    expect(again.map((x) => x.c)).not.toEqual(own.map((x) => x.c));
+  });
+
+  it("a cluster's marks follow v21's distribution (the loop's bound drawn at every turn)", () => {
+    // P(count = c) = (c − 4)/8 · Π_{j<c} (1 − (j − 4)/8), for c = 5..12
+    const expected = new Map<number, number>();
+    let alive = 1;
+    for (let c = 5; c <= 12; c++) {
+      const stop = (c - 4) / 8;
+      expected.set(c, alive * stop);
+      alive *= 1 - stop;
+    }
+    const seen = new Map<number, number>();
+    let n = 0;
+    const P0 = presetParams('Barred spiral', 7, M4);
+    const V = v21Variation(P0, M);
+    for (let seed = 1; seed <= 400; seed++)
+      for (const x of markGroups({ ...P0, seed }, V).filter((y) => y.kind === 0)) {
+        seen.set(x.count, (seen.get(x.count) ?? 0) + 1);
+        n++;
+      }
+    for (const [c, p] of expected) {
+      const got = (seen.get(c) ?? 0) / n;
+      // binomial sampling error over about 6,000 clusters is under 0.007
+      expect(Math.abs(got - p), `count ${String(c)}`).toBeLessThan(0.02);
+    }
+  });
 });
 
 describe('the ribbon kernels (CPU)', () => {
@@ -268,5 +387,73 @@ describe('the ribbon kernels (CPU)', () => {
     // 81° and 99° fall in one incE bucket, but v21's alpha is 0.5 and 1.5 × lines
     expect(at(81)).toBeCloseTo((0.5 * (81 - 72)) / 18, 5);
     expect(at(99)).toBeCloseTo((0.5 * (99 - 72)) / 18, 5);
+  });
+});
+
+describe('the edge-on stroke past 90° (review m1)', () => {
+  it('inks at most 1 on the raster, as v21 does through its RGBA8 canvas', () => {
+    const P = presetParams('Edge-on with dust', 7, { lines: 1, incl: 99 });
+    expect(edgeOnAlpha(P.lines, P.incl)).toBeGreaterThan(1);
+    const scene = buildScene(P, M);
+    const st = new CpuStipple(scene);
+    const v = st.view(cameraOf(P));
+    const r = new CpuRenderer(
+      { plateCss: 800, dpr: 1 },
+      { width: 1, height: 1, data: new Uint8Array(4) },
+    );
+    for (const n of ['dots', 'knots', 'stars', 'cores', 'strokes'] as const) r.addAtlas(atlas(n));
+    r.addAtlas(
+      atlasFromBytes(
+        'pieces',
+        index.atlases.pieces,
+        new Uint8Array(readFileSync(resolve(BUILT, index.atlases.pieces.file))),
+      ),
+    );
+    r.setLayers(lineLayers(v.ribbons, st.lines));
+    r.drawInk();
+    let max = 0;
+    let inked = 0;
+    for (let i = 3; i < r.ink.data.length; i += 4) {
+      const a = r.ink.data[i] ?? 0;
+      max = Math.max(max, a);
+      if (a > 0) inked++;
+    }
+    expect(inked).toBeGreaterThan(1000);
+    expect(max).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('pen lines are unioned per sample (ADR 0019, QA D2)', () => {
+  const ink = (caps: number[][]) => {
+    const t = createInkBuffer(64, 64);
+    const buf = new Float32Array(caps.length * 8);
+    caps.forEach((c, i) => {
+      buf.set([c[0] ?? 0, c[1] ?? 0, c[2] ?? 0, c[3] ?? 0, c[4] ?? 0, 1, 0, 0], i * 8);
+    });
+    rasteriseCapsules(t, buf, caps.length, { pxPerUnit: 1, gain: 1 });
+    let s = 0;
+    for (let i = 3; i < t.data.length; i += 4) s += t.data[i] ?? 0;
+    return s;
+  };
+  const w = 0.456;
+  it("one segment inks v21's quad: its area, extended by 0.9 w at both ends", () => {
+    // slanted, so that the four samples' quantisation averages out along it (an axis-aligned
+    // line of this width covers all four samples of one row of pixels, as in v21)
+    const slant = Math.hypot(40, 10.8);
+    expect(ink([[10.2, 20.3, 50.2, 31.1, w]]) / (2 * w * (slant + 1.8 * w))).toBeCloseTo(1, 1);
+  });
+  it('a segment drawn twice, or overlapping its neighbour, inks no more than the union', () => {
+    const one = ink([[10.2, 20.3, 50.2, 31.1, w]]);
+    expect(
+      ink([
+        [10.2, 20.3, 50.2, 31.1, w],
+        [10.2, 20.3, 50.2, 31.1, w],
+      ]),
+    ).toBe(one);
+    // a polyline cut into 1-px pieces inks as much as one quad: the overlaps at its joins count once
+    const pieces: number[][] = [];
+    for (let x = 10; x < 50; x++) pieces.push([x + 0.2, 20.5, x + 1.2, 20.5, w]);
+    const whole = ink([[10.2, 20.5, 50.2, 20.5, w]]);
+    expect(Math.abs(ink(pieces) / whole - 1)).toBeLessThan(0.03);
   });
 });

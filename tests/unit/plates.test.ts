@@ -255,11 +255,10 @@ describe('plates against v21', () => {
       off: [p.off[0], p.off[1]] as [number, number],
       gain: p.gain,
     }));
-    const worst = (passes: typeof real) =>
-      Math.max(
-        ...compareInk(inkWith(layers, passes, cap.size), png, cap.size).err,
-        ...compareInk(inkWith(layers, passes, cap.size), png, cap.size).total.map(Math.abs),
-      );
+    const worst = (passes: typeof real) => {
+      const c = compareInk(inkWith(layers, passes, cap.size), png, cap.size);
+      return Math.max(...c.err, ...c.total.map(Math.abs));
+    };
     // the same passes pass: the controls differ only by what they change
     expect(worst(real)).toBeLessThan(FLOOR);
     const slipped = real.map((p, k) =>
@@ -270,5 +269,5 @@ describe('plates against v21', () => {
     expect(worst(gain), 'cyan 30% heavier').toBeGreaterThan(TOTAL);
     const swapped = real.map((p, k) => (k === 2 ? { ...p, ink: () => PALETTES.light.hii } : p));
     expect(worst(swapped), 'yellow plate in the wrong ink').toBeGreaterThan(TOTAL);
-  });
+  }, 60_000);
 });

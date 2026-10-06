@@ -485,6 +485,9 @@ async function start(): Promise<void> {
     frameRequested = false;
     const e = engine;
     if (!e) return; // the first frame will pick up the current surface and size
+    // the size as it is now: a DPR change can reach a frame before its media-query event has
+    // updated wantedSize, which drew (and reported in __rosse.size) the old DPR for one frame
+    wantedSize = plateSize(plateCanvas());
     const wantedSurface = surface;
     const wantedPlates = wanted.P.plates as Plates;
     try {
