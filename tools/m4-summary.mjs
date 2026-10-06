@@ -5,7 +5,8 @@
  *
  *   node tools/m4-summary.mjs results                 test-results/golden.json (npm run golden), the
  *                                                     thresholds, and the margins per case
- *   node tools/m4-summary.mjs calibration <k1.json>   the K spreads and the negative-control cells:
+ *   node tools/m4-summary.mjs calibration <k1.json> [<prev-calibration.json> <prev-thresholds.json>]
+ *                                                     the K spreads and the negative-control cells:
  *                                                     tests/golden/calibration.json (K = 6) against
  *                                                     <k1.json>, the same shards aggregated for K = 1
  *                                                     (`npm run golden -- --calibrate --reuse-shards
@@ -44,7 +45,7 @@ const r4 = (/** @type {number} */ x) => Math.round(x * 1e4) / 1e4;
 
 try {
   if (mode === 'results') results();
-  else if (mode === 'calibration') calibration(rest[0] ?? '');
+  else if (mode === 'calibration') calibration(rest[0] ?? '', rest[1], rest[2]);
   else if (mode === 'breaks') breaks(rest[0] ?? '');
   else if (mode === 'hatch') await hatch(rest);
   else
@@ -151,8 +152,10 @@ function results() {
  * for K = 6 (the committed calibration.json) against K = 1 (the same shards, one draw each).
  *
  * @param {string} k1Path
+ * @param {string} [prevCalibration] the calibration this one replaces (K = 3 single-draw pairs)
+ * @param {string} [prevThresholds]
  */
-function calibration(k1Path) {
+function calibration(k1Path, prevCalibration, prevThresholds) {
   if (!existsSync(k1Path)) throw new Error(`no K = 1 aggregate at ${k1Path}`);
   const k6 = JSON.parse(readFileSync(join(ROOT, 'tests/golden/calibration.json'), 'utf8'));
   const k1 = JSON.parse(readFileSync(k1Path, 'utf8'));
@@ -202,15 +205,43 @@ function calibration(k1Path) {
     }
   }
   const thresholds = JSON.parse(readFileSync(join(ROOT, 'tests/golden/thresholds.json'), 'utf8'));
+  /** the earlier calibration (before the K-mean): cells that detect less now, and thresholds that rose */
+  let vsPrevious = null;
+  if (prevCalibration && prevThresholds) {
+    const pc = JSON.parse(readFileSync(prevCalibration, 'utf8'));
+    const pt = JSON.parse(readFileSync(prevThresholds, 'utf8'));
+    const lower = [];
+    for (const c of cells) {
+      const x = pc.families[c.family]?.negativeControls?.[c.control];
+      if (x && c.detectedK6 / c.applicable < x.detected / x.applicable - 1e-9)
+        lower.push({
+          family: c.family,
+          control: c.control,
+          before: `${String(x.detected)}/${String(x.applicable)}`,
+          now: `${String(c.detectedK6)}/${String(c.applicable)}`,
+        });
+    }
+    const rose = [];
+    for (const [f, t] of Object.entries(thresholds.parity)) {
+      for (const k of ['ink', 'median', 'p90', 'r25', 'r50', 'r90', 'outer', 'q', 'qInner']) {
+        const before = pt.parity[f]?.[k];
+        const now = /** @type {any} */ (t)[k];
+        if (typeof before === 'number' && now > before + 1e-9)
+          rose.push({ family: f, measure: k, before, now });
+      }
+    }
+    vsPrevious = { lowerDetection: lower, thresholdsRaised: rose };
+  }
   write('m4-calibration-k.json', {
     about:
       "ADR 0018's evidence, from the calibration's shards (test-results/calibration-shard-*.json): spread, per family and K, of the mean-of-K statistic of a re-draw against a stand-in for v21 (the 95th percentile of |Δ| of r50, r25 and ink; the ratio of r50's to K = 1 and its theoretical value √((1 + 1/K)/2)); and the negative controls' detection cells with the K = 6 thresholds against the same measurements as single draws (K = 1). Written by tools/m4-summary.mjs calibration.",
     keys: k6.keys,
     standIns: k6.standIns,
-    controlsEvery: k6.controlsEvery,
+    controls: k6.controls,
     configurations: k6.configurations?.length ?? null,
     spread,
     controlCells: cells,
+    vsPrevious,
     totals: {
       cells: cells.length,
       cellsNotWorse: cells.filter((c) => c.detectedK6 >= (c.detectedK1 ?? 0)).length,
@@ -333,7 +364,19 @@ async function hatch(dirs) {
       "Ink the dust hatching adds, engine against v21 (ADR 0019): (hatch − no hatch) of Σα on v21 captures with the stipple, lines, knots and sparkle off, against the CPU engine drawn with v21's choices (ADR 0018). `before` is the first build (capsule coverage, composited per pixel), measured the same way on the ten pen 2.4 cases before ADR 0019 (the engine as of commit 6eb2e8e); `rows` are the final build (v21's quads unioned at its four sample positions). Written by tools/m4-summary.mjs hatch.",
     before: {
       pen: 2.4,
-      ratios: [1.196, 1.244, 1.19, 1.195, 1.19, 1.207, 1.196, 1.212, 1.167, 1.205],
+      about: 'the first build: capsule coverage composited per pixel (engine as of commit 6eb2e8e)',
+      ratios: Object.fromEntries([
+        ['grand-design--hatch__s7__home', 1.196],
+        ['grand-design--hatch__s4242__home', 1.244],
+        ['flocculent--hatch__s7__home', 1.19],
+        ['flocculent--hatch__s4242__home', 1.195],
+        ['hand-wobble--hatch__s7__home', 1.19],
+        ['hand-wobble--hatch__s4242__home', 1.207],
+        ['tightly-wound--hatch__s7__home', 1.196],
+        ['tightly-wound--hatch__s4242__home', 1.212],
+        ['dusty-spiral--hatch__s7__home', 1.167],
+        ['dusty-spiral--hatch__s4242__home', 1.205],
+      ]),
       mean: 1.2,
     },
     summary: {

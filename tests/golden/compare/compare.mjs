@@ -576,9 +576,8 @@ async function calibrate(G, node) {
   };
   /** @type {{ pairs: Record<string, any[]>, controls: Record<string, Record<string, any[]>>, heldOut: Record<string, any[]> }} */
   const eng = { pairs: {}, controls: {}, heldOut: {} };
-  // what the shards say about how they were made (a re-aggregation must not write its defaults)
-  /** @type {Set<number>} */
-  const everySeen = new Set();
+  // which configurations the negative controls ran on, as the shards recorded it (a
+  // re-aggregation must not write its own defaults)
   /** @type {Set<string>} */
   const withControls = new Set();
   for (let k = 0; existsSync(join(ROOT, `test-results/calibration-shard-${k}.json`)); k++) {
@@ -586,7 +585,6 @@ async function calibrate(G, node) {
     const part = JSON.parse(
       readFileSync(join(ROOT, `test-results/calibration-shard-${k}.json`), 'utf8'),
     );
-    if (typeof part.controlsEvery === 'number') everySeen.add(part.controlsEvery);
     for (const label of part.controlsDone ?? []) withControls.add(label);
     for (const byName of Object.values(part.controls ?? {}))
       for (const list of Object.values(/** @type {any} */ (byName)))
@@ -791,10 +789,12 @@ async function calibrate(G, node) {
       "ADR 0013 / 0015 / 0018 calibration: per family, summaries (n, min, p5, median, p95, max) of each measure. engineRekey: the new engine (CPU, equal to WebGPU at L1) drawing v21's replayed variation and re-keying its placement stream: per configuration, each of `standIns` draws stands in for v21 against the mean of each measure over the `keys` draws of keys 0..K − 1 (a full re-draw). negativeControls: one structural or pen change per control, drawn with the same K keys, against the first stand-in, with how many applicable configurations the thresholds caught. v21Reroll: v21 at az and az + 0.3° where its stipple re-rolled (a partial re-draw, one draw against one).",
     keys: K,
     standIns: R,
-    // as the shards recorded it: the negative controls ran on every n-th configuration of each
-    // shard (null if the shards disagree), and on this many configurations in all
-    controlsEvery: everySeen.size === 1 ? [...everySeen][0] : null,
-    controlsConfigurations: withControls.size,
+    // the negative controls ran on this many of the configurations that have them (every
+    // configuration but the line-work alone's): the controls' detection rates are over these
+    controls: {
+      configurations: withControls.size,
+      ofConfigurations: cases.filter((c) => c.family !== 'lines').length,
+    },
     configurations: cases.map((c) => `${c.preset} s${c.params.seed} incl ${c.params.incl}`),
     families: numbers,
   });

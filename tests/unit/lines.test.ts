@@ -461,3 +461,22 @@ describe('pen lines are unioned per sample (ADR 0019, QA D2)', () => {
     expect(Math.abs(ink(pieces) / whole - 1)).toBeLessThan(0.03);
   });
 });
+
+describe('the lane cull thins the stipple near the lanes (QA D3: the metric sees this only in part)', () => {
+  it('a lane radius of 0 keeps every disc sample the cull would have removed', () => {
+    const P = presetParams('Dusty spiral', 7, M4);
+    const scene = buildScene(P, M);
+    expect(scene.ribbons.laneR).toBeGreaterThan(3);
+    const cam = cameraOf(P);
+    const count = (laneR: number) => {
+      const st = new CpuStipple({ ...scene, ribbons: { ...scene.ribbons, laneR } });
+      return st.view(cam).perClass.reduce((a, b) => a + b, 0);
+    };
+    const full = count(scene.ribbons.laneR);
+    const none = count(0);
+    // p = 0.7 of the disc samples within about 4 px of a lane point: 61 of about 11,000 marks
+    // here, half a per cent, far below any ink gate; this test is what guards the cull
+    expect(none - full).toBeGreaterThan(30);
+    expect(none - full).toBeLessThan(400);
+  });
+});
