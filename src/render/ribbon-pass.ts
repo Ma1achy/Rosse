@@ -199,27 +199,32 @@ export class RibbonBatch {
  */
 export class CapsuleBatch {
   private readonly uniforms: GPUBuffer;
-  private readonly group: GPUBindGroup;
   private readonly mask: GPUTexture;
   private readonly maskView: GPUTextureView;
   private readonly resolveGroup: GPUBindGroup;
+  /** the layer's capsule buffers, each with its own draw: unioned in the one coverage target */
+  private readonly sources: { group: GPUBindGroup; count: number; indirect?: GPUBuffer }[];
+  readonly count: number;
 
   constructor(
     private readonly pipe: RibbonPipeline,
-    buffer: GPUBuffer,
-    readonly count: number,
+    sources: { buffer: GPUBuffer; count: number; indirect?: GPUBuffer | undefined }[],
     opts: DrawOpts,
-    private readonly indirect?: GPUBuffer,
   ) {
     const d = pipe.device;
     this.uniforms = drawUniforms(d, opts, null, 'pen-line uniforms');
-    this.group = d.createBindGroup({
-      layout: pipe.capsuleLayout,
-      entries: [
-        { binding: 0, resource: { buffer: this.uniforms } },
-        { binding: 4, resource: { buffer } },
-      ],
-    });
+    this.sources = sources.map((s) => ({
+      group: d.createBindGroup({
+        layout: pipe.capsuleLayout,
+        entries: [
+          { binding: 0, resource: { buffer: this.uniforms } },
+          { binding: 4, resource: { buffer: s.buffer } },
+        ],
+      }),
+      count: s.count,
+      ...(s.indirect ? { indirect: s.indirect } : {}),
+    }));
+    this.count = sources.reduce((n, s) => n + s.count, 0);
     this.mask = d.createTexture({
       label: 'pen-line coverage',
       size: [Math.max(1, opts.targetWidth), Math.max(1, opts.targetHeight)],
@@ -243,11 +248,12 @@ export class CapsuleBatch {
         { view: this.maskView, loadOp: 'clear', storeOp: 'store', clearValue: [0, 0, 0, 0] },
       ],
     });
-    if (this.count) {
-      pass.setPipeline(this.pipe.penMask);
-      pass.setBindGroup(0, this.group);
-      if (this.indirect) pass.drawIndirect(this.indirect, 0);
-      else pass.draw(this.count * 6);
+    pass.setPipeline(this.pipe.penMask);
+    for (const s of this.sources) {
+      if (!s.count) continue;
+      pass.setBindGroup(0, s.group);
+      if (s.indirect) pass.drawIndirect(s.indirect, 0);
+      else pass.draw(s.count * 6);
     }
     pass.end();
   }

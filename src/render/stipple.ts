@@ -378,9 +378,28 @@ export class GpuStipple {
     const stipple = this.layers();
     const { P, meta, galaxy, vectors } = this.scene;
     const cores = coreInstances(P, meta, this.camera, galaxy.noise, vectors.parts.picks.nuclear);
+    // v21 expands the hatching and the placed drawings into one line buffer: their pen-line
+    // quads are one layer, one union per sample (ADR 0019)
+    const placed = this.vectors.layers();
+    const hatch = line.find((l) => l.kind === 'gpu-capsules');
+    const parts = placed.find((l) => l.kind === 'gpu-capsules');
+    const merged: InkLayer[] = [];
+    if (hatch?.kind === 'gpu-capsules' && parts?.kind === 'gpu-capsules')
+      merged.push({
+        ...hatch,
+        more: [
+          {
+            buffer: parts.buffer,
+            count: parts.count,
+            ...(parts.indirect ? { indirect: parts.indirect } : {}),
+          },
+        ],
+      });
+    else if (hatch ?? parts) merged.push((hatch ?? parts) as InkLayer);
     return [
-      ...line.filter((l) => !pieces.includes(l)),
-      ...this.vectors.layers(),
+      ...line.filter((l) => !pieces.includes(l) && l !== hatch),
+      ...merged,
+      ...placed.filter((l) => l !== parts),
       ...pieces,
       ...stipple.slice(0, 3),
       ...this.vectors.streamLayers(),
