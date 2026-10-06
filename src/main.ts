@@ -51,6 +51,8 @@ declare global {
     __rosse?: {
       backend: Backend;
       surface: SurfaceName;
+      /** the plates the ink was printed with */
+      plates: Plates;
       frames: number;
       size: FrameSize;
       preset: string;
@@ -484,6 +486,7 @@ async function start(): Promise<void> {
     const e = engine;
     if (!e) return; // the first frame will pick up the current surface and size
     const wantedSurface = surface;
+    const wantedPlates = wanted.P.plates as Plates;
     try {
       if (drawnBy !== e || drawn !== wanted) {
         e.draw(wanted.P, wanted.zoom);
@@ -491,7 +494,7 @@ async function start(): Promise<void> {
         drawn = wanted;
       }
       if (!sameSize(e.size(), wantedSize)) e.resize(wantedSize);
-      await e.present(wantedSurface, wanted.P.plates as Plates);
+      await e.present(wantedSurface, wantedPlates);
     } catch (err) {
       if (e !== engine) return; // a newer engine has taken over
       // a lost device is being recreated, and onRebuilt will show the frame again
@@ -503,6 +506,7 @@ async function start(): Promise<void> {
     const rosse = {
       backend: e.backend,
       surface: wantedSurface,
+      plates: wantedPlates,
       frames,
       size: e.size(),
       // what is on the plate, which may lag the controls by a frame
@@ -592,6 +596,7 @@ async function start(): Promise<void> {
   const syncPlates = () => {
     if (platesSelect instanceof HTMLSelectElement) platesSelect.value = wanted.P.plates;
   };
+  syncPlates();
   platesSelect?.addEventListener('change', () => {
     if (!(platesSelect instanceof HTMLSelectElement)) return;
     const plates =

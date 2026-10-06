@@ -251,7 +251,7 @@ describe('plates against v21', () => {
       instances: instances(c),
     }));
     const real = platePasses('slip', PALETTES.light).map((p) => ({
-      ink: p.inkOf,
+      ink: (pop: Pop) => p.inkOf(pop),
       off: [p.off[0], p.off[1]] as [number, number],
       gain: p.gain,
     }));

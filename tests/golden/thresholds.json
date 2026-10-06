@@ -309,6 +309,56 @@
           "paEps0": 0.04
         }
       }
+    },
+    "slip": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.82,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.043,
+      "r50": 0.03,
+      "r90": 0.063,
+      "outer": 0.02,
+      "q": 0.038,
+      "qInner": 0.03,
+      "paA": 1.471,
+      "paEps0": 0.045,
+      "byPreset": {
+        "Plates slipped": {
+          "q": 0.038,
+          "qInner": 0.03,
+          "paEps0": 0.045
+        }
+      }
+    },
+    "slip@zoom": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.78,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.035,
+      "r50": 0.037,
+      "r90": 0.017,
+      "outer": 0.01,
+      "q": 0.039,
+      "qInner": 0.037,
+      "paA": 1.098,
+      "paEps0": 0.04,
+      "byPreset": {
+        "Plates slipped": {
+          "q": 0.039,
+          "qInner": 0.037,
+          "paEps0": 0.04
+        }
+      }
     }
   }
 }

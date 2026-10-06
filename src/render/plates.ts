@@ -50,7 +50,13 @@ export function populationInk(pop: Pop, palette: Palette): Rgb {
   }
 }
 
-/** The passes of a plates mode, in order (app23.js:L1302–1307). */
+/**
+ * The passes of a plates mode, in order (app23.js:L1302–1307).
+ *
+ * v21 parity: the slipped plates' offsets are in plate units (`VIEW.W` = 800), added to every
+ * position before the plate is scaled to the canvas, so they shrink and grow with the plate's
+ * width and are not moved by the zoom, the orbit or the DPR.
+ */
 export function platePasses(plates: Plates, palette: Palette): PlatePass[] {
   const flat = (c: Rgb, off: readonly [number, number], gain: number): PlatePass => ({
     inkOf: () => c,

@@ -191,7 +191,19 @@
     "Tightly wound (ribbons) s4242 incl 30",
     "Tightly wound (ribbons) s7 incl 30",
     "Tightly wound (ribbons) s7 incl 50",
-    "Tightly wound (ribbons) s7 incl 30"
+    "Tightly wound (ribbons) s7 incl 30",
+    "Plates slipped (single) s4242 incl 30",
+    "Plates slipped (single) s4242 incl 50",
+    "Plates slipped (single) s7 incl 30",
+    "Plates slipped (single) s7 incl 50",
+    "Plates slipped s11 incl 30",
+    "Plates slipped s11 incl 50",
+    "Plates slipped s19 incl 30",
+    "Plates slipped s19 incl 50",
+    "Plates slipped s3 incl 30",
+    "Plates slipped s3 incl 50",
+    "Plates slipped s5 incl 30",
+    "Plates slipped s5 incl 50"
   ],
   "families": {
     "spiral": {
@@ -6837,6 +6849,1953 @@
               "config": "Stellar streams (vectors) s4242 incl 88 zoom 2",
               "failed": true,
               "by": ["axis ratio -0.0526"]
+            }
+          ]
+        }
+      },
+      "v21Reroll": null
+    },
+    "slip": {
+      "engineRekey": {
+        "ssim": {
+          "n": 36,
+          "min": 0.2717,
+          "p5": 0.2821,
+          "median": 0.338,
+          "p95": 0.3775,
+          "max": 0.3788
+        },
+        "ssimCoarse": {
+          "n": 36,
+          "min": 0.8462,
+          "p5": 0.8486,
+          "median": 0.8717,
+          "p95": 0.9043,
+          "max": 0.9053
+        },
+        "inkAbs": {
+          "n": 36,
+          "min": 0.0005,
+          "p5": 0.0006,
+          "median": 0.0077,
+          "p95": 0.027,
+          "max": 0.0312
+        },
+        "medianAbs": {
+          "n": 36,
+          "min": 0.0001,
+          "p5": 0.0002,
+          "median": 0.0087,
+          "p95": 0.0282,
+          "max": 0.0326
+        },
+        "p90Abs": {
+          "n": 36,
+          "min": 0.0004,
+          "p5": 0.001,
+          "median": 0.0187,
+          "p95": 0.0503,
+          "max": 0.0532
+        },
+        "r25Abs": {
+          "n": 36,
+          "min": 0.0009,
+          "p5": 0.001,
+          "median": 0.0054,
+          "p95": 0.0281,
+          "max": 0.0299
+        },
+        "r50Abs": {
+          "n": 36,
+          "min": 0.0004,
+          "p5": 0.0005,
+          "median": 0.0073,
+          "p95": 0.0199,
+          "max": 0.0211
+        },
+        "r90Abs": {
+          "n": 36,
+          "min": 0.0002,
+          "p5": 0.0004,
+          "median": 0.0167,
+          "p95": 0.0417,
+          "max": 0.046
+        },
+        "outerAbs": {
+          "n": 36,
+          "min": 0.0001,
+          "p5": 0.0001,
+          "median": 0.0053,
+          "p95": 0.0132,
+          "max": 0.0163
+        },
+        "qAbs": {
+          "n": 36,
+          "min": 0.0002,
+          "p5": 0.0003,
+          "median": 0.0091,
+          "p95": 0.0252,
+          "max": 0.0268
+        },
+        "qInnerAbs": {
+          "n": 36,
+          "min": 0.0011,
+          "p5": 0.0012,
+          "median": 0.0069,
+          "p95": 0.02,
+          "max": 0.0203
+        },
+        "paAbs": {
+          "n": 36,
+          "min": 0.0166,
+          "p5": 0.033,
+          "median": 1.5789,
+          "p95": 5.379,
+          "max": 5.9494
+        }
+      },
+      "negativeControls": {
+        "pa +90°": {
+          "applicable": 12,
+          "detected": 12,
+          "missed": [],
+          "ssim": {
+            "n": 12,
+            "min": 0.1756,
+            "p5": 0.1756,
+            "median": 0.2208,
+            "p95": 0.2593,
+            "max": 0.2593
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.4049,
+            "p5": 0.4049,
+            "median": 0.5637,
+            "p95": 0.7105,
+            "max": 0.7105
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.0021,
+            "p5": 0.0021,
+            "median": 0.004,
+            "p95": 0.0167,
+            "max": 0.0167
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0056,
+            "p95": 0.0303,
+            "max": 0.0303
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0029,
+            "p5": 0.0029,
+            "median": 0.011,
+            "p95": 0.0419,
+            "max": 0.0419
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.003,
+            "p5": 0.003,
+            "median": 0.0054,
+            "p95": 0.0101,
+            "max": 0.0101
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0016,
+            "p5": 0.0016,
+            "median": 0.0043,
+            "p95": 0.0263,
+            "max": 0.0263
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.002,
+            "p5": 0.002,
+            "median": 0.0072,
+            "p95": 0.0246,
+            "max": 0.0246
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0007,
+            "p5": 0.0007,
+            "median": 0.0028,
+            "p95": 0.0085,
+            "max": 0.0085
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0022,
+            "p5": 0.0022,
+            "median": 0.0112,
+            "p95": 0.0348,
+            "max": 0.0348
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0009,
+            "p5": 0.0009,
+            "median": 0.0086,
+            "p95": 0.0204,
+            "max": 0.0204
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 84.7522,
+            "p5": 84.7522,
+            "median": 87.6628,
+            "p95": 89.6207,
+            "max": 89.6207
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s3 incl 30",
+              "failed": true,
+              "by": ["coarse ssim 0.7105", "position angle 86.44°"]
+            },
+            {
+              "config": "Plates slipped s11 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.4084", "position angle 88.16°"]
+            },
+            {
+              "config": "Plates slipped (single) s4242 incl 30",
+              "failed": true,
+              "by": ["coarse ssim 0.6628", "position angle -88.54°"]
+            },
+            {
+              "config": "Plates slipped (single) s7 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.4049", "position angle 89.58°"]
+            }
+          ]
+        },
+        "halo off": {
+          "applicable": 12,
+          "detected": 1,
+          "missed": [
+            "Plates slipped s3 incl 30",
+            "Plates slipped s11 incl 50",
+            "Plates slipped (single) s4242 incl 30",
+            "Plates slipped (single) s7 incl 50",
+            "Plates slipped s3 incl 50",
+            "Plates slipped s19 incl 30",
+            "Plates slipped (single) s4242 incl 50",
+            "Plates slipped s5 incl 30",
+            "Plates slipped s19 incl 50",
+            "Plates slipped s11 incl 30",
+            "Plates slipped s5 incl 50"
+          ],
+          "ssim": {
+            "n": 12,
+            "min": 0.2976,
+            "p5": 0.2976,
+            "median": 0.3292,
+            "p95": 0.3801,
+            "max": 0.3801
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.855,
+            "p5": 0.855,
+            "median": 0.8725,
+            "p95": 0.9003,
+            "max": 0.9003
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.0012,
+            "p5": 0.0012,
+            "median": 0.0077,
+            "p95": 0.0258,
+            "max": 0.0258
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0.0004,
+            "p5": 0.0004,
+            "median": 0.0096,
+            "p95": 0.034,
+            "max": 0.034
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.007,
+            "p5": 0.007,
+            "median": 0.0263,
+            "p95": 0.0848,
+            "max": 0.0848
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.0042,
+            "p5": 0.0042,
+            "median": 0.0111,
+            "p95": 0.0185,
+            "max": 0.0185
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0072,
+            "p95": 0.032,
+            "max": 0.032
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0106,
+            "p95": 0.024,
+            "max": 0.024
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.0039,
+            "p95": 0.0078,
+            "max": 0.0078
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0033,
+            "p5": 0.0033,
+            "median": 0.0117,
+            "p95": 0.0375,
+            "max": 0.0375
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0004,
+            "p5": 0.0004,
+            "median": 0.0117,
+            "p95": 0.0251,
+            "max": 0.0251
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 0.0266,
+            "p5": 0.0266,
+            "median": 1.8229,
+            "p95": 4.5318,
+            "max": 4.5318
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s3 incl 30",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s11 incl 50",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped (single) s4242 incl 30",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped (single) s7 incl 50",
+              "failed": false,
+              "by": []
+            }
+          ]
+        },
+        "RMAX 4.2": {
+          "applicable": 12,
+          "detected": 12,
+          "missed": [],
+          "ssim": {
+            "n": 12,
+            "min": 0.3028,
+            "p5": 0.3028,
+            "median": 0.3274,
+            "p95": 0.3669,
+            "max": 0.3669
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.7417,
+            "p5": 0.7417,
+            "median": 0.787,
+            "p95": 0.8173,
+            "max": 0.8173
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.0006,
+            "p5": 0.0006,
+            "median": 0.0211,
+            "p95": 0.0503,
+            "max": 0.0503
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0.0032,
+            "p5": 0.0032,
+            "median": 0.0141,
+            "p95": 0.0364,
+            "max": 0.0364
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0072,
+            "p5": 0.0072,
+            "median": 0.0578,
+            "p95": 0.0757,
+            "max": 0.0757
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.0042,
+            "p5": 0.0042,
+            "median": 0.0194,
+            "p95": 0.0347,
+            "max": 0.0347
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0083,
+            "p5": 0.0083,
+            "median": 0.0286,
+            "p95": 0.0542,
+            "max": 0.0542
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0894,
+            "p5": 0.0894,
+            "median": 0.1059,
+            "p95": 0.1433,
+            "max": 0.1433
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0324,
+            "p5": 0.0324,
+            "median": 0.0416,
+            "p95": 0.0571,
+            "max": 0.0571
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0016,
+            "p5": 0.0016,
+            "median": 0.0162,
+            "p95": 0.0369,
+            "max": 0.0369
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.0095,
+            "p95": 0.0236,
+            "max": 0.0236
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 0.4317,
+            "p5": 0.4317,
+            "median": 1.7433,
+            "p95": 5.1128,
+            "max": 5.1128
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s3 incl 30",
+              "failed": true,
+              "by": ["coarse ssim 0.8062", "r90 -8.94%", "outer ink -3.24%"]
+            },
+            {
+              "config": "Plates slipped s11 incl 50",
+              "failed": true,
+              "by": [
+                "ink -5.03%",
+                "coarse ssim 0.7472",
+                "r50 -5.42%",
+                "r90 -14.33%",
+                "outer ink -5.14%"
+              ]
+            },
+            {
+              "config": "Plates slipped (single) s4242 incl 30",
+              "failed": true,
+              "by": ["coarse ssim 0.8038", "r90 -10.70%", "outer ink -4.05%"]
+            },
+            {
+              "config": "Plates slipped (single) s7 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.8083", "r90 -9.87%", "outer ink -4.06%"]
+            }
+          ]
+        },
+        "thick ×3": {
+          "applicable": 12,
+          "detected": 2,
+          "missed": [
+            "Plates slipped s3 incl 30",
+            "Plates slipped (single) s4242 incl 30",
+            "Plates slipped (single) s7 incl 50",
+            "Plates slipped s3 incl 50",
+            "Plates slipped s19 incl 30",
+            "Plates slipped s5 incl 30",
+            "Plates slipped s19 incl 50",
+            "Plates slipped s11 incl 30",
+            "Plates slipped s5 incl 50",
+            "Plates slipped (single) s7 incl 30"
+          ],
+          "ssim": {
+            "n": 12,
+            "min": 0.2791,
+            "p5": 0.2791,
+            "median": 0.3297,
+            "p95": 0.3592,
+            "max": 0.3592
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.8496,
+            "p5": 0.8496,
+            "median": 0.8709,
+            "p95": 0.8951,
+            "max": 0.8951
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.0033,
+            "p5": 0.0033,
+            "median": 0.0297,
+            "p95": 0.049,
+            "max": 0.049
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0068,
+            "p95": 0.0185,
+            "max": 0.0185
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0034,
+            "p5": 0.0034,
+            "median": 0.0347,
+            "p95": 0.0887,
+            "max": 0.0887
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0027,
+            "p95": 0.0213,
+            "max": 0.0213
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0005,
+            "p5": 0.0005,
+            "median": 0.0047,
+            "p95": 0.0248,
+            "max": 0.0248
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0006,
+            "p5": 0.0006,
+            "median": 0.0049,
+            "p95": 0.0265,
+            "max": 0.0265
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0017,
+            "p95": 0.0097,
+            "max": 0.0097
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0095,
+            "p5": 0.0095,
+            "median": 0.0157,
+            "p95": 0.0359,
+            "max": 0.0359
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0023,
+            "p5": 0.0023,
+            "median": 0.0127,
+            "p95": 0.0446,
+            "max": 0.0446
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 0.0368,
+            "p5": 0.0368,
+            "median": 2.0233,
+            "p95": 8.1249,
+            "max": 8.1249
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s3 incl 30",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s11 incl 50",
+              "failed": true,
+              "by": ["inner axis ratio 0.0302"]
+            },
+            {
+              "config": "Plates slipped (single) s4242 incl 30",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped (single) s7 incl 50",
+              "failed": false,
+              "by": []
+            }
+          ]
+        },
+        "dot size ×1.3": {
+          "applicable": 12,
+          "detected": 12,
+          "missed": [],
+          "ssim": {
+            "n": 12,
+            "min": 0.2362,
+            "p5": 0.2362,
+            "median": 0.2599,
+            "p95": 0.3083,
+            "max": 0.3083
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.7457,
+            "p5": 0.7457,
+            "median": 0.7768,
+            "p95": 0.8115,
+            "max": 0.8115
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.3147,
+            "p5": 0.3147,
+            "median": 0.3379,
+            "p95": 0.3818,
+            "max": 0.3818
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0.1393,
+            "p5": 0.1393,
+            "median": 0.1775,
+            "p95": 0.2733,
+            "max": 0.2733
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.3832,
+            "p5": 0.3832,
+            "median": 0.4896,
+            "p95": 0.7272,
+            "max": 0.7272
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.0932,
+            "p5": 0.0932,
+            "median": 0.1077,
+            "p95": 0.1259,
+            "max": 0.1259
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0577,
+            "p5": 0.0577,
+            "median": 0.0765,
+            "p95": 0.0986,
+            "max": 0.0986
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0304,
+            "p5": 0.0304,
+            "median": 0.0605,
+            "p95": 0.0719,
+            "max": 0.0719
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0101,
+            "p5": 0.0101,
+            "median": 0.0222,
+            "p95": 0.0262,
+            "max": 0.0262
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0065,
+            "p5": 0.0065,
+            "median": 0.0092,
+            "p95": 0.0402,
+            "max": 0.0402
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0086,
+            "p5": 0.0086,
+            "median": 0.0177,
+            "p95": 0.0459,
+            "max": 0.0459
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 0.1108,
+            "p5": 0.1108,
+            "median": 1.7655,
+            "p95": 4.5065,
+            "max": 4.5065
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s3 incl 30",
+              "failed": true,
+              "by": [
+                "ink 38.18%",
+                "coarse ssim 0.7570",
+                "median width 24.99%",
+                "p90 width 56.61%",
+                "r25 10.90%",
+                "r50 6.40%",
+                "r90 6.71%",
+                "outer ink 2.62%"
+              ]
+            },
+            {
+              "config": "Plates slipped s11 incl 50",
+              "failed": true,
+              "by": [
+                "ink 31.76%",
+                "coarse ssim 0.7887",
+                "median width 26.82%",
+                "p90 width 72.72%",
+                "r25 9.99%",
+                "r50 7.73%",
+                "inner axis ratio 0.0323"
+              ]
+            },
+            {
+              "config": "Plates slipped (single) s4242 incl 30",
+              "failed": true,
+              "by": [
+                "ink 36.45%",
+                "coarse ssim 0.7717",
+                "median width 17.45%",
+                "p90 width 42.00%",
+                "r25 10.03%",
+                "r50 8.26%",
+                "inner axis ratio 0.0327"
+              ]
+            },
+            {
+              "config": "Plates slipped (single) s7 incl 50",
+              "failed": true,
+              "by": [
+                "ink 33.79%",
+                "coarse ssim 0.7991",
+                "median width 15.49%",
+                "p90 width 42.44%",
+                "r25 11.22%",
+                "r50 9.86%",
+                "r90 6.75%",
+                "outer ink 2.12%"
+              ]
+            }
+          ]
+        },
+        "pa +30°": {
+          "applicable": 6,
+          "detected": 6,
+          "missed": [],
+          "ssim": {
+            "n": 6,
+            "min": 0.2301,
+            "p5": 0.2301,
+            "median": 0.2551,
+            "p95": 0.2894,
+            "max": 0.2894
+          },
+          "ssimCoarse": {
+            "n": 6,
+            "min": 0.6193,
+            "p5": 0.6193,
+            "median": 0.6777,
+            "p95": 0.7366,
+            "max": 0.7366
+          },
+          "inkAbs": {
+            "n": 6,
+            "min": 0.0013,
+            "p5": 0.0013,
+            "median": 0.0117,
+            "p95": 0.0185,
+            "max": 0.0185
+          },
+          "medianAbs": {
+            "n": 6,
+            "min": 0.0017,
+            "p5": 0.0017,
+            "median": 0.0116,
+            "p95": 0.032,
+            "max": 0.032
+          },
+          "p90Abs": {
+            "n": 6,
+            "min": 0.0092,
+            "p5": 0.0092,
+            "median": 0.0282,
+            "p95": 0.0508,
+            "max": 0.0508
+          },
+          "r25Abs": {
+            "n": 6,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0053,
+            "p95": 0.0138,
+            "max": 0.0138
+          },
+          "r50Abs": {
+            "n": 6,
+            "min": 0.0007,
+            "p5": 0.0007,
+            "median": 0.0046,
+            "p95": 0.0224,
+            "max": 0.0224
+          },
+          "r90Abs": {
+            "n": 6,
+            "min": 0.0048,
+            "p5": 0.0048,
+            "median": 0.0129,
+            "p95": 0.0292,
+            "max": 0.0292
+          },
+          "outerAbs": {
+            "n": 6,
+            "min": 0.0015,
+            "p5": 0.0015,
+            "median": 0.0047,
+            "p95": 0.01,
+            "max": 0.01
+          },
+          "qAbs": {
+            "n": 6,
+            "min": 0.0078,
+            "p5": 0.0078,
+            "median": 0.0107,
+            "p95": 0.0141,
+            "max": 0.0141
+          },
+          "qInnerAbs": {
+            "n": 6,
+            "min": 0.0063,
+            "p5": 0.0063,
+            "median": 0.013,
+            "p95": 0.0186,
+            "max": 0.0186
+          },
+          "paAbs": {
+            "n": 6,
+            "min": 28.218,
+            "p5": 28.218,
+            "median": 29.8548,
+            "p95": 34.2507,
+            "max": 34.2507
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s11 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.6457", "position angle 28.22°"]
+            },
+            {
+              "config": "Plates slipped (single) s7 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.6193", "position angle 29.85°"]
+            },
+            {
+              "config": "Plates slipped s3 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.7366", "position angle 31.35°"]
+            },
+            {
+              "config": "Plates slipped (single) s4242 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.6777", "position angle 29.63°"]
+            }
+          ]
+        },
+        "pa −30°": {
+          "applicable": 6,
+          "detected": 6,
+          "missed": [],
+          "ssim": {
+            "n": 6,
+            "min": 0.2349,
+            "p5": 0.2349,
+            "median": 0.2525,
+            "p95": 0.2985,
+            "max": 0.2985
+          },
+          "ssimCoarse": {
+            "n": 6,
+            "min": 0.6366,
+            "p5": 0.6366,
+            "median": 0.6853,
+            "p95": 0.7481,
+            "max": 0.7481
+          },
+          "inkAbs": {
+            "n": 6,
+            "min": 0.0052,
+            "p5": 0.0052,
+            "median": 0.006,
+            "p95": 0.0154,
+            "max": 0.0154
+          },
+          "medianAbs": {
+            "n": 6,
+            "min": 0.0014,
+            "p5": 0.0014,
+            "median": 0.0102,
+            "p95": 0.0302,
+            "max": 0.0302
+          },
+          "p90Abs": {
+            "n": 6,
+            "min": 0.0096,
+            "p5": 0.0096,
+            "median": 0.0233,
+            "p95": 0.0708,
+            "max": 0.0708
+          },
+          "r25Abs": {
+            "n": 6,
+            "min": 0.0045,
+            "p5": 0.0045,
+            "median": 0.005,
+            "p95": 0.0086,
+            "max": 0.0086
+          },
+          "r50Abs": {
+            "n": 6,
+            "min": 0.0014,
+            "p5": 0.0014,
+            "median": 0.0046,
+            "p95": 0.0192,
+            "max": 0.0192
+          },
+          "r90Abs": {
+            "n": 6,
+            "min": 0.0031,
+            "p5": 0.0031,
+            "median": 0.005,
+            "p95": 0.0298,
+            "max": 0.0298
+          },
+          "outerAbs": {
+            "n": 6,
+            "min": 0.0012,
+            "p5": 0.0012,
+            "median": 0.0017,
+            "p95": 0.0105,
+            "max": 0.0105
+          },
+          "qAbs": {
+            "n": 6,
+            "min": 0.0044,
+            "p5": 0.0044,
+            "median": 0.0095,
+            "p95": 0.0144,
+            "max": 0.0144
+          },
+          "qInnerAbs": {
+            "n": 6,
+            "min": 0.0052,
+            "p5": 0.0052,
+            "median": 0.0109,
+            "p95": 0.0213,
+            "max": 0.0213
+          },
+          "paAbs": {
+            "n": 6,
+            "min": 25.6003,
+            "p5": 25.6003,
+            "median": 28.9171,
+            "p95": 31.8157,
+            "max": 31.8157
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s11 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.6366", "position angle -31.82°"]
+            },
+            {
+              "config": "Plates slipped (single) s7 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.6437", "position angle -30.15°"]
+            },
+            {
+              "config": "Plates slipped s3 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.7481", "position angle -28.92°"]
+            },
+            {
+              "config": "Plates slipped (single) s4242 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.6997", "position angle -30.26°"]
+            }
+          ]
+        },
+        "orbit 35°": {
+          "applicable": 6,
+          "detected": 6,
+          "missed": [],
+          "ssim": {
+            "n": 6,
+            "min": 0.2172,
+            "p5": 0.2172,
+            "median": 0.2531,
+            "p95": 0.2884,
+            "max": 0.2884
+          },
+          "ssimCoarse": {
+            "n": 6,
+            "min": 0.516,
+            "p5": 0.516,
+            "median": 0.6186,
+            "p95": 0.6794,
+            "max": 0.6794
+          },
+          "inkAbs": {
+            "n": 6,
+            "min": 0.1773,
+            "p5": 0.1773,
+            "median": 0.1951,
+            "p95": 0.2248,
+            "max": 0.2248
+          },
+          "medianAbs": {
+            "n": 6,
+            "min": 0.0022,
+            "p5": 0.0022,
+            "median": 0.0062,
+            "p95": 0.0436,
+            "max": 0.0436
+          },
+          "p90Abs": {
+            "n": 6,
+            "min": 0.0355,
+            "p5": 0.0355,
+            "median": 0.0792,
+            "p95": 0.2257,
+            "max": 0.2257
+          },
+          "r25Abs": {
+            "n": 6,
+            "min": 0.1097,
+            "p5": 0.1097,
+            "median": 0.125,
+            "p95": 0.1623,
+            "max": 0.1623
+          },
+          "r50Abs": {
+            "n": 6,
+            "min": 0.0511,
+            "p5": 0.0511,
+            "median": 0.1288,
+            "p95": 0.1766,
+            "max": 0.1766
+          },
+          "r90Abs": {
+            "n": 6,
+            "min": 0.0075,
+            "p5": 0.0075,
+            "median": 0.0084,
+            "p95": 0.0195,
+            "max": 0.0195
+          },
+          "outerAbs": {
+            "n": 6,
+            "min": 0.0022,
+            "p5": 0.0022,
+            "median": 0.0027,
+            "p95": 0.0055,
+            "max": 0.0055
+          },
+          "qAbs": {
+            "n": 6,
+            "min": 0.2173,
+            "p5": 0.2173,
+            "median": 0.2398,
+            "p95": 0.324,
+            "max": 0.324
+          },
+          "qInnerAbs": {
+            "n": 6,
+            "min": 0.1614,
+            "p5": 0.1614,
+            "median": 0.2093,
+            "p95": 0.2463,
+            "max": 0.2463
+          },
+          "paAbs": {
+            "n": 6,
+            "min": 1.6981,
+            "p5": 1.6981,
+            "median": 4.3556,
+            "p95": 5.6594,
+            "max": 5.6594
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s11 incl 50",
+              "failed": true,
+              "by": [
+                "ink -19.51%",
+                "coarse ssim 0.6543",
+                "r25 -12.16%",
+                "r50 -7.12%",
+                "axis ratio -0.2173",
+                "inner axis ratio -0.2093"
+              ]
+            },
+            {
+              "config": "Plates slipped (single) s7 incl 50",
+              "failed": true,
+              "by": [
+                "ink -22.48%",
+                "coarse ssim 0.5160",
+                "p90 width 22.57%",
+                "r25 -16.23%",
+                "r50 -12.88%",
+                "axis ratio -0.3240",
+                "inner axis ratio -0.2463"
+              ]
+            },
+            {
+              "config": "Plates slipped s3 incl 50",
+              "failed": true,
+              "by": [
+                "ink -17.73%",
+                "coarse ssim 0.6794",
+                "r25 -12.50%",
+                "r50 -5.11%",
+                "axis ratio -0.2465",
+                "inner axis ratio -0.2357"
+              ]
+            },
+            {
+              "config": "Plates slipped (single) s4242 incl 50",
+              "failed": true,
+              "by": [
+                "ink -22.17%",
+                "coarse ssim 0.5531",
+                "p90 width 20.42%",
+                "r25 -15.09%",
+                "r50 -16.42%",
+                "axis ratio -0.2835",
+                "inner axis ratio -0.2412",
+                "position angle -5.66°"
+              ]
+            }
+          ]
+        }
+      },
+      "v21Reroll": null
+    },
+    "slip@zoom": {
+      "engineRekey": {
+        "ssim": {
+          "n": 18,
+          "min": 0.203,
+          "p5": 0.203,
+          "median": 0.2649,
+          "p95": 0.3196,
+          "max": 0.3196
+        },
+        "ssimCoarse": {
+          "n": 18,
+          "min": 0.8093,
+          "p5": 0.8093,
+          "median": 0.8516,
+          "p95": 0.8775,
+          "max": 0.8775
+        },
+        "inkAbs": {
+          "n": 18,
+          "min": 0.0002,
+          "p5": 0.0002,
+          "median": 0.0083,
+          "p95": 0.029,
+          "max": 0.029
+        },
+        "medianAbs": {
+          "n": 18,
+          "min": 0.0021,
+          "p5": 0.0021,
+          "median": 0.0062,
+          "p95": 0.0182,
+          "max": 0.0182
+        },
+        "p90Abs": {
+          "n": 18,
+          "min": 0.0012,
+          "p5": 0.0012,
+          "median": 0.008,
+          "p95": 0.0406,
+          "max": 0.0406
+        },
+        "r25Abs": {
+          "n": 18,
+          "min": 0,
+          "p5": 0,
+          "median": 0.0065,
+          "p95": 0.0232,
+          "max": 0.0232
+        },
+        "r50Abs": {
+          "n": 18,
+          "min": 0.0003,
+          "p5": 0.0003,
+          "median": 0.0047,
+          "p95": 0.0246,
+          "max": 0.0246
+        },
+        "r90Abs": {
+          "n": 18,
+          "min": 0.0001,
+          "p5": 0.0001,
+          "median": 0.0025,
+          "p95": 0.0112,
+          "max": 0.0112
+        },
+        "outerAbs": {
+          "n": 18,
+          "min": 0,
+          "p5": 0,
+          "median": 0.002,
+          "p95": 0.0063,
+          "max": 0.0063
+        },
+        "qAbs": {
+          "n": 18,
+          "min": 0.0004,
+          "p5": 0.0004,
+          "median": 0.0063,
+          "p95": 0.0255,
+          "max": 0.0255
+        },
+        "qInnerAbs": {
+          "n": 18,
+          "min": 0.0011,
+          "p5": 0.0011,
+          "median": 0.0127,
+          "p95": 0.0246,
+          "max": 0.0246
+        },
+        "paAbs": {
+          "n": 18,
+          "min": 0.0904,
+          "p5": 0.0904,
+          "median": 3.2006,
+          "p95": 41.7421,
+          "max": 41.7421
+        }
+      },
+      "negativeControls": {
+        "pa +90°": {
+          "applicable": 6,
+          "detected": 6,
+          "missed": [],
+          "ssim": {
+            "n": 6,
+            "min": 0.087,
+            "p5": 0.087,
+            "median": 0.1036,
+            "p95": 0.1538,
+            "max": 0.1538
+          },
+          "ssimCoarse": {
+            "n": 6,
+            "min": 0.1931,
+            "p5": 0.1931,
+            "median": 0.2775,
+            "p95": 0.4852,
+            "max": 0.4852
+          },
+          "inkAbs": {
+            "n": 6,
+            "min": 0.0005,
+            "p5": 0.0005,
+            "median": 0.0045,
+            "p95": 0.0329,
+            "max": 0.0329
+          },
+          "medianAbs": {
+            "n": 6,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.0044,
+            "p95": 0.018,
+            "max": 0.018
+          },
+          "p90Abs": {
+            "n": 6,
+            "min": 0.0024,
+            "p5": 0.0024,
+            "median": 0.0046,
+            "p95": 0.0546,
+            "max": 0.0546
+          },
+          "r25Abs": {
+            "n": 6,
+            "min": 0.0039,
+            "p5": 0.0039,
+            "median": 0.0068,
+            "p95": 0.0114,
+            "max": 0.0114
+          },
+          "r50Abs": {
+            "n": 6,
+            "min": 0.0027,
+            "p5": 0.0027,
+            "median": 0.0117,
+            "p95": 0.0181,
+            "max": 0.0181
+          },
+          "r90Abs": {
+            "n": 6,
+            "min": 0.0034,
+            "p5": 0.0034,
+            "median": 0.0063,
+            "p95": 0.0139,
+            "max": 0.0139
+          },
+          "outerAbs": {
+            "n": 6,
+            "min": 0.0026,
+            "p5": 0.0026,
+            "median": 0.0039,
+            "p95": 0.0079,
+            "max": 0.0079
+          },
+          "qAbs": {
+            "n": 6,
+            "min": 0.0042,
+            "p5": 0.0042,
+            "median": 0.0107,
+            "p95": 0.0144,
+            "max": 0.0144
+          },
+          "qInnerAbs": {
+            "n": 6,
+            "min": 0.0032,
+            "p5": 0.0032,
+            "median": 0.0109,
+            "p95": 0.0292,
+            "max": 0.0292
+          },
+          "paAbs": {
+            "n": 6,
+            "min": 76.0548,
+            "p5": 76.0548,
+            "median": 86.5239,
+            "p95": 89.971,
+            "max": 89.971
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s5 incl 30 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.2584", "position angle 89.97°"]
+            },
+            {
+              "config": "Plates slipped s11 incl 30 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.3489", "position angle -88.26°"]
+            },
+            {
+              "config": "Plates slipped (single) s7 incl 30 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.4330"]
+            },
+            {
+              "config": "Plates slipped s3 incl 30 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.4852"]
+            }
+          ]
+        },
+        "halo off": {
+          "applicable": 6,
+          "detected": 0,
+          "missed": [
+            "Plates slipped s5 incl 30 zoom 2",
+            "Plates slipped s11 incl 30 zoom 2",
+            "Plates slipped (single) s7 incl 30 zoom 2",
+            "Plates slipped s3 incl 30 zoom 2",
+            "Plates slipped (single) s4242 incl 30 zoom 2",
+            "Plates slipped s19 incl 30 zoom 2"
+          ],
+          "ssim": {
+            "n": 6,
+            "min": 0.2362,
+            "p5": 0.2362,
+            "median": 0.2626,
+            "p95": 0.2959,
+            "max": 0.2959
+          },
+          "ssimCoarse": {
+            "n": 6,
+            "min": 0.8113,
+            "p5": 0.8113,
+            "median": 0.8524,
+            "p95": 0.8686,
+            "max": 0.8686
+          },
+          "inkAbs": {
+            "n": 6,
+            "min": 0.0004,
+            "p5": 0.0004,
+            "median": 0.008,
+            "p95": 0.0378,
+            "max": 0.0378
+          },
+          "medianAbs": {
+            "n": 6,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.006,
+            "p95": 0.0132,
+            "max": 0.0132
+          },
+          "p90Abs": {
+            "n": 6,
+            "min": 0.0017,
+            "p5": 0.0017,
+            "median": 0.011,
+            "p95": 0.0455,
+            "max": 0.0455
+          },
+          "r25Abs": {
+            "n": 6,
+            "min": 0.0046,
+            "p5": 0.0046,
+            "median": 0.0169,
+            "p95": 0.0219,
+            "max": 0.0219
+          },
+          "r50Abs": {
+            "n": 6,
+            "min": 0.007,
+            "p5": 0.007,
+            "median": 0.0196,
+            "p95": 0.0306,
+            "max": 0.0306
+          },
+          "r90Abs": {
+            "n": 6,
+            "min": 0.0015,
+            "p5": 0.0015,
+            "median": 0.0057,
+            "p95": 0.0159,
+            "max": 0.0159
+          },
+          "outerAbs": {
+            "n": 6,
+            "min": 0.0012,
+            "p5": 0.0012,
+            "median": 0.0035,
+            "p95": 0.0093,
+            "max": 0.0093
+          },
+          "qAbs": {
+            "n": 6,
+            "min": 0.0075,
+            "p5": 0.0075,
+            "median": 0.0098,
+            "p95": 0.0198,
+            "max": 0.0198
+          },
+          "qInnerAbs": {
+            "n": 6,
+            "min": 0.0066,
+            "p5": 0.0066,
+            "median": 0.0129,
+            "p95": 0.0324,
+            "max": 0.0324
+          },
+          "paAbs": {
+            "n": 6,
+            "min": 0.1731,
+            "p5": 0.1731,
+            "median": 2.083,
+            "p95": 16.312,
+            "max": 16.312
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s5 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s11 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped (single) s7 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s3 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            }
+          ]
+        },
+        "RMAX 4.2": {
+          "applicable": 6,
+          "detected": 1,
+          "missed": [
+            "Plates slipped s5 incl 30 zoom 2",
+            "Plates slipped s11 incl 30 zoom 2",
+            "Plates slipped (single) s7 incl 30 zoom 2",
+            "Plates slipped s3 incl 30 zoom 2",
+            "Plates slipped s19 incl 30 zoom 2"
+          ],
+          "ssim": {
+            "n": 6,
+            "min": 0.2339,
+            "p5": 0.2339,
+            "median": 0.2621,
+            "p95": 0.289,
+            "max": 0.289
+          },
+          "ssimCoarse": {
+            "n": 6,
+            "min": 0.8197,
+            "p5": 0.8197,
+            "median": 0.8467,
+            "p95": 0.8577,
+            "max": 0.8577
+          },
+          "inkAbs": {
+            "n": 6,
+            "min": 0.022,
+            "p5": 0.022,
+            "median": 0.029,
+            "p95": 0.0621,
+            "max": 0.0621
+          },
+          "medianAbs": {
+            "n": 6,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0048,
+            "p95": 0.0169,
+            "max": 0.0169
+          },
+          "p90Abs": {
+            "n": 6,
+            "min": 0.0025,
+            "p5": 0.0025,
+            "median": 0.0084,
+            "p95": 0.055,
+            "max": 0.055
+          },
+          "r25Abs": {
+            "n": 6,
+            "min": 0.0009,
+            "p5": 0.0009,
+            "median": 0.004,
+            "p95": 0.0188,
+            "max": 0.0188
+          },
+          "r50Abs": {
+            "n": 6,
+            "min": 0.0015,
+            "p5": 0.0015,
+            "median": 0.0105,
+            "p95": 0.0189,
+            "max": 0.0189
+          },
+          "r90Abs": {
+            "n": 6,
+            "min": 0.0036,
+            "p5": 0.0036,
+            "median": 0.0055,
+            "p95": 0.0158,
+            "max": 0.0158
+          },
+          "outerAbs": {
+            "n": 6,
+            "min": 0.0024,
+            "p5": 0.0024,
+            "median": 0.0031,
+            "p95": 0.0101,
+            "max": 0.0101
+          },
+          "qAbs": {
+            "n": 6,
+            "min": 0.0042,
+            "p5": 0.0042,
+            "median": 0.0063,
+            "p95": 0.0148,
+            "max": 0.0148
+          },
+          "qInnerAbs": {
+            "n": 6,
+            "min": 0.0057,
+            "p5": 0.0057,
+            "median": 0.0125,
+            "p95": 0.0281,
+            "max": 0.0281
+          },
+          "paAbs": {
+            "n": 6,
+            "min": 0.6794,
+            "p5": 0.6794,
+            "median": 1.2624,
+            "p95": 20.4927,
+            "max": 20.4927
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s5 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s11 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped (single) s7 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s3 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            }
+          ]
+        },
+        "thick ×3": {
+          "applicable": 6,
+          "detected": 0,
+          "missed": [
+            "Plates slipped s5 incl 30 zoom 2",
+            "Plates slipped s11 incl 30 zoom 2",
+            "Plates slipped (single) s7 incl 30 zoom 2",
+            "Plates slipped s3 incl 30 zoom 2",
+            "Plates slipped (single) s4242 incl 30 zoom 2",
+            "Plates slipped s19 incl 30 zoom 2"
+          ],
+          "ssim": {
+            "n": 6,
+            "min": 0.2036,
+            "p5": 0.2036,
+            "median": 0.2414,
+            "p95": 0.286,
+            "max": 0.286
+          },
+          "ssimCoarse": {
+            "n": 6,
+            "min": 0.8047,
+            "p5": 0.8047,
+            "median": 0.8285,
+            "p95": 0.8614,
+            "max": 0.8614
+          },
+          "inkAbs": {
+            "n": 6,
+            "min": 0.0031,
+            "p5": 0.0031,
+            "median": 0.0096,
+            "p95": 0.0455,
+            "max": 0.0455
+          },
+          "medianAbs": {
+            "n": 6,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.0054,
+            "p95": 0.0147,
+            "max": 0.0147
+          },
+          "p90Abs": {
+            "n": 6,
+            "min": 0.0022,
+            "p5": 0.0022,
+            "median": 0.0109,
+            "p95": 0.017,
+            "max": 0.017
+          },
+          "r25Abs": {
+            "n": 6,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.0051,
+            "p95": 0.0115,
+            "max": 0.0115
+          },
+          "r50Abs": {
+            "n": 6,
+            "min": 0.0027,
+            "p5": 0.0027,
+            "median": 0.0091,
+            "p95": 0.017,
+            "max": 0.017
+          },
+          "r90Abs": {
+            "n": 6,
+            "min": 0.005,
+            "p5": 0.005,
+            "median": 0.0062,
+            "p95": 0.0151,
+            "max": 0.0151
+          },
+          "outerAbs": {
+            "n": 6,
+            "min": 0.0025,
+            "p5": 0.0025,
+            "median": 0.0045,
+            "p95": 0.0093,
+            "max": 0.0093
+          },
+          "qAbs": {
+            "n": 6,
+            "min": 0.0036,
+            "p5": 0.0036,
+            "median": 0.006,
+            "p95": 0.0193,
+            "max": 0.0193
+          },
+          "qInnerAbs": {
+            "n": 6,
+            "min": 0.0054,
+            "p5": 0.0054,
+            "median": 0.0071,
+            "p95": 0.0197,
+            "max": 0.0197
+          },
+          "paAbs": {
+            "n": 6,
+            "min": 0.0749,
+            "p5": 0.0749,
+            "median": 1.2583,
+            "p95": 10.024,
+            "max": 10.024
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s5 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s11 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped (single) s7 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s3 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            }
+          ]
+        },
+        "dot size ×1.3": {
+          "applicable": 6,
+          "detected": 6,
+          "missed": [],
+          "ssim": {
+            "n": 6,
+            "min": 0.1891,
+            "p5": 0.1891,
+            "median": 0.1947,
+            "p95": 0.2283,
+            "max": 0.2283
+          },
+          "ssimCoarse": {
+            "n": 6,
+            "min": 0.7095,
+            "p5": 0.7095,
+            "median": 0.74,
+            "p95": 0.764,
+            "max": 0.764
+          },
+          "inkAbs": {
+            "n": 6,
+            "min": 0.3821,
+            "p5": 0.3821,
+            "median": 0.3986,
+            "p95": 0.4443,
+            "max": 0.4443
+          },
+          "medianAbs": {
+            "n": 6,
+            "min": 0.1734,
+            "p5": 0.1734,
+            "median": 0.2161,
+            "p95": 0.2908,
+            "max": 0.2908
+          },
+          "p90Abs": {
+            "n": 6,
+            "min": 0.3794,
+            "p5": 0.3794,
+            "median": 0.4198,
+            "p95": 0.4812,
+            "max": 0.4812
+          },
+          "r25Abs": {
+            "n": 6,
+            "min": 0.0625,
+            "p5": 0.0625,
+            "median": 0.0689,
+            "p95": 0.0769,
+            "max": 0.0769
+          },
+          "r50Abs": {
+            "n": 6,
+            "min": 0.038,
+            "p5": 0.038,
+            "median": 0.052,
+            "p95": 0.0592,
+            "max": 0.0592
+          },
+          "r90Abs": {
+            "n": 6,
+            "min": 0.0056,
+            "p5": 0.0056,
+            "median": 0.0129,
+            "p95": 0.0317,
+            "max": 0.0317
+          },
+          "outerAbs": {
+            "n": 6,
+            "min": 0.0045,
+            "p5": 0.0045,
+            "median": 0.0082,
+            "p95": 0.0176,
+            "max": 0.0176
+          },
+          "qAbs": {
+            "n": 6,
+            "min": 0.0006,
+            "p5": 0.0006,
+            "median": 0.0046,
+            "p95": 0.0308,
+            "max": 0.0308
+          },
+          "qInnerAbs": {
+            "n": 6,
+            "min": 0.0019,
+            "p5": 0.0019,
+            "median": 0.0155,
+            "p95": 0.035,
+            "max": 0.035
+          },
+          "paAbs": {
+            "n": 6,
+            "min": 0.3214,
+            "p5": 0.3214,
+            "median": 2.4962,
+            "p95": 32.0209,
+            "max": 32.0209
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s5 incl 30 zoom 2",
+              "failed": true,
+              "by": [
+                "ink 39.57%",
+                "coarse ssim 0.7400",
+                "median width 17.34%",
+                "p90 width 38.15%",
+                "r25 6.89%",
+                "r50 5.20%"
+              ]
+            },
+            {
+              "config": "Plates slipped s11 incl 30 zoom 2",
+              "failed": true,
+              "by": [
+                "ink 39.86%",
+                "coarse ssim 0.7640",
+                "median width 27.88%",
+                "p90 width 48.12%",
+                "r25 7.56%",
+                "r50 5.92%"
+              ]
+            },
+            {
+              "config": "Plates slipped (single) s7 incl 30 zoom 2",
+              "failed": true,
+              "by": [
+                "ink 40.97%",
+                "coarse ssim 0.7095",
+                "median width 20.25%",
+                "p90 width 37.94%",
+                "r25 7.69%",
+                "r50 5.90%"
+              ]
+            },
+            {
+              "config": "Plates slipped s3 incl 30 zoom 2",
+              "failed": true,
+              "by": [
+                "ink 41.83%",
+                "coarse ssim 0.7474",
+                "median width 29.08%",
+                "p90 width 41.98%",
+                "r25 6.70%",
+                "r50 3.80%"
+              ]
             }
           ]
         }

@@ -6,16 +6,17 @@
  * Writes test-results/gpu.json.
  *
  * Also runs the surface check of ./surface-css.mjs (the composite against Chromium's own
- * rendering of the reference CSS) and the orbit check of ./orbit.mjs (the page, dragged with the
- * mouse).
+ * rendering of the reference CSS), the orbit check of ./orbit.mjs (the page, dragged with the
+ * mouse) and the plates check of ./plates-page.mjs (the page's Plates menu).
  *
- * Usage: node tools/gpu-test/run.mjs [page …]   (default: every tests/gpu/*.html, surface-css and
- * orbit)
+ * Usage: node tools/gpu-test/run.mjs [page …]   (default: every tests/gpu/*.html, surface-css,
+ * orbit and plates-page)
  */
 import { mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, launch, prepareAssets, startServer } from './browser.mjs';
 import { orbitCheck } from './orbit.mjs';
+import { platesPageCheck } from './plates-page.mjs';
 import { surfaceCssCheck } from './surface-css.mjs';
 
 const TIMEOUT = 180_000;
@@ -23,9 +24,10 @@ const TIMEOUT = 180_000;
 const requested = process.argv.slice(2).filter((a) => !a.startsWith('-'));
 const withCss = !requested.length || requested.includes('surface-css');
 const withOrbit = !requested.length || requested.includes('orbit');
+const withPlatesPage = !requested.length || requested.includes('plates-page');
 const pages = requested.length
   ? requested
-      .filter((p) => p !== 'surface-css' && p !== 'orbit')
+      .filter((p) => p !== 'surface-css' && p !== 'orbit' && p !== 'plates-page')
       .map((p) => (p.endsWith('.html') ? p : `${p}.html`))
   : readdirSync(join(ROOT, 'tests/gpu'))
       .filter((f) => f.endsWith('.html'))
@@ -87,6 +89,18 @@ try {
     } catch (e) {
       results.push({ page: 'orbit', pass: false, lines: [String(e)], errors: [] });
       console.log(`FAIL  orbit: ${String(e)}`);
+    }
+  }
+  if (withPlatesPage) {
+    const t0 = Date.now();
+    try {
+      const r = await platesPageCheck(browser, server.url);
+      results.push({ page: 'plates-page', ...r, errors: [] });
+      console.log(`${r.pass ? 'PASS' : 'FAIL'}  ${r.name}  (${String(Date.now() - t0)} ms)`);
+      for (const l of r.lines) console.log(`      ${l}`);
+    } catch (e) {
+      results.push({ page: 'plates-page', pass: false, lines: [String(e)], errors: [] });
+      console.log(`FAIL  plates-page: ${String(e)}`);
     }
   }
 } finally {
