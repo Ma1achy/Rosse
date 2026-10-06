@@ -292,9 +292,6 @@ export function incE(incl: number): number {
   return i > 90 ? 180 - i : i;
 }
 
-/** The `incE()` thresholds at which the reference switches structure (reference notes 5.1). */
-export const INCL_THRESHOLDS = [70, 72, 74, 78, 80] as const;
-
 /** One use of `incE()` in v21: where, the test it makes, and what it switches. */
 export interface IncEUse {
   line: number;
@@ -501,7 +498,7 @@ export const INCL_CONTINUOUS: readonly {
   {
     line: 442,
     token: 'P.incl',
-    what: '`orientNow` (homes of overlays and lensed sources, M7, M9)',
+    what: '`orientNow` (homes of overlays and lensed sources, M7, M9). Not purely continuous in v21: through `srcNow` it feeds the DISCRETE lens seed at L647, `mulberry32(P.seed * 733 + Math.round(bc[0] * 997))`, so orbiting re-rolls the lensed marks. M9 diverges deliberately: orbiting never re-rolls (docs/architecture.md)',
   },
   { line: 498, token: 'P.incl', what: 'the merger framed from its 3D extent (view, M8)' },
   {

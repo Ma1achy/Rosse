@@ -139,9 +139,9 @@ On SwiftShader the sprite ink pass dominates: it rasterises about 10,000 quads a
 ## Not done, or left for later
 
 - **60 fps on real hardware** (manual acceptance item): not measured. Every check here ran on SwiftShader.
-- **The `incE` uses** are listed and bucketed, but only the two core uses (L1028, L1029) have consumers. The rest arrive with M4 and M5, and the bucket rebuild is ready for them. As in v21, a threshold has no hysteresis. Orbiting back and forth across 72–80° rebuilds the model at each crossing, which shows as a change of structure, not a re-roll (the roadmap's "flicker" risk). No consumer exists yet to judge whether hysteresis would be wanted.
+- **The structure switches** (the `incE` uses and L1000) are listed, but only the two core uses (L1028, L1029) have consumers. The rest arrive with M4 and M5, and the model rebuilds when the structure signature changes (`structureKey`, ADR 0017). As in v21, a threshold has no hysteresis. Orbiting back and forth across 72–80° rebuilds the model at each crossing, which shows as a change of structure, not a re-roll (the roadmap's "flicker" risk). No consumer exists yet to judge whether hysteresis would be wanted.
 - **`toView`, `orient`, `scenePoint`, `srcNow` and `perspective`** are built and checked against v21 but unused until the sky (M7) and the lens (M9). The home orientation as a saved parameter (divergence 2) comes with them.
-- **The counts line under the plate** still awaits a read-back of the indirect arguments after each frame (as in M2). It does not block the GPU and is only for the statistics line. Moving it fully off the frame path, or reading it only when the counts can change, is left to M10.
+- **The counts line under the plate** reads the indirect arguments back once per drawn scene (M2's cache), outside the frame queue. A camera move is a new scene, so orbit frames still read back (the dust cull can change the counts). Reading it only when the counts can change is left to M10.
 - **Zoom-dependent inputs still to come, all view-tier.** Zoom never rebuilds the model, so when these land they must be computed in the view tier, not baked into model buffers:
   - the drawn stars' size factor `ZL = (VIEW.scale / 84)^0.45` (L183);
   - the lane radius `LR` (L194);

@@ -34,7 +34,7 @@ The model tier's inclination key is a **structure signature**: the answer of eve
   - A galaxy with a disc does not rebuild its model at 56°.
 - **`dirtyTier`** rebuilds the model when an inclination change changes the signature.
 - **Every other use** is listed in `INCL_CONTINUOUS` and must be computed in the view tier, L788's alpha included.
-- **The test** (`tests/unit/camera.test.ts`) scans `app23.js` and requires every `P.incl`, `ci()` and `incE()` to be either a structure predicate or a listed continuous use. A new use in a later milestone's port therefore has to be classified.
+- **The test** (`tests/unit/camera.test.ts`) scans `app23.js` and requires every `P.incl`, `ci()` and `incE()` to be either a structure predicate or a listed continuous use. A new use in a later milestone's port therefore has to be classified. The scan is token-level: functions that read the inclination indirectly (`orientNow`, `srcNow`, `scenePoint`, `project`, `discM`, `toView`) are classified once, at their definitions, and what they feed is classified by their consumers.
 
 The alternative was to make the choice of whole-drawing type a view-tier part. It was rejected, because:
 

@@ -167,7 +167,7 @@ export function attachOrbit(canvas: HTMLCanvasElement, target: OrbitTarget): () 
   if (!canvas.getAttribute('aria-label'))
     canvas.setAttribute(
       'aria-label',
-      'Galaxy plate: drag to orbit, arrows to turn, Q and E to roll, + and − to zoom',
+      'Galaxy plate: drag to orbit, shift-drag to roll, arrows to turn, Q and E to roll, + and − to zoom, 0 to reset the zoom',
     );
   const two = () => {
     const [a, b] = [...ptrs.values()];

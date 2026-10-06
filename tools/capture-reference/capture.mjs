@@ -240,7 +240,8 @@ async function captureJob(browser, url, job, out) {
  * browser. A run that captures only some cameras (`--cameras zoom`) updates only theirs; each
  * capture also carries its own `captured` time. A manifest from before this record existed (one
  * `generated` for the whole file, from a run of home and orbit) is carried over as those cameras'
- * run, by this function, not by hand.
+ * run, by this function, not by hand. An `--only` run stamps `runs[camera].generated` although it
+ * re-made only some of that camera's captures: the per-capture `captured` times are authoritative.
  *
  * @param {any} previous the manifest's `extra`, if any
  * @param {string} file
