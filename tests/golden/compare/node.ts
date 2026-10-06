@@ -38,6 +38,12 @@ import {
 } from './thresholds';
 import { v21Variation } from './v21';
 import { v21PartPicks } from './v21-parts';
+import { v21StarPicks } from './v21-stars';
+import { v21Companions, v21Sky } from './v21-sky';
+import { mulberry32 } from './v21';
+import { wantsStars } from '../../../src/model/stars';
+import { skyCounts } from '../../../src/model/sky';
+import { cameraOf, orientationOf } from '../../../src/view/camera';
 
 export { compareMeasures, countAllowance, evaluate, impossibleClasses, measure };
 export type { Comparison, Evaluation, Grey, ImageMeasures, Thresholds };
@@ -60,14 +66,10 @@ export function goldenFamily(preset: string): string {
   const f = presetFamily(preset);
   if (f === 'merger' || f === 'lens' || f === 'star' || f === 'artefact') return f;
   if (preset === 'Layered: lensed merger') return 'merger';
-  const smooth = [
-    'Smooth, round',
-    'Cigar-shaped',
-    'Deep field',
-    'Radio jet',
-    'Stellar streams',
-    'Shell galaxy',
-  ];
+  // M7: a galaxy with a star or an artefact laid over it, and the deep field, have their own
+  if (f === 'layered') return 'layered';
+  if (preset === 'Deep field') return 'deepfield';
+  const smooth = ['Smooth, round', 'Cigar-shaped', 'Radio jet', 'Stellar streams', 'Shell galaxy'];
   return smooth.includes(preset) ? 'smooth' : 'spiral';
 }
 
@@ -127,13 +129,32 @@ export class GoldenNode {
    * Everything the comparison draws with besides the parameters: v21's variation (ADR 0015), from
    * M4 v21's stroke choices and noise field, and from M5 v21's part picks at this zoom (ADR 0021).
    */
-  referenceOptions(P: Params, zoom = 1): SceneOptions {
+  referenceOptions(P: Params, zoom = 1, preset?: string): SceneOptions {
     const variation = this.v21Variation(P);
+    const meta = this.cpu.meta;
+    // M7: v21's choices for the stars and the sky, and the overlays' home (open question Q3): the
+    // orientation the preset starts at, from which an orbit moves the camera round the scene
+    const home = orientationOf(cameraOf(preset ? presetParams(preset, P.seed) : P));
+    const c = skyCounts(P);
+    const fgTiles = meta.fgstars?.count ?? 0;
+    let sky: SceneOptions['sky'];
+    if (c.bg || c.fg || c.companions) {
+      const v = v21Sky(this.root, P, variation, meta, fgTiles);
+      sky = {
+        ...v.catalogue,
+        companions: c.companions
+          ? v21Companions(P, meta.vectors?.companions?.n ?? 0, mulberry32)
+          : [],
+      };
+    }
     return {
       variation,
       curvePicks: this.v21CurvePicks(P, variation),
       noise: this.v21Noise(P.seed),
-      partPicks: v21PartPicks(P, variation, this.cpu.meta, zoom),
+      partPicks: v21PartPicks(P, variation, meta, zoom),
+      ...(wantsStars(P) ? { starPicks: v21StarPicks(this.root, P, variation, meta, zoom) } : {}),
+      ...(sky ? { sky } : {}),
+      home,
     };
   }
 
@@ -197,7 +218,7 @@ export class GoldenNode {
     const controls: Record<string, Record<string, { config: string; c: Comparison }[]>> = {};
     for (const c of cases) {
       const zoom = c.zoom ?? 1;
-      const opts = this.referenceOptions(c.params, zoom);
+      const opts = this.referenceOptions(c.params, zoom, c.base);
       const base = measure(this.cpu.render(c.params, opts, zoom).alpha);
       const baseQ = momentsOf(base.alpha, base.extent.r90).q;
       for (let k = 1; k <= keys; k++) {
@@ -219,7 +240,7 @@ export class GoldenNode {
         const r = this.cpu.render(
           P,
           {
-            ...this.referenceOptions(P, zoom),
+            ...this.referenceOptions(P, zoom, c.base),
             placementKey: (c.params.seed + 1) >>> 0,
             ...(ctl.scene ?? {}),
           },

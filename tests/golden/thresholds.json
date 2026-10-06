@@ -1,5 +1,5 @@
 {
-  "about": "Golden thresholds (ADR 0013, as calibrated in ADR 0015). parity: the new engine against v21 (L2), per family; strict: the CPU engine against WebGPU (L1). Gated: ink, coarse SSIM (b′), widths, counts, and the moment and extent test (r25, r50, r90, outer ink, axis ratio q, position angle pa where the reference q < paBelowQ). Written by `npm run golden -- --calibrate`; the numbers behind them are in calibration.json and docs/milestones/m2/README.md. Families marked provisional have no engine yet.",
+  "about": "Golden thresholds (ADR 0013, as calibrated in ADR 0015). parity: the new engine against v21 (L2), per family; strict: the CPU engine against WebGPU (L1). Gated: ink, coarse SSIM (b\u2032), widths, counts, and the moment and extent test (r25, r50, r90, outer ink, axis ratio q, position angle pa where the reference q < paBelowQ). Written by `npm run golden -- --calibrate`; the numbers behind them are in calibration.json and docs/milestones/m2/README.md. Families marked provisional have no engine yet.",
   "strict": {
     "ink": 0.005,
     "ssimCoarse": 0.98,
@@ -309,6 +309,44 @@
           "paEps0": 0.04
         }
       }
+    },
+    "layered": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.89,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.041,
+      "r50": 0.043,
+      "r90": 0.053,
+      "outer": 0.016,
+      "q": 0.039,
+      "qInner": 0.043,
+      "paA": 1.171,
+      "paEps0": 0.046,
+      "provisional": true
+    },
+    "deepfield": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.91,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.036,
+      "r50": 0.053,
+      "r90": 0.086,
+      "outer": 0.019,
+      "q": 0.06,
+      "qInner": 0.045,
+      "paA": 1.44,
+      "paEps0": 0.066,
+      "provisional": true
     }
   }
 }

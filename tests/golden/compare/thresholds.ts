@@ -58,17 +58,27 @@ export interface ThresholdFile {
 
 /**
  * Classes the parameters make impossible, which must then be 0 in both drawings: knots need
- * `knots`, sparkle stars `sparkle` and drawn stars `starMix` (generate, app23.js:L266–272).
+ * `knots` (or a ring's knots, or a star's heart, or a cosmic ray's), sparkle stars `sparkle` (a
+ * galaxy's only) and drawn stars `starMix` (generate, app23.js:L266–272), a ring (its knots'
+ * stars), a star or an artefact, or an overlay that draws one (starSprites, L419–436).
  */
 export function impossibleClasses(P: {
   knots: number;
   sparkle: number;
   starMix: number;
+  subject?: string;
+  ring?: number;
+  merger?: number;
+  ovStar?: number;
+  ovArtefact?: string;
 }): Set<string> {
   const out = new Set<string>();
-  if (!(P.knots > 0)) out.add('knots');
-  if (!(P.sparkle > 0)) out.add('stars');
-  if (!(P.starMix > 0.01)) out.add('rstars');
+  const star = P.subject === 'star' || P.subject === 'artefact';
+  const overlay = (P.ovStar ?? 0) > 0.02 || (!!P.ovArtefact && P.ovArtefact !== 'none');
+  const ring = (P.ring ?? 0) > 0.1 && !P.merger;
+  if (!(P.knots > 0) && !star && !overlay && !ring) out.add('knots');
+  if (!(P.sparkle > 0) || star) out.add('stars');
+  if (!(P.starMix > 0.01) && !star && !overlay && !ring) out.add('rstars');
   return out;
 }
 

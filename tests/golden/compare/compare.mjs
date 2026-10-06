@@ -30,6 +30,9 @@
  *   --calibrate       measure "same galaxy, other dots" pairs and the negative controls, and write
  *                     ../thresholds.json and ../calibration.json; needs tests/golden/actual/reroll/
  *                     from `npm run capture:reference -- --reroll` for the v21 source
+ *   --families a,b    with --calibrate, only these families (and their `@zoom`): their thresholds
+ *                     and numbers replace the files' own and the other families are kept as they
+ *                     are (M7 calibrated the star, artefact, layered and deepfield families so)
  *   --no-gpu          the CPU engine only (no browser)
  *   --only a,b        only the cases whose name contains one of these (for working on a few; the
  *                     run then checks fewer than the required set)
@@ -159,7 +162,7 @@ async function compareAll(G, node) {
     // v21's own variation (ADR 0015) and, from M4, v21's own stroke choices (v21-curves.ts) and
     // noise field (v21-noise.ts): both engines draw the same galaxy with the same pens, strokes,
     // flocculence and wobble, and only the dots differ
-    const opts = node.referenceOptions(rec.params, rec.zoom ?? 1);
+    const opts = node.referenceOptions(rec.params, rec.zoom ?? 1, rec.preset);
     const ref = node.reference(c.name);
     const refM = G.measure(ref);
     const refCounts = G.countsOf(rec.stats);
@@ -383,6 +386,12 @@ async function calibrate(G, node) {
       zoom,
     });
   }
+  const onlyFamilies = opt('--families')?.split(',');
+  if (onlyFamilies) {
+    const keep = cases.filter((c) => onlyFamilies.includes(c.family.replace('@zoom', '')));
+    cases.length = 0;
+    cases.push(...keep);
+  }
   console.log(
     `calibration: ${cases.length} configurations × ${K} re-keys and the negative controls`,
   );
@@ -455,7 +464,9 @@ async function calibrate(G, node) {
   const parity = {};
   /** @type {Record<string, any>} */
   const numbers = {};
-  const families = ['spiral', 'smooth', 'merger', 'lens', 'star', 'artefact'];
+  const families = onlyFamilies
+    ? [...onlyFamilies]
+    : ['spiral', 'smooth', 'merger', 'lens', 'star', 'artefact'];
   for (const f of Object.keys(eng.pairs)) if (!families.includes(f)) families.push(f);
   for (const family of families) {
     const list = eng.pairs[family] ?? [];
@@ -570,21 +581,31 @@ async function calibrate(G, node) {
     },
     parity,
   };
-  writeFileSync(join(ROOT, 'tests/golden/thresholds.json'), JSON.stringify(file, null, 2) + '\n');
-  writeFileSync(
-    join(ROOT, 'tests/golden/calibration.json'),
-    JSON.stringify(
-      {
-        about:
-          "ADR 0013 / 0015 calibration: per family, summaries (n, min, p5, median, p95, max) of each measure. engineRekey: the new engine (CPU, equal to WebGPU at L1) drawing v21's replayed variation and re-keying its placement stream, 3 keys per configuration (a full re-draw). negativeControls: one structural or pen change per control, re-keyed, against the base, with how many applicable configurations the thresholds caught. v21Reroll: v21 at az and az + 0.3° where its stipple re-rolled (a partial re-draw).",
-        keys: K,
-        configurations: cases.map((c) => `${c.preset} s${c.params.seed} incl ${c.params.incl}`),
-        families: numbers,
-      },
-      null,
-      2,
-    ) + '\n',
-  );
+  const thresholdsPath = join(ROOT, 'tests/golden/thresholds.json');
+  const calibrationPath = join(ROOT, 'tests/golden/calibration.json');
+  const calibration = {
+    about:
+      "ADR 0013 / 0015 calibration: per family, summaries (n, min, p5, median, p95, max) of each measure. engineRekey: the new engine (CPU, equal to WebGPU at L1) drawing v21's replayed variation and re-keying its placement stream, 3 keys per configuration (a full re-draw). negativeControls: one structural or pen change per control, re-keyed, against the base, with how many applicable configurations the thresholds caught. v21Reroll: v21 at az and az + 0.3° where its stipple re-rolled (a partial re-draw).",
+    keys: K,
+    configurations: cases.map((c) => `${c.preset} s${c.params.seed} incl ${c.params.incl}`),
+    families: numbers,
+  };
+  if (onlyFamilies) {
+    // a partial run replaces its families and keeps everything else in the files as it is
+    const old = JSON.parse(readFileSync(thresholdsPath, 'utf8'));
+    const oldCal = JSON.parse(readFileSync(calibrationPath, 'utf8'));
+    file.parity = { ...old.parity, ...parity };
+    calibration.families = { ...oldCal.families, ...numbers };
+    calibration.configurations = [
+      ...oldCal.configurations.filter(
+        (/** @type {string} */ c) => !calibration.configurations.includes(c),
+      ),
+      ...calibration.configurations,
+    ];
+    calibration.keys = oldCal.keys;
+  }
+  writeFileSync(thresholdsPath, JSON.stringify(file, null, 2) + '\n');
+  writeFileSync(calibrationPath, JSON.stringify(calibration, null, 2) + '\n');
   for (const [family, n] of Object.entries(numbers))
     if (n.negativeControls)
       for (const [name, x] of Object.entries(n.negativeControls))
