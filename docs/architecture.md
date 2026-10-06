@@ -24,9 +24,10 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0012](adr/0012-tooling-and-ci.md) | CI runs lint, typecheck, tests, WGSL validation and build on every push. Goldens run on SwiftShader WebGPU on hosted runners; a real-GPU job runs on demand. |
 | [0013](adr/0013-golden-image-metric.md) | Goldens are compared on total ink, SSIM of blurred density maps, stroke-width distribution and mark counts. Thresholds are calibrated from "same galaxy, other dots" pairs (v21's re-roll and the new engine's placement streams). The engine against its own goldens on SwiftShader is bit-exact. |
 | [0014](adr/0014-one-kernel-two-backends.md) | _Proposed:_ hand-written WGSL plus TypeScript twins with parity tests, with TypeGPU re-evaluated in M1. |
-| [0015](adr/0015-golden-metric-as-calibrated-in-m2.md) | The golden metric as calibrated in M2: coarse density SSIM plus a moment and extent test as the structure gate, band-mean widths, Poisson-aware counts, comparisons drawn with v21's replayed variation, and negative controls. Supersedes 0013 in part. |
+| [0015](adr/0015-golden-metric-as-calibrated-in-m2.md) | The golden metric as calibrated in M2: coarse density SSIM plus a moment and extent test as the structure gate, band-mean widths, Poisson-aware counts, comparisons drawn with v21's replayed variation, and negative controls. Supersedes 0013 in part. Superseded in part by 0018. |
 | [0016](adr/0016-m2-acceptance-overrides.md) | _Proposed:_ the extra overrides of the M2 stipple-only acceptance captures (`starMix`, `field`, `fgstars`; `jet` for `Radio jet`; `vary`, `dustScribble` for the arms case). |
 | [0017](adr/0017-model-tier-key-is-a-structure-signature.md) | The model tier's inclination key is a structure signature: every discrete inclination switch in v21 (the `incE` thresholds and L1000's cos i test); every other use of the inclination is a view-tier input. Clarifies 0010. |
+| [0018](adr/0018-comparison-draws-and-the-mean-of-k-redraws.md) | What the golden comparison draws with from M4 (v21's stroke picks, noise corners, dust choices and ring-knot clusters; the placement key re-draws the engine's own), the zoom camera's own thresholds, and v21 compared with the mean of each measure over K = 6 engine draws, with thresholds calibrated for that statistic. Supersedes 0015 in part. |
 
 ## Modules
 

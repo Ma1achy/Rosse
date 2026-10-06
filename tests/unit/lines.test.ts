@@ -14,7 +14,9 @@ import type { Params } from '../../src/core/params';
 import { presetParams } from '../../src/core/presets';
 import { ribbonModel, runRibbons } from '../../src/fallback/kernels/ribbons';
 import { CURVE_STATE_WORDS, CurveFlag, ribUniform } from '../../src/model/ribbons';
-import { curves } from '../../src/model/curves';
+import { curves, edgeOnAlpha } from '../../src/model/curves';
+import { CpuRenderer } from '../../src/fallback';
+import { CpuStipple, lineLayers } from '../../src/fallback/stipple';
 import { dustLanes } from '../../src/model/lanes';
 import { markGroups } from '../../src/model/clumps';
 import { buildScene, drawingsMeta } from '../../src/model/scene';
@@ -384,5 +386,38 @@ describe('the ribbon kernels (CPU)', () => {
     // 81° and 99° fall in one incE bucket, but v21's alpha is 0.5 and 1.5 × lines
     expect(at(81)).toBeCloseTo((0.5 * (81 - 72)) / 18, 5);
     expect(at(99)).toBeCloseTo((0.5 * (99 - 72)) / 18, 5);
+  });
+});
+
+describe('the edge-on stroke past 90° (review m1)', () => {
+  it('inks at most 1 on the raster, as v21 does through its RGBA8 canvas', () => {
+    const P = presetParams('Edge-on with dust', 7, { lines: 1, incl: 99 });
+    expect(edgeOnAlpha(P.lines, P.incl)).toBeGreaterThan(1);
+    const scene = buildScene(P, M);
+    const st = new CpuStipple(scene);
+    const v = st.view(cameraOf(P));
+    const r = new CpuRenderer(
+      { plateCss: 800, dpr: 1 },
+      { width: 1, height: 1, data: new Uint8Array(4) },
+    );
+    for (const n of ['dots', 'knots', 'stars', 'cores', 'strokes'] as const) r.addAtlas(atlas(n));
+    r.addAtlas(
+      atlasFromBytes(
+        'pieces',
+        index.atlases.pieces,
+        new Uint8Array(readFileSync(resolve(BUILT, index.atlases.pieces.file))),
+      ),
+    );
+    r.setLayers(lineLayers(v.ribbons, st.lines));
+    r.drawInk();
+    let max = 0;
+    let inked = 0;
+    for (let i = 3; i < r.ink.data.length; i += 4) {
+      const a = r.ink.data[i] ?? 0;
+      max = Math.max(max, a);
+      if (a > 0) inked++;
+    }
+    expect(inked).toBeGreaterThan(1000);
+    expect(max).toBeLessThanOrEqual(1);
   });
 });

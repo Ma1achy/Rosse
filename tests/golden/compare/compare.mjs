@@ -36,6 +36,7 @@
  *                     from `npm run capture:reference -- --reroll` for the v21 source
  *     --keys K        the K of the mean (default 6, ADR 0018)
  *     --resume        keep what a stopped calibration measured (test-results/calibration-shard-*)
+ *     --controls-every n  the negative controls on every n-th configuration only (default 1)
  *     --reuse-shards  only aggregate the last calibration's measurements (test-results/
  *                     calibration-shard-*.json, made with at least K keys) for this K
  *   --jobs n          parallel processes for the re-draws and the calibration (default 4)
@@ -114,8 +115,10 @@ process.exit(failed ? 1 : 0);
 function requiredCases() {
   const onlyIdx = args.indexOf('--only');
   const only = onlyIdx >= 0 ? (args[onlyIdx + 1] ?? '').split(',') : null;
+  // captures marked `calibration` are held out for the calibration, never gated (ADR 0018)
   return manifest.captures.filter(
-    (/** @type {any} */ c) => c.variant && (!only || only.some((o) => c.name.includes(o))),
+    (/** @type {any} */ c) =>
+      c.variant && !c.calibration && (!only || only.some((o) => c.name.includes(o))),
   );
 }
 
@@ -239,7 +242,7 @@ async function compareAll(G, node) {
     const ref = node.reference(c.name);
     const refM = G.measure(ref);
     const refCounts = G.countsOf(rec.stats);
-    const parity = node.parity(rec.preset, rec.zoom ?? 1);
+    const parity = node.parity(rec.preset, rec.zoom ?? 1, rec.variant);
     const strict = node.thresholds.strict;
     /** @type {Record<string, any>} */
     const row = { name: c.name, preset: rec.preset, required: isRequired };
@@ -442,7 +445,7 @@ async function calibrate(G, node) {
     'Radio jet',
     'Shell galaxy',
   ];
-  /** @type {{ preset: string, base: string, family: string, params: any, zoom?: number }[]} */
+  /** @type {import('./node.ts').CalibrationCase[]} */
   const cases = [];
   for (const preset of presets)
     for (const seed of [7, 4242])
@@ -463,14 +466,15 @@ async function calibrate(G, node) {
   for (const c of manifest.captures.filter((/** @type {any} */ x) => x.variant)) {
     const rec = node.record(c.name);
     const zoom = rec.zoom ?? 1;
-    // the zoom camera is calibrated on its own (`<family>@zoom`)
-    const family = G.goldenFamily(rec.preset);
+    // the zoom camera is calibrated on its own (`<family>@zoom`), the line-work alone too
+    const family = G.goldenFamily(rec.preset, c.variant);
     cases.push({
       preset: `${rec.preset} (${c.variant})`,
       base: rec.preset,
       family: zoom === 1 ? family : `${family}@zoom`,
       params: rec.params,
       zoom,
+      ...(c.calibration ? { heldOut: c.name } : {}),
     });
   }
   console.log(
@@ -478,6 +482,9 @@ async function calibrate(G, node) {
   );
   // the engine pairs are measured in parallel processes (--jobs, default 4), each taking every
   // n-th configuration (--shard k/n) and writing its comparisons to test-results/
+  // the negative controls on every n-th configuration (--controls-every n, default 1): with K
+  // draws each they are most of a calibration's time
+  const controlsEvery = Number(opt('--controls-every') ?? 1);
   const shard = opt('--shard');
   if (shard) {
     const [k = 0, n = 1] = shard.split('/').map(Number);
@@ -485,21 +492,38 @@ async function calibrate(G, node) {
     const file = join(ROOT, `test-results/calibration-shard-${k}.json`);
     // written after every configuration; with --resume, the configurations a stopped run
     // measured with this K are kept (a full calibration takes hours)
-    /** @type {{ keys: number, standIns: number, done: number[], pairs: Record<string, any[]>, controls: Record<string, Record<string, any[]>> }} */
-    let part = { keys: K, standIns: R, done: [], pairs: {}, controls: {} };
-    if (flag('--resume') && existsSync(file)) {
-      const old = JSON.parse(readFileSync(file, 'utf8'));
-      if (old.keys === K && old.standIns === R && Array.isArray(old.done)) part = old;
-    }
+    /** @type {{ keys: number, standIns: number, pairs: Record<string, any[]>, controls: Record<string, Record<string, any[]>>, heldOut: Record<string, any[]> }} */
+    let part = { keys: K, standIns: R, pairs: {}, controls: {}, heldOut: {} };
+    // with --resume, every configuration any shard has measured with this K is kept, by label
+    /** @type {Set<string>} */
+    const done = new Set();
+    if (flag('--resume'))
+      for (let j = 0; existsSync(join(ROOT, `test-results/calibration-shard-${j}.json`)); j++) {
+        const old = JSON.parse(
+          readFileSync(join(ROOT, `test-results/calibration-shard-${j}.json`), 'utf8'),
+        );
+        if (old.keys !== K || old.standIns !== R) continue;
+        if (j === k) part = { heldOut: {}, ...old };
+        for (const list of Object.values(old.pairs ?? {}))
+          for (const e of /** @type {any[]} */ (list)) done.add(e.config);
+      }
     for (let i = k; i < cases.length; i += n) {
       const c = cases[i];
-      if (!c || part.done.includes(i)) continue;
-      const one = node.calibrateEngine([c], K, R, (s) => console.log(`[${shard}] ${s}`));
+      if (!c || done.has(G.configLabel(c))) continue;
+      const one = node.calibrateEngine(
+        [c],
+        K,
+        R,
+        (s) => console.log(`[${shard}] ${s}`),
+        // every n-th of each shard's own configurations, so the shards stay balanced; the
+        // line-work alone has its own breaks instead (docs/milestones/m4/README.md)
+        c.family !== 'lines' && Math.floor(i / n) % controlsEvery === 0,
+      );
       for (const [f, list] of Object.entries(one.pairs)) (part.pairs[f] ??= []).push(...list);
+      for (const [f, list] of Object.entries(one.heldOut)) (part.heldOut[f] ??= []).push(...list);
       for (const [f, byName] of Object.entries(one.controls))
         for (const [name, list] of Object.entries(byName))
           ((part.controls[f] ??= {})[name] ??= []).push(...list);
-      part.done.push(i);
       writeFileSync(file, JSON.stringify(part));
     }
     return;
@@ -507,7 +531,14 @@ async function calibrate(G, node) {
   const jobs = Number(opt('--jobs') ?? 4);
   if (!flag('--reuse-shards'))
     await shards(
-      ['--calibrate', '--keys', String(K), ...(flag('--resume') ? ['--resume'] : [])],
+      [
+        '--calibrate',
+        '--keys',
+        String(K),
+        '--controls-every',
+        String(controlsEvery),
+        ...(flag('--resume') ? ['--resume'] : []),
+      ],
       jobs,
     );
   // the mean over the first K keys of each entry (ADR 0018)
@@ -515,8 +546,8 @@ async function calibrate(G, node) {
     if (cs.length < K) throw new Error(`calibration shards hold ${cs.length} keys, not ${K}`);
     return G.meanComparison(cs.slice(0, K));
   };
-  /** @type {{ pairs: Record<string, any[]>, controls: Record<string, Record<string, any[]>> }} */
-  const eng = { pairs: {}, controls: {} };
+  /** @type {{ pairs: Record<string, any[]>, controls: Record<string, Record<string, any[]>>, heldOut: Record<string, any[]> }} */
+  const eng = { pairs: {}, controls: {}, heldOut: {} };
   for (let k = 0; existsSync(join(ROOT, `test-results/calibration-shard-${k}.json`)); k++) {
     if (k >= jobs && !flag('--reuse-shards')) break;
     const part = JSON.parse(
@@ -531,6 +562,14 @@ async function calibrate(G, node) {
         ((eng.controls[f] ??= {})[name] ??= []).push(
           ...list.map((/** @type {any} */ e) => ({ config: e.config, c: mean(e.cs) })),
         );
+    for (const [f, list] of Object.entries(part.heldOut ?? {}))
+      (eng.heldOut[f] ??= []).push(
+        ...list.map((/** @type {any} */ e) => ({
+          ...mean(e.cs),
+          preset: e.preset,
+          config: e.config,
+        })),
+      );
   }
   console.log('calibration: v21 re-roll pairs');
   const v21 = node.calibrateReroll(join(ROOT, 'tests/golden/actual/reroll'), () => {});
@@ -596,30 +635,43 @@ async function calibrate(G, node) {
       numbers[family] = { v21Reroll: v21.pairs[family]?.length ? stats(v21.pairs[family]) : null };
       continue;
     }
-    const s = stats(list);
-    parity[family] = {
-      ...base,
-      // the ADR's ±5% and ±10% stay as floors: they also cover the renderers' deliberate
-      // differences (per-drawing mipmaps, no MSAA, f16 accumulation), which re-draw pairs do not
-      ink: Math.max(ADR.ink, ceil3(1.5 * s.inkAbs.p95)),
-      ssimCoarse: floor2(s.ssimCoarse.p5 - 0.02),
-      median: Math.max(ADR.median, ceil3(1.5 * s.medianAbs.p95)),
-      p90: Math.max(ADR.p90, ceil3(1.5 * s.p90Abs.p95)),
-      // the moment and extent test: 1.5 × the p95 of the re-draw spread, with small floors for
-      // a quantity's resolution (half a radial bin of 0.25 px is 0.1% of a 100 px radius)
-      r25: spread(s, 'r25Abs', 0.01),
-      r50: spread(s, 'r50Abs', 0.01),
-      r90: spread(s, 'r90Abs', 0.01),
-      outer: spread(s, 'outerAbs', 0.003),
-      q: spread(s, 'qAbs', 0.005),
-      qInner: spread(s, 'qInnerAbs', 0.005),
-      ...positionAngle(list),
+    const rule = (/** @type {any[]} */ l) => {
+      const s = stats(l);
+      return {
+        // the ADR's ±5% and ±10% stay as floors: they also cover the renderers' deliberate
+        // differences (per-drawing mipmaps, no MSAA, f16 accumulation), which re-draw pairs do not
+        ink: Math.max(ADR.ink, ceil3(1.5 * s.inkAbs.p95)),
+        ssimCoarse: floor2(s.ssimCoarse.p5 - 0.02),
+        median: Math.max(ADR.median, ceil3(1.5 * s.medianAbs.p95)),
+        p90: Math.max(ADR.p90, ceil3(1.5 * s.p90Abs.p95)),
+        // the moment and extent test: 1.5 × the p95 of the re-draw spread, with small floors for
+        // a quantity's resolution (half a radial bin of 0.25 px is 0.1% of a 100 px radius)
+        r25: spread(s, 'r25Abs', 0.01),
+        r50: spread(s, 'r50Abs', 0.01),
+        r90: spread(s, 'r90Abs', 0.01),
+        outer: spread(s, 'outerAbs', 0.003),
+        q: spread(s, 'qAbs', 0.005),
+        qInner: spread(s, 'qInnerAbs', 0.005),
+        ...positionAngle(l),
+      };
     };
+    /** @type {Record<string, number>} */
+    const t = rule(list);
+    // ADR 0018: where held-out v21 captures exist (the line-work alone, drawn the same at every
+    // key), the same rule on v21 against the engine there, and the wider of the two
+    const held = eng.heldOut[family] ?? [];
+    if (held.length) {
+      const h = /** @type {Record<string, number>} */ (rule(held));
+      for (const k of Object.keys(t))
+        t[k] = k === 'ssimCoarse' ? Math.min(t[k] ?? 0, h[k] ?? 0) : Math.max(t[k] ?? 0, h[k] ?? 0);
+    }
+    parity[family] = { ...base, ...t, ...(held.length ? { heldOut: held.length } : {}) };
     // per-preset axis-ratio tolerances: near-round galaxies are noisier in q than flat ones, so
     // a family-wide value would be too wide for the flat ones (ADR 0015)
     /** @type {Record<string, any>} */
     const byPreset = {};
-    for (const preset of [...new Set(list.map((c) => c.preset))]) {
+    // (none where held-out captures set the family's tolerances: re-draws alone would be tighter)
+    for (const preset of held.length ? [] : [...new Set(list.map((c) => c.preset))]) {
       const mine = list.filter((c) => c.preset === preset);
       if (mine.length < 8) continue;
       const ps = stats(mine);
@@ -651,7 +703,8 @@ async function calibrate(G, node) {
       };
     }
     numbers[family] = {
-      engineRekey: s,
+      engineRekey: stats(list),
+      ...(held.length ? { heldOutV21: stats(held) } : {}),
       negativeControls: ctl,
       v21Reroll: v21.pairs[family]?.length ? stats(v21.pairs[family]) : null,
     };
@@ -689,6 +742,7 @@ async function calibrate(G, node) {
           "ADR 0013 / 0015 / 0018 calibration: per family, summaries (n, min, p5, median, p95, max) of each measure. engineRekey: the new engine (CPU, equal to WebGPU at L1) drawing v21's replayed variation and re-keying its placement stream: per configuration, each of `standIns` draws stands in for v21 against the mean of each measure over the `keys` draws of keys 0..K − 1 (a full re-draw). negativeControls: one structural or pen change per control, drawn with the same K keys, against the first stand-in, with how many applicable configurations the thresholds caught. v21Reroll: v21 at az and az + 0.3° where its stipple re-rolled (a partial re-draw, one draw against one).",
         keys: K,
         standIns: R,
+        controlsEvery,
         configurations: cases.map((c) => `${c.preset} s${c.params.seed} incl ${c.params.incl}`),
         families: numbers,
       },

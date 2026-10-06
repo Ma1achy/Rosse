@@ -180,7 +180,9 @@ fn fs_ribbon(in: RibbonOut) -> @location(0) vec4<f32> {
     lod = tri_lod(p1, p3, p2, t1 * draw.cell, t3 * draw.cell, t2 * draw.cell, wb.w);
   }
   let ink = textureSampleLevel(strokes, strokes_sampler, uv, in.layer, lod).r;
-  let a = smoothstep(draw.edge.x, draw.edge.y, ink) * in.alpha * draw.gain;
+  // at most 1: the edge-on stroke's alpha, lines · (incl − 72)/18, passes 1 beyond 90°, and
+  // v21's RGBA8 canvas clamps it where this rgba16float target would not (review m1)
+  let a = min(smoothstep(draw.edge.x, draw.edge.y, ink) * in.alpha * draw.gain, 1.0);
   return vec4<f32>(draw.ink.rgb * a, a);
 }
 

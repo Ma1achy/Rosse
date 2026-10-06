@@ -54,8 +54,12 @@ export interface CaptureRecord {
   hand?: number[];
 }
 
-/** The golden family of a preset (thresholds.json `parity` keys). */
-export function goldenFamily(preset: string): string {
+/**
+ * The golden family of a capture (thresholds.json `parity` keys): its preset's, except the
+ * line-work-only captures (variant `lines`, M4's review), which have their own (ADR 0018).
+ */
+export function goldenFamily(preset: string, variant?: string): string {
+  if (variant === 'lines') return 'lines';
   const f = presetFamily(preset);
   if (f === 'merger' || f === 'lens' || f === 'star' || f === 'artefact') return f;
   if (preset === 'Layered: lensed merger') return 'merger';
@@ -161,8 +165,8 @@ export class GoldenNode {
    * calibrated (`<family>@zoom`): at zoom 2 the plate holds the inner galaxy only, and a re-draw
    * of the same galaxy scatters more (docs/milestones/m4/README.md).
    */
-  parity(preset: string, zoom = 1): Thresholds {
-    const f = goldenFamily(preset);
+  parity(preset: string, zoom = 1, variant?: string): Thresholds {
+    const f = goldenFamily(preset, variant);
     const t =
       (zoom !== 1 ? this.thresholds.parity[`${f}@zoom`] : undefined) ?? this.thresholds.parity[f];
     if (!t) throw new Error(`no parity thresholds for ${preset}`);
@@ -197,13 +201,15 @@ export class GoldenNode {
    * mean over any K' ≤ K of them (the first K').
    */
   calibrateEngine(
-    cases: { preset: string; base: string; family: string; params: Params; zoom?: number }[],
+    cases: CalibrationCase[],
     keys: number,
     standIns: number,
     log: (s: string) => void,
+    withControls = true,
   ) {
     const pairs: Record<string, { preset: string; config: string; cs: Comparison[] }[]> = {};
     const controls: Record<string, Record<string, { config: string; cs: Comparison[] }[]>> = {};
+    const heldOut: Record<string, { preset: string; config: string; cs: Comparison[] }[]> = {};
     for (const c of cases) {
       const opts = this.referenceOptions(c.params);
       const zoom = c.zoom ?? 1;
@@ -213,7 +219,17 @@ export class GoldenNode {
         draw(c.params, opts, STAND_IN_KEY + r),
       );
       const drawn = Array.from({ length: keys }, (_, k) => draw(c.params, opts, k));
-      const config = `${c.preset} s${String(c.params.seed)} incl ${String(c.params.incl)}${zoom === 1 ? '' : ` zoom ${String(zoom)}`}`;
+      const config = configLabel(c);
+      // a held-out v21 capture (ADR 0018): v21 against the same K draws, for the renderers' own
+      // differences, which re-draws of line-work drawn the same at every key cannot show
+      if (c.heldOut) {
+        const v21 = measure(this.reference(c.heldOut));
+        (heldOut[c.family] ??= []).push({
+          preset: c.base,
+          config,
+          cs: drawn.map((m) => compareMeasures(v21, m)),
+        });
+      }
       for (const ref of stand)
         // tagged with the preset, for the per-preset axis-ratio tolerances
         (pairs[c.family] ??= []).push({
@@ -222,7 +238,10 @@ export class GoldenNode {
           cs: drawn.map((m) => compareMeasures(ref, m)),
         });
       const ref = stand[0];
-      if (!ref) continue;
+      if (!ref || !withControls) {
+        log(`  ${config}`);
+        continue;
+      }
       const refQ = momentsOf(ref.alpha, ref.extent.r90).q;
       for (const ctl of NEGATIVE_CONTROLS) {
         if (!ctl.applies(c.params, refQ)) continue;
@@ -234,7 +253,7 @@ export class GoldenNode {
       }
       log(`  ${config}`);
     }
-    return { pairs, controls };
+    return { pairs, controls, heldOut };
   }
 
   /**
@@ -358,6 +377,23 @@ export function meanCounts(list: Record<string, number>[]): Record<string, numbe
   for (const c of list) for (const [k, v] of Object.entries(c)) out[k] = (out[k] ?? 0) + v;
   for (const k of Object.keys(out)) out[k] = (out[k] ?? 0) / list.length;
   return out;
+}
+
+/** One configuration of the calibration. */
+export interface CalibrationCase {
+  preset: string;
+  base: string;
+  family: string;
+  params: Params;
+  zoom?: number;
+  /** a v21 capture of this configuration held out for the calibration (ADR 0018) */
+  heldOut?: string;
+}
+
+/** A configuration's label in calibration.json, unique within a calibration. */
+export function configLabel(c: CalibrationCase): string {
+  const zoom = c.zoom ?? 1;
+  return `${c.preset} s${String(c.params.seed)} incl ${String(c.params.incl)}${zoom === 1 ? '' : ` zoom ${String(zoom)}`}`;
 }
 
 /** Summary statistics of a list. */

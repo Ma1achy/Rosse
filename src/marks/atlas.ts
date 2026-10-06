@@ -9,6 +9,8 @@
  * adapter's own limit, so on most adapters one array is enough.
  */
 
+import type { VectorSheet } from './vector';
+
 /** Ink-edge thresholds of the reference's fragment shader (app23.js:L1124): smoothstep(lo, hi, t). */
 export const INK_EDGE: readonly [number, number] = [0.12, 0.55];
 /** The thresholds for MAGNIFIED atlases (whole drawings drawn large; app23.js:L1099). */
@@ -32,8 +34,6 @@ export const MAGNIFIED: ReadonlySet<string> = new Set([
 export function inkEdge(atlas: string): readonly [number, number] {
   return MAGNIFIED.has(atlas) ? INK_EDGE_MAGNIFIED : INK_EDGE;
 }
-
-import type { VectorSheet } from './vector';
 
 export type AtlasName = 'dots' | 'knots' | 'stars' | 'cores' | 'fgstars' | 'pieces' | 'strokes';
 

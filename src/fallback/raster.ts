@@ -350,7 +350,8 @@ export function rasteriseRibbons(
           lod = lodB;
         }
         const t = sampleLevel(atlas, layer, u, v, lod);
-        const a = f(f(smoothstep(lo, hi, t) * f(alpha)) * f(params.gain));
+        // at most 1, as ribbon.wgsl (v21's RGBA8 canvas clamps the edge-on stroke past 90°)
+        const a = Math.min(f(f(smoothstep(lo, hi, t) * f(alpha)) * f(params.gain)), 1);
         if (a === 0) continue;
         const oo = (y * W + x) * 4;
         const k = f(1 - a);
