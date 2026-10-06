@@ -103,9 +103,14 @@ describe('mergerSprites against v21, from the same starts', () => {
         `${name}: engine ${JSON.stringify(mine)} | v21 ${JSON.stringify(theirs)} (v21's lists include bulge dots in old: ${String(0)})`,
       );
       // dots and young: the same stars, a few ± Poisson (the draws differ)
-      const sig = (a: number, b: number) => 4 * Math.sqrt(a + b + 1) + 0.002 * (a + b);
+      // knots come in clusters of 5 to 11 (a knot of new stars in a tail), so their count's variance
+      // is about 8 times Poisson's; drawn stars come singly, or with a cluster's bright one
+      const sig = (a: number, b: number, cluster = 1) =>
+        4 * Math.sqrt(cluster * (a + b + 1)) + 0.002 * (a + b);
       for (const k of ['dots', 'young', 'knots', 'stars', 'rstars'] as const)
-        expect(Math.abs(mine[k] - theirs[k]), k).toBeLessThanOrEqual(sig(mine[k], theirs[k]));
+        expect(Math.abs(mine[k] - theirs[k]), k).toBeLessThanOrEqual(
+          sig(mine[k], theirs[k], k === 'knots' ? 8 : 1),
+        );
 
       // the tidal grids: the engine's, from its own star table, against v21's `tidal` at every vertex
       m.tide.buildGrid();
