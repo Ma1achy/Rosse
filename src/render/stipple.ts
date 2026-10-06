@@ -23,7 +23,7 @@ import { CULLS_LAYOUT } from '../fallback/kernels/project';
 import { GpuRibbons } from './ribbons';
 import { GpuTide } from './tide';
 import { GpuVectors } from './vectors';
-import { vectorView } from '../model/vectors';
+import { hatchRows, vectorView } from '../model/vectors';
 import { coreInstances } from '../model/parts';
 import {
   STIPPLE_LAYERS,
@@ -357,6 +357,7 @@ export class GpuStipple {
         galaxy.g.key,
         galaxy.g.n_dot_pool,
         this.tide?.r2 ?? 0,
+        this.tide ? hatchRows(this.scene.ribbons, cam) : [],
       ),
     );
     this.camera = cam;

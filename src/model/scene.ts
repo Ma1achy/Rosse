@@ -99,7 +99,22 @@ export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {
     opts.curvePicks,
     galaxy.noise,
   );
-  const vectors = describeVectors(P, variation, meta, P.incl, opts.partPicks, opts.tide);
+  const vectors = describeVectors(
+    P,
+    variation,
+    meta,
+    P.incl,
+    opts.partPicks,
+    opts.tide,
+    opts.tide !== undefined ? ribbons.lanes.hatches.map((h) => h.tile) : undefined,
+  );
+  // a merging galaxy's hatching goes through the vector drawings (densified under the tides, torn
+  // piece by piece); the line-work keeps its lanes and curves
+  if (opts.tide !== undefined) {
+    ribbons.nCaps = 0;
+    ribbons.nHDots = 0;
+    ribbons.nHBlobs = 0;
+  }
   return { P, variation, galaxy, ribbons, vectors, meta };
 }
 

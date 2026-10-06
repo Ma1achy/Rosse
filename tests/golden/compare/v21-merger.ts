@@ -67,11 +67,31 @@ export interface V21MergerIC {
   pitch: [number, number];
 }
 
+/** What v21's `mergerSprites()` makes at a view (before render()'s thinning). */
+export interface V21MergerView {
+  /** `MS.sc`, plate px per galaxy unit, and `MS.scale` */
+  sc: number;
+  scale: number;
+  /** the lists of marks: [x, y, tile, alpha, m0…m3] */
+  disc: number[][];
+  young: number[][];
+  knots: number[][];
+  stars: number[][];
+  rstars: number[][];
+  /** the screen positions of the stars (2 per star) */
+  scr: Float32Array;
+  /** the 49 × 49 grid of galaxy g (`tidal(g, false)` at every vertex, render() L1242–1245) */
+  grid(g: number): Float64Array;
+  /** `tidal(g, flip)(x, y)` */
+  tidal(g: number, flip: boolean, x: number, y: number): [number, number];
+}
+
 interface Oracle {
   setP(P: Record<string, unknown>): void;
-  sim(ext?: { X: Float32Array; V: Float32Array }): V21Merger;
+  sim(ext?: MergerStart): V21Merger;
   ic(): V21MergerIC;
   galaxyParams(g: number): Record<string, unknown>;
+  view(p: Record<string, unknown>, ext: MergerStart | null, zoom: number): V21MergerView;
 }
 
 let cached: Oracle | null = null;
@@ -96,13 +116,34 @@ function oracle(root: string): Oracle {
       `return { X: X.slice(), V: V.slice(), G: G.slice(), R0: R0.slice(), DX: DX.slice(), DY: DY.slice(), C: C.map(function (c) { return c.slice(); }), N: N, t0: t0, az: AZ.slice(), pitch: PIT.slice() }; ${icMarker}`,
     );
   // the integration, from outside initial conditions when given
-  const extFn = sim.replace(icMarker, `if (EXT) { X.set(EXT.X); V.set(EXT.V); } ${icMarker}`);
+  const extFn = sim.replace(
+    icMarker,
+    `if (EXT) { X.set(EXT.X); V.set(EXT.V); if (EXT.R0) { R0.set(EXT.R0); DX.set(EXT.DX); DY.set(EXT.DY); } } ${icMarker}`,
+  );
   const body = `var P = {}, MCACHE = { key: null, res: null }, REC = null, EXT = null, AZ = [], PIT = [];
     ${['clamp', 'mulberry32', 'gauss', 'unit3'].map((n) => cut(src, n)).join('\n')}
     ${extFn}
     ${icFn}
     ${cut(src, 'mergerGalaxyParams')}
+    ${['Rm', 'Sm', 'mul', 'chain', 'dotSprite', 'simple', 'paR', 'azR', 'ci', 'snapAt', 'frameOf', 'unionFrame', 'mergerSprites'].map((n) => cut(src, n)).join('\n')}
+    var VIEW = { W: 800, cx: 400, cy: 400, scale: 84 }, PEN = { line: 2.4, dot: 1 }, VAR = null, AT = null, SSm_dummy = 0;
+    function inst(list, atlas, x, y, tile, alpha, M) { list.push([x, y, tile, alpha, M[0], M[1], M[2], M[3]]); }
     return {
+      view: function (p, ext, zoom) {
+        P = p; EXT = ext; MCACHE = { key: null, res: null };
+        VAR = { dotPool: p.__pool, knotPool: p.__knots, spike: p.__spike };
+        AT = { dots: { size: p.__size }, stars: { n: p.__starN }, sstars: { kind: ['outline', 'plain', 'plain'] } };
+        PEN.line = p.pen; PEN.dot = 0.75 + 0.1 * p.pen; VIEW.scale = 84 * zoom;
+        var MS = mergerSprites();
+        var GN = 48;
+        return {
+          sc: MS.sc, scale: MS.scale, disc: MS.S.disc, young: MS.S.young, knots: MS.S.knots, stars: MS.S.stars, rstars: MS.S.rstars,
+          scr: null,
+          grid: function (g) { var out = new Float64Array((GN + 1) * (GN + 1) * 2), t = MS.tidal(g, false);
+            for (var gy = 0; gy <= GN; gy++) for (var gx = 0; gx <= GN; gx++) { var w = t(gx / GN - 0.5, gy / GN - 0.5), o = (gy * (GN + 1) + gx) * 2; out[o] = w[0]; out[o + 1] = w[1]; } return out; },
+          tidal: function (g, flip, x, y) { return MS.tidal(g, flip)(x, y); },
+        };
+      },
       setP: function (o) { P = o; MCACHE = { key: null, res: null }; },
       sim: function (ext) { EXT = ext || null; MCACHE = { key: null, res: null }; return simulateMerger(); },
       ic: function () { AZ = []; PIT = []; return simulateIC(); },
@@ -111,6 +152,48 @@ function oracle(root: string): Oracle {
   // eslint-disable-next-line @typescript-eslint/no-implied-eval
   cached = (new Function(body) as () => Oracle)();
   return cached;
+}
+
+/**
+ * Starts to give v21's integrator in place of its own: positions and velocities, and (for the tidal
+ * map and the classes) each star's initial disc coordinates and radius.
+ */
+export interface MergerStart {
+  X: Float32Array;
+  V: Float32Array;
+  R0?: Float32Array;
+  DX?: Float32Array;
+  DY?: Float32Array;
+}
+
+export interface V21MergerHand {
+  dotPool: number[];
+  knotPool: number[];
+  spike: number;
+  dotSizes: number[];
+  nStarTiles: number;
+}
+
+/** v21's `mergerSprites()` for these parameters, a camera zoom and (optionally) the engine's starts. */
+export function v21MergerView(
+  root: string,
+  P: Params,
+  hand: V21MergerHand,
+  zoom = 1,
+  ext: MergerStart | null = null,
+): V21MergerView {
+  return oracle(root).view(
+    {
+      ...P,
+      __pool: hand.dotPool,
+      __knots: hand.knotPool,
+      __spike: hand.spike,
+      __size: hand.dotSizes,
+      __starN: hand.nStarTiles,
+    },
+    ext,
+    zoom,
+  );
 }
 
 /** v21's parameters for an oracle call: the full set, with `P.seed` and the merger's. */
@@ -126,11 +209,7 @@ export function v21MergerIC(root: string, P: Params): V21MergerIC {
 }
 
 /** v21's integration; `ext` replaces the initial conditions (same star count) with the engine's. */
-export function v21MergerRun(
-  root: string,
-  P: Params,
-  ext?: { X: Float32Array; V: Float32Array },
-): V21Merger {
+export function v21MergerRun(root: string, P: Params, ext?: MergerStart): V21Merger {
   return setup(root, P).sim(ext);
 }
 

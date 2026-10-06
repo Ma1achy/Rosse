@@ -34,7 +34,7 @@ import { classCapacity, compact } from './kernels/scan';
 import { runStipple } from './kernels/stipple';
 import { runVectors, vectorInputs, type VectorOut } from './kernels/vector';
 import { warpCaps, warpInstances, warpRibbons, type TideData } from './kernels/tide';
-import { vectorView, type VectorView } from '../model/vectors';
+import { hatchRows, vectorView, type VectorView } from '../model/vectors';
 import { usedDrawings } from '../model/used';
 
 export interface CpuStippleView {
@@ -215,6 +215,7 @@ export class CpuStipple {
       galaxy.g.key,
       galaxy.g.n_dot_pool,
       T?.r2 ?? 0,
+      T ? hatchRows(R, cam) : [],
     );
     const vo = runVectors(
       vectorInputs(VD.lib, vv, galaxy.pool, galaxy.dotBase, galaxy.noise, T?.data),
