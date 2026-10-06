@@ -74,6 +74,8 @@ export function shellRibbons(scene: ShellScene, arcs: readonly ShellArc[]): Ribb
     0,
     undefined,
     scene.noise,
+    undefined,
+    undefined,
     extra,
   );
 }

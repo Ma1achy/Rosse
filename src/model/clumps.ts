@@ -7,7 +7,9 @@
  * projected and compacted with it.
  *
  * - Ring knots (`ring` > 0.1, not a merger): round(6 + 10·ring) clusters on the ring, 5–12 marks
- *   each (half knots, half young dots), with a drawn star at the centre.
+ *   each (half knots, half young dots), with a drawn star at the centre. v21 draws the bound of
+ *   its marks loop afresh at every turn (`jk < 5 + floor(rr0() · 8)`), so a cluster holds 5 marks
+ *   with probability 1/8 and 12 rarely; the engine draws its counts the same way.
  * - Clumps (arms or `irr`, bulge < 0.9): one per `VAR.clumps` entry, on its arm (or scattered
  *   round the lopsided centre when irregular), `n` marks of which a quarter are knots, plus 1–4
  *   drawn stars with probability 0.85 when `starMix` > 0.01.
@@ -42,15 +44,42 @@ export const GROUP_INDEX = 1 << 24;
 /** A group's marks use indices `group · GROUP_STRIDE + local` on the group's stream. */
 export const GROUP_STRIDE = 256;
 
-export function markGroups(P: Params, V: Variation): MarkGroup[] {
+/**
+ * A ring-knot cluster, given rather than drawn (ADR 0018): the golden runner passes v21's own
+ * (tests/golden/compare/v21-curves.ts `v21RingKnots`, replaying `rr0`), so that the clusters sit
+ * where v21's do and hold as many marks; the marks themselves are drawn on the placement key.
+ */
+export interface RingKnotPick {
+  /** angle on the ring, radians */
+  t: number;
+  /** radius */
+  R: number;
+  /** marks */
+  count: number;
+}
+
+/**
+ * `key`: the key of the groups' own draws (ring-knot centres and counts, clumps' drawn stars), the
+ * placement key (the seed by default), so that a re-draw (ADR 0013, 0018) re-draws them with the
+ * dots. `ringKnots`: v21's clusters instead (ADR 0018).
+ */
+export function markGroups(
+  P: Params,
+  V: Variation,
+  key: number = P.seed,
+  ringKnots?: readonly RingKnotPick[],
+): MarkGroup[] {
   const out: MarkGroup[] = [];
   if (P.ring > 0.1 && !P.merger) {
     const nkc = Math.round(6 + 10 * P.ring);
     for (let kc = 0; kc < nkc; kc++) {
-      const r = new Draws(P.seed, Stream.ringKnots, GROUP_INDEX + kc);
-      const tk = r.f32() * 6.2832;
-      const Rk = P.ringR * (1 + r.gauss() * 0.02);
-      const count = 5 + Math.floor(r.f32() * 8);
+      const r = new Draws(key >>> 0, Stream.ringKnots, GROUP_INDEX + kc);
+      const given = ringKnots?.[kc];
+      const tk = given ? given.t : r.f32() * 6.2832;
+      const Rk = given ? given.R : P.ringR * (1 + r.gauss() * 0.02);
+      let count = given?.count ?? 0;
+      // v21's bound, drawn afresh at every turn of the loop (app23.js:L284)
+      if (!given) while (count < 5 + Math.floor(r.f32() * 8)) count++;
       out.push({
         kind: GroupKind.ringKnots,
         id: kc,
@@ -72,7 +101,7 @@ export function markGroups(P: Params, V: Variation): MarkGroup[] {
         cR * Math.sin(th0) + (irr ? 0.5 * Math.sin(V.lopA) : 0),
         0,
       ];
-      const r = new Draws(P.seed, Stream.clumps, GROUP_INDEX + i);
+      const r = new Draws(key >>> 0, Stream.clumps, GROUP_INDEX + i);
       let rstars = 0;
       if (P.starMix > 0.01 && r.f32() < 0.85)
         rstars = 1 + Math.floor(r.f32() * (1 + 3 * P.starMix));

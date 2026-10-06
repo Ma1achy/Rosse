@@ -50,7 +50,8 @@ const WINDOWS: {
     h: 10,
     shift: (s) => [Math.floor(s * 0.1), 0],
   },
-  { salt: NoiseSalt.laneRing, x0: 7, y0: -4, w: 10, h: 8, shift: (s) => [0, Math.floor(s * 0.01)] },
+  // y = 2.6 sin θ + frac(0.01 seed) reaches 3.6, whose upper corners are at 4: rows −4..4
+  { salt: NoiseSalt.laneRing, x0: 7, y0: -4, w: 10, h: 9, shift: (s) => [0, Math.floor(s * 0.01)] },
   { salt: NoiseSalt.laneArm, x0: -2, y0: 6, w: 42, h: 4, shift: (s) => [0, Math.floor(s * 0.01)] },
   // the wobble: vnoise(0.011x + 3.1, 0.011y + 7.7) and (+ 11.3, − 2.9), no seed (L163)
   { salt: NoiseSalt.wobbleX, x0: -32, y0: -32, w: 80, h: 80, shift: () => [0, 0] },

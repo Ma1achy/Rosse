@@ -45,6 +45,10 @@ export const CurveIndex = {
 export interface CurvePicks {
   strokes: number[];
   spurs: boolean[];
+  /** the outline arcs' start angle and length, radians (ADR 0018); absent: drawn */
+  outline?: { st: number; len: number }[];
+  /** the tidal tail's start angle, radians (ADR 0018); absent: drawn */
+  tail?: number;
 }
 
 export interface Curve {
@@ -238,8 +242,11 @@ export function curves(
     const R = 2.6;
     const a0 = r.f32() * 6.28;
     for (let s = 0; s < 2; s++) {
-      const st = a0 + s * (1.9 + r.f32() * 0.5);
-      const len = 0.7 + r.f32() * 0.8;
+      const drawnSt = a0 + s * (1.9 + r.f32() * 0.5);
+      const drawnLen = 0.7 + r.f32() * 0.8;
+      const given = picks?.outline?.[s];
+      const st = given ? given.st : drawnSt;
+      const len = given ? given.len : drawnLen;
       const pts: Vec3[] = [];
       for (let j = 0; j <= 40; j++) {
         const t = st + (len * j) / 40;
@@ -261,7 +268,8 @@ export function curves(
     // a tidal tail swept out from the disc edge
     const r = at(CurveIndex.tail);
     const pts: Vec3[] = [];
-    const a1 = r.f32() * 6.28;
+    const drawnA1 = r.f32() * 6.28;
+    const a1 = picks?.tail ?? drawnA1;
     for (let j3 = 0; j3 <= 90; j3++) {
       const fj = j3 / 90;
       const R3 = 2.6 + 2.8 * fj;

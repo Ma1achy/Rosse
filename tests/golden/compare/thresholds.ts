@@ -52,22 +52,32 @@ export interface Thresholds {
 }
 
 export interface ThresholdFile {
+  /**
+   * K (ADR 0018): the parity comparison sets v21 against the mean of each measure over K engine
+   * draws (the canonical one and K − 1 re-draws of the placement stream), and the parity
+   * thresholds are calibrated for that statistic. Absent or 1: one draw.
+   */
+  keys?: number;
   strict: Thresholds;
   parity: Record<string, Thresholds & { byPreset?: Record<string, Partial<Thresholds>> }>;
 }
 
 /**
  * Classes the parameters make impossible, which must then be 0 in both drawings: knots need
- * `knots`, sparkle stars `sparkle` and drawn stars `starMix` (generate, app23.js:L266–272).
+ * `knots` (or a group that makes its own: ring knots and clumps, `groupKnots`, app23.js:L282–297),
+ * sparkle stars `sparkle` and drawn stars `starMix` (generate, app23.js:L266–272).
  */
-export function impossibleClasses(P: {
-  knots: number;
-  sparkle: number;
-  starMix: number;
-  merger?: number;
-}): Set<string> {
+export function impossibleClasses(
+  P: {
+    knots: number;
+    sparkle: number;
+    starMix: number;
+    merger?: number;
+  },
+  groupKnots = false,
+): Set<string> {
   const out = new Set<string>();
-  if (!(P.knots > 0)) out.add('knots');
+  if (!(P.knots > 0) && !groupKnots) out.add('knots');
   if (!(P.sparkle > 0)) out.add('stars');
   // a merger's galaxies keep the drawn stars of their clumps, and a knot in a tidal tail has a
   // bright one whatever `starMix` says (mergerSprites, app23.js:L522–524)

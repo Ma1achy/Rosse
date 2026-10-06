@@ -202,8 +202,12 @@ export class GpuStipple {
     const nExtra = G.g.n_extra;
     const cap = classCapacity(n);
     const blocks = blockCount(n);
+    // at least one element of every array, whatever n: a binding smaller than its WGSL type's
+    // minimum (one element) is invalid, and would take the line-work's view pass down with it
+    // when a scene has no stipple samples (QA D1)
     const buf = (size: number, usage: number, label: string) =>
       d.createBuffer({ label, size: Math.max(16, size), usage });
+    const n1 = Math.max(1, n);
     // COPY_SRC: the tier tests read the model buffers back (never on the frame path)
     const SRC = GPUBufferUsage.COPY_SRC;
     const galaxy = bufferWithData(d, packGalaxy(G.g), GPUBufferUsage.UNIFORM | SRC, 'galaxy');
@@ -212,7 +216,7 @@ export class GpuStipple {
     const dotBase = bufferWithData(d, G.dotBase, STORAGE | SRC, 'dot sizes');
     const groupsBuf = bufferWithData(d, G.groups, STORAGE | SRC, 'ring knots and clumps');
     const noise = bufferWithData(d, G.noise.u, STORAGE | SRC, 'noise field');
-    const samples = buf(n * SAMPLE_LAYOUT.size, STORAGE | GPUBufferUsage.COPY_SRC, 'samples');
+    const samples = buf(n1 * SAMPLE_LAYOUT.size, STORAGE | GPUBufferUsage.COPY_SRC, 'samples');
     const view = buf(64, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'view');
     const culls = buf(CULLS_LAYOUT.size, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'culls');
     this.ribbons.load(scene.ribbons, view, pool, dotBase, noise);
@@ -223,7 +227,11 @@ export class GpuStipple {
       GPUBufferUsage.UNIFORM,
       'scan',
     );
-    const projected = buf(n * INSTANCE_LAYOUT.size, STORAGE | GPUBufferUsage.COPY_SRC, 'projected');
+    const projected = buf(
+      n1 * INSTANCE_LAYOUT.size,
+      STORAGE | GPUBufferUsage.COPY_SRC,
+      'projected',
+    );
     const classes = buf(n * 4, STORAGE | GPUBufferUsage.COPY_SRC, 'classes');
     const rank = buf(n * 4, STORAGE, 'rank');
     const blockTotals = buf(blocks * 8, STORAGE, 'block totals');
@@ -234,7 +242,7 @@ export class GpuStipple {
       'stipple draw args',
     );
     const out = buf(
-      CLASS_COUNT * cap * INSTANCE_LAYOUT.size,
+      CLASS_COUNT * Math.max(1, cap) * INSTANCE_LAYOUT.size,
       STORAGE | GPUBufferUsage.COPY_SRC,
       'stipple instances',
     );
@@ -474,9 +482,28 @@ export class GpuStipple {
             },
           ]
         : [];
+    // v21 expands the hatching and the placed drawings into one line buffer: their pen-line
+    // quads are one layer, one union per sample (ADR 0019)
+    const placed = this.vectors.layers();
+    const hatch = line.find((l) => l.kind === 'gpu-capsules');
+    const parts = placed.find((l) => l.kind === 'gpu-capsules');
+    const merged: InkLayer[] = [];
+    if (hatch?.kind === 'gpu-capsules' && parts?.kind === 'gpu-capsules')
+      merged.push({
+        ...hatch,
+        more: [
+          {
+            buffer: parts.buffer,
+            count: parts.count,
+            ...(parts.indirect ? { indirect: parts.indirect } : {}),
+          },
+        ],
+      });
+    else if (hatch ?? parts) merged.push((hatch ?? parts) as InkLayer);
     return [
-      ...line.filter((l) => !pieces.includes(l)),
-      ...this.vectors.layers(),
+      ...line.filter((l) => !pieces.includes(l) && l !== hatch),
+      ...merged,
+      ...placed.filter((l) => l !== parts),
       ...pieces,
       ...stipple.slice(0, 3),
       ...this.vectors.streamLayers(),
