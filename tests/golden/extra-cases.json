@@ -4,21 +4,13 @@
     {
       "preset": "Smooth, round",
       "variant": "stipple",
-      "seeds": [
-        7,
-        4242,
-        3,
-        11
-      ],
+      "seeds": [7, 4242, 3, 11],
       "overrides": {
         "lines": 0,
         "knots": 0,
         "envelope": 0
       },
-      "zoom": [
-        7,
-        4242
-      ]
+      "zoom": [7, 4242]
     },
     {
       "preset": "Cigar-shaped",
@@ -28,29 +20,18 @@
         "knots": 0,
         "envelope": 0
       },
-      "zoom": [
-        7,
-        4242
-      ]
+      "zoom": [7, 4242]
     },
     {
       "preset": "Disc, no arms",
       "variant": "stipple",
-      "seeds": [
-        7,
-        4242,
-        3,
-        11
-      ],
+      "seeds": [7, 4242, 3, 11],
       "overrides": {
         "lines": 0,
         "knots": 0,
         "envelope": 0
       },
-      "zoom": [
-        7,
-        4242
-      ]
+      "zoom": [7, 4242]
     },
     {
       "preset": "Radio jet",
@@ -76,10 +57,7 @@
     {
       "preset": "Grand design",
       "variant": "ribbons",
-      "zoom": [
-        7,
-        4242
-      ],
+      "zoom": [7, 4242],
       "overrides": {
         "bubbles": 0,
         "whole": 0,
@@ -89,10 +67,7 @@
     {
       "preset": "Barred spiral",
       "variant": "ribbons",
-      "zoom": [
-        7,
-        4242
-      ],
+      "zoom": [7, 4242],
       "overrides": {
         "bubbles": 0,
         "whole": 0,
@@ -104,10 +79,7 @@
     {
       "preset": "Flocculent",
       "variant": "ribbons",
-      "zoom": [
-        7,
-        4242
-      ],
+      "zoom": [7, 4242],
       "overrides": {
         "bubbles": 0,
         "whole": 0,
@@ -117,10 +89,7 @@
     {
       "preset": "Tightly wound",
       "variant": "ribbons",
-      "zoom": [
-        7,
-        4242
-      ],
+      "zoom": [7, 4242],
       "overrides": {
         "bubbles": 0,
         "whole": 0,
@@ -130,10 +99,7 @@
     {
       "preset": "Loose, open arms",
       "variant": "ribbons",
-      "zoom": [
-        7,
-        4242
-      ],
+      "zoom": [7, 4242],
       "overrides": {
         "bubbles": 0,
         "whole": 0,
@@ -143,10 +109,7 @@
     {
       "preset": "Dusty spiral",
       "variant": "ribbons",
-      "zoom": [
-        7,
-        4242
-      ],
+      "zoom": [7, 4242],
       "overrides": {
         "bubbles": 0,
         "whole": 0,
@@ -156,10 +119,7 @@
     {
       "preset": "Hand wobble",
       "variant": "ribbons",
-      "zoom": [
-        7,
-        4242
-      ],
+      "zoom": [7, 4242],
       "overrides": {
         "bubbles": 0,
         "whole": 0,
@@ -169,73 +129,49 @@
     {
       "preset": "Hand-drawn arms",
       "variant": "vectors",
-      "zoom": [
-        7,
-        4242
-      ],
+      "zoom": [7, 4242],
       "overrides": {}
     },
     {
       "preset": "Ringed",
       "variant": "vectors",
-      "zoom": [
-        7,
-        4242
-      ],
+      "zoom": [7, 4242],
       "overrides": {}
     },
     {
       "preset": "Disc, no arms",
       "variant": "vectors",
-      "zoom": [
-        7,
-        4242
-      ],
+      "zoom": [7, 4242],
       "overrides": {}
     },
     {
       "preset": "Barred spiral",
       "variant": "vectors",
-      "zoom": [
-        7,
-        4242
-      ],
+      "zoom": [7, 4242],
       "overrides": {}
     },
     {
       "preset": "Edge-on with dust",
       "variant": "vectors",
-      "zoom": [
-        7,
-        4242
-      ],
+      "zoom": [7, 4242],
       "overrides": {}
     },
     {
       "preset": "Radio jet",
       "variant": "vectors",
-      "zoom": [
-        7,
-        4242
-      ],
+      "zoom": [7, 4242],
       "overrides": {}
     },
     {
       "preset": "Stellar streams",
       "variant": "vectors",
-      "zoom": [
-        7,
-        4242
-      ],
+      "zoom": [7, 4242],
       "overrides": {}
     },
     {
       "preset": "Shell galaxy",
       "variant": "vectors",
-      "zoom": [
-        7,
-        4242
-      ],
+      "zoom": [7, 4242],
       "overrides": {
         "shellsOn": 0,
         "shells": 1

@@ -113,12 +113,7 @@ export function v21Sky(
   zoom = 1,
 ): { catalogue: SkyCatalogue; L: V21SkyLists } {
   cached ??= build(root);
-  const out = cached(
-    { ...P },
-    V,
-    atlases(meta, fgTiles),
-    { scale: 84 * zoom, az: P.az, pa: P.pa },
-  );
+  const out = cached({ ...P }, V, atlases(meta, fgTiles), { scale: 84 * zoom, az: P.az, pa: P.pa });
   // the items v21 picks from, in its order: [sheet, tile] → the engine's index into its item list
   const first: Record<string, number> = {};
   let n = 0;

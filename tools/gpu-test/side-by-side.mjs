@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * `node tools/gpu-test/side-by-side.mjs [out dir] [--set m2|m3|m4|m5]`: the new engine (WebGPU on
+ * `node tools/gpu-test/side-by-side.mjs [out dir] [--set m2|m3|m4|m5|m7]`: the new engine (WebGPU on
  * SwiftShader, the page with `?present=copy`) beside v21's capture of the same case
  * (tests/golden/reference/<name>.plate.jpg), as small JPEGs for the milestone notes. The page is
  * given the capture's camera (az, incl, pa) and zoom. Default: the m2 set, in docs/milestones/m2.
@@ -59,8 +59,25 @@ const SETS = {
     ],
     ['radio-jet-s7-zoom', 'radio-jet--vectors__s7__zoom', 'Radio jet', 7, 'vectors'],
   ],
+  m7: [
+    [
+      'star-bright-s7',
+      'star-bright-with-spikes--stars__s7__home',
+      'Star: bright, with spikes',
+      7,
+      'stars',
+    ],
+    [
+      'layered-spiral-star-s4242-orbit',
+      'layered-spiral-beside-a-bright-star--layered__s4242__orbit',
+      'Layered: spiral beside a bright star',
+      4242,
+      'layered',
+    ],
+    ['deep-field-s7', 'deep-field--sky__s7__home', 'Deep field', 7, 'sky'],
+  ],
 };
-const CASES = SETS[/** @type {'m2' | 'm3' | 'm4' | 'm5'} */ (set)];
+const CASES = SETS[/** @type {'m2' | 'm3' | 'm4' | 'm5' | 'm7'} */ (set)];
 if (!CASES) throw new Error(`unknown set ${set}`);
 
 prepareAssets();
@@ -80,7 +97,7 @@ try {
     );
     let ours;
     let label = 'new engine (WebGPU)';
-    if (variant === 'ribbons' || variant === 'vectors') {
+    if (['ribbons', 'vectors', 'stars', 'layered', 'sky'].includes(String(variant))) {
       // M4, M5: the golden runner's draw, with v21's variation, stroke choices, noise and part
       // picks (as the comparison draws), the ink alpha shown over the plate's field colour
       const opts = node.referenceOptions(rec.params, rec.zoom ?? 1, rec.preset);

@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- M7, stars and artefacts:
+  - Drawn stars (`sstars`) through the vector-expand path as a dynamic set (`model/dynvec`), with the RSP breathing-room filter as a pure view filter (`compute/breathe.wgsl`); ring-knot and clump stars.
+  - `starSprites` on the GPU with its CPU twin (`model/stars`, `compute/star-marks.wgsl`, `fallback/kernels/star-marks.ts`): heart knots, power-law glare, spikes, faint rings with lattice noise, the bleed column, the drawn star at the core, fainter nearby stars, trails, ghost reflections and cosmic rays, on counter-RNG named streams, compacted deterministically.
+  - Overlays (a bright foreground star, an artefact) with an explicit home orientation, `SceneOptions.home` (ADR 0030, open question Q3 answered: a deliberate divergence; the page keeps its home).
+  - The sky (`model/sky`, `compute/sky.wgsl`, `render/sky.ts`): a catalogue of up to 6,000 galaxies in perspective with up to 150 dots and a drawing each, foreground stars, companions, per-view dispatch bounds, and a `weak_lens` hook for M9 (ADR 0032).
+  - Goldens: `tests/golden/m7-cases.json` (`Star`, `Artefact`, `Layered`, `Deep field` at seeds 7 and 4242, home, orbit and zoom, no overrides; variants `stars`, `layered`, `sky`), with v21's star and sky choices replayed from its own code (`compare/v21-stars.ts`, `v21-sky.ts`); the `starMix`, `field` and `fgstars` overrides of M2 to M6's cases are removed and those captures made again (ADR 0031, 0033).
+
 - M5, vector marks:
   - `marks/vector`: the whole vector library (12 sheets, 429 drawings, 23,431 segments, 6,038 dots, 328 blobs) packed once into shared tables with a per-drawing range table and a densified-piece prefix (packer 4 copies every sheet with its metadata).
   - `model/parts`: v21's `parts()` as scene description. The model tier picks envelopes, whole drawings by type (with the rewind warp), drawn arms by tightness, bars, rings, the nuclear spiral, arcs, shells, the tail, trails and cosmic rays, the arrow, bubbles at the clumps, the jet and the streams, each part on its own index of the `parts` stream. The view tier lays out v21's rows for a camera (`vectorRows`), in the `MAGNIFIED` order. `model/vectors` packs them for the GPU.

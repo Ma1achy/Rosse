@@ -5,91 +5,61 @@
       "preset": "Star: bright, with spikes",
       "variant": "stars",
       "overrides": {},
-      "zoom": [
-        7,
-        4242
-      ]
+      "zoom": [7, 4242]
     },
     {
       "preset": "Star: faint",
       "variant": "stars",
       "overrides": {},
-      "zoom": [
-        7,
-        4242
-      ]
+      "zoom": [7, 4242]
     },
     {
       "preset": "Artefact: satellite trail",
       "variant": "stars",
       "overrides": {},
-      "zoom": [
-        7,
-        4242
-      ]
+      "zoom": [7, 4242]
     },
     {
       "preset": "Artefact: ghost reflection",
       "variant": "stars",
       "overrides": {},
-      "zoom": [
-        7,
-        4242
-      ]
+      "zoom": [7, 4242]
     },
     {
       "preset": "Artefact: cosmic rays",
       "variant": "stars",
       "overrides": {},
-      "zoom": [
-        7,
-        4242
-      ]
+      "zoom": [7, 4242]
     },
     {
       "preset": "Layered: spiral beside a bright star",
       "variant": "layered",
       "overrides": {},
-      "zoom": [
-        7,
-        4242
-      ]
+      "zoom": [7, 4242]
     },
     {
       "preset": "Layered: barred spiral, satellite trail",
       "variant": "layered",
       "overrides": {},
-      "zoom": [
-        7,
-        4242
-      ]
+      "zoom": [7, 4242]
     },
     {
       "preset": "Layered: edge-on, star on top",
       "variant": "layered",
       "overrides": {},
-      "zoom": [
-        7,
-        4242
-      ]
+      "zoom": [7, 4242]
     },
     {
       "preset": "Layered: ringed galaxy, ghost reflection",
       "variant": "layered",
       "overrides": {},
-      "zoom": [
-        7,
-        4242
-      ]
+      "zoom": [7, 4242]
     },
     {
       "preset": "Deep field",
       "variant": "sky",
       "overrides": {},
-      "zoom": [
-        7,
-        4242
-      ]
+      "zoom": [7, 4242]
     }
   ]
 }

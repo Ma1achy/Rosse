@@ -169,15 +169,13 @@ function ctxPicks(rec: Rec, out: V21StarLists, U: number): StarCtxPicks {
   if (rec.trail) picks.trail = { ...rec.trail, sep: rec.sep ?? 0 };
   if (rec.ghost) picks.ghost = rec.ghost;
   if (rec.cosmic.length)
-    picks.cosmic = rec.cosmic.map(
-      (c): CosmicPick => ({
-        ux: (c.hx - 400) / U,
-        uy: (c.hy - 400) / U,
-        ha: c.ha,
-        hl: c.hl,
-        knot: c.knot,
-      }),
-    );
+    picks.cosmic = rec.cosmic.map((c): CosmicPick => ({
+      ux: (c.hx - 400) / U,
+      uy: (c.hy - 400) / U,
+      ha: c.ha,
+      hl: c.hl,
+      knot: c.knot,
+    }));
   return picks;
 }
 
