@@ -85,6 +85,9 @@ export interface CpuLensView {
   quasar: QuasarImage[];
   /** the warped drawings' placed counts */
   vectorCaps: number;
+  /** the slots as the scan made them, and the instances (parity tests) */
+  slots: { counts: Uint32Array; at: Uint32Array; cls: Uint32Array };
+  out: { f: Float32Array; u: Uint32Array };
 }
 
 export class CpuLens {
@@ -331,6 +334,8 @@ export class CpuLens {
       Q,
       quasar,
       vectorCaps: vo?.nCaps ?? 0,
+      slots: { counts, at, cls },
+      out: { f: outF, u: outU },
     };
   }
 }

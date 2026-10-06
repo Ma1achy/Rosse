@@ -484,9 +484,73 @@ function describeSource(
 }
 
 /**
+ * Every discrete choice the engine makes for a lens by itself (docs/adr/0051): the cluster's
+ * member halos, each source's options, the sketch's drawing and the member galaxies' drawings, on
+ * `Stream.lens`. The draws are v21's, in v21's order within each group, on counter indices of
+ * their own (`LensIndex`), so a source's choices depend on it alone.
+ */
+export function ownLensPicks(P: Params, meta: DrawingsMeta): LensPicks {
+  const thE = P.lensR;
+  const at = (i: number) => new Draws(P.seed, Stream.lens, LensIndex.sources + i);
+  const sources: LensPickSource[] = [];
+  const picks: LensPicks = { sources };
+  const whole = meta.vectors?.whole?.type ?? [];
+  const tiles = (prefix: string) => {
+    const pool: number[] = [];
+    whole.forEach((t, i) => {
+      if (t.startsWith(prefix)) pool.push(i);
+    });
+    return pool;
+  };
+  if (P.lensSource === 'quasar') sources.push({ opts: {} });
+  else if (P.lensSource === 'drawing') {
+    const pool = tiles('galaxy');
+    const r = new Draws(P.seed, Stream.lens, LensIndex.drawing);
+    picks.drawing = pool.length ? (pool[Math.floor(r.f32() * pool.length)] ?? 0) : 0;
+  } else if (P.lensCluster) {
+    picks.halos = lensHalos(P).slice(1);
+    const nS = 6 + Math.floor(at(0).f32() * 4);
+    for (let i = 0; i < nS; i++) {
+      const r = at(1 + i);
+      const a = r.f32() * 6.2832;
+      const d = thE * (0.08 + 1.5 * Math.pow(r.f32(), 0.8));
+      const sz = thE * (0.14 + 0.2 * r.f32());
+      sources.push({
+        a,
+        d,
+        sz,
+        opts: {
+          arms: 1 + Math.floor(r.f32() * 3),
+          bulge: 0.1 + 0.3 * r.f32(),
+          flocc: r.f32() < 0.3 ? 0.5 : 0,
+          incl: r.f32() * 60,
+          pa: r.f32() * 180,
+        },
+      });
+    }
+    const smooth = tiles('smooth');
+    picks.members = picks.halos.map((_, i) => {
+      const r = new Draws(P.seed, Stream.lens, LensIndex.memberTiles + i);
+      return smooth.length ? (smooth[Math.floor(r.f32() * smooth.length)] ?? 0) : 0;
+    });
+  } else {
+    const r = at(0);
+    sources.push({
+      opts: {
+        arms: 2 + Math.floor(r.f32() * 2),
+        incl: 20 + 30 * r.f32(),
+        pa: r.f32() * 180,
+      },
+    });
+  }
+  if (P.lensDouble) sources.push({ opts: {} });
+  return picks;
+}
+
+/**
  * The lensed scene of `P` (L688–707): the halos, the solver geometry, the sources and what they
  * are made of. `build` is `buildScene`, passed in so that the source galaxies are described by the
- * engine's own scene description.
+ * engine's own scene description. `opts.picks` replaces the engine's own choices where given.
  */
 export function describeLens(
   P: Params,
@@ -494,7 +558,16 @@ export function describeLens(
   build: SceneBuilder,
   opts: LensOptions = {},
 ): LensScene {
-  const picks = opts.picks ?? {};
+  const own = ownLensPicks(P, meta);
+  const given = opts.picks ?? {};
+  const picks: LensPicks = {
+    ...(own.halos || given.halos ? { halos: given.halos ?? own.halos ?? [] } : {}),
+    sources: (own.sources ?? []).map((s, i) => given.sources?.[i] ?? s),
+    ...(own.drawing !== undefined || given.drawing !== undefined
+      ? { drawing: given.drawing ?? own.drawing ?? 0 }
+      : {}),
+    ...(own.members || given.members ? { members: given.members ?? own.members ?? [] } : {}),
+  };
   const rekey = opts.placementKey === undefined ? undefined : opts.placementKey - P.seed;
   const home = opts.home ?? lensHomeOf(P);
   const thE = P.lensR;
@@ -515,17 +588,11 @@ export function describeLens(
     by: P.lensSrc * thE * Math.sin(sa),
     depth: sourceDepth.main(thE),
   };
-  const at = (i: number) => new Draws(P.seed, Stream.lens, LensIndex.sources + i);
   const sources: LensSource[] = [];
   const members: LensMember[] = [];
   let pickIndex = 0;
   const nextPick = () => picks.sources?.[pickIndex++];
-  const stub = (
-    kind: SourceKind,
-    pos: Omit<typeof mainPos, never>,
-    solver: number,
-    dens: number,
-  ) => ({
+  const stub = (kind: SourceKind, pos: typeof mainPos, solver: number, dens: number) => ({
     kind,
     ...pos,
     solver,
@@ -550,18 +617,10 @@ export function describeLens(
     );
   } else if (P.lensSource === 'drawing') {
     // one of the user's drawings as the source (L692–694): a `whole` galaxy drawing, 140 px wide
-    const types = meta.vectors?.whole?.type ?? [];
-    const pool: number[] = [];
-    types.forEach((t, i) => {
-      if (t.startsWith('galaxy')) pool.push(i);
-    });
-    const r = new Draws(P.seed, Stream.lens, LensIndex.drawing);
-    const tile =
-      picks.drawing ?? (pool.length ? (pool[Math.floor(r.f32() * pool.length)] ?? 0) : 0);
     const Sd = SRC_SCALE;
     const row: VectorRow = {
       atlas: 'whole',
-      tile,
+      tile: picks.drawing ?? 0,
       x: PLATE / 2,
       y: PLATE / 2,
       m: [Sd * 2, 0, 0, Sd * 2],
@@ -580,23 +639,11 @@ export function describeLens(
     });
   } else if (P.lensCluster) {
     // 6–9 background galaxies, each at its own depth (L695–699)
-    const r0 = at(0);
-    const nS = 6 + Math.floor(r0.f32() * 4);
+    const nS = (picks.sources?.length ?? 0) - (P.lensDouble ? 1 : 0);
     for (let i = 0; i < nS; i++) {
       const pk = nextPick();
-      const r = at(1 + i);
-      const a = pk?.a ?? r.f32() * 6.2832;
-      const d = pk?.d ?? thE * (0.08 + 1.5 * Math.pow(r.f32(), 0.8));
-      const sz = pk?.sz ?? thE * (0.14 + 0.2 * r.f32());
-      const o: SourceOpts = {
-        arms: 1 + Math.floor(r.f32() * 3),
-        bulge: 0.1 + 0.3 * r.f32(),
-        stars: 1200,
-        lines: 0.45,
-        flocc: r.f32() < 0.3 ? 0.5 : 0,
-        incl: r.f32() * 60,
-        pa: r.f32() * 180,
-      };
+      const a = pk?.a ?? 0;
+      const d = pk?.d ?? 0;
       sources.push(
         describeSource(
           P,
@@ -609,8 +656,8 @@ export function describeLens(
             (P.lensStars / nS) * 1.1,
           ),
           P.seed * 29 + i * 7 + 3,
-          sz,
-          o,
+          pk?.sz ?? thE * 0.2,
+          { arms: 1, bulge: 0.2, stars: 1200, lines: 0.45 },
           pk,
           cell0,
           rekey,
@@ -618,23 +665,13 @@ export function describeLens(
       );
     }
     // the member galaxies, drawn in (L700)
-    const smooth: number[] = [];
-    (meta.vectors?.whole?.type ?? []).forEach((t, i) => {
-      if (t.startsWith('smooth')) smooth.push(i);
-    });
-    const halos = model.halos.filter((h) => h.member);
-    halos.forEach((halo, i) => {
-      if (!smooth.length) return;
-      const r = new Draws(P.seed, Stream.lens, LensIndex.memberTiles + i);
-      members.push({
-        halo,
-        tile: picks.members?.[i] ?? smooth[Math.floor(r.f32() * smooth.length)] ?? 0,
-      });
+    const memberHalos = model.halos.filter((h) => h.member);
+    const nWhole = (meta.vectors?.whole?.type ?? []).some((t) => t.startsWith('smooth'));
+    memberHalos.forEach((halo, i) => {
+      if (nWhole) members.push({ halo, tile: picks.members?.[i] ?? 0 });
     });
   } else {
     // one source galaxy, lensed mark by mark (L702)
-    const pk = nextPick();
-    const r = at(0);
     sources.push(
       describeSource(
         P,
@@ -643,16 +680,8 @@ export function describeLens(
         stub('galaxy', mainPos, 0, P.lensStars),
         P.seed * 17 + 5,
         2 * P.lensSize,
-        {
-          arms: 2 + Math.floor(r.f32() * 2),
-          bulge: 0.2,
-          stars: 2200,
-          lines: 0.35,
-          knots: 0.35,
-          incl: 20 + 30 * r.f32(),
-          pa: r.f32() * 180,
-        },
-        pk,
+        { arms: 2, bulge: 0.2, stars: 2200, lines: 0.35, knots: 0.35 },
+        nextPick(),
         cell0,
         rekey,
       ),

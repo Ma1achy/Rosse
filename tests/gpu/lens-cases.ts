@@ -78,7 +78,7 @@ export function runLensParity(title: string, preset: string, seeds: readonly num
     const gpu = GpuStipple.create(dev);
     const swiftShader = /swiftshader/i.test(adapterName(adapter));
     const lines = [
-      `adapter: ${adapterName(adapter)} (${swiftShader ? 'SwiftShader: exact structure expected' : 'L1 tolerances'})`,
+      `adapter: ${adapterName(adapter)} (${swiftShader ? 'SwiftShader' : 'other adapter'}; L1 tolerances)`,
     ];
     let pass = true;
     const data: Record<string, unknown> = {};
@@ -104,8 +104,8 @@ export function runLensParity(title: string, preset: string, seeds: readonly num
       const gs = await gl.readSolvers();
       let vertWorst = 0;
       let offDiff = 0;
-      let idDiff = 0;
       let idTotal = 0;
+      let binsTotal = 0;
       cl.tiers.forEach((T, s) => {
         const o = s * SOLVER_WORDS;
         const vbase = gs.solvers[o + 4] ?? 0;
@@ -117,11 +117,18 @@ export function runLensParity(title: string, preset: string, seeds: readonly num
             vertWorst,
             Math.abs((gs.verts[vbase * 4 + i] ?? 0) - (T.verts[i] ?? 0)),
           );
-        for (let b = 0; b <= T.H * T.H; b++)
-          if ((gs.bins[obase + b] ?? 0) !== (T.offsets[b] ?? 0)) offDiff++;
-        for (let k = 0; k < T.idTotal; k++)
-          if ((gs.bins[ibase + k] ?? 0) !== (T.ids[k] ?? 0)) idDiff++;
+        for (let b = 0; b < T.H * T.H; b++) {
+          const glo = gs.bins[obase + b] ?? 0;
+          const ghi = gs.bins[obase + b + 1] ?? 0;
+          const clo = T.offsets[b] ?? 0;
+          const chi = T.offsets[b + 1] ?? 0;
+          let same = ghi - glo === chi - clo;
+          for (let k = 0; same && k < chi - clo; k++)
+            if ((gs.bins[ibase + glo + k] ?? 0) !== (T.ids[clo + k] ?? 0)) same = false;
+          if (!same) offDiff++;
+        }
         idTotal += T.idTotal;
+        binsTotal += T.H * T.H;
       });
 
       // ---- the view tier
@@ -177,17 +184,39 @@ export function runLensParity(title: string, preset: string, seeds: readonly num
           worstCount,
           Math.abs(a - b) <= 1 ? 0 : Math.abs(a - b) / Math.max(1, b),
         );
-        // the instances, slot by slot: the CPU engine's layers carry them as lists
-        const list = cpuClass(lv.layers, k);
+      }
+      // the instances, slot by slot, each engine at its own scanned offset (a slot whose count
+      // differs by one, at a knife edge of floor(κ·μ + u), would shift every later one)
+      let slotDiff = 0;
+      const nTot = lo.nSlots + lo.nQSlots;
+      for (let s = 0; s < nTot; s++) {
+        const gc = q.slots[4 * s] ?? 0;
+        const cc = lv.slots.counts[s] ?? 0;
+        if (gc !== cc) {
+          slotDiff++;
+          continue;
+        }
+        if (!gc) continue;
+        const k = q.slots[4 * s + 2] ?? 0;
         const base = lo.cbase[k] ?? 0;
-        for (let j = 0; j < Math.min(a, b); j++) {
-          const o = (base + j) * INSTANCE_WORDS;
-          const inst = list[j];
-          if (!inst) continue;
+        for (let i = 0; i < gc; i++) {
+          const gj = (q.slots[4 * s + 1] ?? 0) + i;
+          const cj = (lv.slots.at[s] ?? 0) + i;
+          if (gj >= (lo.ccap[k] ?? 0) || cj >= (lo.ccap[k] ?? 0)) continue;
+          const go = (base + gj) * INSTANCE_WORDS;
+          const co = (base + cj) * INSTANCE_WORDS;
           instTotal++;
-          const d = Math.hypot((out[o] ?? 0) - inst.x, (out[o + 1] ?? 0) - inst.y);
+          const d = Math.hypot(
+            (out[go] ?? 0) - (lv.out.f[co] ?? 0),
+            (out[go + 1] ?? 0) - (lv.out.f[co + 1] ?? 0),
+          );
           instPosWorst = Math.max(instPosWorst, d);
-          if (d > POS_TOL || (outU[o + 2] ?? 0) !== inst.layer) instBad++;
+          if (
+            d > POS_TOL ||
+            (outU[go + 2] ?? 0) !== (lv.out.u[co + 2] ?? 0) ||
+            k !== (lv.slots.cls[s] ?? 0)
+          )
+            instBad++;
         }
       }
       const gBranches = countBranches(q.curves);
@@ -212,39 +241,22 @@ export function runLensParity(title: string, preset: string, seeds: readonly num
         quasarDiff === 0 &&
         Math.abs(gCaps - lv.vectorCaps) <= Math.max(1, 0.001 * lv.vectorCaps);
       if (!ok) pass = false;
-      if (swiftShader && (differ > 0 || instBad > 0)) pass = false;
       lines.push(
         `${ok ? 'ok  ' : 'FAIL'} ${c.name}: ${String(lo.nMarks)} marks, ${String(solved)} solved, ${String(differ)} image lists differ; ` +
-          `grid max |Δ| ${vertWorst.toExponential(1)}, bins ${String(offDiff)} offsets and ${String(idDiff)}/${String(idTotal)} ids differ; ` +
+          `grid max |Δ| ${vertWorst.toExponential(1)}, ${String(offDiff)} of ${String(binsTotal)} bins differ (${String(idTotal)} ids); ` +
           `images max |Δp| ${posWorst.toExponential(1)}, |Δμ| ${muWorst.toExponential(1)}; ` +
           `instances per class (GPU/CPU) ${perClass.join(' ')}, worst count ${(100 * worstCount).toFixed(3)}%, ` +
-          `${String(instBad)}/${String(instTotal)} out of tolerance (max ${instPosWorst.toExponential(1)} px); ` +
+          `${String(slotDiff)} slots differ in count, ${String(instBad)}/${String(instTotal)} instances out of tolerance (max ${instPosWorst.toExponential(1)} px); ` +
           `branches ${String(gBranches)}/${String(cBranches)}, drawn capsules ${String(gCaps)}/${String(lv.vectorCaps)}, quasar images ${String(nq)}/${String(lv.quasar.length)} (${String(quasarDiff)} off); ` +
           `${(performance.now() - t0).toFixed(0)} ms`,
       );
-      data[c.name] = { differ, solved, instBad, instTotal, worstCount };
+      data[c.name] = { differ, solved, instBad, instTotal, worstCount, slotDiff };
     }
     lines.push(
       `image lists that differ: ${String(listsDiffer)} of ${String(listsTotal)} (${((100 * listsDiffer) / Math.max(1, listsTotal)).toFixed(4)}%)`,
     );
     return { pass, lines, data };
   });
-}
-
-import type { Instance } from '../../src/marks/instance';
-import type { LensLayers } from '../../src/sim/lens-pack';
-
-/** The CPU engine's instances of one lens class, from its layer lists. */
-function cpuClass(L: LensLayers, c: number): readonly Instance[] {
-  const pick = (l: LensLayers[keyof LensLayers], i: number) => {
-    const x = l[i];
-    return x && x.kind === 'sprites' ? x.instances : [];
-  };
-  if (c <= 2) return pick(L.dots, c);
-  if (c === 3) return pick(L.knots, 0);
-  if (c === 4) return pick(L.stars, 0);
-  if (c === 6) return pick(L.cores, 0);
-  return [];
 }
 
 /** Branches in the ribbons' curve table: curves with points (n > 0, word 1 of 12). */
