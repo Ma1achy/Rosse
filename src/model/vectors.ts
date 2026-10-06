@@ -51,6 +51,16 @@ export const WarpKind = {
    * v21's drop of segments stretched more than 1.8× (app23.js:L1208).
    */
   post: 2,
+  /**
+   * A merging galaxy's mark carried by its tides (M8, app23.js:L1195): the galaxy's 49 × 49 grid of
+   * the tidal map (common/tide.wgsl `tide_post`) after the matrix, with the drops of `post`.
+   */
+  tide: 3,
+  /**
+   * `mWarp`'s whole drawing (app23.js:L1196, L1262): the tidal map itself (the 4 nearest stars) on
+   * the drawing's own coordinates, mirrored for an S-wise drawing; dropped only past 22 px.
+   */
+  tideScreen: 4,
 } as const;
 
 /** One placed drawing: the `VInst` struct of vector-expand.wgsl (96 bytes). */
@@ -137,6 +147,8 @@ export interface VectorDesc {
   penDot: number;
   /** 0.55 + 0.45 · streams: a stream mark is kept when its draw is at most this (L1077) */
   streamKeep: number;
+  /** a merging galaxy (0 or 1): every drawing is carried by that galaxy's tides (M8) */
+  tide?: number;
 }
 
 const libCache = new WeakMap<object, PackedVectors>();
@@ -175,6 +187,7 @@ export function describeVectors(
   meta: DrawingsMeta,
   incl: number,
   picks?: PartPicks,
+  tide?: number,
 ): VectorDesc {
   const lib = packedLibrary(meta.vectors);
   const parts = describeParts(P, V, meta, incl, picks);
@@ -195,7 +208,7 @@ export function describeVectors(
   let nBlob = 0;
   for (const r of rows) {
     const d = drawingOf(lib, r);
-    const w = r.warp ? WarpKind.rewind : WarpKind.none;
+    const w = tide !== undefined ? WarpKind.tide : r.warp ? WarpKind.rewind : WarpKind.none;
     drawings.push(d);
     warps.push(w);
     capFirst.push(nCap);
@@ -222,6 +235,7 @@ export function describeVectors(
     penLine: pen.line,
     penDot: pen.dot,
     streamKeep: 0.55 + 0.45 * P.streams,
+    ...(tide !== undefined ? { tide } : {}),
   };
 }
 
@@ -280,6 +294,7 @@ export function vectorView(
   cam: Camera,
   key: number,
   nDotPool: number,
+  r2 = 0,
 ): VectorView {
   const rows = vectorRows(P, V, meta, D.parts, cam);
   if (rows.length !== D.nInst) throw new Error('the placed drawings changed with the view');
@@ -293,7 +308,11 @@ export function vectorView(
     fl[o + 5] = f(r.y);
     fl[o + 6] = f(r.ps);
     fl[o + 7] = f(Math.sqrt(Math.abs(r.m[0] * r.m[3] - r.m[1] * r.m[2])));
-    if (r.warp) {
+    if (D.tide !== undefined) {
+      // the tides: the galaxy and R2, the plate px the grid spans
+      fl[o + 8] = D.tide;
+      fl[o + 9] = f(r2);
+    } else if (r.warp) {
       fl[o + 8] = f(r.warp.dk);
       fl[o + 9] = r.warp.flip ? 1 : 0;
     }
