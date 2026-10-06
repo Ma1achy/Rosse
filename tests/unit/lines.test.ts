@@ -16,6 +16,7 @@ import { ribbonModel, runRibbons } from '../../src/fallback/kernels/ribbons';
 import { CURVE_STATE_WORDS, CurveFlag, ribUniform } from '../../src/model/ribbons';
 import { curves, edgeOnAlpha } from '../../src/model/curves';
 import { CpuRenderer } from '../../src/fallback';
+import { createInkBuffer, rasteriseCapsules } from '../../src/fallback/raster';
 import { CpuStipple, lineLayers } from '../../src/fallback/stipple';
 import { dustLanes } from '../../src/model/lanes';
 import { markGroups } from '../../src/model/clumps';
@@ -419,5 +420,40 @@ describe('the edge-on stroke past 90° (review m1)', () => {
     }
     expect(inked).toBeGreaterThan(1000);
     expect(max).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('pen lines are unioned per sample (ADR 0019, QA D2)', () => {
+  const ink = (caps: number[][]) => {
+    const t = createInkBuffer(64, 64);
+    const buf = new Float32Array(caps.length * 8);
+    caps.forEach((c, i) => {
+      buf.set([c[0] ?? 0, c[1] ?? 0, c[2] ?? 0, c[3] ?? 0, c[4] ?? 0, 1, 0, 0], i * 8);
+    });
+    rasteriseCapsules(t, buf, caps.length, { pxPerUnit: 1, gain: 1 });
+    let s = 0;
+    for (let i = 3; i < t.data.length; i += 4) s += t.data[i] ?? 0;
+    return s;
+  };
+  const w = 0.456;
+  it("one segment inks v21's quad: its area, extended by 0.9 w at both ends", () => {
+    // slanted, so that the four samples' quantisation averages out along it (an axis-aligned
+    // line of this width covers all four samples of one row of pixels, as in v21)
+    const slant = Math.hypot(40, 10.8);
+    expect(ink([[10.2, 20.3, 50.2, 31.1, w]]) / (2 * w * (slant + 1.8 * w))).toBeCloseTo(1, 1);
+  });
+  it('a segment drawn twice, or overlapping its neighbour, inks no more than the union', () => {
+    const one = ink([[10.2, 20.3, 50.2, 31.1, w]]);
+    expect(
+      ink([
+        [10.2, 20.3, 50.2, 31.1, w],
+        [10.2, 20.3, 50.2, 31.1, w],
+      ]),
+    ).toBe(one);
+    // a polyline cut into 1-px pieces inks as much as one quad: the overlaps at its joins count once
+    const pieces: number[][] = [];
+    for (let x = 10; x < 50; x++) pieces.push([x + 0.2, 20.5, x + 1.2, 20.5, w]);
+    const whole = ink([[10.2, 20.5, 50.2, 20.5, w]]);
+    expect(Math.abs(ink(pieces) / whole - 1)).toBeLessThan(0.03);
   });
 });
