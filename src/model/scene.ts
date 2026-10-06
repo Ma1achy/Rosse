@@ -47,7 +47,7 @@ export interface SceneOptions {
   /**
    * Place the parts with these picks (src/model/parts.ts `PartPicks`): which envelope, whole
    * drawing, arms, bar, ring… and their spins. The golden runner passes v21's own, replayed from
-   * v21's parts stream (tests/golden/compare/v21-parts.ts, ADR 0019).
+   * v21's parts stream (tests/golden/compare/v21-parts.ts, ADR 0021).
    */
   partPicks?: PartPicks;
   /**

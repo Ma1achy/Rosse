@@ -6,6 +6,9 @@
  * weight (test c: the medial-axis widths of α ≥ 0.5, upsampled 4×, band mean of the 40th–60th
  * percentiles): the median stroke width is PEN.line plate px at every zoom, for two pens. The
  * rewound (warped) drawing too.
+ *
+ * Ink per unit length against v21's own quads (drawn with WebGL2 and 4× MSAA as v21 draws them),
+ * at every pen scale the parts use, is tests/gpu/pen-ink.ts (`npm run test:gpu`).
  */
 import { describe, expect, it } from 'vitest';
 import type { Params } from '../../src/core/params';

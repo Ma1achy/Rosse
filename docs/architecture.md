@@ -27,6 +27,8 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0015](adr/0015-golden-metric-as-calibrated-in-m2.md) | The golden metric as calibrated in M2: coarse density SSIM plus a moment and extent test as the structure gate, band-mean widths, Poisson-aware counts, comparisons drawn with v21's replayed variation, and negative controls. Supersedes 0013 in part. |
 | [0016](adr/0016-m2-acceptance-overrides.md) | _Proposed:_ the extra overrides of the M2 stipple-only acceptance captures (`starMix`, `field`, `fgstars`; `jet` for `Radio jet`; `vary`, `dustScribble` for the arms case). |
 | [0017](adr/0017-model-tier-key-is-a-structure-signature.md) | The model tier's inclination key is a structure signature: every discrete inclination switch in v21 (the `incE` thresholds and L1000's cos i test); every other use of the inclination is a view-tier input. Clarifies 0010. |
+| [0021](adr/0021-goldens-drawn-with-v21s-part-picks.md) | _Proposed:_ the goldens draw the parts with v21's part picks, replayed from `mulberry32(seed · 57 + 3)` and checked against v21's own `parts()`; the engine's own picks are tested by their distributions. Extends 0015 item 5. |
+| [0022](adr/0022-m5-acceptance-overrides.md) | _Proposed:_ the overrides of the M5 acceptance captures (`starMix`, `field`, `fgstars`; the drawn shells for `Shell galaxy`). |
 
 ## Modules
 

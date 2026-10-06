@@ -1,5 +1,5 @@
 /**
- * v21's own part picks, for the golden comparison (ADR 0015 item 5, extended by ADR 0019).
+ * v21's own part picks, for the golden comparison (ADR 0015 item 5, extended by ADR 0021).
  *
  * v21's `parts(r)` (app23.js:L987–1086) draws every choice of a drawn part (which envelope, whole
  * drawing, arms, bar, ring, nuclear spiral; spins, sizes, the trails' places, the bubbles, the

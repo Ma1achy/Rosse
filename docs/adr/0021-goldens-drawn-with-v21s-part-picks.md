@@ -1,4 +1,4 @@
-# 19. Goldens are drawn with v21's part picks
+# 21. Goldens are drawn with v21's part picks
 
 Date: 2026-10-06
 

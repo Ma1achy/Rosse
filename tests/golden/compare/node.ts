@@ -125,7 +125,7 @@ export class GoldenNode {
 
   /**
    * Everything the comparison draws with besides the parameters: v21's variation (ADR 0015), from
-   * M4 v21's stroke choices and noise field, and from M5 v21's part picks at this zoom (ADR 0019).
+   * M4 v21's stroke choices and noise field, and from M5 v21's part picks at this zoom (ADR 0021).
    */
   referenceOptions(P: Params, zoom = 1): SceneOptions {
     const variation = this.v21Variation(P);

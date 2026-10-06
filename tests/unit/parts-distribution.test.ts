@@ -2,7 +2,7 @@
  * Our part picks (src/model/parts.ts `ownPartPicks`, on the counter RNG of ADR 0004, every part on
  * its own index) against v21's (`parts()` replayed on v21's own stream,
  * tests/golden/compare/v21-parts.ts), over 2,000 seeds: the same distributions, pick by pick. The
- * golden runs place the parts with v21's replayed picks (ADR 0019), so this test is what keeps the
+ * golden runs place the parts with v21's replayed picks (ADR 0021), so this test is what keeps the
  * engine's own picks honest. Each side draws with its own variation (whose distributions
  * tests/unit/variation-distribution.test.ts checks), as each engine would.
  *

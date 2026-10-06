@@ -10,7 +10,7 @@
  *   (`mulberry32(P.seed * 57 + 3)`), so a change to one part shifts every later one. Here every
  *   part has its own index on the `parts` stream (`PartIndex`, ADR 0004), so turning the jet on
  *   changes the jet only. The golden runner passes v21's own picks instead (`SceneOptions`
- *   `partPicks`, replayed from v21's stream by tests/golden/compare/v21-parts.ts, ADR 0019).
+ *   `partPicks`, replayed from v21's stream by tests/golden/compare/v21-parts.ts, ADR 0021).
  * - **View tier, `vectorRows`**: the instance rows of v21 (`[x, y, tile, alpha, m0…m3, ps, warp]`,
  *   section 15 of the reference notes) for a camera: the disc matrix `discM`, the scale, the
  *   bubbles' projected positions. A few dozen rows, expanded per segment, dot and blob on the GPU
