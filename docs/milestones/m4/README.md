@@ -52,6 +52,7 @@ The zoom camera has its own thresholds (`spiral@zoom`, `smooth@zoom`), calibrate
 ### Results (WebGPU against v21; the CPU engine gives the same numbers)
 
 | case | ink | coarse SSIM | median | p90 | r50 | dots | knots | stars | rstars | result |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | barred-spiral s4242 home | 1.9% | 0.941 | -0.4% | 5.6% | 1.3% | 9368/9373 | 146/128 | 19/12 | 9/9 | pass |
 | barred-spiral s4242 orbit | 2.1% | 0.946 | 0.0% | 3.7% | 1.7% | 9302/9309 | 144/132 | 20/11 | 9/9 | pass |
 | barred-spiral s4242 zoom | 1.9% | 0.917 | 1.2% | 2.1% | 1.8% | 9368/9373 | 146/128 | 19/12 | 9/9 | pass |
