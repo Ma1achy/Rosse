@@ -377,7 +377,7 @@ async function calibrate(G, node) {
     // held-out configurations of the family's presets: other seeds, home, an orbit, and zoom 2, as
     // the captures are (they need no v21 capture: the pairs are the engine's own re-draws)
     for (const preset of onlyFamilyPresets(onlyFamily))
-      for (const seed of [3, 11, 5, 19]) {
+      for (const seed of [3, 11, 5, 19, 1, 2, 9, 13, 17, 21]) {
         const P = G.presetCase(preset, seed, { starMix: 0, field: 0, fgstars: 0 });
         const orbit = { ...P, az: P.az + 35, incl: Math.min(180, P.incl + 20) };
         const family = G.goldenFamily(preset);

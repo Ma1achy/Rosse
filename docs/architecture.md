@@ -29,6 +29,9 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0017](adr/0017-model-tier-key-is-a-structure-signature.md) | The model tier's inclination key is a structure signature: every discrete inclination switch in v21 (the `incE` thresholds and L1000's cos i test); every other use of the inclination is a view-tier input. Clarifies 0010. |
 | [0021](adr/0021-goldens-drawn-with-v21s-part-picks.md) | _Proposed:_ the goldens draw the parts with v21's part picks, replayed from `mulberry32(seed · 57 + 3)` and checked against v21's own `parts()`; the engine's own picks are tested by their distributions. Extends 0015 item 5. |
 | [0022](adr/0022-m5-acceptance-overrides.md) | _Proposed:_ the overrides of the M5 acceptance captures (`starMix`, `field`, `fgstars`; the drawn shells for `Shell galaxy`). |
+| [0023](adr/0023-m6-acceptance-overrides.md) | _Proposed:_ the overrides of the M6 acceptance captures (`starMix`, `field`, `fgstars`, as before; the Chalkboard captures; the `knob-*` probes). |
+| [0024](adr/0024-plates-are-present-tier-passes.md) | Plates (`slip`, `colour`) are present-tier passes over layers that carry their population; switching them builds uniforms only. |
+| [0025](adr/0025-the-slipped-plates-are-their-own-golden-family.md) | _Proposed:_ the slipped plates are their own golden family (`slip`), calibrated alone. |
 
 ## Modules
 
