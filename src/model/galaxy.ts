@@ -11,6 +11,7 @@ import type { Params } from '../core/params';
 import type { StructLayout } from '../marks/instance';
 import { dotSprite, penWeights, type DrawingsMeta, type Variation } from './variation';
 import { GROUP_STRIDE, markGroups, type MarkGroup } from './clumps';
+import { packNoise, type NoiseField } from '../core/noise';
 
 const f = Math.fround;
 
@@ -115,6 +116,8 @@ export interface GalaxyDesc {
   groups: ArrayBuffer;
   /** the same, unpacked */
   groupList: MarkGroup[];
+  /** the noise field (src/core/noise.ts): hashed for every salt unless a comparison gives tables */
+  noise: NoiseField;
 }
 
 /** One ring-knot cluster or clump: the `Group` struct of stipple.wgsl. */
@@ -243,7 +246,7 @@ export function describeGalaxy(P: Params, V: Variation, meta: DrawingsMeta): Gal
   pool.set(V.dotPool, KNOT_POOL);
 
   const dotBase = new Float32Array(meta.dots.size.map((s) => dotSprite(s, penDot, 1)));
-  return { g, shape, pool, dotBase, groups: packed.buf, groupList };
+  return { g, shape, pool, dotBase, groups: packed.buf, groupList, noise: packNoise() };
 }
 
 /** The Galaxy uniform as bytes. */

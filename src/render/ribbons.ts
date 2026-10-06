@@ -40,11 +40,11 @@ type Entry = (typeof ENTRIES)[number];
 const USES: Record<Entry, number[]> = {
   project_points: [0, 1, 2, 3],
   measure: [1, 3, 4, 5, 6, 10],
-  expand: [1, 3, 4, 5, 6, 8],
-  place_pieces: [1, 3, 4, 5, 6, 7, 9, 10],
-  hatch_caps: [1, 3, 11, 12, 13, 16],
-  hatch_dots: [1, 3, 11, 12, 14, 17, 19, 20],
-  hatch_blobs: [1, 3, 11, 12, 15, 18, 19],
+  expand: [1, 3, 4, 5, 6, 8, 30],
+  place_pieces: [1, 3, 4, 5, 6, 7, 9, 10, 30],
+  hatch_caps: [1, 3, 11, 12, 13, 16, 30],
+  hatch_dots: [1, 3, 11, 12, 14, 17, 19, 20, 30],
+  hatch_blobs: [1, 3, 11, 12, 15, 18, 19, 30],
 };
 
 interface Model {
@@ -95,8 +95,17 @@ export class GpuRibbons {
     return this.need().carve;
   }
 
-  /** Model tier: the line-work's buffers, reading the shared view uniform and the galaxy's pools. */
-  load(R: RibbonDesc, view: GPUBuffer, pool: GPUBuffer, dotBase: GPUBuffer): void {
+  /**
+   * Model tier: the line-work's buffers, reading the shared view uniform, the galaxy's pools and
+   * the scene's noise field (the wobble's).
+   */
+  load(
+    R: RibbonDesc,
+    view: GPUBuffer,
+    pool: GPUBuffer,
+    dotBase: GPUBuffer,
+    noise: GPUBuffer,
+  ): void {
     this.destroy();
     const d = this.device;
     const buf = (bytes: number, usage: number, label: string) =>
@@ -137,6 +146,7 @@ export class GpuRibbons {
       18: keep(buf(Math.max(1, R.nHBlobs) * INSTANCE_LAYOUT.size, src, 'hatch blobs')),
       19: pool,
       20: dotBase,
+      30: noise,
     };
     const hdotArgs = keep(
       data(new Uint32Array([4, R.nHDots, 0, 0]), 'hatch dots args', GPUBufferUsage.INDIRECT),

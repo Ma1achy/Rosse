@@ -11,6 +11,7 @@ import { Cls } from './classes';
 import type { StrokesMeta } from '../marks/strokes';
 import type { VectorSheet } from '../marks/vector';
 import type { CurvePicks } from './curves';
+import { packNoise, type NoiseTable } from '../core/noise';
 import { describeGalaxy, type GalaxyDesc } from './galaxy';
 import { describeRibbons, type RibbonDesc } from './ribbons';
 import { makeVariation, type DrawingsMeta, type Variation } from './variation';
@@ -43,6 +44,12 @@ export interface SceneOptions {
    * structural choice and re-draws the dots: the calibration of ADR 0013 and 0015.
    */
   placementKey?: number;
+  /**
+   * Draw with these noise tables in place of the lattice's hashed corners (src/core/noise.ts): the
+   * golden runner passes v21's own corners (tests/golden/compare/v21-noise.ts), so flocculence,
+   * patchiness, the lanes' gaps and the hand wobble follow v21's pattern, as the variation does.
+   */
+  noise?: NoiseTable[];
   /** Calibration only (negative controls, ADR 0015): a truncation radius in place of RMAX. */
   rmax?: number;
   /** Calibration only (negative controls): every dot's quad scaled by this. */
@@ -52,6 +59,7 @@ export interface SceneOptions {
 export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {}): GalaxyScene {
   const variation = opts.variation ?? makeVariation(P, meta);
   const galaxy = describeGalaxy(P, variation, meta);
+  if (opts.noise) galaxy.noise = packNoise(opts.noise);
   if (opts.placementKey !== undefined) galaxy.g.key = opts.placementKey >>> 0;
   if (opts.rmax !== undefined) galaxy.g.rmax = Math.fround(opts.rmax);
   if (opts.dotScale !== undefined)
@@ -63,6 +71,7 @@ export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {
     meta.penlines,
     P.incl,
     opts.curvePicks,
+    galaxy.noise,
   );
   return { P, variation, galaxy, ribbons, meta };
 }

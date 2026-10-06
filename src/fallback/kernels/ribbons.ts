@@ -37,6 +37,7 @@ import {
 import { HATCH_FLAT, HATCH_PEN } from '../../model/lanes';
 import type { ViewDesc } from '../../view/camera';
 import { smWarp } from '../../view/warp';
+import type { NoiseField } from '../../core/noise';
 import { INSTANCE_WORDS } from './project';
 
 const f = Math.fround;
@@ -194,8 +195,8 @@ export function expandSegment(
     const w = f(f(cw * tap) / 2);
     const px = q[(first + e) * 2] ?? 0;
     const py = q[(first + e) * 2 + 1] ?? 0;
-    const p0 = smWarp(f(px + f(nx * w)), f(py + f(ny * w)), wob);
-    const p1 = smWarp(f(px - f(nx * w)), f(py - f(ny * w)), wob);
+    const p0 = smWarp(f(px + f(nx * w)), f(py + f(ny * w)), wob, M.R.noise);
+    const p1 = smWarp(f(px - f(nx * w)), f(py - f(ny * w)), wob, M.R.noise);
     ends.push(...p0, ...p1);
     us.push(f(fr * reps));
   }
@@ -272,7 +273,12 @@ export function placePiece(
   const ny = f(tx / tl);
   const tap = taper ? f(f(1.1) - f(f(f(0.45) * sPos) / tot)) : 1;
   const off = f(f(f(pcy - f(H / 2)) * kpx) * tap);
-  const [px, py] = smWarp(f(x + f(nx * off)), f(y + f(ny * off)), rib.wobble ?? 0);
+  const [px, py] = smWarp(
+    f(x + f(nx * off)),
+    f(y + f(ny * off)),
+    rib.wobble ?? 0,
+    M.R.noise,
+  );
   const size = f(f(pcs * kpx) * tap);
   const cs = tl0 === 0 ? 1 : f(tx / tl);
   const sn = tl0 === 0 ? 0 : f(ty / tl);
@@ -333,12 +339,19 @@ export function hatchFrame(
 }
 
 /** A tile point through a hatch's frame and the wobble. */
-function tf(H: HatchFrame, x: number, y: number, wob: number): [number, number] {
+function tf(
+  H: HatchFrame,
+  x: number,
+  y: number,
+  wob: number,
+  field?: NoiseField | null,
+): [number, number] {
   const m = H.m;
   return smWarp(
     f(f(H.cx + f(m[0] * x)) + f(m[2] * y)),
     f(f(H.cy + f(m[1] * x)) + f(m[3] * y)),
     wob,
+    field,
   );
 }
 
@@ -356,8 +369,8 @@ export function hatchCapsule(
   const s = (R.pen.table[H.tile * 8] ?? 0) + i - (hu[h * HATCH_WORDS + 3] ?? 0);
   const wob = rib.wobble ?? 0;
   const g = R.pen.segs;
-  const a = tf(H, g[s * 4] ?? 0, g[s * 4 + 1] ?? 0, wob);
-  const b = tf(H, g[s * 4 + 2] ?? 0, g[s * 4 + 3] ?? 0, wob);
+  const a = tf(H, g[s * 4] ?? 0, g[s * 4 + 1] ?? 0, wob, M.R.noise);
+  const b = tf(H, g[s * 4 + 2] ?? 0, g[s * 4 + 3] ?? 0, wob, M.R.noise);
   const oo = i * CAPSULE_WORDS;
   outF[oo] = a[0];
   outF[oo + 1] = a[1];
@@ -383,7 +396,7 @@ export function hatchDot(
   const H = hatchFrame(h, M, rib, q);
   const d = ((R.pen.table[H.tile * 8 + 2] ?? 0) + i - (hu[h * HATCH_WORDS + 4] ?? 0)) * 4;
   const D = R.pen.dots;
-  const [px, py] = tf(H, D[d] ?? 0, D[d + 1] ?? 0, rib.wobble ?? 0);
+  const [px, py] = tf(H, D[d] ?? 0, D[d + 1] ?? 0, rib.wobble ?? 0, M.R.noise);
   const nPool = Math.max(1, rib.n_dot_pool ?? 1);
   const t = M.pool[KNOT_POOL + ((D[d + 3] ?? 0) % nPool)] ?? 0;
   const k0 = clamp(f(f(f(f(f(2) * (D[d + 2] ?? 0)) * H.sc) * f(0.42)) / f(2.6)), f(0.8), f(1.6));
@@ -414,7 +427,7 @@ export function hatchBlob(
   const H = hatchFrame(h, M, rib, q);
   const b = ((R.pen.table[H.tile * 8 + 4] ?? 0) + i - (hu[h * HATCH_WORDS + 5] ?? 0)) * 8;
   const B = R.pen.blobs;
-  const [px, py] = tf(H, B[b] ?? 0, B[b + 1] ?? 0, rib.wobble ?? 0);
+  const [px, py] = tf(H, B[b] ?? 0, B[b + 1] ?? 0, rib.wobble ?? 0, M.R.noise);
   const t = M.pool[(B[b + 6] ?? 0) % KNOT_POOL] ?? 0;
   const lim = f(f(3) / H.sc);
   const sx = Math.max(f(f(f(2) * (B[b + 2] ?? 0)) * f(0.85)), lim);

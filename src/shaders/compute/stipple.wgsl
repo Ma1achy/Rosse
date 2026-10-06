@@ -10,6 +10,7 @@
 
 // #import "common/rng.wgsl"
 // #import "common/math.wgsl"
+// #import "common/noise-table.wgsl"
 // #import "common/stipple-types.wgsl"
 
 // The galaxy description: GALAXY_LAYOUT in src/model/galaxy.ts.
@@ -177,7 +178,7 @@ fn arm_profile(R: f32, th: f32) -> f32 {
   }
   let flocc = galaxy.flocc;
   if (flocc > 0.0) {
-    let n = vnoise(R * 2.2 + 11.0, (th - arm_phase(R, 0u)) * 1.6, galaxy.seed, SALT_FLOCC);
+    let n = vnoise_t(R * 2.2 + 11.0, (th - arm_phase(R, 0u)) * 1.6, galaxy.seed, SALT_FLOCC);
     fv = fv * ((1.0 - flocc) + flocc * max(0.0, (n - 0.35) * 2.2));
   }
   let inner = galaxy.arm_inner;
@@ -317,7 +318,7 @@ fn sample(i: u32) {
       if (rt >= 6) {
         break;
       }
-      let nz = vnoise(cos_f(th) * 2.2, sin_f(th) * 2.2, galaxy.seed, SALT_RING);
+      let nz = vnoise_t(cos_f(th) * 2.2, sin_f(th) * 2.2, galaxy.seed, SALT_RING);
       if (!(next() > 0.45 + 0.55 * nz)) {
         break;
       }
@@ -345,7 +346,7 @@ fn sample(i: u32) {
         continue;
       }
       if (patchy > 0.0) {
-        let nz = vnoise((R2 * cos_f(th2)) * 1.4, (R2 * sin_f(th2)) * 1.4, galaxy.seed, SALT_PATCHY);
+        let nz = vnoise_t((R2 * cos_f(th2)) * 1.4, (R2 * sin_f(th2)) * 1.4, galaxy.seed, SALT_PATCHY);
         if (next() > (1.0 - patchy) + (patchy * pow(nz, 2.2)) * 2.2) {
           continue;
         }
@@ -364,7 +365,7 @@ fn sample(i: u32) {
     }
     let irr = galaxy.irr;
     if (irr > 0.0) {
-      let nz = vnoise((R2 * cos_f(th2)) * 1.3, (R2 * sin_f(th2)) * 1.3, galaxy.seed, SALT_IRR);
+      let nz = vnoise_t((R2 * cos_f(th2)) * 1.3, (R2 * sin_f(th2)) * 1.3, galaxy.seed, SALT_IRR);
       if (next() > 0.5 + 1.1 * max(0.0, nz - 0.3)) {
         put(i, none, CLS_NONE, 0u, 0.0, 0.0, 0.0);
         return;

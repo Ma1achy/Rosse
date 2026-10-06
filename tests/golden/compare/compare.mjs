@@ -159,14 +159,14 @@ async function compareAll(G, node) {
   for (const c of [...required, ...informational]) {
     const isRequired = !!c.variant;
     const rec = node.record(c.name);
-    // v21's own variation (ADR 0015) and, from M4, v21's own stroke choices (v21-curves.ts):
-    // both engines draw the same galaxy with the same pens and strokes, and only the dots differ
-    const variation = node.v21Variation(rec.params);
-    const opts = { variation, curvePicks: node.v21CurvePicks(rec.params, variation) };
+    // v21's own variation (ADR 0015) and, from M4, v21's own stroke choices (v21-curves.ts) and
+    // noise field (v21-noise.ts): both engines draw the same galaxy with the same pens, strokes,
+    // flocculence and wobble, and only the dots differ
+    const opts = node.referenceOptions(rec.params);
     const ref = node.reference(c.name);
     const refM = G.measure(ref);
     const refCounts = G.countsOf(rec.stats);
-    const parity = node.parity(rec.preset);
+    const parity = node.parity(rec.preset, rec.zoom ?? 1);
     const strict = node.thresholds.strict;
     /** @type {Record<string, any>} */
     const row = { name: c.name, preset: rec.preset, required: isRequired };
@@ -344,20 +344,33 @@ async function calibrate(G, node) {
     'Radio jet',
     'Shell galaxy',
   ];
-  /** @type {{ preset: string, family: string, params: any }[]} */
+  /** @type {{ preset: string, family: string, params: any, zoom?: number }[]} */
   const cases = [];
   for (const preset of presets)
     for (const seed of [7, 4242])
       for (const camera of ['home', 'orbit']) {
         const rec = node.record(`${manifestSlug(preset)}__s${seed}__${camera}`);
         cases.push({ preset, family: G.goldenFamily(preset), params: rec.params });
+        // the zoom camera (M3, M4) is calibrated on the same configurations, home at zoom 2:
+        // re-draw pairs need no v21 capture
+        if (camera === 'home')
+          cases.push({
+            preset: `${preset} (zoom 2)`,
+            family: `${G.goldenFamily(preset)}@zoom`,
+            params: rec.params,
+            zoom: 2,
+          });
       }
   for (const c of manifest.captures.filter((/** @type {any} */ x) => x.variant)) {
     const rec = node.record(c.name);
+    const zoom = rec.zoom ?? 1;
+    // the zoom camera is calibrated on its own (`<family>@zoom`)
+    const family = G.goldenFamily(rec.preset);
     cases.push({
       preset: `${rec.preset} (${c.variant})`,
-      family: G.goldenFamily(rec.preset),
+      family: zoom === 1 ? family : `${family}@zoom`,
       params: rec.params,
+      zoom,
     });
   }
   console.log(
@@ -433,7 +446,9 @@ async function calibrate(G, node) {
   const parity = {};
   /** @type {Record<string, any>} */
   const numbers = {};
-  for (const family of ['spiral', 'smooth', 'merger', 'lens', 'star', 'artefact']) {
+  const families = ['spiral', 'smooth', 'merger', 'lens', 'star', 'artefact'];
+  for (const f of Object.keys(eng.pairs)) if (!families.includes(f)) families.push(f);
+  for (const family of families) {
     const list = eng.pairs[family] ?? [];
     const base = {
       counts: ADR.counts,

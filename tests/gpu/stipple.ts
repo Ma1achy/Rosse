@@ -115,6 +115,7 @@ run('stipple kernels (GPU = CPU, L1)', async () => {
       c: cullsUniform(scene.ribbons, cam, P, G.g.key),
       points: rv.points,
       carve: scene.ribbons.carve,
+      noise: G.noise,
     });
     const cC = compact(cP.classes, n, cP.u32);
 

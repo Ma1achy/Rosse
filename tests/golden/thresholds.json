@@ -26,16 +26,16 @@
       "poissonBelow": 2000,
       "paBelowQ": 0.8,
       "ink": 0.05,
-      "ssimCoarse": 0.88,
+      "ssimCoarse": 0.89,
       "median": 0.1,
       "p90": 0.1,
-      "r25": 0.041,
-      "r50": 0.046,
-      "r90": 0.051,
+      "r25": 0.042,
+      "r50": 0.042,
+      "r90": 0.048,
       "outer": 0.016,
-      "q": 0.037,
-      "qInner": 0.044,
-      "pa": 3.827
+      "q": 0.038,
+      "qInner": 0.041,
+      "pa": 3.786
     },
     "smooth": {
       "counts": 0.03,
@@ -130,6 +130,42 @@
       "qInner": 0.05,
       "pa": 10,
       "provisional": true
+    },
+    "spiral@zoom": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "paBelowQ": 0.8,
+      "ink": 0.05,
+      "ssimCoarse": 0.85,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.059,
+      "r50": 0.043,
+      "r90": 0.027,
+      "outer": 0.017,
+      "q": 0.042,
+      "qInner": 0.052,
+      "pa": 3.575
+    },
+    "smooth@zoom": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "paBelowQ": 0.8,
+      "ink": 0.05,
+      "ssimCoarse": 0.9,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.035,
+      "r50": 0.033,
+      "r90": 0.073,
+      "outer": 0.021,
+      "q": 0.045,
+      "qInner": 0.035,
+      "pa": 3.115
     }
   }
 }

@@ -25,9 +25,20 @@ interface V21Curve {
   k: number;
 }
 
-type V21Curves = (P: Params, VAR: Variation, AT: unknown) => V21Curve[];
+/** v21's dust lanes (dustLanes, app23.js:L944–985): hatches [x, y, angle, length] and lane points. */
+export interface V21Lanes {
+  strokes: number[][];
+  pts: number[][];
+}
 
-let cached: V21Curves | null = null;
+type V21Eval = (
+  P: Params,
+  VAR: Variation,
+  AT: unknown,
+  scale: number,
+) => { curves: V21Curve[]; lanes: () => V21Lanes };
+
+let cached: V21Eval | null = null;
 
 function cut(src: string, name: string): string {
   const start = src.indexOf(`\nfunction ${name}(`);
@@ -43,6 +54,12 @@ function cut(src: string, name: string): string {
 
 const NAMES = [
   'mulberry32',
+  'gauss',
+  'ci',
+  'paR',
+  'azR',
+  'project',
+  'dustLanes',
   'hash2',
   'vnoise',
   'clamp',
@@ -52,6 +69,29 @@ const NAMES = [
   'curves',
 ];
 
+/** v21's own curves() and dustLanes(), evaluated as written (tests also read them). */
+export function v21Lines(
+  root: string,
+  P: Params,
+  V: Variation,
+  strokesKind: readonly string[],
+  zoom = 1,
+): { curves: V21Curve[]; lanes: () => V21Lanes } {
+  if (!cached) {
+    const src = readFileSync(join(root, 'assets/reference/rosse-source/app23.js'), 'utf8');
+    const body = `var P, AT, VAR, VIEW = { W: 800, cx: 400, cy: 400, scale: 84 };
+      var LANES = { key: null, v: { strokes: [], pts: [] } };
+      ${NAMES.map((n) => cut(src, n)).join('\n')}
+      return function (p, v, at, scale) {
+        P = p; VAR = v; AT = at; VIEW.scale = scale; LANES = { key: null, v: { strokes: [], pts: [] } };
+        return { curves: curves(), lanes: function () { return dustLanes(); } };
+      };`;
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval
+    cached = (new Function(body) as () => V21Eval)();
+  }
+  return cached(P, V, { strokes: { kind: strokesKind } }, 84 * zoom);
+}
+
 /** v21's stroke per curve, in curve order, and which of its spurs it drew. */
 export function v21CurvePicks(
   root: string,
@@ -59,15 +99,7 @@ export function v21CurvePicks(
   V: Variation,
   strokesKind: readonly string[],
 ): CurvePicks {
-  if (!cached) {
-    const src = readFileSync(join(root, 'assets/reference/rosse-source/app23.js'), 'utf8');
-    const body = `var P, AT, VAR;
-      ${NAMES.map((n) => cut(src, n)).join('\n')}
-      return function (p, v, at) { P = p; VAR = v; AT = at; return curves(); };`;
-    // eslint-disable-next-line @typescript-eslint/no-implied-eval
-    cached = (new Function(body) as () => V21Curves)();
-  }
-  const C = cached(P, V, { strokes: { kind: strokesKind } });
+  const C = v21Lines(root, P, V, strokesKind).curves;
   // a spur's curve starts at radius R0 (app23.js:L782–783)
   const spurs = V.spurs.map((sp) =>
     C.some(

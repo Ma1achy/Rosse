@@ -13,6 +13,8 @@ import type { MarkCounts, SceneOptions } from '../../../src/model/scene';
 import type { Variation } from '../../../src/model/variation';
 import { CpuGolden } from './engine-cpu';
 import { v21CurvePicks } from './v21-curves';
+import { v21NoiseTables } from './v21-noise';
+import type { NoiseTable } from '../../../src/core/noise';
 import type { CurvePicks } from '../../../src/model/curves';
 import {
   alphaFromRgba8,
@@ -119,6 +121,24 @@ export class GoldenNode {
     return this.cpu.render(P, opts, zoom);
   }
 
+  /**
+   * Everything the comparison draws with besides the parameters: v21's variation (ADR 0015), and
+   * from M4 v21's stroke choices and noise field.
+   */
+  referenceOptions(P: Params): SceneOptions {
+    const variation = this.v21Variation(P);
+    return {
+      variation,
+      curvePicks: this.v21CurvePicks(P, variation),
+      noise: this.v21Noise(P.seed),
+    };
+  }
+
+  /** v21's own noise corners for a seed (./v21-noise.ts), as plain arrays (they cross to the page). */
+  v21Noise(seed: number): NoiseTable[] {
+    return v21NoiseTables(this.root, seed).map((t) => ({ ...t, values: Array.from(t.values) }));
+  }
+
   /** v21's own stroke choices for these parameters and variation (./v21-curves.ts). */
   v21CurvePicks(P: Params, V: Variation): CurvePicks {
     return v21CurvePicks(this.root, P, V, this.cpu.meta.strokes?.kind ?? []);
@@ -129,8 +149,15 @@ export class GoldenNode {
     return v21Variation(P, this.cpu.meta);
   }
 
-  parity(preset: string): Thresholds {
-    const t = this.thresholds.parity[goldenFamily(preset)];
+  /**
+   * The thresholds of a preset's family; at a zoomed camera, the family's zoom thresholds when
+   * calibrated (`<family>@zoom`): at zoom 2 the plate holds the inner galaxy only, and a re-draw
+   * of the same galaxy scatters more (docs/milestones/m4/README.md).
+   */
+  parity(preset: string, zoom = 1): Thresholds {
+    const f = goldenFamily(preset);
+    const t =
+      (zoom !== 1 ? this.thresholds.parity[`${f}@zoom`] : undefined) ?? this.thresholds.parity[f];
     if (!t) throw new Error(`no parity thresholds for ${preset}`);
     return t;
   }
@@ -157,32 +184,38 @@ export class GoldenNode {
    * that applies to the configuration, re-keyed, against key 0.
    */
   calibrateEngine(
-    cases: { preset: string; family: string; params: Params }[],
+    cases: { preset: string; family: string; params: Params; zoom?: number }[],
     keys: number,
     log: (s: string) => void,
   ) {
     const pairs: Record<string, Comparison[]> = {};
     const controls: Record<string, Record<string, { config: string; c: Comparison }[]>> = {};
     for (const c of cases) {
-      const variation = this.v21Variation(c.params);
-      const base = measure(this.cpu.render(c.params, { variation }).alpha);
+      const opts = this.referenceOptions(c.params);
+      const zoom = c.zoom ?? 1;
+      const base = measure(this.cpu.render(c.params, opts, zoom).alpha);
       const baseQ = momentsOf(base.alpha, base.extent.r90).q;
       for (let k = 1; k <= keys; k++) {
-        const r = this.cpu.render(c.params, {
-          variation,
-          placementKey: (c.params.seed + k * 7_919_000) >>> 0,
-        });
+        const r = this.cpu.render(
+          c.params,
+          { ...opts, placementKey: (c.params.seed + k * 7_919_000) >>> 0 },
+          zoom,
+        );
         (pairs[c.family] ??= []).push(compareMeasures(base, measure(r.alpha)));
       }
-      const config = `${c.preset} s${String(c.params.seed)} incl ${String(c.params.incl)}`;
+      const config = `${c.preset} s${String(c.params.seed)} incl ${String(c.params.incl)}${zoom === 1 ? '' : ` zoom ${String(zoom)}`}`;
       for (const ctl of NEGATIVE_CONTROLS) {
         if (!ctl.applies(c.params, baseQ)) continue;
         const P = ctl.params ? ctl.params(c.params) : c.params;
-        const r = this.cpu.render(P, {
-          variation: this.v21Variation(P),
-          placementKey: (c.params.seed + 1) >>> 0,
-          ...(ctl.scene ?? {}),
-        });
+        const r = this.cpu.render(
+          P,
+          {
+            ...this.referenceOptions(P),
+            placementKey: (c.params.seed + 1) >>> 0,
+            ...(ctl.scene ?? {}),
+          },
+          zoom,
+        );
         ((controls[c.family] ??= {})[ctl.name] ??= []).push({
           config,
           c: compareMeasures(base, measure(r.alpha)),

@@ -150,6 +150,7 @@ export function armProfile(G: GalaxyDesc, R: number, th: number): number {
       f(f(th - armPhase(G, R, 0)) * f(1.6)),
       g.seed,
       NoiseSalt.flocc,
+      G.noise,
     );
     fv = f(fv * f(f(1 - flocc) + f(flocc * Math.max(0, f(f(n - f(0.35)) * f(2.2))))));
   }
@@ -313,7 +314,7 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
       th = f(TAU * r.next());
       rt++;
       if (rt >= 6) break;
-      const nz = vnoise(f(cos(th) * f(2.2)), f(sin(th) * f(2.2)), g.seed, NoiseSalt.ring);
+      const nz = vnoise(f(cos(th) * f(2.2)), f(sin(th) * f(2.2)), g.seed, NoiseSalt.ring, G.noise);
       if (!(r.next() > f(f(0.45) + f(f(0.55) * nz)))) break;
     }
     const R = f(g.ring_r * f(1 + f(r.gauss() * f(0.035))));
@@ -339,6 +340,7 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
           f(f(R2 * sin(th2)) * f(1.4)),
           g.seed,
           NoiseSalt.patchy,
+          G.noise,
         );
         if (r.next() > f(f(1 - patchy) + f(f(patchy * pow(nz, f(2.2))) * f(2.2)))) continue;
       }
@@ -357,6 +359,7 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
         f(f(R2 * sin(th2)) * f(1.3)),
         g.seed,
         NoiseSalt.irr,
+        G.noise,
       );
       if (r.next() > f(f(0.5) + f(f(1.1) * Math.max(0, f(nz - f(0.3)))))) {
         none();

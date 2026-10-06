@@ -23,6 +23,7 @@ import { Stream } from '../../core/streams';
 import type { StructLayout } from '../../marks/instance';
 import type { ViewDesc } from '../../view/camera';
 import { smWarp } from '../../view/warp';
+import type { NoiseField } from '../../core/noise';
 import { Cls, SAMPLE_WORDS, SampleFlag } from './stipple';
 
 const f = Math.fround;
@@ -62,6 +63,8 @@ export interface CullsDesc {
   points: Float32Array;
   /** per carving segment: the index of its first point (the second follows it) */
   carve: Uint32Array;
+  /** the scene's noise field (the wobble's) */
+  noise?: NoiseField | null;
 }
 
 /** No culls, no wobble. */
@@ -202,7 +205,7 @@ export function projectSample(
     inLane(qx, qy, C)
   )
     return Cls.none;
-  const [wx, wy] = smWarp(qx, qy, C.c.wobble ?? 0);
+  const [wx, wy] = smWarp(qx, qy, C.c.wobble ?? 0, C.noise);
   instF[io] = wx;
   instF[io + 1] = wy;
   instU[io + 2] = su[o + 4] ?? 0;

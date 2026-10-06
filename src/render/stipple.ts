@@ -58,6 +58,7 @@ interface ModelBuffers {
   pool: GPUBuffer;
   dotBase: GPUBuffer;
   groupsBuf: GPUBuffer;
+  noise: GPUBuffer;
   samples: GPUBuffer;
   view: GPUBuffer;
   culls: GPUBuffer;
@@ -167,10 +168,11 @@ export class GpuStipple {
     const pool = bufferWithData(d, G.pool, STORAGE, 'galaxy pools');
     const dotBase = bufferWithData(d, G.dotBase, STORAGE, 'dot sizes');
     const groupsBuf = bufferWithData(d, G.groups, STORAGE, 'ring knots and clumps');
+    const noise = bufferWithData(d, G.noise.u, STORAGE, 'noise field');
     const samples = buf(n * SAMPLE_LAYOUT.size, STORAGE | GPUBufferUsage.COPY_SRC, 'samples');
     const view = buf(64, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'view');
     const culls = buf(CULLS_LAYOUT.size, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'culls');
-    this.ribbons.load(scene.ribbons, view, pool, dotBase);
+    this.ribbons.load(scene.ribbons, view, pool, dotBase, noise);
     const scan = bufferWithData(
       d,
       new Uint32Array([n, cap, blocks, 0]),
@@ -207,6 +209,7 @@ export class GpuStipple {
       pool,
       dotBase,
       groupsBuf,
+      noise,
       samples,
       view,
       culls,
@@ -225,6 +228,7 @@ export class GpuStipple {
           [2, pool],
           [3, dotBase],
           [4, samples],
+          [30, noise],
         ]),
         extra: group(P.extra, [
           [0, galaxy],
@@ -241,6 +245,7 @@ export class GpuStipple {
           [4, culls],
           [5, this.ribbons.points],
           [6, this.ribbons.carve],
+          [30, noise],
         ]),
         local: group(P.local, [
           [0, scan],
@@ -398,6 +403,7 @@ export class GpuStipple {
       m.pool,
       m.dotBase,
       m.groupsBuf,
+      m.noise,
       m.samples,
       m.view,
       m.culls,

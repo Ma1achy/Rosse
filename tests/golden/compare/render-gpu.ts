@@ -95,7 +95,7 @@ async function main(): Promise<void> {
       stipple.setScene(scene);
       stipple.setView(cam);
       const layers: InkLayer[] = [...stipple.lineLayers(), ...stipple.layers()];
-      const cores = coreInstances(P, meta, cam);
+      const cores = coreInstances(P, meta, cam, scene.galaxy.noise);
       if (cores.length) layers.push({ kind: 'sprites', atlas: 'cores', gain: 1, instances: cores });
       renderer.setLayers(layers);
       renderer.drawInk();

@@ -11,7 +11,7 @@
  * `curves` stream (CurveIndex), so a curve's choices depend on that curve only.
  */
 import type { Params } from '../core/params';
-import { NoiseSalt, vnoise } from '../core/noise';
+import { NoiseSalt, vnoise, type NoiseField } from '../core/noise';
 import { Draws } from '../core/rng';
 import { Stream } from '../core/streams';
 import { strokeIndex, strokePools, type StrokesMeta } from '../marks/strokes';
@@ -93,6 +93,7 @@ export function curves(
   strokes: StrokesMeta | undefined,
   incl: number,
   picks?: CurvePicks,
+  field?: NoiseField | null,
 ): Curve[] {
   const C: Curve[] = [];
   if (P.lines <= 0 || !strokes) return C;
@@ -139,7 +140,7 @@ export function curves(
             });
         };
         for (let j2 = 0; j2 < pts.length; j2++) {
-          const n = vnoise(j2 * 0.08 + k * 7, 0, P.seed, NoiseSalt.floccArm);
+          const n = vnoise(j2 * 0.08 + k * 7, 0, P.seed, NoiseSalt.floccArm, field);
           const p = pts[j2];
           if (n > 0.25 + 0.35 * P.flocc && p) seg.push(p);
           else {

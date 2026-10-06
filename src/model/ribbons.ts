@@ -9,6 +9,7 @@
  * projection pass serves the ribbons, the pieces, the hatches and the stipple's dust culls.
  */
 import type { Params } from '../core/params';
+import { packNoise, type NoiseField } from '../core/noise';
 import type { StructLayout } from '../marks/instance';
 import type { StrokesMeta } from '../marks/strokes';
 import type { VectorSheet } from '../marks/vector';
@@ -240,6 +241,8 @@ export interface RibbonDesc {
   sheetH: number;
   /** pieces of the strokes sheet, per row */
   strokePieces: number[];
+  /** the scene's noise field (the wobble of ribbons, pieces and hatches) */
+  noise: NoiseField;
 }
 
 /** The model tier's line-work for a galaxy at an inclination (only its `incE` bucket matters). */
@@ -250,9 +253,10 @@ export function describeRibbons(
   penlines: VectorSheet | undefined,
   incl: number,
   picks?: CurvePicks,
+  noise: NoiseField = packNoise(),
 ): RibbonDesc {
-  const C = curves(P, V, strokes, incl, picks);
-  const lanes = dustLanes(P, V, penlines, incl);
+  const C = curves(P, V, strokes, incl, picks, noise);
+  const lanes = dustLanes(P, V, penlines, incl, noise);
   const pen = packPen(penlines);
   const pcs = packPieces(strokes);
   const penLine = penWeights(P.pen).line;
@@ -370,6 +374,7 @@ export function describeRibbons(
     sheetW,
     sheetH,
     strokePieces: pcs.count,
+    noise,
   };
 }
 

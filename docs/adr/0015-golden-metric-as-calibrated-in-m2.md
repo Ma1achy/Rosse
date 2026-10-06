@@ -32,3 +32,11 @@ ADR 0013 set the golden metric and left its thresholds provisional until M2 cali
 - A structural change that moves the ink by more than the noise of re-drawing it is caught. Changes smaller than that are not, whatever the metric; the calibration says which they are.
 - Thresholds are per family and are recalibrated (`npm run golden -- --calibrate`) when an engine for a new family lands (merger, lens, star, artefact keep provisional values until then) or when the capture setup changes.
 - The comparison depends on an offline replay of v21's variation. A capture of a preset whose variation the replay cannot reproduce (none today) would need its own record.
+
+## Addendum, M4 (awaiting the owner's sign-off)
+
+The line-work of M4 brings three more discrete random choices, and a camera the M2 calibration did not cover. Each is handled as item 5 handles the variation, or as item 6 calibrates:
+
+1. **v21's stroke choices.** v21's `curves()` picks each curve's stroke row, and which spurs are drawn, from `mulberry32(VAR.strokeSeed)`. The golden runner evaluates v21's own `curves()` (cut out of app23.js, `tests/golden/compare/v21-curves.ts`) on the replayed variation and draws with its choices (`SceneOptions.curvePicks`). A unit test checks that the engine's curves then match v21's control points to 10⁻⁹ (`tests/unit/lines.test.ts`).
+2. **v21's noise field.** v21's `vnoise` and the engine's lattice noise share the interpolation and differ in their corner values (deliberate divergence 5). The runner gives the engine v21's corners (`hash2` cut out of app23.js, `tests/golden/compare/v21-noise.ts`) as tables (`SceneOptions.noise`, `NoiseField` in src/core/noise.ts, `common/noise-table.wgsl`), so flocculence, patchiness, the lanes' gaps and the hand wobble follow v21's pattern. The lattice noise's own statistics are tested against v21's separately (mean, spread, tail fractions). Without it, `Flocculent` and `Hand wobble` at the zoom camera scored a coarse SSIM of 0.82–0.86: the metric sees the pattern, which is the divergence, not a defect.
+3. **The zoom camera is calibrated on its own** (`<family>@zoom` in thresholds.json): at zoom 2 the plate holds the inner 2.4 units, and the same galaxy re-drawn scatters more there (coarse SSIM p5 0.87 against 0.91 at home). The configurations are the home ones at zoom 2 plus the zoom captures, by the same rule.

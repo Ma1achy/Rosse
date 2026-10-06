@@ -114,6 +114,7 @@ export class CpuStipple {
       c: cullsUniform(R, cam, P, galaxy.g.key),
       points: rv.points,
       carve: R.carve,
+      noise: galaxy.noise,
     };
     const p = runProject(V, this.samples, culls);
     const { out, counts, cap } = compact(p.classes, n, p.u32);
@@ -142,7 +143,7 @@ export class CpuStipple {
         instances: list(l.cls),
       })),
     ];
-    const cores = coreInstances(this.scene.P, this.scene.meta, cam);
+    const cores = coreInstances(this.scene.P, this.scene.meta, cam, galaxy.noise);
     if (cores.length) layers.push({ kind: 'sprites', atlas: 'cores', gain: 1, instances: cores });
     return {
       layers,
