@@ -147,11 +147,15 @@ export function ownCatalogue(
   for (let i = 0; i < c.fg; i++) {
     const r = new Draws(key, Stream.sky, (1 << 24) + i);
     const u = unit3(r);
-    const R = f(R_FG * f(0.85 + f(0.3 * r.f32())));
+    // v21 parity: the radius factor is drawn afresh for each coordinate (`unit3(r).map(x · R_FG ·
+    // (0.85 + 0.3 r()))`, app23.js:L875), so the stars lie in a thick shell, not on a sphere
+    const fx = f(R_FG * f(0.85 + f(0.3 * r.f32())));
+    const fy = f(R_FG * f(0.85 + f(0.3 * r.f32())));
+    const fz = f(R_FG * f(0.85 + f(0.3 * r.f32())));
     const tile = Math.floor(r.f32() * nTiles.fgstars);
     const size = f(16 + f(26 * r.f32()));
     const rot = f(f(r.f32() - 0.5) * f(0.6));
-    fg.push({ w: [f(u[0] * R), f(u[1] * R), f(u[2] * R)], tile, size, rot });
+    fg.push({ w: [f(u[0] * fx), f(u[1] * fy), f(u[2] * fz)], tile, size, rot });
   }
   const companions: CompanionPick[] = [];
   for (let i = 0; i < c.companions; i++) {

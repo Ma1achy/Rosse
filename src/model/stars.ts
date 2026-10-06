@@ -177,9 +177,11 @@ export function ownCtxPicks(
   if (subject === 'star') {
     out.stars.push(ownStar(at(0), V, pool, 0, 0, starBright, true));
     if (!overlay) {
+      // v21 parity: the bound of the loop is drawn afresh at every test (`f < 3 + Math.floor(r()
+      // * 5)`, app23.js:L420), so 3 stars are certain and each test stops with probability
+      // 1/5, 2/5 … 1 (3 with 0.2, 4 with 0.32, 5 with 0.288, 6 with 0.154, 7 with 0.038)
       const r = at(1);
-      const nf = 3 + Math.floor(r.f32() * 5);
-      for (let i = 0; i < nf; i++) {
+      for (let i = 0; i < 3 + Math.floor(r.f32() * 5); i++) {
         const q = at(10 + i);
         const fa = f(q.f32() * f(TAU));
         const fd = f(f(1.6) + f(f(2.2) * q.f32()));
@@ -213,10 +215,11 @@ export function ownCtxPicks(
       ownStar(r, V, pool, f(Math.cos(sa) * f(1.1)), f(Math.sin(sa) * f(1.1)), f(0.85), true),
     );
   } else {
+    // v21 parity: the loop's bound is drawn afresh at every test too (`c < 70 + Math.floor(r() *
+    // 60)`, L433): 70 hits are certain, then a test stops with probability 1/60, 2/60 …
     const r = at(5);
-    const nh = 70 + Math.floor(r.f32() * 60);
     const hits: CosmicPick[] = [];
-    for (let c = 0; c < nh; c++) {
+    for (let c = 0; c < 70 + Math.floor(r.f32() * 60); c++) {
       const q = at(1000 + c);
       const ux = f(f(q.f32() - f(0.5)) * f(5.2));
       const uy = f(f(q.f32() - f(0.5)) * f(5.2));
