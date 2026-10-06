@@ -64,7 +64,7 @@ export function v21NoiseTables(root: string, seed: number): NoiseTable[] {
     const m = /\nfunction hash2\([^\n]*\n/.exec(src);
     if (!m) throw new Error('hash2 not found in app23.js');
     // eslint-disable-next-line @typescript-eslint/no-implied-eval
-    hash2 = new Function(`${m[0]}\nreturn hash2;`)() as (x: number, y: number) => number;
+    hash2 = (new Function(`${m[0]}\nreturn hash2;`) as () => (x: number, y: number) => number)();
   }
   const h = hash2;
   return WINDOWS.map((W) => {
