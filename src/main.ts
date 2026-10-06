@@ -24,7 +24,7 @@ import type { Params } from './core/params';
 import { PRESET_NAMES, presetParams } from './core/presets';
 import { CpuRenderer } from './fallback';
 import { CpuStippleTiers } from './fallback/stipple';
-import { Gpu, detectBackend, type Backend } from './gpu/device';
+import { Gpu, awaitLoss, detectBackend, type Backend } from './gpu/device';
 import { readTexture } from './gpu/readback';
 import { BuiltAssets, type AtlasData, type AtlasName, type ImageData8 } from './marks/atlas';
 import { coreInstances } from './model/parts';
@@ -108,9 +108,10 @@ interface Engine {
   resize(size: FrameSize): void;
   /**
    * After a failed frame: true when it failed because the device was lost, so recovery will
-   * rebuild and show it again (no CPU fallback needed).
+   * rebuild and show it again (no CPU fallback needed). `err` is the failure: one that looks like a
+   * loss (an AbortError from `mapAsync`) waits longer for the loss to be reported.
    */
-  recovering(): Promise<boolean>;
+  recovering(err: unknown): Promise<boolean>;
   destroy(): void;
 }
 
@@ -300,19 +301,12 @@ async function gpuEngine(
         r.drawInk();
         fitOutput(r);
       },
-      recovering() {
-        // the loss may be reported just after the failed call that revealed it
+      recovering(err) {
+        // the loss may be reported well after the failed call that revealed it (awaitLoss)
         const device = renderer?.device;
         if (!device) return Promise.resolve(false);
         if (lostDevices.has(device)) return Promise.resolve(true);
-        return Promise.race([
-          device.lost.then(() => true),
-          new Promise<boolean>((res) =>
-            setTimeout(() => {
-              res(false);
-            }, 200),
-          ),
-        ]);
+        return awaitLoss(device, err);
       },
       destroy() {
         stipple?.destroy();
@@ -421,7 +415,7 @@ async function start(): Promise<void> {
     } catch (err) {
       if (e !== engine) return; // a newer engine has taken over
       // a lost device is being recreated, and onRebuilt will show the frame again
-      if (!(await e.recovering()) && e === engine) toCpu(err);
+      if (!(await e.recovering(err)) && e === engine) toCpu(err);
       return;
     }
     frames++;

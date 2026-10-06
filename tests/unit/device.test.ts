@@ -1,5 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
-import { Gpu, detectBackend, requiredLimits, type GpuNavigator } from '../../src/gpu/device';
+import {
+  Gpu,
+  awaitLoss,
+  detectBackend,
+  looksLikeLoss,
+  requiredLimits,
+  type GpuNavigator,
+} from '../../src/gpu/device';
 
 /** A fake adapter and device, enough for device.ts. */
 function fakeNavigator(opts: { adapters?: boolean[]; later?: Promise<void> } = {}) {
@@ -206,5 +213,57 @@ describe('Gpu', () => {
     for (let i = 0; i < 10; i++) await tick();
     expect(second).toHaveBeenCalledTimes(1);
     expect(err).toHaveBeenCalled();
+  });
+});
+
+describe('awaitLoss (a loss reported after the failed frame)', () => {
+  const abort = Object.assign(new Error('mapAsync: Buffer was unmapped before mapping resolved'), {
+    name: 'AbortError',
+  });
+  /** a device whose loss resolves after `ms` (never when null) */
+  const lateDevice = (ms: number | null) => ({
+    lost: new Promise<GPUDeviceLostInfo>((res) => {
+      if (ms !== null)
+        setTimeout(() => {
+          res({ reason: 'unknown', message: 'lost' } as GPUDeviceLostInfo);
+        }, ms);
+    }),
+  });
+
+  it('treats an AbortError from mapAsync, or a lost-device message, as a probable loss', () => {
+    expect(looksLikeLoss(abort)).toBe(true);
+    expect(looksLikeLoss(new Error('the device was lost during the frame'))).toBe(true);
+    expect(looksLikeLoss(new Error('shader compile failed'))).toBe(false);
+    expect(looksLikeLoss('AbortError')).toBe(false);
+  });
+
+  it('waits long enough for a late loss after an AbortError (the 1-in-9 race)', async () => {
+    vi.useFakeTimers();
+    try {
+      const r = awaitLoss(lateDevice(900), abort);
+      await vi.advanceTimersByTimeAsync(900);
+      await expect(r).resolves.toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('gives up after the long wait if no loss comes, and soon for other errors', async () => {
+    vi.useFakeTimers();
+    try {
+      const a = awaitLoss(lateDevice(null), abort);
+      await vi.advanceTimersByTimeAsync(2000);
+      await expect(a).resolves.toBe(false);
+      // a non-loss error: the short wait, so a loss at 900 ms is not waited for
+      const b = awaitLoss(lateDevice(900), new Error('shader compile failed'));
+      await vi.advanceTimersByTimeAsync(200);
+      await expect(b).resolves.toBe(false);
+      // a loss already reported resolves at once
+      const c = awaitLoss(lateDevice(0), new Error('other'));
+      await vi.advanceTimersByTimeAsync(0);
+      await expect(c).resolves.toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

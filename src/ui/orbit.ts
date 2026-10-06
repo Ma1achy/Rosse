@@ -164,6 +164,9 @@ export function attachOrbit(canvas: HTMLCanvasElement, target: OrbitTarget): () 
   canvas.style.touchAction = 'none';
   canvas.style.cursor = 'grab';
   canvas.tabIndex = 0;
+  // role application: the plate takes its own keys (arrows, Q/E, +/−, 0), which a screen reader
+  // must pass through rather than use for browsing
+  if (!canvas.getAttribute('role')) canvas.setAttribute('role', 'application');
   if (!canvas.getAttribute('aria-label'))
     canvas.setAttribute(
       'aria-label',
