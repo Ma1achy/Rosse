@@ -4,7 +4,7 @@ Date: 2026-10-03
 
 ## Status
 
-Accepted. The thresholds are provisional until calibrated in M2.
+Accepted; superseded in part by [0015](0015-golden-metric-as-calibrated-in-m2.md). The thresholds were provisional until calibrated in M2.
 
 ## Context
 

@@ -5,10 +5,11 @@
  * penlines, front drawings, foreground stars, trails. Each layer names its atlas or segment
  * buffer, its population (for the colour plates) and its ink-edge thresholds.
  *
- * M1 has bitmap sprite layers only.
+ * M1 has bitmap sprite layers; M2 adds sprites written by compute passes (`gpu-sprites`).
  */
 import type { AtlasName } from '../marks/atlas';
 import type { Instance } from '../marks/instance';
+import type { GpuInstances } from './sprites';
 
 export interface SpriteLayer {
   kind: 'sprites';
@@ -18,4 +19,12 @@ export interface SpriteLayer {
   gain: number;
 }
 
-export type InkLayer = SpriteLayer;
+/** Sprites written on the GPU by a compute pass and drawn indirectly (WebGPU engine only). */
+export interface GpuSpriteLayer {
+  kind: 'gpu-sprites';
+  atlas: AtlasName;
+  source: GpuInstances;
+  gain: number;
+}
+
+export type InkLayer = SpriteLayer | GpuSpriteLayer;

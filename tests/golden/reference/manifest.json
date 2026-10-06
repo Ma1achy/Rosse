@@ -465,6 +465,114 @@
       "pageErrors": 0
     },
     {
+      "name": "cigar-shaped--stipple__s4242__home",
+      "preset": "Cigar-shaped",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "6cdf01e337dab6a8b4add4bb9ef24b673ecb8726459ace59ec27cb56be5e92ef",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 13
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "cigar-shaped--stipple__s4242__orbit",
+      "preset": "Cigar-shaped",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "a9263eb1bde79e0f7521de1b431fec5fbbd4c36a02c04375d07b0ca461d31bad",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 7
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "cigar-shaped--stipple__s7__home",
+      "preset": "Cigar-shaped",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "c5267d2eead66106cf8ef8bc4a3649899a06b9b30431ae40bb6103bb3121e11f",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 19
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "cigar-shaped--stipple__s7__orbit",
+      "preset": "Cigar-shaped",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "36e5dc6263b1b6513755a696c22d190e05a3b6cb61221e8555a7544f0fa4ac54",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 7
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "deep-field__s4242__home",
       "preset": "Deep field",
       "seed": 4242,
@@ -605,6 +713,222 @@
         "curves": 2,
         "used": 56,
         "ms": 74
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--stipple__s11__home",
+      "preset": "Disc, no arms",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 11,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "e6a40d3c949073f291152b42eeab5172fb92a3bae82519e032c4fe915bf87242",
+      "stats": {
+        "rstars": 0,
+        "dots": 9498,
+        "knots": 0,
+        "stars": 2,
+        "curves": 0,
+        "used": 6,
+        "ms": 10
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--stipple__s11__orbit",
+      "preset": "Disc, no arms",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 11,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "6742aa9ea821d5e9b73b4ff3b04d74d44feb52ceee97e75d6684baacd7c17362",
+      "stats": {
+        "rstars": 0,
+        "dots": 9498,
+        "knots": 0,
+        "stars": 2,
+        "curves": 0,
+        "used": 6,
+        "ms": 10
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--stipple__s3__home",
+      "preset": "Disc, no arms",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 3,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "487c7b3635f50f4b4925ee2964819742c00d5a77b6933696f578421cafe4fbe4",
+      "stats": {
+        "rstars": 0,
+        "dots": 9457,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 3,
+        "ms": 9
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--stipple__s3__orbit",
+      "preset": "Disc, no arms",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 3,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "e02b07eb52699bb1faacd663f9a5ae418c8db38f4d5c8bd00ca9557b45c01252",
+      "stats": {
+        "rstars": 0,
+        "dots": 9457,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 3,
+        "ms": 8
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--stipple__s4242__home",
+      "preset": "Disc, no arms",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "ae2815906062d65b9aba1416615b75380475a603e7fd6d6af52fd043e33d8c1c",
+      "stats": {
+        "rstars": 0,
+        "dots": 9469,
+        "knots": 0,
+        "stars": 3,
+        "curves": 0,
+        "used": 5,
+        "ms": 8
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--stipple__s4242__orbit",
+      "preset": "Disc, no arms",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "e2f858910d89b23e66342d70500f3f75161d3be261b365037ec156142a6ac473",
+      "stats": {
+        "rstars": 0,
+        "dots": 9469,
+        "knots": 0,
+        "stars": 3,
+        "curves": 0,
+        "used": 5,
+        "ms": 10
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--stipple__s7__home",
+      "preset": "Disc, no arms",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "1acbae03a3f6ea61e34ed0c83340e00736d0d2ab6eb6d1a207ecae368a1e5c36",
+      "stats": {
+        "rstars": 0,
+        "dots": 9442,
+        "knots": 0,
+        "stars": 1,
+        "curves": 0,
+        "used": 3,
+        "ms": 9
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--stipple__s7__orbit",
+      "preset": "Disc, no arms",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "a9e5aa643d7cc65c90730907b32131c1d56ee16aab00d03a13e4c6a1c3b2471e",
+      "stats": {
+        "rstars": 0,
+        "dots": 9442,
+        "knots": 0,
+        "stars": 1,
+        "curves": 0,
+        "used": 3,
+        "ms": 8
       },
       "pageErrors": 0
     },
@@ -929,6 +1253,122 @@
         "curves": 4,
         "used": 91,
         "ms": 368
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--stipple-arms__s4242__home",
+      "preset": "Grand design",
+      "variant": "stipple-arms",
+      "overrides": {
+        "vary": 0,
+        "dustScribble": 0,
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "a98426af8829e24ee47827b96852eb5d296f9335f11a387b507220c29e0d9368",
+      "stats": {
+        "rstars": 0,
+        "dots": 9470,
+        "knots": 0,
+        "stars": 30,
+        "curves": 0,
+        "used": 41,
+        "ms": 13
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--stipple-arms__s4242__orbit",
+      "preset": "Grand design",
+      "variant": "stipple-arms",
+      "overrides": {
+        "vary": 0,
+        "dustScribble": 0,
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "4067dd935d75a9b6e49e20efadfb6e564721fcf5f4e8b3b598fa1fb02443a701",
+      "stats": {
+        "rstars": 0,
+        "dots": 9470,
+        "knots": 0,
+        "stars": 30,
+        "curves": 0,
+        "used": 41,
+        "ms": 18
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--stipple-arms__s7__home",
+      "preset": "Grand design",
+      "variant": "stipple-arms",
+      "overrides": {
+        "vary": 0,
+        "dustScribble": 0,
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "48b5e171530f1fda06459fb167058826f8d5df3a679a513967a95d5785577913",
+      "stats": {
+        "rstars": 0,
+        "dots": 9475,
+        "knots": 0,
+        "stars": 25,
+        "curves": 0,
+        "used": 42,
+        "ms": 453
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--stipple-arms__s7__orbit",
+      "preset": "Grand design",
+      "variant": "stipple-arms",
+      "overrides": {
+        "vary": 0,
+        "dustScribble": 0,
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "4455612b02e71984d9a93557888efb1617560729eff14b0b3bb34bdc843f677e",
+      "stats": {
+        "rstars": 0,
+        "dots": 9475,
+        "knots": 0,
+        "stars": 25,
+        "curves": 0,
+        "used": 42,
+        "ms": 29
       },
       "pageErrors": 0
     },
@@ -2733,6 +3173,118 @@
       "pageErrors": 0
     },
     {
+      "name": "radio-jet--stipple__s4242__home",
+      "preset": "Radio jet",
+      "variant": "stipple",
+      "overrides": {
+        "jet": 0,
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "3d570387f24cc16b223a87cce69470fc956c6098a8b190f15603cef8fe1efc9b",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 16
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "radio-jet--stipple__s4242__orbit",
+      "preset": "Radio jet",
+      "variant": "stipple",
+      "overrides": {
+        "jet": 0,
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "fd54791363760f2fbbfba79fa2ac8136829f5425e265ff6f4df97571e6e559b9",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 11
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "radio-jet--stipple__s7__home",
+      "preset": "Radio jet",
+      "variant": "stipple",
+      "overrides": {
+        "jet": 0,
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "81ea709ed9ca61e32f821f91a25183b9348c1765632bd08864dc78b69c274c3e",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 17
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "radio-jet--stipple__s7__orbit",
+      "preset": "Radio jet",
+      "variant": "stipple",
+      "overrides": {
+        "jet": 0,
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "94ec23e2a2406108377e2c81cdaab4a7151e3a8135d52ec01d230853736458c1",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 7
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "ringed__s4242__home",
       "preset": "Ringed",
       "seed": 4242,
@@ -3017,6 +3569,222 @@
         "curves": 0,
         "used": 50,
         "ms": 79
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round--stipple__s11__home",
+      "preset": "Smooth, round",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 11,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "35c370efa7fbe4bb04cb1b2247e1339e66bc4ef8248391ee9536302ea72a3312",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 3,
+        "ms": 7
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round--stipple__s11__orbit",
+      "preset": "Smooth, round",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 11,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "0b60cb50f35fdf67ba6ab00b916ef694dfb791ec4cc0e7e248d2c9c46d32c3aa",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 3,
+        "ms": 7
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round--stipple__s3__home",
+      "preset": "Smooth, round",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 3,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "47853b5d9dd377454eef7fd28ac8936c080d69c44912ec1a574357e89f86a2a1",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 7
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round--stipple__s3__orbit",
+      "preset": "Smooth, round",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 3,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "59d6895122160a7b610384f10c866634f523c0275412779a49542291ce507fba",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 7
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round--stipple__s4242__home",
+      "preset": "Smooth, round",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "94ea1965b699492680bbb0c2b1a78db266b8d4ba0a81ec1c5d64298db08ab39c",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 8
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round--stipple__s4242__orbit",
+      "preset": "Smooth, round",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "20ff70686aa126d6155498fadac5deabc1c8c24d683c89c9cbfbee456c4b8f9f",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 6
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round--stipple__s7__home",
+      "preset": "Smooth, round",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "d87b257d91e25ce13128d802470367a020ea998f4be30da58416ccdeb0a8751b",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 16
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round--stipple__s7__orbit",
+      "preset": "Smooth, round",
+      "variant": "stipple",
+      "overrides": {
+        "lines": 0,
+        "knots": 0,
+        "envelope": 0,
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "c157440d24af54d3356ecad765ba36d00f81c3e1cf686be4919420c3a149e75a",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 9
       },
       "pageErrors": 0
     },
@@ -3380,5 +4148,18 @@
       },
       "pageErrors": 0
     }
-  ]
+  ],
+  "extra": {
+    "file": "tests/golden/extra-cases.json",
+    "generated": "2026-10-04T01:16:33.157Z",
+    "browser": {
+      "name": "chromium",
+      "version": "141.0.7390.37",
+      "args": [
+        "--use-angle=swiftshader",
+        "--enable-unsafe-swiftshader"
+      ],
+      "deviceScaleFactor": 1
+    }
+  }
 }

@@ -7,27 +7,13 @@
 import { randF32, randU32 } from '../core/rng';
 import { Stream } from '../core/streams';
 import { simple, type Instance } from '../marks/instance';
-import type { InkLayer } from './layers';
+import { dotSprite, penWeights } from '../model/variation';
+import type { SpriteLayer } from './layers';
 
-export const PLATE_UNITS = 800;
-
-/** The reference's pen weights at a given pen (render(), app23.js:L1227). */
-export function penWeights(pen: number): { line: number; dot: number } {
-  return { line: pen, dot: 0.75 + 0.1 * pen };
-}
-
-/**
- * The reference's `dotSprite(t, k)` (app23.js:L81): the quad size, in plate units, that draws
- * dot `t` (of measured size `size`) at a readable diameter.
- */
-export function dotSprite(size: number, penDot: number, k = 1): number {
-  const ds = Math.max(4, size);
-  const want = Math.min(3.4, Math.max(1.9, 1.9 + 0.045 * ds)) * penDot * k;
-  return (want * 40) / ds;
-}
+export { dotSprite, penWeights };
 
 /** One dot, cell 0, at the centre: the one-mark test. */
-export function oneMark(dotSizes: readonly number[], pen = 2.4): InkLayer[] {
+export function oneMark(dotSizes: readonly number[], pen = 2.4): SpriteLayer[] {
   const size = dotSprite(dotSizes[0] ?? 4, penWeights(pen).dot);
   return [
     {
@@ -45,7 +31,7 @@ export function sampleScene(
   counts: { dots: number; knots: number; stars: number; cores: number; pieces: number },
   seed = 7,
   pen = 2.4,
-): InkLayer[] {
+): SpriteLayer[] {
   const { dot } = penWeights(pen);
   const r = (i: number, d: number) => randF32(seed, Stream.test, i, d);
   const pick = (i: number, n: number) => randU32(seed, Stream.test, i, 9) % n;

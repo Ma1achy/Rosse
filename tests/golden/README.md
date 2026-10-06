@@ -33,28 +33,49 @@ v21 places every dot from a sequential random stream. The new engine uses a para
   - pairs that re-roll only _part_ of the stipple score 0.70–0.81 plain SSIM;
   - the density-map SSIM below scores those same pairs 0.97–0.98, and a genuine change of structure (a 35° orbit) 0.37–0.50.
 
-So the metric (ADR 0013) compares what must match. All four tests below must pass. They work on the alpha channel α of the ink images:
+So the metric (ADR 0013, as calibrated in M2 by ADR 0015) compares what must match. It works on the alpha channel α of the ink images. The gated tests are (a), (b′), (c), (d) and (f):
 
-| test | what | parity threshold (new engine vs v21) | strict threshold (engine vs itself on another adapter, or CPU engine vs GPU) |
+| test | what | parity (new engine vs v21), spiral / smooth | strict (CPU engine vs WebGPU) |
 | --- | --- | --- | --- |
-| a. total ink | Σα | ±5% | ±0.5% |
-| b. structure | SSIM of density maps: α blurred with σ = 4 plate px, downsampled 4× to 200², 7 × 7 window | ≥ τ per preset family, calibrated (provisional 0.85) | ≥ 0.98 |
-| c. pen weight | stroke widths from the distance transform of α ≥ 0.5 on its medial axis: median and p90 | ±10% | ±2% |
-| d. mark counts | instances per class (engine statistics vs `__GEN.stats()`) | ±3% (±10% under 100) | ±0.1% |
-| e. self-regression | new engine vs its own goldens, SwiftShader | — | bit-exact |
+| a. total ink | Σα | ±5% / ±5% | ±0.5% |
+| b. fine structure (reported, not gated) | SSIM of density maps: σ = 4 px, downsampled 4× to 200², 7 × 7 windows with ink | — | — |
+| b′. structure | the same SSIM on coarse density maps: σ = 16 px, downsampled 8× to 100² | ≥ 0.88 / ≥ 0.91 | ≥ 0.98 |
+| c. pen weight | stroke widths from the distance transform of α ≥ 0.5 (α upsampled 4×) on its medial axis: band means of the 40th–60th ("median") and 85th–95th ("p90") percentiles | ±10% / ±10% | ±2% |
+| d. mark counts | per class (dots, knots, stars, drawn stars), engine statistics vs `__GEN.stats()` | 0 in both where the parameters make the class impossible; else ±3% (±10% under 100), or 3·√(v21 + engine) below 2,000 (v21 drawing none included) | ±0.1% |
+| e. self-regression | WebGPU vs its own goldens (`engine-hashes.json`), SwiftShader; and twice in a row | — | bit-exact |
+| f. moments and extent | about the plate centre: radii holding 25%, 50%, 90% of the ink; ink beyond v21's r90; axis ratio within v21's r90 and r50; position angle | r25 ±4.1% / ±3.7%, r50 ±4.6% / ±5.6%, r90 ±5.1% / ±9.0%, outer ±1.6 / ±1.9 points; q and inner q per preset (family ±0.037, ±0.044 / ±0.057, ±0.039); pa ≤ paA / (ε − ε₀), ε the ellipticity of v21's drawing, paA 1.27° / 1.37°, ε₀ per preset, ungated when that exceeds 90° | ±0.5%, ±0.2 points, ±0.003, pa ≤ 0.1° / ε |
 
-**Why these four.** They cover the four ways a drawing can be wrong:
+The values are in `thresholds.json` (merger, lens, star and artefact are provisional until their engines land), the numbers behind them in `calibration.json`, and the reasoning in ADR 0015 and `docs/milestones/m2/README.md`.
+
+**Why these.** They cover the ways a drawing can be wrong:
 
 - (a) too much or too little ink: density, dot size, missing layers;
-- (b) ink in the wrong places, at the scale of arms, bulges, tails and arcs, while ignoring the dots themselves;
-- (c) the wrong pen: blurred, thickened or thinned marks, which (a) and (b) can miss;
+- (b′) ink in the wrong places, at the scale of arms, bulges, tails and arcs, while ignoring the dots themselves;
+- (f) the wrong size or shape: a bulge too big, a galaxy too round, a halo missing, a disc truncated, a wrong position angle, which density maps hardly see;
+- (c) the wrong pen: blurred, thickened or thinned marks;
 - (d) the wrong number of each kind of mark, which is independent of placement.
 
-**Calibrating τ.** Two sources of "the same galaxy, different dots":
+**Calibrating.** Two sources of "the same galaxy, different dots":
 
 - v21's partial re-roll under a 0.3° orbit (docs/reference-notes.md);
-- the new engine re-keying only its placement streams (ADR 0004), which gives a full re-draw with identical structure.
+- the new engine re-keying only its placement stream (ADR 0004) while drawing v21's own variation, which gives a full re-draw with identical structure.
 
-M2 measures tests (a)–(c) over such pairs and sets τ per family to the 5th percentile of the full re-draws minus 0.02. Values go in `thresholds.json`. See ADR 0013.
+Thresholds are 1.5 × the 95th percentile of each measure over the engine's re-draws (ink and widths keep ADR 0013's ±5% and ±10% as floors), and (b′) the 5th percentile minus 0.02. Negative controls (pa ±30°, `bulgeFlat` ±0.15, `bulgeSize` × 1.5, halo off, truncation at 4.2 units, `thick` × 3, dot size × 1.3, a 35° orbit) are measured against them; `calibration.json` records which are caught.
+
+## Running it (from M2)
+
+```sh
+npm run golden                       # integrity, then every required case on WebGPU and the CPU engine
+npm run golden -- --all              # also every preset capture, for information (never fails)
+npm run golden -- --report-all       # an HTML report for every case, not only failing ones
+npm run golden -- --calibrate        # re-measure (4 processes; --jobs n) and rewrite thresholds.json, calibration.json
+npm run golden -- --update-engine    # rewrite engine-hashes.json, the engine's own goldens (test e)
+npm run capture:reference -- --extra tests/golden/extra-cases.json   # the variant captures
+npm run capture:reference -- --reroll                                # v21 re-roll pairs, for --calibrate
+```
+
+- **Required cases** are the captures with a `variant` (from `extra-cases.json`): the stipple-only captures of `Smooth, round` and `Disc, no arms` (seeds 7, 4242, 3 and 11), `Cigar-shaped` and `Radio jet` (Sérsic), and `Grand design` with `vary: 0` (arms), at seeds 7 and 4242 otherwise, home and orbit cameras. Each is compared three ways: WebGPU and the CPU engine against v21 at the family's parity thresholds, and the CPU engine against WebGPU at the strict ones. WebGPU is rendered twice (L0) and checked against `engine-hashes.json` (e).
+- **Drawn-star gate.** The drawn-star counts of the full captures of the three acceptance presets are compared with v21's (`STATS.rstars` does not depend on v21's breathing room), on the CPU engine.
+- **v21's variation.** The runner replays v21's `makeVariation` offline on v21's own stream (`compare/v21.ts`) and draws with it, so both engines draw the same galaxy with the same pens. The engine's own variation is printed for information. The capture tool still records v21's hand (`hand`, truncated by the page at 400 tiles) as a cross-check of the replay (`tests/unit/v21-replay.test.ts`).
 
 **Reports.** A failing case writes `diff/<name>.html`: both renders, both density maps, the signed density difference, and both stroke-width histograms. `diff/` is git-ignored and uploaded by CI as an artifact. Attach the report to your pull request.

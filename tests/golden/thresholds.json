@@ -1,0 +1,194 @@
+{
+  "about": "Golden thresholds (ADR 0013, as calibrated in ADR 0015). parity: the new engine against v21 (L2), per family; strict: the CPU engine against WebGPU (L1). Gated: ink, coarse SSIM (b′), widths, counts, and the moment and extent test (r25, r50, r90, outer ink, axis ratio q, position angle pa where the reference q < paBelowQ). Written by `npm run golden -- --calibrate`; the numbers behind them are in calibration.json and docs/milestones/m2/README.md. Families marked provisional have no engine yet.",
+  "strict": {
+    "ink": 0.005,
+    "ssimCoarse": 0.98,
+    "median": 0.02,
+    "p90": 0.02,
+    "r25": 0.005,
+    "r50": 0.005,
+    "r90": 0.005,
+    "outer": 0.002,
+    "q": 0.003,
+    "qInner": 0.003,
+    "paA": 0.1,
+    "paEps0": 0,
+    "counts": 0.001,
+    "countsSmall": 0.001,
+    "poisson": 0,
+    "poissonBelow": 0
+  },
+  "parity": {
+    "spiral": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.88,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.041,
+      "r50": 0.046,
+      "r90": 0.051,
+      "outer": 0.016,
+      "q": 0.037,
+      "qInner": 0.044,
+      "paA": 1.265,
+      "paEps0": 0.042,
+      "byPreset": {
+        "Grand design": {
+          "q": 0.038,
+          "qInner": 0.033,
+          "paEps0": 0.045
+        },
+        "Barred spiral": {
+          "q": 0.034,
+          "qInner": 0.031,
+          "paEps0": 0.037
+        },
+        "Flocculent": {
+          "q": 0.032,
+          "qInner": 0.045,
+          "paEps0": 0.034
+        },
+        "Tightly wound": {
+          "q": 0.047,
+          "qInner": 0.054,
+          "paEps0": 0.054
+        },
+        "Ringed": {
+          "q": 0.035,
+          "qInner": 0.046,
+          "paEps0": 0.038
+        },
+        "Disc, no arms": {
+          "q": 0.04,
+          "qInner": 0.036,
+          "paEps0": 0.051
+        },
+        "Edge-on with dust": {
+          "q": 0.03,
+          "qInner": 0.062,
+          "paEps0": 0.034
+        }
+      }
+    },
+    "smooth": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.91,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.037,
+      "r50": 0.056,
+      "r90": 0.09,
+      "outer": 0.019,
+      "q": 0.057,
+      "qInner": 0.039,
+      "paA": 1.374,
+      "paEps0": 0.061,
+      "byPreset": {
+        "Smooth, round": {
+          "q": 0.067,
+          "qInner": 0.032,
+          "paEps0": 0.068
+        },
+        "Cigar-shaped": {
+          "q": 0.047,
+          "qInner": 0.039,
+          "paEps0": 0.061
+        },
+        "Radio jet": {
+          "q": 0.041,
+          "qInner": 0.044,
+          "paEps0": 0.043
+        },
+        "Shell galaxy": {
+          "q": 0.042,
+          "qInner": 0.049,
+          "paEps0": 0.047
+        }
+      }
+    },
+    "merger": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.85,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.1,
+      "r50": 0.1,
+      "r90": 0.1,
+      "outer": 0.03,
+      "q": 0.05,
+      "qInner": 0.05,
+      "paA": 2,
+      "paEps0": 0.05,
+      "provisional": true
+    },
+    "lens": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.85,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.1,
+      "r50": 0.1,
+      "r90": 0.1,
+      "outer": 0.03,
+      "q": 0.05,
+      "qInner": 0.05,
+      "paA": 2,
+      "paEps0": 0.05,
+      "provisional": true
+    },
+    "star": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.85,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.1,
+      "r50": 0.1,
+      "r90": 0.1,
+      "outer": 0.03,
+      "q": 0.05,
+      "qInner": 0.05,
+      "paA": 2,
+      "paEps0": 0.05,
+      "provisional": true
+    },
+    "artefact": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.85,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.1,
+      "r50": 0.1,
+      "r90": 0.1,
+      "outer": 0.03,
+      "q": 0.05,
+      "qInner": 0.05,
+      "paA": 2,
+      "paEps0": 0.05,
+      "provisional": true
+    }
+  }
+}

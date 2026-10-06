@@ -15,8 +15,8 @@ import {
 } from '../marks/atlas';
 import { CompositePass } from './composite';
 import type { InkLayer } from './layers';
-import { PLATE_UNITS } from './sample-scene';
-import { INK_FORMAT, SpriteBatch, SpritePipeline } from './sprites';
+import { PLATE } from '../view/camera';
+import { INK_FORMAT, IndirectSpriteBatch, SpriteBatch, SpritePipeline } from './sprites';
 import type { Surface } from './surface';
 
 export interface FrameSize {
@@ -36,7 +36,7 @@ export class GpuRenderer {
   private readonly composite: CompositePass;
   private readonly atlases = new Map<AtlasName, GpuAtlas>();
   private layers: readonly InkLayer[] = [];
-  private batches: SpriteBatch[] = [];
+  private batches: (SpriteBatch | IndirectSpriteBatch)[] = [];
 
   constructor(
     readonly device: GPUDevice,
@@ -52,7 +52,7 @@ export class GpuRenderer {
     this.size = size;
     this.width = Math.round(size.plateCss * size.dpr);
     this.height = this.width;
-    this.pxPerUnit = this.width / PLATE_UNITS;
+    this.pxPerUnit = this.width / PLATE;
     this.ink = this.device.createTexture({
       label: 'ink target',
       size: [this.width, this.height],
@@ -89,12 +89,15 @@ export class GpuRenderer {
     this.batches = layers.map((l) => {
       const atlas = this.atlases.get(l.atlas);
       if (!atlas) throw new Error(`atlas ${l.atlas} not loaded`);
-      return new SpriteBatch(this.sprites, atlas, l.instances, {
+      const opts = {
         targetWidth: this.width,
         targetHeight: this.height,
         pxPerUnit: this.pxPerUnit,
         gain: l.gain,
-      });
+      };
+      return l.kind === 'gpu-sprites'
+        ? new IndirectSpriteBatch(this.sprites, atlas, l.source, opts)
+        : new SpriteBatch(this.sprites, atlas, l.instances, opts);
     });
   }
 

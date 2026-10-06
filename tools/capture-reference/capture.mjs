@@ -11,7 +11,16 @@
  *
  * Usage:
  *   node tools/capture-reference/capture.mjs [--out dir] [--only "Grand design,Ringed"] [--verify]
+ *   node tools/capture-reference/capture.mjs --extra tests/golden/extra-cases.json [--verify]
+ *   node tools/capture-reference/capture.mjs --reroll [--out dir] [--only …]
  *   --verify  capture again into a temporary folder and compare pixel hashes with the manifest.
+ *   --extra   capture the cases of a file ({ cases: [{ preset, variant, overrides }] }): a preset
+ *             with parameter overrides set after it (and after the seed), named
+ *             <preset-slug>--<variant>__s<seed>__<camera>. They are added to (or replaced in) the
+ *             existing manifest, which records the file.
+ *   --reroll  for calibration (ADR 0013): every preset at the home camera and again at az + 0.3°,
+ *             which in v21 re-rolls the stipple when dust lanes are on (reference notes 20.1).
+ *             Written to tests/golden/actual/reroll/ by default (not committed), with no manifest.
  *
  * How it drives the page: the built page is served over http://localhost, Chromium renders WebGL
  * through SwiftShader (software, so the same on every machine), the canvas is forced to 800 CSS px
@@ -22,7 +31,7 @@
  * the orbit moves the camera round a scene placed at home, as the reference intends.
  */
 import { createHash } from 'node:crypto';
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
@@ -47,6 +56,8 @@ export const SEEDS = [7, 4242];
 /** Cameras: the preset's own view, then an orbit of 35° round the axis and 20° of tilt. */
 export const CAMERAS = /** @type {const} */ (['home', 'orbit']);
 export const ORBIT = { az: 35, incl: 20 };
+/** The re-roll camera of --reroll: a 0.3° orbit (ADR 0013). */
+export const REROLL = { az: 0.3 };
 /** A few presets also captured on the Chalkboard surface. */
 export const CHALK = ['Grand design', 'Merger: the Mice', 'Lens: Einstein ring'];
 const BROWSER_ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'];
@@ -87,9 +98,14 @@ function serve() {
 }
 
 /**
+ * @typedef {{ preset: string, seed: number, chalk: boolean, variant?: string,
+ *   overrides?: Record<string, unknown>, cameras: readonly string[] }} Job
+ */
+
+/**
  * @param {import('playwright').Browser} browser
  * @param {string} url
- * @param {{ preset: string, seed: number, chalk: boolean }} job
+ * @param {Job} job
  * @param {string} out
  */
 async function captureJob(browser, url, job, out) {
@@ -126,13 +142,17 @@ async function captureJob(browser, url, job, out) {
     { timeout: 120_000 },
   );
   const results = [];
-  for (const camera of CAMERAS) {
+  for (const camera of job.cameras) {
     const state = await page.evaluate(
-      ({ preset, seed, camera, orbit }) => {
+      ({ preset, seed, camera, orbit, overrides, reroll }) => {
         const G = /** @type {any} */ (window).__GEN;
         if (camera === 'home') {
           G.preset(preset);
           G.set({ seed });
+          if (overrides) G.set(overrides);
+        } else if (camera === 'reroll') {
+          const P = G.P();
+          G.set({ az: (P.az || 0) + reroll.az });
         } else {
           const P = G.P();
           G.set({
@@ -144,13 +164,24 @@ async function captureJob(browser, url, job, out) {
         return {
           P: JSON.parse(JSON.stringify(G.P())),
           stats: G.stats(),
+          // the dot pool of this galaxy's hand (VAR.dotPool, truncated by the page at 400): a
+          // cross-check of the offline replay the comparison uses (tests/unit/v21-replay.test.ts)
+          hand: G.var().pool,
           canvas: [c.width, c.height],
           ink: c.toDataURL('image/png'),
         };
       },
-      { preset: job.preset, seed: job.seed, camera, orbit: ORBIT },
+      {
+        preset: job.preset,
+        seed: job.seed,
+        camera,
+        orbit: ORBIT,
+        overrides: job.overrides ?? null,
+        reroll: REROLL,
+      },
     );
-    const name = `${slug(job.preset)}__s${job.seed}__${camera}${job.chalk ? '__chalk' : ''}`;
+    const base = job.variant ? `${slug(job.preset)}--${slug(job.variant)}` : slug(job.preset);
+    const name = `${base}__s${job.seed}__${camera}${job.chalk ? '__chalk' : ''}`;
     const ink = Buffer.from(state.ink.split(',')[1] ?? '', 'base64');
     writeFileSync(join(out, `${name}.ink.png`), ink);
     await page
@@ -162,20 +193,25 @@ async function captureJob(browser, url, job, out) {
       seed: job.seed,
       camera,
       surface: job.chalk ? 'chalkboard' : 'paper',
+      ...(job.variant ? { variant: job.variant, overrides: job.overrides } : {}),
       sequence:
         camera === 'home'
           ? [
               `load page (theme ${job.chalk ? 'dark' : 'light'})`,
               `__GEN.preset(${JSON.stringify(job.preset)})`,
               `__GEN.set({ seed: ${job.seed} })`,
+              ...(job.overrides ? [`__GEN.set(${JSON.stringify(job.overrides)})`] : []),
             ]
-          : [
-              'after home',
-              `__GEN.set({ az: az + ${ORBIT.az}, incl: clamp(incl + ${ORBIT.incl}, 0, 180) })`,
-            ],
+          : camera === 'reroll'
+            ? ['after home', `__GEN.set({ az: az + ${REROLL.az} })`]
+            : [
+                'after home',
+                `__GEN.set({ az: az + ${ORBIT.az}, incl: clamp(incl + ${ORBIT.incl}, 0, 180) })`,
+              ],
       zoom: 1,
       canvas: state.canvas,
       stats: state.stats,
+      hand: state.hand,
       params: state.P,
       pageErrors: errors.slice(),
       inkPixelSha256: pixelHash(ink),
@@ -194,7 +230,12 @@ async function main() {
     return i >= 0 ? args[i + 1] : undefined;
   };
   const verify = args.includes('--verify');
-  const goldenDir = resolve(ROOT, opt('--out') ?? 'tests/golden/reference');
+  const reroll = args.includes('--reroll');
+  const extraFile = opt('--extra');
+  const goldenDir = resolve(
+    ROOT,
+    opt('--out') ?? (reroll ? 'tests/golden/actual/reroll' : 'tests/golden/reference'),
+  );
   const out = verify ? mkdtempSync(join(tmpdir(), 'rosse-verify-')) : goldenDir;
   mkdirSync(out, { recursive: true });
 
@@ -203,10 +244,31 @@ async function main() {
     ?.split(',')
     .map((s) => s.trim());
   const names = Object.keys(presets).filter((n) => !only || only.includes(n));
-  const jobs = names.flatMap((preset) => [
-    ...SEEDS.map((seed) => ({ preset, seed, chalk: false })),
-    ...(CHALK.includes(preset) ? [{ preset, seed: SEEDS[0] ?? 7, chalk: true }] : []),
-  ]);
+  /** @type {Job[]} */
+  let jobs;
+  if (extraFile) {
+    /** @type {{ cases: { preset: string, variant: string, overrides: Record<string, unknown>, seeds?: number[] }[] }} */
+    const extra = JSON.parse(readFileSync(resolve(ROOT, extraFile), 'utf8'));
+    jobs = extra.cases
+      .filter((c) => !only || only.includes(c.preset))
+      .flatMap((c) => {
+        if (!presets[c.preset]) throw new Error(`unknown preset ${c.preset}`);
+        const { seeds, ...rest } = c;
+        return (seeds ?? SEEDS).map((seed) => ({ ...rest, seed, chalk: false, cameras: CAMERAS }));
+      });
+  } else if (reroll) {
+    jobs = names.flatMap((preset) =>
+      SEEDS.map((seed) => ({ preset, seed, chalk: false, cameras: ['home', 'reroll'] })),
+    );
+  } else {
+    jobs = names.flatMap((preset) => [
+      ...SEEDS.map((seed) => ({ preset, seed, chalk: false, cameras: CAMERAS })),
+      ...(CHALK.includes(preset)
+        ? [{ preset, seed: SEEDS[0] ?? 7, chalk: true, cameras: CAMERAS }]
+        : []),
+    ]);
+  }
+  const total = jobs.reduce((a, j) => a + j.cameras.length, 0);
 
   const { server, url } = /** @type {{ server: import('node:http').Server, url: string }} */ (
     await serve()
@@ -223,7 +285,7 @@ async function main() {
         const r = await captureJob(browser, url, job, out);
         records.push(...r);
         console.log(
-          `${records.length}/${jobs.length * CAMERAS.length}  ${job.preset}  seed ${job.seed}${job.chalk ? '  chalk' : ''}`,
+          `${records.length}/${total}  ${job.preset}${job.variant ? ` (${job.variant})` : ''}  seed ${job.seed}${job.chalk ? '  chalk' : ''}`,
         );
       }
     }),
@@ -247,6 +309,48 @@ async function main() {
     process.exit(bad.length ? 1 : 0);
   }
 
+  /** @param {any} r */
+  const entry = (r) => ({
+    name: r.name,
+    preset: r.preset,
+    ...(r.variant ? { variant: r.variant, overrides: r.overrides } : {}),
+    seed: r.seed,
+    camera: r.camera,
+    surface: r.surface,
+    inkPixelSha256: r.inkPixelSha256,
+    stats: r.stats,
+    pageErrors: r.pageErrors.length,
+  });
+  const manifestPath = join(out, 'manifest.json');
+  /** @param {any[]} list */
+  const sorted = (list) => list.sort((a, b) => a.name.localeCompare(b.name));
+
+  if (reroll) {
+    console.log(`${records.length} re-roll captures in ${out} (no manifest)`);
+    return;
+  }
+
+  if (extraFile) {
+    // add to (or replace in) the existing manifest; everything else in it is kept as it is
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+    const names = new Set(records.map((r) => r.name));
+    manifest.captures = sorted([
+      ...manifest.captures.filter((/** @type {any} */ c) => !names.has(c.name)),
+      ...records.map(entry),
+    ]);
+    manifest.extra = {
+      file: extraFile,
+      generated: new Date().toISOString(),
+      browser: { name: 'chromium', version, args: BROWSER_ARGS, deviceScaleFactor: 1 },
+    };
+    writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+    console.log(`${records.length} extra captures added to ${manifestPath}`);
+    return;
+  }
+
+  // a full run keeps the extra captures already in the manifest (re-made with --extra)
+  const previous = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, 'utf8')) : null;
+  const kept = only ? [] : (previous?.captures ?? []).filter((/** @type {any} */ c) => c.variant);
   const manifest = {
     generated: new Date().toISOString(),
     reference: {
@@ -259,18 +363,10 @@ async function main() {
     cameras: { home: "the preset's own incl, az, pa", orbit: ORBIT },
     chalkboard: CHALK,
     seconds: Math.round((Date.now() - t0) / 1000),
-    captures: records.map((r) => ({
-      name: r.name,
-      preset: r.preset,
-      seed: r.seed,
-      camera: r.camera,
-      surface: r.surface,
-      inkPixelSha256: r.inkPixelSha256,
-      stats: r.stats,
-      pageErrors: r.pageErrors.length,
-    })),
+    ...(kept.length && previous?.extra ? { extra: previous.extra } : {}),
+    captures: sorted([...records.map(entry), ...kept]),
   };
-  writeFileSync(join(out, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
+  writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
   console.log(`${records.length} captures in ${manifest.seconds} s → ${out}`);
 }
 

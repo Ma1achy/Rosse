@@ -9,7 +9,7 @@
  */
 import type { AtlasData, AtlasName, ImageData8 } from '../marks/atlas';
 import type { InkLayer } from '../render/layers';
-import { PLATE_UNITS } from '../render/sample-scene';
+import { PLATE } from '../view/camera';
 import type { Surface } from '../render/surface';
 import { composite, createInkBuffer, rasteriseSprites, type InkBuffer } from './raster';
 
@@ -35,7 +35,7 @@ export class CpuRenderer {
     this.size = size;
     this.width = Math.round(size.plateCss * size.dpr);
     this.height = this.width;
-    this.pxPerUnit = this.width / PLATE_UNITS;
+    this.pxPerUnit = this.width / PLATE;
     this.ink = createInkBuffer(this.width, this.height);
   }
 
@@ -52,6 +52,7 @@ export class CpuRenderer {
     for (const l of this.layers) {
       const atlas = this.atlases.get(l.atlas);
       if (!atlas) throw new Error(`atlas ${l.atlas} not loaded`);
+      if (l.kind !== 'sprites') throw new Error('the CPU engine draws CPU instance lists only');
       rasteriseSprites(this.ink, atlas, l.instances, { pxPerUnit: this.pxPerUnit, gain: l.gain });
     }
   }

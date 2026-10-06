@@ -34,6 +34,7 @@
       .bar {
         display: flex;
         gap: 8px;
+        flex-wrap: wrap;
         align-items: center;
         margin: 10px 0 0;
       }
@@ -50,6 +51,33 @@
         background: var(--ink);
         color: var(--paper);
       }
+      .bar select,
+      .bar input {
+        font: inherit;
+        padding: 3px 6px;
+        border: 1px solid var(--ink);
+        background: transparent;
+        color: var(--ink);
+        border-radius: 3px;
+      }
+      .bar label {
+        display: inline-flex;
+        gap: 4px;
+        align-items: center;
+        min-width: 0;
+        max-width: 100%;
+      }
+      .bar select {
+        min-width: 0;
+        max-width: 100%;
+        flex: 1 1 auto;
+      }
+      .bar input {
+        width: 5em;
+      }
+      .stats {
+        color: var(--ink2);
+      }
       .note {
         margin-left: auto;
         color: var(--ink2);
@@ -58,9 +86,17 @@
     </style>
   </head>
   <body>
-    <!-- The page proper arrives in milestone M11; until then this is the plate and a surface switch. -->
+    <!-- The page proper arrives in milestone M11; until then: the plate, a preset, a seed and a surface switch. -->
     <main>
       <canvas id="plate" class="plate" width="800" height="800"></canvas>
+      <div class="bar" role="group" aria-label="Galaxy">
+        <label
+          >Preset
+          <select id="preset"></select
+        ></label>
+        <label>Seed <input id="seed" type="number" min="1" max="9999" step="1" value="7" /></label>
+        <span id="stats" class="stats" aria-live="polite"></span>
+      </div>
       <div class="bar" role="group" aria-label="Surface">
         <button type="button" data-surface="paper" aria-pressed="true">Paper</button>
         <button type="button" data-surface="chalk" aria-pressed="false">Chalkboard</button>
