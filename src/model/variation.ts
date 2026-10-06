@@ -33,9 +33,10 @@ export const VariationIndex = {
 /** What makeVariation needs to know about the drawings. */
 export interface DrawingsMeta {
   dots: { src: readonly string[]; size: readonly number[] };
-  knots: { count: number };
-  stars: { count: number };
-  cores: { kind: readonly string[]; style: readonly string[] };
+  /** `src`: each drawing's source (M5: the used-drawings count) */
+  knots: { count: number; src?: readonly string[] };
+  stars: { count: number; src?: readonly string[] };
+  cores: { kind: readonly string[]; style: readonly string[]; src?: readonly string[] };
   /** the strokes sheet (M4): without it no curves are drawn */
   strokes?: StrokesMeta;
   /** the pen lines of the dust hatching and carving (M4): without them no hatches */

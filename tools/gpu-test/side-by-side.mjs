@@ -1,12 +1,12 @@
 // @ts-check
 /**
- * `node tools/gpu-test/side-by-side.mjs [out dir] [--set m2|m3|m4]`: the new engine (WebGPU on
+ * `node tools/gpu-test/side-by-side.mjs [out dir] [--set m2|m3|m4|m5]`: the new engine (WebGPU on
  * SwiftShader, the page with `?present=copy`) beside v21's capture of the same case
  * (tests/golden/reference/<name>.plate.jpg), as small JPEGs for the milestone notes. The page is
  * given the capture's camera (az, incl, pa) and zoom. Default: the m2 set, in docs/milestones/m2.
  * The m4 set is drawn as the golden runner draws it (tests/golden/render.html), with v21's
  * variation, stroke choices and noise, so the two show the same galaxy; its ink is shown over the
- * plate's field colour.
+ * plate's field colour. The m5 set is drawn the same way, with v21's part picks too.
  */
 import { mkdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -48,8 +48,19 @@ const SETS = {
     ],
     ['flocculent-s7-orbit', 'flocculent--ribbons__s7__orbit', 'Flocculent', 7, 'ribbons'],
   ],
+  m5: [
+    ['hand-drawn-arms-s7', 'hand-drawn-arms--vectors__s7__home', 'Hand-drawn arms', 7, 'vectors'],
+    [
+      'barred-spiral-s4242-orbit',
+      'barred-spiral--vectors__s4242__orbit',
+      'Barred spiral',
+      4242,
+      'vectors',
+    ],
+    ['radio-jet-s7-zoom', 'radio-jet--vectors__s7__zoom', 'Radio jet', 7, 'vectors'],
+  ],
 };
-const CASES = SETS[/** @type {'m2' | 'm3' | 'm4'} */ (set)];
+const CASES = SETS[/** @type {'m2' | 'm3' | 'm4' | 'm5'} */ (set)];
 if (!CASES) throw new Error(`unknown set ${set}`);
 
 prepareAssets();
@@ -69,9 +80,9 @@ try {
     );
     let ours;
     let label = 'new engine (WebGPU)';
-    if (variant === 'ribbons') {
-      // M4: the golden runner's draw, with v21's variation, stroke choices and noise (as the
-      // comparison draws), the ink alpha shown over the plate's field colour
+    if (variant === 'ribbons' || variant === 'vectors') {
+      // M4, M5: the golden runner's draw, with v21's variation, stroke choices, noise and part
+      // picks (as the comparison draws), the ink alpha shown over the plate's field colour
       const opts = node.referenceOptions(rec.params, rec.zoom ?? 1);
       await page.goto(`${server.url}/tests/golden/render.html`);
       await page.waitForFunction(() => window.__golden !== undefined, undefined, {
@@ -106,7 +117,10 @@ try {
         { a: r.alpha, w: r.width, h: r.height },
       );
       ours = Buffer.from(png, 'base64');
-      label = "new engine (WebGPU), with v21's variation, strokes and noise";
+      label =
+        variant === 'vectors'
+          ? "new engine (WebGPU), with v21's variation, strokes, noise and part picks"
+          : "new engine (WebGPU), with v21's variation, strokes and noise";
     } else {
       const q = new URLSearchParams({
         preset: String(preset),

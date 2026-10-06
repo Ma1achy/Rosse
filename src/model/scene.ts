@@ -146,8 +146,8 @@ export function markCounts(perClass: ArrayLike<number>): MarkCounts {
 export function drawingsMeta(
   atlases: {
     dots: { meta: Record<string, unknown[]> };
-    knots: { layers: number };
-    stars: { layers: number };
+    knots: { layers: number; meta?: Record<string, unknown[]> };
+    stars: { layers: number; meta?: Record<string, unknown[]> };
     cores: { meta: Record<string, unknown[]> };
     strokes?: { meta: Record<string, unknown[]>; levels: { width: number; height: number }[] };
   },
@@ -173,9 +173,16 @@ export function drawingsMeta(
       src: atlases.dots.meta.src as string[],
       size: atlases.dots.meta.size as number[],
     },
-    knots: { count: atlases.knots.layers },
-    stars: { count: atlases.stars.layers },
+    knots: {
+      count: atlases.knots.layers,
+      ...(atlases.knots.meta?.src ? { src: atlases.knots.meta.src as string[] } : {}),
+    },
+    stars: {
+      count: atlases.stars.layers,
+      ...(atlases.stars.meta?.src ? { src: atlases.stars.meta.src as string[] } : {}),
+    },
     cores: {
+      ...(atlases.cores.meta.src ? { src: atlases.cores.meta.src as string[] } : {}),
       kind: atlases.cores.meta.kind as string[],
       style: atlases.cores.meta.style as string[],
     },

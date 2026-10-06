@@ -34,6 +34,7 @@ import { classCapacity, compact } from './kernels/scan';
 import { runStipple } from './kernels/stipple';
 import { runVectors, vectorInputs, type VectorOut } from './kernels/vector';
 import { vectorView, type VectorView } from '../model/vectors';
+import { usedDrawings } from '../model/used';
 
 export interface CpuStippleView {
   layers: InkLayer[];
@@ -192,16 +193,42 @@ export class CpuStipple {
       gain: 1,
       instances: list(l.cls),
     }));
+    const streams = VD.parts.streams.length ? streamLayers(vo) : [];
     const layers: InkLayer[] = [
       ...line.filter((l) => !pieces.includes(l)),
       ...vectorLayers(vo, VD.nDots, VD.nBlobs),
       ...pieces,
       ...stipple.slice(0, 3),
-      ...(VD.parts.streams.length ? streamLayers(vo) : []),
+      ...streams,
       ...stipple.slice(3),
     ];
     const cores = coreInstances(P, meta, cam, galaxy.noise, VD.parts.picks.nuclear);
     if (cores.length) layers.push({ kind: 'sprites', atlas: 'cores', gain: 1, instances: cores });
+    const tiles = (l: InkLayer[], atlas: string) =>
+      l.flatMap((x) =>
+        x.kind === 'sprites' && x.atlas === atlas ? x.instances.map((i) => i.layer) : [],
+      );
+    const used = usedDrawings(meta, {
+      dots: [
+        ...tiles(stipple, 'dots'),
+        ...tiles(streams, 'dots'),
+        ...vo.dotsU
+          .subarray(0, VD.nDots * INSTANCE_WORDS)
+          .filter((_, k) => k % INSTANCE_WORDS === 2),
+        ...rv.hdotsU
+          .subarray(0, R.nHDots * INSTANCE_WORDS)
+          .filter((_, k) => k % INSTANCE_WORDS === 2),
+      ],
+      knots: [...tiles(stipple, 'knots'), ...tiles(streams, 'knots')],
+      stars: tiles(stipple, 'stars'),
+      cores,
+      strokes: R.curves.map((c) => c.k),
+      rows: vv.rows,
+      penlines: [
+        ...R.lanes.hatches.map((h) => h.tile),
+        ...VD.parts.picks.streams.map((s) => s.tile),
+      ],
+    });
     return {
       layers,
       counts: {
@@ -216,6 +243,7 @@ export class CpuStipple {
         vectorBlobs: VD.nBlobs,
         streamDots: vo.nSdots,
         streamKnots: vo.nSknots,
+        used,
       },
       perClass: counts,
       classes: p.classes,
