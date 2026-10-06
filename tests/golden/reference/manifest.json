@@ -393,6 +393,130 @@
       "pageErrors": 0
     },
     {
+      "name": "barred-spiral--knob-ring-lines__s4242__home",
+      "preset": "Barred spiral",
+      "variant": "knob-ring-lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "ringOnlyLines": 1,
+        "ring": 0.85,
+        "ringR": 1.5,
+        "ringStyle": "ribbon",
+        "stroke": "faint",
+        "outline": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "1e801739eabe50dc66f812576a655b9dfa577e58a47ca26e58eefeae8f444cee",
+      "captured": "2026-10-06T16:39:12.377Z",
+      "stats": {
+        "rstars": 15,
+        "dots": 9553,
+        "knots": 133,
+        "stars": 9,
+        "curves": 1,
+        "used": 59,
+        "ms": 517
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--knob-ring-lines__s4242__orbit",
+      "preset": "Barred spiral",
+      "variant": "knob-ring-lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "ringOnlyLines": 1,
+        "ring": 0.85,
+        "ringR": 1.5,
+        "ringStyle": "ribbon",
+        "stroke": "faint",
+        "outline": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "a5c5107ef56160efac111b1f35d671be76ac71ee8bf5327b7182d3da3025f4bd",
+      "captured": "2026-10-06T16:39:18.487Z",
+      "stats": {
+        "rstars": 15,
+        "dots": 9515,
+        "knots": 136,
+        "stars": 10,
+        "curves": 1,
+        "used": 60,
+        "ms": 85
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--knob-ring-lines__s7__home",
+      "preset": "Barred spiral",
+      "variant": "knob-ring-lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "ringOnlyLines": 1,
+        "ring": 0.85,
+        "ringR": 1.5,
+        "ringStyle": "ribbon",
+        "stroke": "faint",
+        "outline": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "5d96369cf4a7319a5ee2f6846ab693f030750840aa5576df38b570f2e8ea2b6c",
+      "captured": "2026-10-06T16:38:54.427Z",
+      "stats": {
+        "rstars": 15,
+        "dots": 9699,
+        "knots": 185,
+        "stars": 10,
+        "curves": 1,
+        "used": 66,
+        "ms": 52
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--knob-ring-lines__s7__orbit",
+      "preset": "Barred spiral",
+      "variant": "knob-ring-lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "ringOnlyLines": 1,
+        "ring": 0.85,
+        "ringR": 1.5,
+        "ringStyle": "ribbon",
+        "stroke": "faint",
+        "outline": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "41482e5784fb3f7053a93c2963558a8f171619a2f2b05c4f9cfaff547818049b",
+      "captured": "2026-10-06T16:39:02.259Z",
+      "stats": {
+        "rstars": 15,
+        "dots": 9669,
+        "knots": 192,
+        "stars": 10,
+        "curves": 1,
+        "used": 62,
+        "ms": 98
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "barred-spiral--ribbons__s4242__home",
       "preset": "Barred spiral",
       "variant": "ribbons",
@@ -1257,6 +1381,230 @@
         "curves": 2,
         "used": 56,
         "ms": 74
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--knob-sersic__s4242__home",
+      "preset": "Disc, no arms",
+      "variant": "knob-sersic",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "sersicN": 2,
+        "re": 0.8,
+        "bulge": 1,
+        "bulgeFlat": 0.6,
+        "incl": 60
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "6dcd7e3145748385afd4169d44b3d5ed9768b4cb3b1c89620a58ef1904f453de",
+      "captured": "2026-10-06T16:38:28.293Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 2,
+        "used": 4,
+        "ms": 15
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--knob-sersic__s4242__orbit",
+      "preset": "Disc, no arms",
+      "variant": "knob-sersic",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "sersicN": 2,
+        "re": 0.8,
+        "bulge": 1,
+        "bulgeFlat": 0.6,
+        "incl": 60
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "31c916e0be614367f23b7c2cfa069711c6242ff176478553d286e3cb06157c50",
+      "captured": "2026-10-06T16:38:34.601Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 2,
+        "used": 4,
+        "ms": 21
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--knob-sersic__s7__home",
+      "preset": "Disc, no arms",
+      "variant": "knob-sersic",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "sersicN": 2,
+        "re": 0.8,
+        "bulge": 1,
+        "bulgeFlat": 0.6,
+        "incl": 60
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "f2761d83582e48fa82e44fd52b1e337d1114a4bc7f60669077cbcb2afc280fc6",
+      "captured": "2026-10-06T16:38:34.637Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 2,
+        "used": 4,
+        "ms": 30
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--knob-sersic__s7__orbit",
+      "preset": "Disc, no arms",
+      "variant": "knob-sersic",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "sersicN": 2,
+        "re": 0.8,
+        "bulge": 1,
+        "bulgeFlat": 0.6,
+        "incl": 60
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "99cbc1df012786ec741d2d7b2d734e3c1aa47d7c4b6675e9f1af6893dd74e16b",
+      "captured": "2026-10-06T16:38:38.617Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 2,
+        "used": 4,
+        "ms": 32
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--knob-tail__s4242__home",
+      "preset": "Disc, no arms",
+      "variant": "knob-tail",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "tail": 0.8
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "cd9ba9f45f582f3bcafc71533d69cf2ffdd01ae78670a76da95b48df0d558f85",
+      "captured": "2026-10-06T16:38:33.566Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9469,
+        "knots": 0,
+        "stars": 3,
+        "curves": 3,
+        "used": 10,
+        "ms": 28
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--knob-tail__s4242__orbit",
+      "preset": "Disc, no arms",
+      "variant": "knob-tail",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "tail": 0.8
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "8b3cf9c2824024a9647cad5e9cca222937cca2d29658a96ee3884e2dc34ddfb3",
+      "captured": "2026-10-06T16:38:37.198Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9469,
+        "knots": 0,
+        "stars": 3,
+        "curves": 3,
+        "used": 10,
+        "ms": 33
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--knob-tail__s7__home",
+      "preset": "Disc, no arms",
+      "variant": "knob-tail",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "tail": 0.8
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "22435add0cad009ade30ca44014eaea119cc4114ae8642a204dd6ac203d81856",
+      "captured": "2026-10-06T16:38:34.558Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9442,
+        "knots": 0,
+        "stars": 1,
+        "curves": 3,
+        "used": 8,
+        "ms": 33
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--knob-tail__s7__orbit",
+      "preset": "Disc, no arms",
+      "variant": "knob-tail",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "tail": 0.8
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "c493d23d71bda5d64b0e8350377e00e07663c1f48fb876254081f4dd51b9dc19",
+      "captured": "2026-10-06T16:38:38.657Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9442,
+        "knots": 0,
+        "stars": 1,
+        "curves": 3,
+        "used": 8,
+        "ms": 15
       },
       "pageErrors": 0
     },
@@ -2803,6 +3151,446 @@
         "curves": 4,
         "used": 91,
         "ms": 368
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-dust__s4242__home",
+      "preset": "Grand design",
+      "variant": "knob-dust",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "dust": 0.7,
+        "thick": 0.12,
+        "incl": 75
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "9b5a6a239971c8d950023171c3bf03ea511ac9f6d77c9b5531a51083dd20d8a7",
+      "captured": "2026-10-06T16:39:12.815Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 5782,
+        "knots": 121,
+        "stars": 13,
+        "curves": 3,
+        "used": 53,
+        "ms": 574
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-dust__s4242__orbit",
+      "preset": "Grand design",
+      "variant": "knob-dust",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "dust": 0.7,
+        "thick": 0.12,
+        "incl": 75
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "f9cea1640f789281122581747c051b8e6f5567038f13d59e8cdffa6eb7de7501",
+      "captured": "2026-10-06T16:39:20.262Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 4444,
+        "knots": 101,
+        "stars": 9,
+        "curves": 4,
+        "used": 52,
+        "ms": 138
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-dust__s7__home",
+      "preset": "Grand design",
+      "variant": "knob-dust",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "dust": 0.7,
+        "thick": 0.12,
+        "incl": 75
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "8fe8ba63ebf96ed33f8fff0f5c81bb73579b60f5d8a856b48d063ca4ebb6618c",
+      "captured": "2026-10-06T16:39:13.207Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 5949,
+        "knots": 144,
+        "stars": 14,
+        "curves": 4,
+        "used": 59,
+        "ms": 508
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-dust__s7__orbit",
+      "preset": "Grand design",
+      "variant": "knob-dust",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "dust": 0.7,
+        "thick": 0.12,
+        "incl": 75
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "7b6cefc354381ff0faf1092c5ddea22a933927da045663d5fad0f67ff6c3f6fe",
+      "captured": "2026-10-06T16:39:20.416Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 4573,
+        "knots": 125,
+        "stars": 9,
+        "curves": 5,
+        "used": 58,
+        "ms": 194
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-irr__s4242__home",
+      "preset": "Grand design",
+      "variant": "knob-irr",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "irr": 1,
+        "arms": 0,
+        "bulge": 0.1
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "1603edc3b8ea8c182f19eab263f7fa17f5e0d864a8333f8cdb587d06332fb1b7",
+      "captured": "2026-10-06T16:37:57.438Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 7202,
+        "knots": 70,
+        "stars": 8,
+        "curves": 0,
+        "used": 25,
+        "ms": 1220
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-irr__s4242__orbit",
+      "preset": "Grand design",
+      "variant": "knob-irr",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "irr": 1,
+        "arms": 0,
+        "bulge": 0.1
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "0d3c22ca42c5624ed148b8c002aa59358279201d5d5d1f185ebd68be99378395",
+      "captured": "2026-10-06T16:38:02.283Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 7202,
+        "knots": 70,
+        "stars": 8,
+        "curves": 0,
+        "used": 25,
+        "ms": 43
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-irr__s7__home",
+      "preset": "Grand design",
+      "variant": "knob-irr",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "irr": 1,
+        "arms": 0,
+        "bulge": 0.1
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "b678f0014c834f78be9b03e923918a109bf9ad478efa76e97280307a5460ecad",
+      "captured": "2026-10-06T16:37:57.951Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 7293,
+        "knots": 116,
+        "stars": 8,
+        "curves": 0,
+        "used": 27,
+        "ms": 37
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-irr__s7__orbit",
+      "preset": "Grand design",
+      "variant": "knob-irr",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "irr": 1,
+        "arms": 0,
+        "bulge": 0.1
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "a057999728d4be4377aee5aa711a9493868613ae02cfb4faec1e8e62781b7266",
+      "captured": "2026-10-06T16:38:03.737Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 7293,
+        "knots": 116,
+        "stars": 8,
+        "curves": 0,
+        "used": 27,
+        "ms": 85
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-patchy__s4242__home",
+      "preset": "Grand design",
+      "variant": "knob-patchy",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "patchy": 0.9
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "5516ee7824b2f9111ab191fa1cc3c225c1d1b81fc561aebe1b1247251e9f4976",
+      "captured": "2026-10-06T16:37:58.070Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9757,
+        "knots": 260,
+        "stars": 19,
+        "curves": 2,
+        "used": 57,
+        "ms": 1473
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-patchy__s4242__orbit",
+      "preset": "Grand design",
+      "variant": "knob-patchy",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "patchy": 0.9
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "3fbde4f43b3a68a1417e6becfbd57451fe299f31e76e8e7bc8511ada5ee49619",
+      "captured": "2026-10-06T16:38:03.773Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9679,
+        "knots": 287,
+        "stars": 21,
+        "curves": 2,
+        "used": 56,
+        "ms": 202
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-patchy__s7__home",
+      "preset": "Grand design",
+      "variant": "knob-patchy",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "patchy": 0.9
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "9181cae05978fa487ee153e2c5770c5657408a0712c67a7e364d35fd0d0245a4",
+      "captured": "2026-10-06T16:37:57.369Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9947,
+        "knots": 361,
+        "stars": 18,
+        "curves": 3,
+        "used": 52,
+        "ms": 224
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-patchy__s7__orbit",
+      "preset": "Grand design",
+      "variant": "knob-patchy",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "patchy": 0.9
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "c42b0ce0d53394bc86c2bbcd35a0df54c381a544fa64802101eba6bf764bcd82",
+      "captured": "2026-10-06T16:38:03.700Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9930,
+        "knots": 363,
+        "stars": 17,
+        "curves": 3,
+        "used": 52,
+        "ms": 283
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-whole__s4242__home",
+      "preset": "Grand design",
+      "variant": "knob-whole",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "nuclear": 1,
+        "whole": 1,
+        "envelope": 1
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "3a311d6f8407248a802664b8716576c961f095190b817ae05347c630c452a395",
+      "captured": "2026-10-06T16:39:48.801Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9272,
+        "knots": 148,
+        "stars": 30,
+        "curves": 3,
+        "used": 59,
+        "ms": 43
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-whole__s4242__orbit",
+      "preset": "Grand design",
+      "variant": "knob-whole",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "nuclear": 1,
+        "whole": 1,
+        "envelope": 1
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "cd23291c0e83d252cf176bead212b521364ba37d5e92d3b3817a7bf13ea0d98d",
+      "captured": "2026-10-06T16:39:53.871Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9189,
+        "knots": 161,
+        "stars": 28,
+        "curves": 3,
+        "used": 59,
+        "ms": 70
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-whole__s7__home",
+      "preset": "Grand design",
+      "variant": "knob-whole",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "nuclear": 1,
+        "whole": 1,
+        "envelope": 1
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "435facd68e616e8b90f6c6640f07d7452dc99aaff4ce374065d1f91edca66111",
+      "captured": "2026-10-06T16:39:50.172Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9492,
+        "knots": 175,
+        "stars": 22,
+        "curves": 4,
+        "used": 54,
+        "ms": 108
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-whole__s7__orbit",
+      "preset": "Grand design",
+      "variant": "knob-whole",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "nuclear": 1,
+        "whole": 1,
+        "envelope": 1
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "fb6d86663418dbd2da0ab4b4a273ae81f3fc947771c7305477fc47e187084988",
+      "captured": "2026-10-06T16:39:55.052Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9477,
+        "knots": 161,
+        "stars": 22,
+        "curves": 4,
+        "used": 54,
+        "ms": 87
       },
       "pageErrors": 0
     },
@@ -6965,6 +7753,118 @@
       "pageErrors": 0
     },
     {
+      "name": "smooth-round--knob-halo__s4242__home",
+      "preset": "Smooth, round",
+      "variant": "knob-halo",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "halo": 0.9,
+        "envelope": 1,
+        "outline": 0.6
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "c3db4901559c018436c7123f1b1d2fd4e00e4f4c3ad39dff99d51cfca529fda5",
+      "captured": "2026-10-06T16:39:50.285Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 20
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round--knob-halo__s4242__orbit",
+      "preset": "Smooth, round",
+      "variant": "knob-halo",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "halo": 0.9,
+        "envelope": 1,
+        "outline": 0.6
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "a4c09396f3708a8d944a5e39fdac932bc4c52770f0644662ba41f6b31ba08df7",
+      "captured": "2026-10-06T16:39:56.547Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 11
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round--knob-halo__s7__home",
+      "preset": "Smooth, round",
+      "variant": "knob-halo",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "halo": 0.9,
+        "envelope": 1,
+        "outline": 0.6
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "51c81c1123843f7bdfda2f2772911ef430694cfe6908c56cc44f15e1a6934ed3",
+      "captured": "2026-10-06T16:39:30.927Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 32
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round--knob-halo__s7__orbit",
+      "preset": "Smooth, round",
+      "variant": "knob-halo",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "halo": 0.9,
+        "envelope": 1,
+        "outline": 0.6
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "8fd3edeab51bdcdbfe8e08df3545aa35f41f793b83eefb59cf8abc04181872dc",
+      "captured": "2026-10-06T16:39:35.668Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 16
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "smooth-round--single__s4242__home",
       "preset": "Smooth, round",
       "variant": "single",
@@ -8436,7 +9336,7 @@
     },
     "runs": {
       "home": {
-        "generated": "2026-10-06T16:07:12.066Z",
+        "generated": "2026-10-06T16:39:57.198Z",
         "browser": {
           "name": "chromium",
           "version": "141.0.7390.37",
@@ -8448,7 +9348,7 @@
         }
       },
       "orbit": {
-        "generated": "2026-10-06T16:07:12.066Z",
+        "generated": "2026-10-06T16:39:57.198Z",
         "browser": {
           "name": "chromium",
           "version": "141.0.7390.37",
