@@ -280,6 +280,26 @@
           "paEps0": 0.032
         }
       }
+    },
+    "lines": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.96,
+      "median": 0.1,
+      "p90": 0.138,
+      "r25": 0.128,
+      "r50": 0.064,
+      "r90": 0.132,
+      "outer": 0.02,
+      "q": 0.041,
+      "qInner": 0.053,
+      "paA": 1.651,
+      "paEps0": 0.052,
+      "heldOut": 56,
+      "byPreset": {}
     }
   }
 }

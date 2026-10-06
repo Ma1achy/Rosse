@@ -70,8 +70,12 @@
     "Shell galaxy s4242 incl 88",
     "Shell galaxy (zoom 2) s4242 incl 88",
     "Shell galaxy s4242 incl 108",
+    "Barred spiral (lines) s101 incl 30",
+    "Barred spiral (lines) s101 incl 50",
     "Barred spiral (lines) s11 incl 30",
     "Barred spiral (lines) s11 incl 50",
+    "Barred spiral (lines) s23 incl 30",
+    "Barred spiral (lines) s23 incl 50",
     "Barred spiral (lines) s3 incl 30",
     "Barred spiral (lines) s3 incl 50",
     "Barred spiral (lines) s4242 incl 30",
@@ -100,8 +104,12 @@
     "Disc, no arms (stipple) s7 incl 45",
     "Disc, no arms (stipple) s7 incl 65",
     "Disc, no arms (stipple) s7 incl 45",
+    "Dusty spiral (lines) s101 incl 35",
+    "Dusty spiral (lines) s101 incl 55",
     "Dusty spiral (lines) s11 incl 35",
     "Dusty spiral (lines) s11 incl 55",
+    "Dusty spiral (lines) s23 incl 35",
+    "Dusty spiral (lines) s23 incl 55",
     "Dusty spiral (lines) s3 incl 35",
     "Dusty spiral (lines) s3 incl 55",
     "Dusty spiral (lines) s4242 incl 35",
@@ -114,8 +122,12 @@
     "Dusty spiral (ribbons) s7 incl 35",
     "Dusty spiral (ribbons) s7 incl 55",
     "Dusty spiral (ribbons) s7 incl 35",
+    "Flocculent (lines) s101 incl 30",
+    "Flocculent (lines) s101 incl 50",
     "Flocculent (lines) s11 incl 30",
     "Flocculent (lines) s11 incl 50",
+    "Flocculent (lines) s23 incl 30",
+    "Flocculent (lines) s23 incl 50",
     "Flocculent (lines) s3 incl 30",
     "Flocculent (lines) s3 incl 50",
     "Flocculent (lines) s4242 incl 30",
@@ -128,8 +140,12 @@
     "Flocculent (ribbons) s7 incl 30",
     "Flocculent (ribbons) s7 incl 50",
     "Flocculent (ribbons) s7 incl 30",
+    "Grand design (lines) s101 incl 30",
+    "Grand design (lines) s101 incl 50",
     "Grand design (lines) s11 incl 30",
     "Grand design (lines) s11 incl 50",
+    "Grand design (lines) s23 incl 30",
+    "Grand design (lines) s23 incl 50",
     "Grand design (lines) s3 incl 30",
     "Grand design (lines) s3 incl 50",
     "Grand design (lines) s4242 incl 30",
@@ -146,8 +162,12 @@
     "Grand design (stipple-arms) s4242 incl 50",
     "Grand design (stipple-arms) s7 incl 30",
     "Grand design (stipple-arms) s7 incl 50",
+    "Hand wobble (lines) s101 incl 30",
+    "Hand wobble (lines) s101 incl 50",
     "Hand wobble (lines) s11 incl 30",
     "Hand wobble (lines) s11 incl 50",
+    "Hand wobble (lines) s23 incl 30",
+    "Hand wobble (lines) s23 incl 50",
     "Hand wobble (lines) s3 incl 30",
     "Hand wobble (lines) s3 incl 50",
     "Hand wobble (lines) s4242 incl 30",
@@ -160,8 +180,12 @@
     "Hand wobble (ribbons) s7 incl 30",
     "Hand wobble (ribbons) s7 incl 50",
     "Hand wobble (ribbons) s7 incl 30",
+    "Loose, open arms (lines) s101 incl 30",
+    "Loose, open arms (lines) s101 incl 50",
     "Loose, open arms (lines) s11 incl 30",
     "Loose, open arms (lines) s11 incl 50",
+    "Loose, open arms (lines) s23 incl 30",
+    "Loose, open arms (lines) s23 incl 50",
     "Loose, open arms (lines) s3 incl 30",
     "Loose, open arms (lines) s3 incl 50",
     "Loose, open arms (lines) s4242 incl 30",
@@ -188,8 +212,12 @@
     "Smooth, round (stipple) s7 incl 10",
     "Smooth, round (stipple) s7 incl 30",
     "Smooth, round (stipple) s7 incl 10",
+    "Tightly wound (lines) s101 incl 30",
+    "Tightly wound (lines) s101 incl 50",
     "Tightly wound (lines) s11 incl 30",
     "Tightly wound (lines) s11 incl 50",
+    "Tightly wound (lines) s23 incl 30",
+    "Tightly wound (lines) s23 incl 50",
     "Tightly wound (lines) s3 incl 30",
     "Tightly wound (lines) s3 incl 50",
     "Tightly wound (lines) s4242 incl 30",
@@ -408,22 +436,34 @@
             {
               "config": "Grand design s7 incl 30",
               "failed": true,
-              "by": ["coarse ssim 0.7447", "position angle 86.52°"]
+              "by": [
+                "coarse ssim 0.7447",
+                "position angle 86.52°"
+              ]
             },
             {
               "config": "Barred spiral s7 incl 50",
               "failed": true,
-              "by": ["coarse ssim 0.5783", "position angle 88.65°"]
+              "by": [
+                "coarse ssim 0.5783",
+                "position angle 88.65°"
+              ]
             },
             {
               "config": "Ringed s7 incl 30",
               "failed": true,
-              "by": ["coarse ssim 0.8497", "position angle -79.95°"]
+              "by": [
+                "coarse ssim 0.8497",
+                "position angle -79.95°"
+              ]
             },
             {
               "config": "Disc, no arms s7 incl 65",
               "failed": true,
-              "by": ["coarse ssim 0.4714", "position angle -89.54°"]
+              "by": [
+                "coarse ssim 0.4714",
+                "position angle -89.54°"
+              ]
             }
           ]
         },
@@ -695,12 +735,19 @@
             {
               "config": "Barred spiral s7 incl 50",
               "failed": true,
-              "by": ["r90 -7.97%", "outer ink -3.48%"]
+              "by": [
+                "r90 -7.97%",
+                "outer ink -3.48%"
+              ]
             },
             {
               "config": "Ringed s7 incl 30",
               "failed": true,
-              "by": ["r25 -3.18%", "r90 -10.28%", "outer ink -3.78%"]
+              "by": [
+                "r25 -3.18%",
+                "r90 -10.28%",
+                "outer ink -3.78%"
+              ]
             },
             {
               "config": "Disc, no arms s7 incl 65",
@@ -860,7 +907,10 @@
             {
               "config": "Disc, no arms s7 incl 65",
               "failed": true,
-              "by": ["axis ratio 0.0430", "inner axis ratio 0.0502"]
+              "by": [
+                "axis ratio 0.0430",
+                "inner axis ratio 0.0502"
+              ]
             }
           ]
         },
@@ -1118,22 +1168,34 @@
             {
               "config": "Barred spiral s7 incl 50",
               "failed": true,
-              "by": ["coarse ssim 0.7305", "position angle 28.63°"]
+              "by": [
+                "coarse ssim 0.7305",
+                "position angle 28.63°"
+              ]
             },
             {
               "config": "Disc, no arms s7 incl 65",
               "failed": true,
-              "by": ["coarse ssim 0.6726", "position angle 30.48°"]
+              "by": [
+                "coarse ssim 0.6726",
+                "position angle 30.48°"
+              ]
             },
             {
               "config": "Dusty spiral (ribbons) s4242 incl 35",
               "failed": true,
-              "by": ["coarse ssim 0.8121", "position angle 31.05°"]
+              "by": [
+                "coarse ssim 0.8121",
+                "position angle 31.05°"
+              ]
             },
             {
               "config": "Grand design (ribbons) s7 incl 50",
               "failed": true,
-              "by": ["coarse ssim 0.6979", "position angle 28.78°"]
+              "by": [
+                "coarse ssim 0.6979",
+                "position angle 28.78°"
+              ]
             }
           ]
         },
@@ -1241,22 +1303,34 @@
             {
               "config": "Barred spiral s7 incl 50",
               "failed": true,
-              "by": ["coarse ssim 0.7427", "position angle -31.28°"]
+              "by": [
+                "coarse ssim 0.7427",
+                "position angle -31.28°"
+              ]
             },
             {
               "config": "Disc, no arms s7 incl 65",
               "failed": true,
-              "by": ["coarse ssim 0.6969", "position angle -29.51°"]
+              "by": [
+                "coarse ssim 0.6969",
+                "position angle -29.51°"
+              ]
             },
             {
               "config": "Dusty spiral (ribbons) s4242 incl 35",
               "failed": true,
-              "by": ["coarse ssim 0.8150", "position angle -28.96°"]
+              "by": [
+                "coarse ssim 0.8150",
+                "position angle -28.96°"
+              ]
             },
             {
               "config": "Grand design (ribbons) s7 incl 50",
               "failed": true,
-              "by": ["coarse ssim 0.7118", "position angle -31.32°"]
+              "by": [
+                "coarse ssim 0.7118",
+                "position angle -31.32°"
+              ]
             }
           ]
         },
@@ -2041,22 +2115,34 @@
             {
               "config": "Cigar-shaped s7 incl 88",
               "failed": true,
-              "by": ["coarse ssim 0.7773", "position angle 29.22°"]
+              "by": [
+                "coarse ssim 0.7773",
+                "position angle 29.22°"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["coarse ssim 0.7780", "position angle 30.15°"]
+              "by": [
+                "coarse ssim 0.7780",
+                "position angle 30.15°"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 108",
               "failed": true,
-              "by": ["coarse ssim 0.8545", "position angle 30.06°"]
+              "by": [
+                "coarse ssim 0.8545",
+                "position angle 30.06°"
+              ]
             },
             {
               "config": "Cigar-shaped s7 incl 108",
               "failed": true,
-              "by": ["coarse ssim 0.8348", "position angle 28.50°"]
+              "by": [
+                "coarse ssim 0.8348",
+                "position angle 28.50°"
+              ]
             }
           ]
         },
@@ -2164,22 +2250,35 @@
             {
               "config": "Cigar-shaped s7 incl 88",
               "failed": true,
-              "by": ["coarse ssim 0.7694", "position angle -30.79°"]
+              "by": [
+                "coarse ssim 0.7694",
+                "position angle -30.79°"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["coarse ssim 0.7931", "position angle -29.85°"]
+              "by": [
+                "coarse ssim 0.7931",
+                "position angle -29.85°"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 108",
               "failed": true,
-              "by": ["coarse ssim 0.8496", "position angle -29.97°"]
+              "by": [
+                "coarse ssim 0.8496",
+                "position angle -29.97°"
+              ]
             },
             {
               "config": "Cigar-shaped s7 incl 108",
               "failed": true,
-              "by": ["coarse ssim 0.8290", "outer ink -1.70%", "position angle -31.46°"]
+              "by": [
+                "coarse ssim 0.8290",
+                "outer ink -1.70%",
+                "position angle -31.46°"
+              ]
             }
           ]
         },
@@ -2293,17 +2392,26 @@
             {
               "config": "Cigar-shaped s7 incl 88",
               "failed": true,
-              "by": ["coarse ssim 0.6091", "position angle 89.19°"]
+              "by": [
+                "coarse ssim 0.6091",
+                "position angle 89.19°"
+              ]
             },
             {
               "config": "Radio jet s7 incl 108",
               "failed": true,
-              "by": ["coarse ssim 0.9090", "position angle -80.23°"]
+              "by": [
+                "coarse ssim 0.9090",
+                "position angle -80.23°"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["coarse ssim 0.6356", "position angle -89.88°"]
+              "by": [
+                "coarse ssim 0.6356",
+                "position angle -89.88°"
+              ]
             },
             {
               "config": "Smooth, round (stipple) s3 incl 10",
@@ -2416,22 +2524,36 @@
             {
               "config": "Cigar-shaped s7 incl 88",
               "failed": true,
-              "by": ["ink 7.35%", "axis ratio 0.0977", "inner axis ratio 0.0955"]
+              "by": [
+                "ink 7.35%",
+                "axis ratio 0.0977",
+                "inner axis ratio 0.0955"
+              ]
             },
             {
               "config": "Radio jet s7 incl 108",
               "failed": true,
-              "by": ["axis ratio 0.0696", "inner axis ratio 0.0398", "position angle 19.59°"]
+              "by": [
+                "axis ratio 0.0696",
+                "inner axis ratio 0.0398",
+                "position angle 19.59°"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["ink 7.14%", "axis ratio 0.0825", "inner axis ratio 0.0761"]
+              "by": [
+                "ink 7.14%",
+                "axis ratio 0.0825",
+                "inner axis ratio 0.0761"
+              ]
             },
             {
               "config": "Radio jet s4242 incl 88",
               "failed": true,
-              "by": ["axis ratio 0.0639"]
+              "by": [
+                "axis ratio 0.0639"
+              ]
             }
           ]
         },
@@ -2539,22 +2661,37 @@
             {
               "config": "Cigar-shaped s7 incl 88",
               "failed": true,
-              "by": ["ink 10.33%", "axis ratio 0.1342", "inner axis ratio 0.1295"]
+              "by": [
+                "ink 10.33%",
+                "axis ratio 0.1342",
+                "inner axis ratio 0.1295"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["ink 9.94%", "axis ratio 0.1267", "inner axis ratio 0.1086"]
+              "by": [
+                "ink 9.94%",
+                "axis ratio 0.1267",
+                "inner axis ratio 0.1086"
+              ]
             },
             {
               "config": "Shell galaxy s4242 incl 108",
               "failed": true,
-              "by": ["axis ratio 0.0977", "inner axis ratio 0.0523"]
+              "by": [
+                "axis ratio 0.0977",
+                "inner axis ratio 0.0523"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 108",
               "failed": true,
-              "by": ["ink 5.89%", "axis ratio 0.0927", "inner axis ratio 0.0725"]
+              "by": [
+                "ink 5.89%",
+                "axis ratio 0.0927",
+                "inner axis ratio 0.0725"
+              ]
             }
           ]
         },
@@ -2662,22 +2799,43 @@
             {
               "config": "Cigar-shaped s7 incl 88",
               "failed": true,
-              "by": ["ink 20.56%", "r25 12.10%", "r50 9.91%", "inner axis ratio 0.0485"]
+              "by": [
+                "ink 20.56%",
+                "r25 12.10%",
+                "r50 9.91%",
+                "inner axis ratio 0.0485"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["ink 19.95%", "r25 11.15%", "r50 12.93%"]
+              "by": [
+                "ink 19.95%",
+                "r25 11.15%",
+                "r50 12.93%"
+              ]
             },
             {
               "config": "Smooth, round (stipple) s3 incl 10",
               "failed": true,
-              "by": ["ink 15.80%", "r25 10.41%", "r50 13.96%", "r90 9.51%", "outer ink 2.17%"]
+              "by": [
+                "ink 15.80%",
+                "r25 10.41%",
+                "r50 13.96%",
+                "r90 9.51%",
+                "outer ink 2.17%"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 108",
               "failed": true,
-              "by": ["ink 18.70%", "r25 10.62%", "r50 14.85%", "r90 10.26%", "outer ink 2.42%"]
+              "by": [
+                "ink 18.70%",
+                "r25 10.62%",
+                "r50 14.85%",
+                "r90 10.26%",
+                "outer ink 2.42%"
+              ]
             }
           ]
         },
@@ -2816,7 +2974,9 @@
             {
               "config": "Smooth, round (stipple) s3 incl 10",
               "failed": true,
-              "by": ["ink -5.13%"]
+              "by": [
+                "ink -5.13%"
+              ]
             }
           ]
         },
@@ -2943,7 +3103,9 @@
             {
               "config": "Radio jet s7 incl 108",
               "failed": true,
-              "by": ["outer ink -2.25%"]
+              "by": [
+                "outer ink -2.25%"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88",
@@ -3216,22 +3378,38 @@
             {
               "config": "Cigar-shaped s7 incl 88",
               "failed": true,
-              "by": ["ink 7.50%", "axis ratio 0.0948", "inner axis ratio 0.0993"]
+              "by": [
+                "ink 7.50%",
+                "axis ratio 0.0948",
+                "inner axis ratio 0.0993"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["ink 6.82%", "axis ratio 0.0923", "inner axis ratio 0.0804"]
+              "by": [
+                "ink 6.82%",
+                "axis ratio 0.0923",
+                "inner axis ratio 0.0804"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 108",
               "failed": true,
-              "by": ["ink 10.84%", "axis ratio 0.1876", "inner axis ratio 0.1256"]
+              "by": [
+                "ink 10.84%",
+                "axis ratio 0.1876",
+                "inner axis ratio 0.1256"
+              ]
             },
             {
               "config": "Cigar-shaped s7 incl 108",
               "failed": true,
-              "by": ["ink 9.96%", "axis ratio 0.1676", "inner axis ratio 0.1242"]
+              "by": [
+                "ink 9.96%",
+                "axis ratio 0.1676",
+                "inner axis ratio 0.1242"
+              ]
             }
           ]
         },
@@ -3345,7 +3523,10 @@
             {
               "config": "Radio jet s7 incl 108",
               "failed": true,
-              "by": ["axis ratio -0.0789", "inner axis ratio -0.0507"]
+              "by": [
+                "axis ratio -0.0789",
+                "inner axis ratio -0.0507"
+              ]
             },
             {
               "config": "Smooth, round (stipple) s3 incl 10",
@@ -3355,12 +3536,19 @@
             {
               "config": "Radio jet s4242 incl 88",
               "failed": true,
-              "by": ["axis ratio -0.0777", "inner axis ratio -0.0525"]
+              "by": [
+                "axis ratio -0.0777",
+                "inner axis ratio -0.0525"
+              ]
             },
             {
               "config": "Shell galaxy s4242 incl 108",
               "failed": true,
-              "by": ["r50 -4.41%", "axis ratio -0.0829", "inner axis ratio -0.0552"]
+              "by": [
+                "r50 -4.41%",
+                "axis ratio -0.0829",
+                "inner axis ratio -0.0552"
+              ]
             }
           ]
         }
@@ -3583,22 +3771,33 @@
             {
               "config": "Flocculent (zoom 2) s4242 incl 30 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.6202"]
+              "by": [
+                "coarse ssim 0.6202"
+              ]
             },
             {
               "config": "Edge-on with dust (zoom 2) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.6087", "position angle -89.59°"]
+              "by": [
+                "coarse ssim 0.6087",
+                "position angle -89.59°"
+              ]
             },
             {
               "config": "Flocculent (ribbons) s4242 incl 30 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.5872", "position angle -85.25°"]
+              "by": [
+                "coarse ssim 0.5872",
+                "position angle -85.25°"
+              ]
             },
             {
               "config": "Hand wobble (ribbons) s4242 incl 30 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.4464", "position angle -89.10°"]
+              "by": [
+                "coarse ssim 0.4464",
+                "position angle -89.10°"
+              ]
             }
           ]
         },
@@ -3723,12 +3922,18 @@
             {
               "config": "Edge-on with dust (zoom 2) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["ink -7.70%", "axis ratio -0.0474", "inner axis ratio -0.0328"]
+              "by": [
+                "ink -7.70%",
+                "axis ratio -0.0474",
+                "inner axis ratio -0.0328"
+              ]
             },
             {
               "config": "Flocculent (ribbons) s4242 incl 30 zoom 2",
               "failed": true,
-              "by": ["r25 4.96%"]
+              "by": [
+                "r25 4.96%"
+              ]
             },
             {
               "config": "Hand wobble (ribbons) s4242 incl 30 zoom 2",
@@ -3853,12 +4058,16 @@
             {
               "config": "Flocculent (zoom 2) s4242 incl 30 zoom 2",
               "failed": true,
-              "by": ["ink 6.45%"]
+              "by": [
+                "ink 6.45%"
+              ]
             },
             {
               "config": "Edge-on with dust (zoom 2) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["r50 -5.29%"]
+              "by": [
+                "r50 -5.29%"
+              ]
             },
             {
               "config": "Flocculent (ribbons) s4242 incl 30 zoom 2",
@@ -3996,7 +4205,11 @@
             {
               "config": "Edge-on with dust (zoom 2) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["ink 36.19%", "r25 11.33%", "inner axis ratio 0.1058"]
+              "by": [
+                "ink 36.19%",
+                "r25 11.33%",
+                "inner axis ratio 0.1058"
+              ]
             },
             {
               "config": "Flocculent (ribbons) s4242 incl 30 zoom 2",
@@ -4278,7 +4491,12 @@
             {
               "config": "Loose, open arms (ribbons) s7 incl 30 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.6038", "r90 3.43%", "outer ink 2.14%", "position angle 28.88°"]
+              "by": [
+                "coarse ssim 0.6038",
+                "r90 3.43%",
+                "outer ink 2.14%",
+                "position angle 28.88°"
+              ]
             }
           ]
         },
@@ -4386,12 +4604,19 @@
             {
               "config": "Edge-on with dust (zoom 2) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.6717", "r50 -4.84%", "position angle -29.59°"]
+              "by": [
+                "coarse ssim 0.6717",
+                "r50 -4.84%",
+                "position angle -29.59°"
+              ]
             },
             {
               "config": "Loose, open arms (ribbons) s7 incl 30 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.6159", "position angle -31.16°"]
+              "by": [
+                "coarse ssim 0.6159",
+                "position angle -31.16°"
+              ]
             }
           ]
         },
@@ -4504,7 +4729,10 @@
             {
               "config": "Edge-on with dust (zoom 2) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["r50 -4.37%", "inner axis ratio 0.0356"]
+              "by": [
+                "r50 -4.37%",
+                "inner axis ratio 0.0356"
+              ]
             },
             {
               "config": "Ringed (zoom 2) s7 incl 30 zoom 2",
@@ -4761,7 +4989,9 @@
             {
               "config": "Edge-on with dust (zoom 2) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["inner axis ratio 0.0372"]
+              "by": [
+                "inner axis ratio 0.0372"
+              ]
             },
             {
               "config": "Ringed (zoom 2) s7 incl 30 zoom 2",
@@ -5015,7 +5245,9 @@
         "pa +90°": {
           "applicable": 5,
           "detected": 4,
-          "missed": ["Smooth, round (zoom 2) s7 incl 10 zoom 2"],
+          "missed": [
+            "Smooth, round (zoom 2) s7 incl 10 zoom 2"
+          ],
           "ssim": {
             "n": 5,
             "min": 0.3913,
@@ -5116,29 +5348,42 @@
             {
               "config": "Shell galaxy (zoom 2) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.8842", "position angle 88.23°"]
+              "by": [
+                "coarse ssim 0.8842",
+                "position angle 88.23°"
+              ]
             },
             {
               "config": "Cigar-shaped (zoom 2) s7 incl 88 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.5471", "position angle 89.04°"]
+              "by": [
+                "coarse ssim 0.5471",
+                "position angle 89.04°"
+              ]
             },
             {
               "config": "Radio jet (zoom 2) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["position angle -86.78°"]
+              "by": [
+                "position angle -86.78°"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.5673", "position angle -89.44°"]
+              "by": [
+                "coarse ssim 0.5673",
+                "position angle -89.44°"
+              ]
             }
           ]
         },
         "bulgeFlat +0.1": {
           "applicable": 4,
           "detected": 3,
-          "missed": ["Radio jet (zoom 2) s4242 incl 88 zoom 2"],
+          "missed": [
+            "Radio jet (zoom 2) s4242 incl 88 zoom 2"
+          ],
           "ssim": {
             "n": 4,
             "min": 0.4116,
@@ -5239,12 +5484,19 @@
             {
               "config": "Shell galaxy (zoom 2) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["axis ratio 0.0721", "inner axis ratio 0.0394"]
+              "by": [
+                "axis ratio 0.0721",
+                "inner axis ratio 0.0394"
+              ]
             },
             {
               "config": "Cigar-shaped (zoom 2) s7 incl 88 zoom 2",
               "failed": true,
-              "by": ["ink 7.55%", "axis ratio 0.1073", "inner axis ratio 0.0751"]
+              "by": [
+                "ink 7.55%",
+                "axis ratio 0.1073",
+                "inner axis ratio 0.0751"
+              ]
             },
             {
               "config": "Radio jet (zoom 2) s4242 incl 88 zoom 2",
@@ -5254,7 +5506,11 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["ink 6.66%", "axis ratio 0.1042", "inner axis ratio 0.0756"]
+              "by": [
+                "ink 6.66%",
+                "axis ratio 0.1042",
+                "inner axis ratio 0.0756"
+              ]
             }
           ]
         },
@@ -5362,24 +5618,38 @@
             {
               "config": "Shell galaxy (zoom 2) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["axis ratio 0.0882", "inner axis ratio 0.0494", "position angle -12.77°"]
+              "by": [
+                "axis ratio 0.0882",
+                "inner axis ratio 0.0494",
+                "position angle -12.77°"
+              ]
             },
             {
               "config": "Cigar-shaped (zoom 2) s7 incl 88 zoom 2",
               "failed": true,
-              "by": ["ink 10.01%", "axis ratio 0.1480", "inner axis ratio 0.1093"]
+              "by": [
+                "ink 10.01%",
+                "axis ratio 0.1480",
+                "inner axis ratio 0.1093"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["ink 9.15%", "axis ratio 0.1423", "inner axis ratio 0.1106"]
+              "by": [
+                "ink 9.15%",
+                "axis ratio 0.1423",
+                "inner axis ratio 0.1106"
+              ]
             }
           ]
         },
         "bulgeFlat −0.15": {
           "applicable": 3,
           "detected": 2,
-          "missed": ["Smooth, round (zoom 2) s7 incl 10 zoom 2"],
+          "missed": [
+            "Smooth, round (zoom 2) s7 incl 10 zoom 2"
+          ],
           "ssim": {
             "n": 3,
             "min": 0.4125,
@@ -5480,12 +5750,18 @@
             {
               "config": "Shell galaxy (zoom 2) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["axis ratio -0.0778", "inner axis ratio -0.0593"]
+              "by": [
+                "axis ratio -0.0778",
+                "inner axis ratio -0.0593"
+              ]
             },
             {
               "config": "Radio jet (zoom 2) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["axis ratio -0.0936", "inner axis ratio -0.0718"]
+              "by": [
+                "axis ratio -0.0936",
+                "inner axis ratio -0.0718"
+              ]
             },
             {
               "config": "Smooth, round (zoom 2) s7 incl 10 zoom 2",
@@ -6009,12 +6285,20 @@
             {
               "config": "Cigar-shaped (zoom 2) s7 incl 88 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.7470", "position angle 29.05°"]
+              "by": [
+                "coarse ssim 0.7470",
+                "position angle 29.05°"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.7475", "r90 5.75%", "outer ink 1.39%", "position angle 30.52°"]
+              "by": [
+                "coarse ssim 0.7475",
+                "r90 5.75%",
+                "outer ink 1.39%",
+                "position angle 30.52°"
+              ]
             }
           ]
         },
@@ -6122,12 +6406,18 @@
             {
               "config": "Cigar-shaped (zoom 2) s7 incl 88 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.7429", "position angle -30.95°"]
+              "by": [
+                "coarse ssim 0.7429",
+                "position angle -30.95°"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.7480", "position angle -29.46°"]
+              "by": [
+                "coarse ssim 0.7480",
+                "position angle -29.46°"
+              ]
             }
           ]
         },
@@ -6235,17 +6525,33 @@
             {
               "config": "Cigar-shaped (zoom 2) s7 incl 88 zoom 2",
               "failed": true,
-              "by": ["ink 16.64%", "r25 10.81%", "r50 13.13%"]
+              "by": [
+                "ink 16.64%",
+                "r25 10.81%",
+                "r50 13.13%"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["ink 15.38%", "r25 10.32%", "r50 10.90%", "r90 8.11%", "outer ink 2.43%"]
+              "by": [
+                "ink 15.38%",
+                "r25 10.32%",
+                "r50 10.90%",
+                "r90 8.11%",
+                "outer ink 2.43%"
+              ]
             },
             {
               "config": "Smooth, round (zoom 2) s7 incl 10 zoom 2",
               "failed": true,
-              "by": ["ink 9.88%", "r25 10.83%", "r50 11.85%", "r90 5.49%", "outer ink 1.75%"]
+              "by": [
+                "ink 9.88%",
+                "r25 10.83%",
+                "r50 11.85%",
+                "r90 5.49%",
+                "outer ink 1.75%"
+              ]
             }
           ]
         },
@@ -6353,16 +6659,224 @@
             {
               "config": "Cigar-shaped (zoom 2) s7 incl 88 zoom 2",
               "failed": true,
-              "by": ["ink 7.57%", "axis ratio 0.1064", "inner axis ratio 0.0703"]
+              "by": [
+                "ink 7.57%",
+                "axis ratio 0.1064",
+                "inner axis ratio 0.0703"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["ink 6.26%", "axis ratio 0.1045", "inner axis ratio 0.0749"]
+              "by": [
+                "ink 6.26%",
+                "axis ratio 0.1045",
+                "inner axis ratio 0.0749"
+              ]
             }
           ]
         }
       },
+      "v21Reroll": null
+    },
+    "lines": {
+      "engineRekey": {
+        "ssim": {
+          "n": 252,
+          "min": 0.8458,
+          "p5": 0.8932,
+          "median": 0.9542,
+          "p95": 0.9907,
+          "max": 0.9965
+        },
+        "ssimCoarse": {
+          "n": 252,
+          "min": 0.9833,
+          "p5": 0.9874,
+          "median": 0.9947,
+          "p95": 0.9988,
+          "max": 0.9996
+        },
+        "inkAbs": {
+          "n": 252,
+          "min": 0,
+          "p5": 0.0005,
+          "median": 0.006,
+          "p95": 0.0207,
+          "max": 0.0351
+        },
+        "medianAbs": {
+          "n": 252,
+          "min": 0.0001,
+          "p5": 0.0008,
+          "median": 0.0105,
+          "p95": 0.0379,
+          "max": 0.0732
+        },
+        "p90Abs": {
+          "n": 252,
+          "min": 0.0001,
+          "p5": 0.0011,
+          "median": 0.0136,
+          "p95": 0.0562,
+          "max": 0.1191
+        },
+        "r25Abs": {
+          "n": 252,
+          "min": 0,
+          "p5": 0.0008,
+          "median": 0.0068,
+          "p95": 0.0467,
+          "max": 0.0901
+        },
+        "r50Abs": {
+          "n": 252,
+          "min": 0.0001,
+          "p5": 0.0006,
+          "median": 0.0056,
+          "p95": 0.026,
+          "max": 0.0489
+        },
+        "r90Abs": {
+          "n": 252,
+          "min": 0,
+          "p5": 0.0003,
+          "median": 0.0068,
+          "p95": 0.0458,
+          "max": 0.1178
+        },
+        "outerAbs": {
+          "n": 252,
+          "min": 0,
+          "p5": 0.0002,
+          "median": 0.0038,
+          "p95": 0.0126,
+          "max": 0.0203
+        },
+        "qAbs": {
+          "n": 252,
+          "min": 0.0001,
+          "p5": 0.0005,
+          "median": 0.0055,
+          "p95": 0.0267,
+          "max": 0.0471
+        },
+        "qInnerAbs": {
+          "n": 252,
+          "min": 0,
+          "p5": 0,
+          "median": 0.0063,
+          "p95": 0.0244,
+          "max": 0.0376
+        },
+        "paAbs": {
+          "n": 252,
+          "min": 0.002,
+          "p5": 0.0842,
+          "median": 0.6785,
+          "p95": 3.1359,
+          "max": 53.0591
+        }
+      },
+      "heldOutV21": {
+        "ssim": {
+          "n": 56,
+          "min": 0.8519,
+          "p5": 0.8923,
+          "median": 0.9574,
+          "p95": 0.9893,
+          "max": 0.9955
+        },
+        "ssimCoarse": {
+          "n": 56,
+          "min": 0.986,
+          "p5": 0.9889,
+          "median": 0.9938,
+          "p95": 0.9989,
+          "max": 0.9993
+        },
+        "inkAbs": {
+          "n": 56,
+          "min": 0.0002,
+          "p5": 0.0009,
+          "median": 0.0065,
+          "p95": 0.0283,
+          "max": 0.0323
+        },
+        "medianAbs": {
+          "n": 56,
+          "min": 0.0004,
+          "p5": 0.001,
+          "median": 0.0128,
+          "p95": 0.0395,
+          "max": 0.0892
+        },
+        "p90Abs": {
+          "n": 56,
+          "min": 0.0005,
+          "p5": 0.0014,
+          "median": 0.0161,
+          "p95": 0.0517,
+          "max": 0.1253
+        },
+        "r25Abs": {
+          "n": 56,
+          "min": 0.0003,
+          "p5": 0.0006,
+          "median": 0.0071,
+          "p95": 0.0723,
+          "max": 0.1155
+        },
+        "r50Abs": {
+          "n": 56,
+          "min": 0,
+          "p5": 0.0002,
+          "median": 0.0061,
+          "p95": 0.0349,
+          "max": 0.058
+        },
+        "r90Abs": {
+          "n": 56,
+          "min": 0.0003,
+          "p5": 0.0004,
+          "median": 0.0082,
+          "p95": 0.0607,
+          "max": 0.1191
+        },
+        "outerAbs": {
+          "n": 56,
+          "min": 0.0001,
+          "p5": 0.0003,
+          "median": 0.0048,
+          "p95": 0.0128,
+          "max": 0.0157
+        },
+        "qAbs": {
+          "n": 56,
+          "min": 0.0001,
+          "p5": 0.0003,
+          "median": 0.0045,
+          "p95": 0.0192,
+          "max": 0.0205
+        },
+        "qInnerAbs": {
+          "n": 56,
+          "min": 0.0002,
+          "p5": 0.0003,
+          "median": 0.0042,
+          "p95": 0.0283,
+          "max": 0.0474
+        },
+        "paAbs": {
+          "n": 56,
+          "min": 0.0035,
+          "p5": 0.0846,
+          "median": 1.0825,
+          "p95": 7.0979,
+          "max": 47.3187
+        }
+      },
+      "negativeControls": {},
       "v21Reroll": null
     }
   }
