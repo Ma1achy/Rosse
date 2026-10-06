@@ -105,6 +105,106 @@
       "pageErrors": 0
     },
     {
+      "name": "a-sketch-lensed--lens__s4242__home",
+      "preset": "A sketch, lensed",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "8f78789950139713d71772fc57cff2c8f43ff35cb87f5a997c23beef1c33bc83",
+      "captured": "2026-10-06T16:57:12.204Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 83
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "a-sketch-lensed--lens__s4242__orbit",
+      "preset": "A sketch, lensed",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "07ee97b990f633befa0d9001f360ae720446bbce54e3c473def94d1c07e470a6",
+      "captured": "2026-10-06T16:57:16.728Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 38
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "a-sketch-lensed--lens__s7__home",
+      "preset": "A sketch, lensed",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "1f423a8a1b6fc39ea43d88794d959db07da608154a40342a15ec4fdd3fe1a70c",
+      "captured": "2026-10-06T16:57:13.010Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 164
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "a-sketch-lensed--lens__s7__orbit",
+      "preset": "A sketch, lensed",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "29fb69219dd9cd38880e368d7c11aacc001e1e34d0de0f66fab9fc9605e8fdd7",
+      "captured": "2026-10-06T16:57:18.137Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 195
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "artefact-cosmic-rays__s4242__home",
       "preset": "Artefact: cosmic rays",
       "seed": 4242,
@@ -3539,6 +3639,106 @@
       "pageErrors": 0
     },
     {
+      "name": "lens-a-quad--lens__s4242__home",
+      "preset": "Lens: a quad",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "29c0d346ebbd2d8c3290b3b56da748196018843104e0edeef66fdeab76fef204",
+      "captured": "2026-10-06T16:56:54.541Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 13003,
+        "knots": 242,
+        "stars": 5,
+        "curves": 0,
+        "used": 43,
+        "ms": 607
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-a-quad--lens__s4242__orbit",
+      "preset": "Lens: a quad",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "10e6f14a18c783b87a6899ff377f6ca13afe6307773fe59cbfa1d5d5d564ea1c",
+      "captured": "2026-10-06T16:57:03.384Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 13033,
+        "knots": 61,
+        "stars": 0,
+        "curves": 0,
+        "used": 43,
+        "ms": 687
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-a-quad--lens__s7__home",
+      "preset": "Lens: a quad",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "1ab5c1bcb503872656e01ba36861bee1b09158153c82a3859436526d3b3200f8",
+      "captured": "2026-10-06T16:56:40.710Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 13002,
+        "knots": 193,
+        "stars": 6,
+        "curves": 0,
+        "used": 41,
+        "ms": 2046
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-a-quad--lens__s7__orbit",
+      "preset": "Lens: a quad",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "8fee5d261663452cc2214157ece3c90c60ab664743ad0b90e969d4fd6bb1ae65",
+      "captured": "2026-10-06T16:56:52.305Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 13020,
+        "knots": 29,
+        "stars": 0,
+        "curves": 0,
+        "used": 41,
+        "ms": 361
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "lens-double-einstein-ring__s4242__home",
       "preset": "Lens: double Einstein ring",
       "seed": 4242,
@@ -3611,6 +3811,106 @@
       "pageErrors": 0
     },
     {
+      "name": "lens-double-einstein-ring--lens__s4242__home",
+      "preset": "Lens: double Einstein ring",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "76ba0898f7107f962d13f49d6dc68124da2d1a8df960a82d6972ec98f5f7aa95",
+      "captured": "2026-10-06T16:55:30.882Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 14572,
+        "knots": 259,
+        "stars": 6,
+        "curves": 0,
+        "used": 52,
+        "ms": 398
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-double-einstein-ring--lens__s4242__orbit",
+      "preset": "Lens: double Einstein ring",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "8b6d1a0709ad4f702f68b50bb8ac278d25b170f2010b23631f220998ff2c1c68",
+      "captured": "2026-10-06T16:55:47.604Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 13010,
+        "knots": 61,
+        "stars": 1,
+        "curves": 0,
+        "used": 52,
+        "ms": 669
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-double-einstein-ring--lens__s7__home",
+      "preset": "Lens: double Einstein ring",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "02199bbe0c2a147c672a3e8f6ed44957c531de6f4ab1b88a563f37f2e8d4661b",
+      "captured": "2026-10-06T16:55:47.414Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 14613,
+        "knots": 282,
+        "stars": 8,
+        "curves": 0,
+        "used": 57,
+        "ms": 621
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-double-einstein-ring--lens__s7__orbit",
+      "preset": "Lens: double Einstein ring",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "a68fe4e0db226654575d922653d73b6090381bf72e6d5b283924d917107512fb",
+      "captured": "2026-10-06T16:55:53.228Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 13046,
+        "knots": 33,
+        "stars": 1,
+        "curves": 0,
+        "used": 57,
+        "ms": 670
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "lens-einstein-cross-quasar__s4242__home",
       "preset": "Lens: Einstein cross (quasar)",
       "seed": 4242,
@@ -3679,6 +3979,106 @@
         "curves": 0,
         "used": 84,
         "ms": 129
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-einstein-cross-quasar--lens__s4242__home",
+      "preset": "Lens: Einstein cross (quasar)",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "c0e8643933cc94c0549104baded3efa2d1de1a9de4e9bff53b329322eac8f62f",
+      "captured": "2026-10-06T16:54:37.826Z",
+      "stats": {
+        "rstars": 4,
+        "dots": 14588,
+        "knots": 275,
+        "stars": 11,
+        "curves": 0,
+        "used": 49,
+        "ms": 242
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-einstein-cross-quasar--lens__s4242__orbit",
+      "preset": "Lens: Einstein cross (quasar)",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "7b50b615bac09124103fac257c1dbfa024199bca62b8f6f725381a25cfdf4d02",
+      "captured": "2026-10-06T16:54:49.087Z",
+      "stats": {
+        "rstars": 1,
+        "dots": 10559,
+        "knots": 54,
+        "stars": 3,
+        "curves": 0,
+        "used": 43,
+        "ms": 255
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-einstein-cross-quasar--lens__s7__home",
+      "preset": "Lens: Einstein cross (quasar)",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "aca9ca72bba9bb3ec7df2e4c458db72b941b6325894bcb04550b9d9c47c768af",
+      "captured": "2026-10-06T16:54:38.160Z",
+      "stats": {
+        "rstars": 4,
+        "dots": 14567,
+        "knots": 403,
+        "stars": 10,
+        "curves": 0,
+        "used": 46,
+        "ms": 2390
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-einstein-cross-quasar--lens__s7__orbit",
+      "preset": "Lens: Einstein cross (quasar)",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "c6084fc1a630e8aff23f6d44fbcce297a9c92669b883e371389fa501475d581e",
+      "captured": "2026-10-06T16:54:49.165Z",
+      "stats": {
+        "rstars": 1,
+        "dots": 10570,
+        "knots": 73,
+        "stars": 4,
+        "curves": 0,
+        "used": 43,
+        "ms": 348
       },
       "pageErrors": 0
     },
@@ -3791,6 +4191,106 @@
       "pageErrors": 0
     },
     {
+      "name": "lens-einstein-ring--lens__s4242__home",
+      "preset": "Lens: Einstein ring",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "5ac7515014120d38db00755eb7217103eccdf6532ba36850f0b8233bdd3740e4",
+      "captured": "2026-10-06T16:54:38.344Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 12491,
+        "knots": 195,
+        "stars": 6,
+        "curves": 0,
+        "used": 43,
+        "ms": 973
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-einstein-ring--lens__s4242__orbit",
+      "preset": "Lens: Einstein ring",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "a71c7b862608e451ac566f398baa82c8545ec5c48f3a9b098c29cece4d05c6ec",
+      "captured": "2026-10-06T16:54:46.860Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 12514,
+        "knots": 58,
+        "stars": 0,
+        "curves": 0,
+        "used": 43,
+        "ms": 263
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-einstein-ring--lens__s7__home",
+      "preset": "Lens: Einstein ring",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "9aaa5dcf303204f3056f05ac644796b995aa814422aae9375e9069d9b498deca",
+      "captured": "2026-10-06T16:54:39.141Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 12518,
+        "knots": 160,
+        "stars": 4,
+        "curves": 0,
+        "used": 41,
+        "ms": 2765
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-einstein-ring--lens__s7__orbit",
+      "preset": "Lens: Einstein ring",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "ccc116ca0cf9c70ea8961bb98c315780870ed4aab66ba241f8f31282ab3f8282",
+      "captured": "2026-10-06T16:54:49.122Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 12474,
+        "knots": 42,
+        "stars": 2,
+        "curves": 0,
+        "used": 41,
+        "ms": 185
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "lens-galaxy-cluster__s4242__home",
       "preset": "Lens: galaxy cluster",
       "seed": 4242,
@@ -3863,6 +4363,106 @@
       "pageErrors": 0
     },
     {
+      "name": "lens-galaxy-cluster--lens__s4242__home",
+      "preset": "Lens: galaxy cluster",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "034dc040ae3f0e71a7775ed3eee2c1b4065695c42e8645921074107654e1a255",
+      "captured": "2026-10-06T16:55:32.543Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 14957,
+        "knots": 699,
+        "stars": 7,
+        "curves": 0,
+        "used": 107,
+        "ms": 9652
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-galaxy-cluster--lens__s4242__orbit",
+      "preset": "Lens: galaxy cluster",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "047d257c70d35d369846e4b6c29aae73ed8fec0f38e14ee1f568f63c9050d272",
+      "captured": "2026-10-06T16:55:47.507Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 13973,
+        "knots": 230,
+        "stars": 5,
+        "curves": 0,
+        "used": 106,
+        "ms": 392
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-galaxy-cluster--lens__s7__home",
+      "preset": "Lens: galaxy cluster",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "84532394cf49b6e17c3792fd5c6925afc2b09704f27d34e8bce5591aca13d3f2",
+      "captured": "2026-10-06T16:55:51.975Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 14673,
+        "knots": 1196,
+        "stars": 34,
+        "curves": 0,
+        "used": 121,
+        "ms": 1842
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-galaxy-cluster--lens__s7__orbit",
+      "preset": "Lens: galaxy cluster",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "865d504e4a4609c9f89d4c39e2015c1106f597cc6688434c5495e744f18605ff",
+      "captured": "2026-10-06T16:56:05.403Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 12804,
+        "knots": 409,
+        "stars": 5,
+        "curves": 0,
+        "used": 110,
+        "ms": 2060
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "lens-giant-arc__s4242__home",
       "preset": "Lens: giant arc",
       "seed": 4242,
@@ -3931,6 +4531,106 @@
         "curves": 0,
         "used": 86,
         "ms": 133
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-giant-arc--lens__s4242__home",
+      "preset": "Lens: giant arc",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "21af1669c91e311cf48c0bd476e77dc4cc92ee8cb621400ca68d509cdf9a388b",
+      "captured": "2026-10-06T16:56:33.874Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 12505,
+        "knots": 177,
+        "stars": 2,
+        "curves": 0,
+        "used": 43,
+        "ms": 339
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-giant-arc--lens__s4242__orbit",
+      "preset": "Lens: giant arc",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "72a8020bf0b6f24e6d644808f3185d3a816373e3145030d266e6de904f99ccf2",
+      "captured": "2026-10-06T16:56:42.909Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 12497,
+        "knots": 66,
+        "stars": 0,
+        "curves": 0,
+        "used": 43,
+        "ms": 462
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-giant-arc--lens__s7__home",
+      "preset": "Lens: giant arc",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "b03df15c01f01dea6f0b4dfab333f621ac5aaab9cc72dabe3f38ff4b5af2d211",
+      "captured": "2026-10-06T16:56:28.098Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 12477,
+        "knots": 126,
+        "stars": 3,
+        "curves": 0,
+        "used": 41,
+        "ms": 381
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-giant-arc--lens__s7__orbit",
+      "preset": "Lens: giant arc",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "5af0a904e27e072aa57d8134c18f3eb2a1a23fbe0360753eb58f2b7a7421c817",
+      "captured": "2026-10-06T16:56:37.555Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 12444,
+        "knots": 40,
+        "stars": 1,
+        "curves": 0,
+        "used": 41,
+        "ms": 985
       },
       "pageErrors": 0
     },
@@ -6766,7 +7466,7 @@
     },
     "runs": {
       "home": {
-        "generated": "2026-10-06T12:38:29.464Z",
+        "generated": "2026-10-06T16:57:19.896Z",
         "browser": {
           "name": "chromium",
           "version": "141.0.7390.37",
@@ -6778,7 +7478,7 @@
         }
       },
       "orbit": {
-        "generated": "2026-10-06T12:38:29.464Z",
+        "generated": "2026-10-06T16:57:19.896Z",
         "browser": {
           "name": "chromium",
           "version": "141.0.7390.37",
