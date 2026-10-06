@@ -137,6 +137,12 @@ export interface VectorDesc {
   penDot: number;
   /** 0.55 + 0.45 · streams: a stream mark is kept when its draw is at most this (L1077) */
   streamKeep: number;
+  /**
+   * A dynamic set (M7: the drawn stars, the deep field's drawings): its instance rows are written
+   * by a compute pass each view (compute/dyn-rows.wgsl) at fixed strides of slots, not by the CPU
+   * (src/model/dynvec.ts); `nInst` is its capacity.
+   */
+  dynamic?: boolean;
 }
 
 const libCache = new WeakMap<object, PackedVectors>();

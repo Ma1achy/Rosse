@@ -117,6 +117,11 @@ export class GpuVectors {
     return this.model?.D ?? null;
   }
 
+  /** The instance table (VINST_LAYOUT): written by the CPU, or by a rows pass for a dynamic set. */
+  get instances(): GPUBuffer {
+    return this.need().buffers[1] as GPUBuffer;
+  }
+
   /** The library's tables, uploaded once per set of drawings. */
   private library(lib: PackedVectors): GPUBuffer[] {
     if (this.libBuffers?.lib === lib) return this.libBuffers.bufs;
@@ -271,7 +276,8 @@ export class GpuVectors {
     const q = this.device.queue;
     if (V.nStreamSlots > m.markCap) throw new Error('stream slots beyond their capacity');
     q.writeBuffer(m.buffers[0] as GPUBuffer, 0, packStruct(VEC_LAYOUT, V.uniform));
-    if (m.D.nInst) q.writeBuffer(m.buffers[1] as GPUBuffer, 0, V.inst);
+    // a dynamic set's rows are written by compute/dyn-rows.wgsl
+    if (m.D.nInst && !m.D.dynamic) q.writeBuffer(m.buffers[1] as GPUBuffer, 0, V.inst);
     if (V.nStreamSegs) q.writeBuffer(m.buffers[13] as GPUBuffer, 0, V.streamSegs);
     q.writeBuffer(
       m.marks.uniform,

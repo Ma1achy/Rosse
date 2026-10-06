@@ -15,7 +15,8 @@ import type { PartPicks } from './parts';
 import { describeVectors, type VectorDesc } from './vectors';
 import type { CurvePicks } from './curves';
 import { packNoise, type NoiseTable } from '../core/noise';
-import { describeGalaxy, type GalaxyDesc } from './galaxy';
+import { describeGalaxy, rstarBound, type GalaxyDesc } from './galaxy';
+import { sheetStrides, type DynSpec } from './dynvec';
 import { describeRibbons, type RibbonDesc } from './ribbons';
 import { makeVariation, type DrawingsMeta, type Variation } from './variation';
 
@@ -28,6 +29,8 @@ export interface GalaxyScene {
   /** the placed vector drawings (M5): the parts' picks and their slots */
   vectors: VectorDesc;
   meta: DrawingsMeta;
+  /** the drawn stars' rows (M7): their capacity and the slots each owns (src/model/dynvec.ts) */
+  rstars: DynSpec;
 }
 
 export interface SceneOptions {
@@ -85,7 +88,12 @@ export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {
     galaxy.noise,
   );
   const vectors = describeVectors(P, variation, meta, P.incl, opts.partPicks);
-  return { P, variation, galaxy, ribbons, vectors, meta };
+  const strides = sheetStrides(vectors.lib, ['sstars']);
+  const rstars: DynSpec = {
+    rows: strides.strideCaps + strides.strideDots + strides.strideBlobs ? rstarBound(galaxy) : 0,
+    ...strides,
+  };
+  return { P, variation, galaxy, ribbons, vectors, meta, rstars };
 }
 
 /**
@@ -121,6 +129,8 @@ export interface MarkCounts {
   /** the streams' dots and knots */
   streamDots?: number;
   streamKnots?: number;
+  /** the capsules of the drawn stars (M7) */
+  starCaps?: number;
   /** source drawings used (`STATS.used`, app23.js:L1302), where the engine can tell */
   used?: number;
   /** per population, for the colour plates and debugging */

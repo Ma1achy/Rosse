@@ -13,15 +13,17 @@
 import stippleWgsl from '../shaders/compute/stipple.wgsl';
 import projectWgsl from '../shaders/compute/project.wgsl';
 import scanWgsl from '../shaders/compute/scan.wgsl';
+import breatheWgsl from '../shaders/compute/breathe.wgsl';
 import { bufferWithData } from '../gpu/buffers';
 import { INSTANCE_LAYOUT } from '../marks/instance';
-import { CLASS_COUNT } from '../model/classes';
+import { CLASS_COUNT, Cls } from '../model/classes';
 import { packGalaxy, sampleCount } from '../model/galaxy';
 import { cullsUniform } from '../model/ribbons';
 import { packStruct } from '../gpu/buffers';
 import { CULLS_LAYOUT } from '../fallback/kernels/project';
 import { GpuRibbons } from './ribbons';
 import { GpuVectors } from './vectors';
+import { GpuStarSet } from './star-set';
 import { vectorView } from '../model/vectors';
 import { coreInstances } from '../model/parts';
 import {
@@ -73,6 +75,26 @@ interface ModelBuffers {
   blockOffsets: GPUBuffer;
   args: GPUBuffer;
   out: GPUBuffer;
+  /** the breathing room's own compaction of the bright drawn stars (compute/breathe.wgsl) */
+  room: {
+    uniform: GPUBuffer;
+    scan: GPUBuffer;
+    keys: GPUBuffer;
+    rank: GPUBuffer;
+    totals: GPUBuffer;
+    offsets: GPUBuffer;
+    args: GPUBuffer;
+    out: GPUBuffer;
+    blocks: number;
+    on: boolean;
+    groups: {
+      keys: GPUBindGroup;
+      local: GPUBindGroup;
+      blocks: GPUBindGroup;
+      scatter: GPUBindGroup;
+      clear: GPUBindGroup;
+    };
+  };
   groups: {
     stipple: GPUBindGroup;
     extra: GPUBindGroup;
@@ -100,27 +122,34 @@ export class GpuStipple {
       local: GPUComputePipeline;
       blocks: GPUComputePipeline;
       scatter: GPUComputePipeline;
+      brightKeys: GPUComputePipeline;
+      clear: GPUComputePipeline;
     },
     /** the line-work (M4) */
     readonly ribbons: GpuRibbons,
     /** the placed vector drawings and the streams' marks (M5) */
     readonly vectors: GpuVectors,
+    /** the drawn stars (M7) */
+    readonly stars: GpuStarSet,
   ) {}
 
   static create(device: GPUDevice): GpuStipple {
-    const [stipple, extra, project, local, blocks, scatter] = [
+    const [stipple, extra, project, local, blocks, scatter, brightKeys, clear] = [
       pipeline(device, stippleWgsl, 'main', 'stipple.wgsl'),
       pipeline(device, stippleWgsl, 'extra', 'stipple.wgsl'),
       pipeline(device, projectWgsl, 'main', 'project.wgsl'),
       pipeline(device, scanWgsl, 'scan_local', 'scan.wgsl'),
       pipeline(device, scanWgsl, 'scan_blocks', 'scan.wgsl'),
       pipeline(device, scanWgsl, 'scatter', 'scan.wgsl'),
+      pipeline(device, breatheWgsl, 'bright_keys', 'breathe.wgsl'),
+      pipeline(device, breatheWgsl, 'clear', 'breathe.wgsl'),
     ];
     return new GpuStipple(
       device,
-      { stipple, extra, project, local, blocks, scatter },
+      { stipple, extra, project, local, blocks, scatter, brightKeys, clear },
       GpuRibbons.create(device),
       GpuVectors.create(device),
+      GpuStarSet.create(device),
     );
   }
 
@@ -210,6 +239,27 @@ export class GpuStipple {
       STORAGE | GPUBufferUsage.COPY_SRC,
       'stipple instances',
     );
+    // the breathing room: its own compaction of the bright drawn stars of the proposals
+    const nMain = G.g.n;
+    const capR = classCapacity(nMain);
+    const blocksR = blockCount(nMain);
+    const room = {
+      uniform: bufferWithData(d, new Uint32Array([nMain, 0, 0, 0]), GPUBufferUsage.UNIFORM, 'room'),
+      scan: bufferWithData(
+        d,
+        new Uint32Array([nMain, capR, blocksR, 0]),
+        GPUBufferUsage.UNIFORM,
+        'room scan',
+      ),
+      keys: buf(nMain * 4, STORAGE, 'room keys'),
+      rank: buf(nMain * 4, STORAGE, 'room rank'),
+      totals: buf(blocksR * 8, STORAGE, 'room block totals'),
+      offsets: buf(blocksR * BLOCK_STRIDE * 4, STORAGE, 'room block offsets'),
+      args: buf(CLASS_COUNT * 16, STORAGE, 'room args'),
+      out: buf(capR * INSTANCE_LAYOUT.size, STORAGE, 'bright drawn stars'),
+      blocks: blocksR,
+      on: G.g.star_mix > 0.01 && nMain > 0,
+    };
     const group = (p: GPUComputePipeline, entries: [number, GPUBuffer][]) =>
       d.createBindGroup({
         layout: p.getBindGroupLayout(0),
@@ -237,6 +287,44 @@ export class GpuStipple {
       blockOffsets,
       args,
       out,
+      room: {
+        ...room,
+        groups: {
+          keys: group(P.brightKeys, [
+            [0, room.uniform],
+            [1, samples],
+            [2, classes],
+            [4, room.keys],
+          ]),
+          local: group(P.local, [
+            [0, room.scan],
+            [1, room.keys],
+            [2, room.rank],
+            [3, room.totals],
+          ]),
+          blocks: group(P.blocks, [
+            [0, room.scan],
+            [3, room.totals],
+            [4, room.offsets],
+            [5, room.args],
+          ]),
+          scatter: group(P.scatter, [
+            [0, room.scan],
+            [1, room.keys],
+            [2, room.rank],
+            [4, room.offsets],
+            [6, projected],
+            [7, room.out],
+          ]),
+          clear: group(P.clear, [
+            [0, room.uniform],
+            [2, classes],
+            [3, projected],
+            [5, room.out],
+            [6, room.args],
+          ]),
+        },
+      },
       groups: {
         stipple: group(P.stipple, [
           [0, galaxy],
@@ -285,6 +373,18 @@ export class GpuStipple {
         ]),
       },
     };
+    this.stars.load(
+      scene.P,
+      scene.vectors.lib,
+      scene.rstars,
+      pool,
+      dotBase,
+      noise,
+      out,
+      args,
+      Cls.rstar,
+      cap,
+    );
     const enc = d.createCommandEncoder({ label: 'stipple model' });
     const pass = enc.beginComputePass({ label: 'stipple' });
     pass.setPipeline(P.stipple);
@@ -311,6 +411,7 @@ export class GpuStipple {
     if (!m || !this.scene) throw new Error('setScene first');
     const d = this.device;
     const { P: params, galaxy } = this.scene;
+    this.stars.setView(params, galaxy.g.key, galaxy.g.n_dot_pool);
     d.queue.writeBuffer(m.view, 0, packView(viewDesc(cam, galaxy.g.dust, m.n, m.cap)));
     d.queue.writeBuffer(
       m.culls,
@@ -338,6 +439,25 @@ export class GpuStipple {
     pass.setPipeline(P.project);
     pass.setBindGroup(0, m.groups.project);
     pass.dispatchWorkgroups(Math.ceil(m.n / 64) || 1);
+    if (m.room.on) {
+      // the breathing room round bright drawn stars: their own compaction, then the clearing
+      const r = m.room;
+      pass.setPipeline(P.brightKeys);
+      pass.setBindGroup(0, r.groups.keys);
+      pass.dispatchWorkgroups(Math.ceil(galaxy.g.n / 64));
+      pass.setPipeline(P.local);
+      pass.setBindGroup(0, r.groups.local);
+      pass.dispatchWorkgroups(r.blocks);
+      pass.setPipeline(P.blocks);
+      pass.setBindGroup(0, r.groups.blocks);
+      pass.dispatchWorkgroups(1);
+      pass.setPipeline(P.scatter);
+      pass.setBindGroup(0, r.groups.scatter);
+      pass.dispatchWorkgroups(Math.ceil(galaxy.g.n / 64));
+      pass.setPipeline(P.clear);
+      pass.setBindGroup(0, r.groups.clear);
+      pass.dispatchWorkgroups(Math.ceil(galaxy.g.n / 64));
+    }
     pass.setPipeline(P.local);
     pass.setBindGroup(0, m.groups.local);
     pass.dispatchWorkgroups(m.blocks);
@@ -349,6 +469,7 @@ export class GpuStipple {
     pass.dispatchWorkgroups(Math.ceil(m.n / 64) || 1);
     this.ribbons.encodeExpand(pass);
     this.vectors.encode(pass);
+    this.stars.encode(pass);
     pass.end();
     d.queue.submit([enc.finish()]);
   }
@@ -373,6 +494,7 @@ export class GpuStipple {
     return [
       ...line.filter((l) => !pieces.includes(l)),
       ...this.vectors.layers(),
+      ...this.stars.layers(),
       ...pieces,
       ...stipple.slice(0, 3),
       ...this.vectors.streamLayers(),
@@ -511,8 +633,17 @@ export class GpuStipple {
       m.blockOffsets,
       m.args,
       m.out,
+      m.room.uniform,
+      m.room.scan,
+      m.room.keys,
+      m.room.rank,
+      m.room.totals,
+      m.room.offsets,
+      m.room.args,
+      m.room.out,
     ])
       b.destroy();
+    this.stars.unload();
     this.ribbons.destroy();
     this.vectors.unload();
     this.model = null;
@@ -522,5 +653,6 @@ export class GpuStipple {
     this.tiers.invalidate();
     this.destroyModel();
     this.vectors.destroy();
+    this.stars.destroy();
   }
 }

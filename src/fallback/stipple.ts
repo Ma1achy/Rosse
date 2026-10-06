@@ -30,6 +30,9 @@ import type { DrawingsMeta } from '../model/variation';
 import { TierState, type TierWork } from '../render/tiers';
 import { cameraOf, viewDesc, type Camera } from '../view/camera';
 import { INSTANCE_WORDS, runProject } from './kernels/project';
+import { breatheRoom } from './kernels/breathe';
+import { dynView, rstarRows } from '../model/dynvec';
+import { Cls } from '../model/classes';
 import { classCapacity, compact } from './kernels/scan';
 import { runStipple } from './kernels/stipple';
 import { runVectors, vectorInputs, type VectorOut } from './kernels/vector';
@@ -49,6 +52,11 @@ export interface CpuStippleView {
   /** the placed vector drawings' view tier (M5) */
   vectors: VectorOut;
   vectorView: VectorView;
+  /** the drawn stars (M7): their capsules, dots and blobs, and the rows they are expanded from */
+  stars: VectorOut;
+  starRows: number;
+  /** proposals the breathing room cleared (M7) */
+  cleared: number;
 }
 
 /** Instances from a buffer of INSTANCE_WORDS words each. */
@@ -165,6 +173,9 @@ export class CpuStipple {
       noise: galaxy.noise,
     };
     const p = runProject(V, this.samples, culls);
+    // the breathing room round bright drawn stars: a pure view filter (app23.js:L275–281)
+    const cleared =
+      galaxy.g.star_mix > 0.01 ? breatheRoom(p.classes, galaxy.g.n, p.f32, this.samples.u32) : 0;
     const { out, counts, cap } = compact(p.classes, n, p.u32);
     const outF = new Float32Array(out.buffer);
     const list = (cls: number): Instance[] => {
@@ -185,6 +196,21 @@ export class CpuStipple {
     const { variation, meta, vectors: VD } = this.scene;
     const vv = vectorView(VD, P, variation, meta, cam, galaxy.g.key, galaxy.g.n_dot_pool);
     const vo = runVectors(vectorInputs(VD.lib, vv, galaxy.pool, galaxy.dotBase, galaxy.noise));
+    // the drawn stars, one `sstars` drawing per compacted `rstar` (M7)
+    const spec = this.scene.rstars;
+    const nStars = counts[Cls.rstar] ?? 0;
+    const liveStars = Math.min(nStars, spec.rows);
+    const starIn = rstarRows(
+      outF,
+      out,
+      Cls.rstar * cap,
+      nStars,
+      VD.lib.first.sstars,
+      spec,
+      liveStars,
+    );
+    const starDV = dynView(P, spec, starIn, liveStars, galaxy.g.key, galaxy.g.n_dot_pool);
+    const so = runVectors(vectorInputs(VD.lib, starDV, galaxy.pool, galaxy.dotBase, galaxy.noise));
     const line = lineLayers(rv, this.lines);
     const pieces = line.filter((l) => l.kind === 'sprites' && l.atlas === 'pieces');
     const stipple = STIPPLE_LAYERS.map((l): InkLayer => ({
@@ -197,6 +223,7 @@ export class CpuStipple {
     const layers: InkLayer[] = [
       ...line.filter((l) => !pieces.includes(l)),
       ...vectorLayers(vo, VD.nDots, VD.nBlobs),
+      ...vectorLayers(so, liveStars * spec.strideDots, liveStars * spec.strideBlobs),
       ...pieces,
       ...stipple.slice(0, 3),
       ...streams,
@@ -243,6 +270,7 @@ export class CpuStipple {
         vectorBlobs: VD.nBlobs,
         streamDots: vo.nSdots,
         streamKnots: vo.nSknots,
+        starCaps: so.nCaps,
         used,
       },
       perClass: counts,
@@ -251,6 +279,9 @@ export class CpuStipple {
       ribbons: rv,
       vectors: vo,
       vectorView: vv,
+      stars: so,
+      starRows: liveStars,
+      cleared,
     };
   }
 }

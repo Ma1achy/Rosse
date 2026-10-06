@@ -129,6 +129,8 @@ export function rasteriseSprites(
     const m: M2 = [f(f(s.m[0]) * px), f(f(s.m[1]) * px), f(f(s.m[2]) * px), f(f(s.m[3]) * px)];
     const cx = f(f(s.x) * px);
     const cy = f(f(s.y) * px);
+    // a degenerate quad (an empty slot of a dynamic set, src/model/dynvec.ts) covers nothing
+    if (f(f(m[0] * m[3]) - f(m[2] * m[1])) === 0) continue;
     const inv = inverse2(m);
     const lod = spriteLod(s.m, px, top.width, maxLod);
     // bounding box of the quad, in pixels
