@@ -5,9 +5,12 @@
  * of what src/render/stipple.ts dispatches on the GPU, giving the same per-class instance lists and
  * the same ribbon, capsule and piece buffers, in the same order.
  *
+ * The placed vector drawings (M5) are ./kernels/vector.ts, the twin of src/render/vectors.ts.
+ *
  * Layer order follows the reference's `scene()` (app23.js:L1289–1301): stroke ribbons (line ink),
- * the hatching's lines, dots and blobs (line ink), pieces (young ink), then the stipple by
- * population, knots, sparkle stars, and the core.
+ * the hatching's and the placed parts' lines, dots and blobs (line ink), pieces (young ink), the
+ * stipple by population, the streams' dots and knots (old), knots, sparkle stars, and the core
+ * with the nuclear spiral.
  */
 import type { Instance } from '../marks/instance';
 import type { InkLayer } from '../render/layers';
@@ -29,6 +32,8 @@ import { cameraOf, viewDesc, type Camera } from '../view/camera';
 import { INSTANCE_WORDS, runProject } from './kernels/project';
 import { classCapacity, compact } from './kernels/scan';
 import { runStipple } from './kernels/stipple';
+import { runVectors, vectorInputs, type VectorOut } from './kernels/vector';
+import { vectorView, type VectorView } from '../model/vectors';
 
 export interface CpuStippleView {
   layers: InkLayer[];
@@ -40,6 +45,9 @@ export interface CpuStippleView {
   projected: Float32Array;
   /** the line-work's view tier */
   ribbons: RibbonView;
+  /** the placed vector drawings' view tier (M5) */
+  vectors: VectorOut;
+  vectorView: VectorView;
 }
 
 /** Instances from a buffer of INSTANCE_WORDS words each. */
@@ -96,6 +104,45 @@ export function lineLayers(rv: RibbonView, M: RibbonModel): InkLayer[] {
   return out;
 }
 
+/** The placed drawings' layers (line ink): capsules, dots, blobs. */
+export function vectorLayers(vo: VectorOut, nDots: number, nBlobs: number): InkLayer[] {
+  const out: InkLayer[] = [];
+  if (vo.nCaps) out.push({ kind: 'capsules', caps: vo.caps, count: vo.nCaps, gain: 1 });
+  if (nDots)
+    out.push({
+      kind: 'sprites',
+      atlas: 'dots',
+      gain: 1,
+      instances: instanceList(vo.dots, vo.dotsU, nDots),
+    });
+  if (nBlobs)
+    out.push({
+      kind: 'sprites',
+      atlas: 'knots',
+      gain: 1,
+      instances: instanceList(vo.blobs, vo.blobsU, nBlobs),
+    });
+  return out;
+}
+
+/** The streams' dots and knots (old ink). */
+export function streamLayers(vo: VectorOut): InkLayer[] {
+  return [
+    {
+      kind: 'sprites',
+      atlas: 'dots',
+      gain: 1,
+      instances: instanceList(vo.sdots, vo.sdotsU, vo.nSdots),
+    },
+    {
+      kind: 'sprites',
+      atlas: 'knots',
+      gain: 1,
+      instances: instanceList(vo.sknots, vo.sknotsU, vo.nSknots),
+    },
+  ];
+}
+
 export class CpuStipple {
   readonly samples: ReturnType<typeof runStipple>;
   readonly lines: RibbonModel;
@@ -134,16 +181,26 @@ export class CpuStipple {
       }
       return res;
     };
+    const { variation, meta, vectors: VD } = this.scene;
+    const vv = vectorView(VD, P, variation, meta, cam, galaxy.g.key, galaxy.g.n_dot_pool);
+    const vo = runVectors(vectorInputs(VD.lib, vv, galaxy.pool, galaxy.dotBase, galaxy.noise));
+    const line = lineLayers(rv, this.lines);
+    const pieces = line.filter((l) => l.kind === 'sprites' && l.atlas === 'pieces');
+    const stipple = STIPPLE_LAYERS.map((l): InkLayer => ({
+      kind: 'sprites',
+      atlas: l.atlas,
+      gain: 1,
+      instances: list(l.cls),
+    }));
     const layers: InkLayer[] = [
-      ...lineLayers(rv, this.lines),
-      ...STIPPLE_LAYERS.map((l): InkLayer => ({
-        kind: 'sprites',
-        atlas: l.atlas,
-        gain: 1,
-        instances: list(l.cls),
-      })),
+      ...line.filter((l) => !pieces.includes(l)),
+      ...vectorLayers(vo, VD.nDots, VD.nBlobs),
+      ...pieces,
+      ...stipple.slice(0, 3),
+      ...(VD.parts.streams.length ? streamLayers(vo) : []),
+      ...stipple.slice(3),
     ];
-    const cores = coreInstances(this.scene.P, this.scene.meta, cam, galaxy.noise);
+    const cores = coreInstances(P, meta, cam, galaxy.noise, VD.parts.picks.nuclear);
     if (cores.length) layers.push({ kind: 'sprites', atlas: 'cores', gain: 1, instances: cores });
     return {
       layers,
@@ -153,11 +210,19 @@ export class CpuStipple {
         pieces: rv.nPieces,
         ribbonSegments: R.nSegs,
         hatches: R.nHatch,
+        drawings: VD.nInst,
+        vectorCaps: vo.nCaps,
+        vectorDots: VD.nDots,
+        vectorBlobs: VD.nBlobs,
+        streamDots: vo.nSdots,
+        streamKnots: vo.nSknots,
       },
       perClass: counts,
       classes: p.classes,
       projected: p.f32,
       ribbons: rv,
+      vectors: vo,
+      vectorView: vv,
     };
   }
 }

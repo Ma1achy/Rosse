@@ -37,6 +37,11 @@ export const Stream = {
   noise: 14,
   /** Star-forming knots strung along a ring (generate, app23.js:L282–288). */
   ringKnots: 15,
+  /**
+   * Marks the parts place: the stellar streams' dots and knots (parts, app23.js:L1076–1080),
+   * keyed by the placement key, so a re-key re-draws them as it re-draws the stipple.
+   */
+  partMarks: 16,
 } as const;
 
 export type StreamName = keyof typeof Stream;

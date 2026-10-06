@@ -11,8 +11,10 @@
  * Also the plate's paper texture (assets/embedded-other/rosse_000_asset.png, the image in
  * head23.html's `.plate` rule) as raw RGBA8, so the GPU and CPU paths read identical bytes.
  *
- * Also the vector drawings the engine reads so far (M4: `penlines`, the pen lines of the dust
- * hatching), copied as JSON (records and sources only) to assets-built/vector/<name>.json.
+ * Also every vector sheet (from M5: all 12, 429 drawings; M4 read only `penlines`), copied as
+ * JSON to assets-built/vector/<name>.json: the records (lines, dots, blobs), their sources, and
+ * the per-drawing metadata the part placement reads (`type`, `winding`, `pitch` of `whole`,
+ * `meta` of `arms`, `solid` of `bars`, `kind` of the others), unchanged.
  *
  * Output: assets-built/atlas/<name>.bin (levels in order; within a level, layers in order, each
  * width × height bytes), assets-built/surface/paper.bin, and assets-built/index.json describing
@@ -26,14 +28,29 @@ import { join, relative, resolve } from 'node:path';
 import pngjs from 'pngjs';
 import { cutCells, mipChain } from './pack-lib.js';
 
-const PACKER_VERSION = 3;
+const PACKER_VERSION = 4;
 const ROOT = resolve(import.meta.dirname, '../..');
 const SHEETS = join(ROOT, 'assets/drawings/bitmap');
 const PAPER = join(ROOT, 'assets/embedded-other/rosse_000_asset.png');
 const OUT = join(ROOT, 'assets-built');
 const NAMES = ['dots', 'knots', 'stars', 'cores', 'fgstars', 'pieces', 'strokes'];
-/** Vector drawings the engine reads on the CPU so far (M4: the pen lines of the dust hatching). */
-const VECTORS = ['penlines'];
+/** Every vector sheet (M5), in the reference's `MAGNIFIED` order (app23.js:L1099). */
+const VECTORS = [
+  'arms',
+  'whole',
+  'env',
+  'rings',
+  'bars',
+  'arcs',
+  'shells',
+  'trails',
+  'penlines',
+  'companions',
+  'misc',
+  'sstars',
+];
+/** The per-drawing metadata copied with the records (assets/README.md). */
+const VECTOR_META = ['type', 'winding', 'pitch', 'lineish', 'meta', 'solid', 'kind'];
 const VECTOR_DIR = join(ROOT, 'assets/drawings/vector');
 
 /** @param {Buffer} b */
@@ -118,21 +135,22 @@ for (const name of NAMES) {
   );
 }
 
-// vector drawings: the records (lines, dots, blobs) and their sources, unchanged
+// vector drawings: the records (lines, dots, blobs), their sources and metadata, unchanged
 /** @type {Record<string, unknown>} */
 const vectors = {};
 for (const name of VECTORS) {
   const bytes = readFileSync(join(VECTOR_DIR, `${name}.json`));
   const v = JSON.parse(bytes.toString('utf8'));
   const file = `vector/${name}.json`;
-  writeFileSync(join(OUT, file), JSON.stringify({ n: v.n, src: v.src, vec: v.vec }));
+  const meta = Object.fromEntries(VECTOR_META.filter((k) => k in v).map((k) => [k, v[k]]));
+  writeFileSync(join(OUT, file), JSON.stringify({ n: v.n, src: v.src, ...meta, vec: v.vec }));
   vectors[name] = {
     file,
     count: v.n,
     source: rel(join(VECTOR_DIR, `${name}.json`)),
     sha256: sha(bytes),
   };
-  console.log(`${name.padEnd(8)} ${String(v.n).padStart(3)} vector records`);
+  console.log(`${name.padEnd(10)} ${String(v.n).padStart(3)} vector records`);
 }
 
 const paperBytes = readFileSync(PAPER);

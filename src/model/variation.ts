@@ -14,7 +14,7 @@ import { Draws } from '../core/rng';
 import { Stream } from '../core/streams';
 import type { Params } from '../core/params';
 import type { StrokesMeta } from '../marks/strokes';
-import type { VectorSheet } from '../marks/vector';
+import type { VectorLibrary, VectorSheet } from '../marks/vector';
 
 const f = Math.fround;
 
@@ -40,6 +40,8 @@ export interface DrawingsMeta {
   strokes?: StrokesMeta;
   /** the pen lines of the dust hatching and carving (M4): without them no hatches */
   penlines?: VectorSheet;
+  /** every vector sheet (M5): without them no drawn parts */
+  vectors?: Partial<VectorLibrary>;
 }
 
 export interface ArmVariation {

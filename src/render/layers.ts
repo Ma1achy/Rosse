@@ -7,7 +7,8 @@
  *
  * M1 has bitmap sprite layers; M2 adds sprites written by compute passes (`gpu-sprites`); M4 adds
  * textured stroke ribbons and pen-line capsules, as CPU arrays (the CPU engine) or GPU buffers
- * written by compute/ribbons.wgsl (the WebGPU engine).
+ * written by compute/ribbons.wgsl (the WebGPU engine); M5 adds the placed vector drawings' capsules
+ * (compute/vector-expand.wgsl), drawn indirectly after their compaction.
  */
 import type { AtlasName } from '../marks/atlas';
 import type { Instance } from '../marks/instance';
@@ -56,12 +57,17 @@ export interface CapsuleLayer {
   gain: number;
 }
 
-/** Pen-line capsules in a GPU buffer (WebGPU engine). */
+/**
+ * Pen-line capsules in a GPU buffer (WebGPU engine): `count` of them, or (M5) as many as the
+ * indirect draw arguments `[6·n, 1, 0, 0]` at `indirect` say, written by a compaction, with
+ * `count` the buffer's capacity.
+ */
 export interface GpuCapsuleLayer {
   kind: 'gpu-capsules';
   buffer: GPUBuffer;
   count: number;
   gain: number;
+  indirect?: GPUBuffer;
 }
 
 export type InkLayer =

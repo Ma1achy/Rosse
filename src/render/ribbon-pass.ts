@@ -158,7 +158,10 @@ export class RibbonBatch {
   }
 }
 
-/** One layer of pen-line capsules. */
+/**
+ * One layer of pen-line capsules: `count` of them, or, with `indirect`, as many as its draw
+ * arguments [6·n, 1, 0, 0] say (a compaction's output, `count` being the buffer's capacity).
+ */
 export class CapsuleBatch {
   private readonly uniforms: GPUBuffer;
   private readonly group: GPUBindGroup;
@@ -168,6 +171,7 @@ export class CapsuleBatch {
     buffer: GPUBuffer,
     readonly count: number,
     opts: DrawOpts,
+    private readonly indirect?: GPUBuffer,
   ) {
     this.uniforms = drawUniforms(pipe.device, opts, null, 'capsule uniforms');
     this.group = pipe.device.createBindGroup({
@@ -183,7 +187,8 @@ export class CapsuleBatch {
     if (!this.count) return;
     pass.setPipeline(this.pipe.capsule);
     pass.setBindGroup(0, this.group);
-    pass.draw(this.count * 6);
+    if (this.indirect) pass.drawIndirect(this.indirect, 0);
+    else pass.draw(this.count * 6);
   }
 
   destroy(): void {
