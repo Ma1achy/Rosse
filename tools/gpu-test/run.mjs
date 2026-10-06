@@ -18,7 +18,8 @@ import { ROOT, launch, prepareAssets, startServer } from './browser.mjs';
 import { orbitCheck } from './orbit.mjs';
 import { surfaceCssCheck } from './surface-css.mjs';
 
-const TIMEOUT = 180_000;
+// 180 s a page; a loaded machine (CI runners share cores) can ask for more
+const TIMEOUT = Number(process.env.ROSSE_GPU_TIMEOUT_MS ?? 180_000);
 
 const requested = process.argv.slice(2).filter((a) => !a.startsWith('-'));
 const withCss = !requested.length || requested.includes('surface-css');

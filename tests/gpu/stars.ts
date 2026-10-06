@@ -117,7 +117,15 @@ run('drawn stars (GPU = CPU, L1)', async () => {
       // the star layers, inked
       gpuR.setLayers(st.stars.layers());
       gpuR.drawInk();
-      cpuR.setLayers(vectorLayers(c, live * spec.strideDots, live * spec.strideBlobs));
+      // the rasteriser is compared on the same inputs, the GPU's own capsules: coverage is a step
+      // at an edge, so with 50,000 capsules a sample within the positions' tolerance of one can
+      // fall on either side between the two engines' capsules (a deterministic 0.25 at Grand
+      // design, zoom 2.5); the positions have their own tolerance above
+      cpuR.setLayers(
+        vectorLayers(c, live * spec.strideDots, live * spec.strideBlobs).map((l) =>
+          l.kind === 'capsules' && g.nCaps === c.nCaps ? { ...l, caps: g.caps } : l,
+        ),
+      );
       cpuR.drawInk();
       const half = new Uint16Array((await readTexture(dev, gpuR.ink, 8)).buffer);
       let maxPx = 0;

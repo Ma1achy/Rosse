@@ -43,6 +43,8 @@
  *     --reuse-shards  only aggregate the last calibration's measurements (test-results/
  *                     calibration-shard-*.json, made with at least K keys) for this K
  *   --jobs n          parallel processes for the re-draws and the calibration (default 4)
+ *   --reuse-redraws   with the comparison, the last run's re-draws as they are (a run stopped after
+ *                     them); only while the engine and the cases are unchanged
  *   --no-gpu          the CPU engine only (no browser)
  *   --only a,b        only the cases whose name contains one of these (for working on a few; the
  *                     run then checks fewer than the required set)
@@ -220,7 +222,9 @@ async function compareAll(G, node) {
     const jobs = Math.max(1, Math.min(Number(opt('--jobs') ?? 4), required.length));
     mkdirSync(join(ROOT, 'test-results'), { recursive: true });
     const pass = args.filter((a, i) => a === '--only' || args[i - 1] === '--only');
-    await shards(['--redraws', ...pass], jobs);
+    // --reuse-redraws: the last run's re-draws (test-results/redraws-shard-*.json), for a run that
+    // was stopped after them; only valid if nothing the engine draws has changed since
+    if (!flag('--reuse-redraws')) await shards(['--redraws', ...pass], jobs);
     for (let k = 0; k < jobs; k++)
       Object.assign(
         redraws,
