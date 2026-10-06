@@ -59,6 +59,10 @@ struct Galaxy {
   warp_a: f32,
   rmax: f32,
   n_extra: u32,
+  n_ss_small: u32,
+  n_ss_bright: u32,
+  spike: f32,
+  pad_g: u32,
 }
 
 // A ring-knot cluster or a clump (GROUP_LAYOUT in src/model/galaxy.ts, src/model/clumps.ts).
@@ -73,6 +77,9 @@ struct Group {
   // kind in the low byte (0 ring knots, 1 clump), the group's index within its kind above
   tag: u32,
 }
+
+// a small drawn star's high bit in the pool: an asterisk (STAR_ASTERISK in src/model/galaxy.ts)
+const STAR_ASTERISK: u32 = 0x80000000u;
 
 // Layout of `shape` (SHAPE in src/model/galaxy.ts)
 const SHAPE_ARMS: u32 = 0u;
@@ -222,6 +229,66 @@ fn dot_tile() -> u32 {
   return pool[KNOT_POOL + min(n - 1u, u32(floor(next() * f32(n))))];
 }
 
+// A drawn star (rstar, app23.js:L184-190): which drawing, how big (before the zoom's growth) and
+// how it is turned, on the sample's own draws; without an `sstars` sheet the star is classified
+// (and counted) but has nothing to draw. `young` makes a bright one likelier unless `forced`. CPU
+// twin: drawStar in src/fallback/kernels/stipple.ts.
+struct Star {
+  tile: u32,
+  size: f32,
+  rot: f32,
+  bright: bool,
+}
+
+fn draw_star(young: bool, forced: bool) -> Star {
+  let ns = galaxy.n_ss_small;
+  let nb = galaxy.n_ss_bright;
+  if (ns == 0u) {
+    return Star(0u, 0.0, 0.0, false);
+  }
+  var br = forced;
+  if (!br) {
+    var p = 0.05;
+    if (young) {
+      p = 0.18;
+    }
+    br = next() < p;
+  }
+  let off = KNOT_POOL + galaxy.n_dot_pool;
+  var tile = 0u;
+  var asterisk = false;
+  if (br && nb > 0u) {
+    tile = pool[off + ns + min(nb - 1u, u32(floor(next() * f32(nb))))];
+  } else {
+    let e = pool[off + min(ns - 1u, u32(floor(next() * f32(ns))))];
+    asterisk = (e & STAR_ASTERISK) != 0u;
+    tile = e & 0x7fffffffu;
+  }
+  let pd = galaxy.pen_dot;
+  var size = 0.0;
+  if (br) {
+    size = (9.0 + 9.0 * pow(next(), 2.4)) * pd;
+  } else {
+    size = exp(log(4.6) + 0.38 * gauss()) * pd;
+  }
+  var sd = 0.2;
+  if (br) {
+    sd = 0.1;
+  } else if (asterisk) {
+    sd = 0.35;
+  }
+  let rot = galaxy.spike + gauss() * sd;
+  return Star(tile, size, rot, br);
+}
+
+fn put_star(i: u32, p: vec3<f32>, flags: u32, u_tau: f32, st: Star) {
+  var fl = flags;
+  if (st.bright) {
+    fl = fl | FLAG_BRIGHT;
+  }
+  put(i, p, CLS_RSTAR | fl, st.tile, st.size, st.rot, u_tau);
+}
+
 fn sample(i: u32) {
   rng_index = i;
   rng_draw = 0u;
@@ -270,7 +337,7 @@ fn sample(i: u32) {
     let p2 = vec3<f32>(xS, yS, 0.0);
     if (galaxy.star_mix > 0.01 && rS < 2.2 * re) {
       if (next() < 0.09 * galaxy.star_mix) {
-        put(i, p2, CLS_RSTAR | FLAG_SERSIC2D, 0u, 0.0, 0.0, 0.0);
+        put_star(i, p2, FLAG_SERSIC2D, 0.0, draw_star(false, false));
         return;
       }
     }
@@ -431,7 +498,7 @@ fn sample(i: u32) {
     }
     if (Rg < 2.7) {
       if (next() < ((0.34 * star_mix) * kc) * outer) {
-        put(i, p, CLS_RSTAR | flags_out, 0u, 0.0, 0.0, u_tau);
+        put_star(i, p, flags_out, u_tau, draw_star(comp == 3u || (comp == 4u && arm > 0.55), false));
         return;
       }
     }
@@ -494,15 +561,22 @@ fn sample_extra(j: u32) {
   rng_index = (g.tag >> 8u) * GROUP_STRIDE + local;
   rng_draw = 0u;
   if (local >= g.count) {
-    // a drawn star: at the ring knot's centre, or scattered over the clump (classified only)
+    // a drawn star: at the ring knot's centre (bright with probability 0.6), or scattered over the
+    // clump (the first bright with probability 0.55), always `young` (app23.js:L288, L296)
+    var p = g.c;
+    var forced = false;
     if (ring) {
-      put(i, g.c, CLS_RSTAR, 0u, 0.0, 0.0, 0.0);
+      forced = next() < 0.6;
     } else {
       let ss = g.s * 1.3;
       let x = g.c.x + gauss() * ss;
       let y = g.c.y + gauss() * ss;
-      put(i, vec3<f32>(x, y, 0.0), CLS_RSTAR, 0u, 0.0, 0.0, 0.0);
+      p = vec3<f32>(x, y, 0.0);
+      if (local - g.count == 0u) {
+        forced = next() < 0.55;
+      }
     }
+    put_star(i, p, 0u, 0.0, draw_star(true, forced));
     return;
   }
   let x = g.c.x + gauss() * g.s;

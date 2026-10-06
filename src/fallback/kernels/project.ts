@@ -45,7 +45,7 @@ export const CULLS_LAYOUT: StructLayout = {
     ['carve_w2', 'f32'],
     ['carve_p', 'f32'],
     ['wobble', 'f32'],
-    ['pad0', 'f32'],
+    ['pen_dot', 'f32'],
     ['pad1', 'f32'],
     ['pad2', 'f32'],
   ].map(([name, type], i) => ({
@@ -80,7 +80,7 @@ export function noCulls(key = 0): CullsDesc {
       carve_w2: 0,
       carve_p: 0,
       wobble: 0,
-      pad0: 0,
+      pen_dot: 1,
       pad1: 0,
       pad2: 0,
     },
@@ -205,13 +205,35 @@ export function projectSample(
     inLane(qx, qy, C)
   )
     return Cls.none;
+  const size = sf[o + 5] ?? 0;
+  const rot = sf[o + 6] ?? 0;
+  if (cls === Cls.rstar) {
+    // a drawn star (M7): the hand wobble acts on each point of the drawing (vector-expand), not
+    // on its centre (a vector mark, app23.js:L171); the size grows with the zoom, `ZL` (L183)
+    const pd = C.c.pen_dot ?? 1;
+    const zl = f(Math.pow(f(sc / f(84)), f(0.45)));
+    const sz = Math.max(f(f(3.2) * pd), Math.min(f(f(f(20) * pd) * zl), f(size * zl)));
+    const ps =
+      flags & SampleFlag.bright
+        ? f(0.58)
+        : Math.min(Math.max(f(f(0.3) + f(f(0.03) * sz)), f(0.36)), 0.5);
+    const cs = cosF(rot);
+    const sn = sinF(rot);
+    instF[io] = qx;
+    instF[io + 1] = qy;
+    instU[io + 2] = su[o + 4] ?? 0;
+    instF[io + 3] = ps;
+    instF[io + 4] = f(cs * sz);
+    instF[io + 5] = f(sn * sz);
+    instF[io + 6] = f(-f(sn * sz));
+    instF[io + 7] = f(cs * sz);
+    return cls;
+  }
   const [wx, wy] = smWarp(qx, qy, C.c.wobble ?? 0, C.noise);
   instF[io] = wx;
   instF[io + 1] = wy;
   instU[io + 2] = su[o + 4] ?? 0;
   instF[io + 3] = 1;
-  const size = sf[o + 5] ?? 0;
-  const rot = sf[o + 6] ?? 0;
   const c = cosF(rot);
   const s = sinF(rot);
   instF[io + 4] = f(c * size);

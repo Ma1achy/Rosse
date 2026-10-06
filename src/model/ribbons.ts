@@ -422,7 +422,7 @@ export function cullsUniform(R: RibbonDesc | null, cam: Camera, P: Params, key: 
     carve_w2: f(cw * cw),
     carve_p: R ? f(R.carveP) : 0,
     wobble: wobbleAmplitude(P.distort),
-    pad0: 0,
+    pen_dot: f(penWeights(P.pen).dot),
     pad1: 0,
     pad2: 0,
   };

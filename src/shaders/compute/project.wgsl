@@ -35,7 +35,8 @@ struct Culls {
   carve_p: f32,
   // the wobble's amplitude, d0 (0: off)
   wobble: f32,
-  pad0: f32,
+  // PEN.dot, for the drawn stars' size limits
+  pen_dot: f32,
   pad1: f32,
   pad2: f32,
 }
@@ -149,6 +150,22 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     if (rand_f32(culls.key, STREAM_STIPPLE_CULL, i, 1u) < culls.lane_p && in_lane(pre)) {
       return;
     }
+  }
+  if (cls == CLS_RSTAR) {
+    // a drawn star (M7): the hand wobble acts on each point of the drawing (vector-expand), not on
+    // its centre (a vector mark, app23.js:L171); the size grows with the zoom, ZL (app23.js:L183)
+    let pd = culls.pen_dot;
+    let zl = pow(view.scale / 84.0, 0.45);
+    let sz = max(3.2 * pd, min((20.0 * pd) * zl, s.size * zl));
+    var ps = min(max(0.3 + 0.03 * sz, 0.36), 0.5);
+    if ((s.cls & FLAG_BRIGHT) != 0u) {
+      ps = 0.58;
+    }
+    let cs = cos_f(s.rot);
+    let sn = sin_f(s.rot);
+    projected[i] = Instance(pre, s.tile, ps, vec4<f32>(cs * sz, sn * sz, -(sn * sz), cs * sz));
+    classes[i] = cls;
+    return;
   }
   let pos = sm_warp(pre, culls.wobble);
   let c = cos_f(s.rot);

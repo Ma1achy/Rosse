@@ -19,4 +19,6 @@ export const SampleFlag = {
   lane: 1 << 10,
   /** a disc, bar or ring sample: carved by the dust lines (nearDust, app23.js:L264) */
   carve: 1 << 11,
+  /** a bright drawn star (M7): it clears a breathing room among the stipple (app23.js:L191) */
+  bright: 1 << 12,
 } as const;
