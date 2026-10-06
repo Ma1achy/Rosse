@@ -51,6 +51,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { join, resolve } from 'node:path';
 import { PNG } from 'pngjs';
+import { format, resolveConfig } from 'prettier';
 import { ROOT, launch, prepareAssets, startServer } from '../../../tools/gpu-test/browser.mjs';
 
 const args = process.argv.slice(2);
@@ -178,6 +179,18 @@ async function gpuPage() {
   const err = await page.evaluate(() => window.__goldenError);
   if (err) throw new Error(`golden render page: ${err}`);
   return { page, errors, adapter: await page.evaluate(() => window.__golden?.adapter) };
+}
+
+/**
+ * Writes a generated JSON file formatted as the repository's Prettier config formats it, so that
+ * a regenerated thresholds.json, calibration.json or engine-hashes.json never fails `npm run lint`.
+ *
+ * @param {string} file
+ * @param {unknown} data
+ */
+async function writeJson(file, data) {
+  const config = (await resolveConfig(file)) ?? {};
+  writeFileSync(file, await format(JSON.stringify(data, null, 2), { ...config, filepath: file }));
 }
 
 function pct(/** @type {number} */ x) {
@@ -397,19 +410,12 @@ async function compareAll(G, node) {
     JSON.stringify({ adapter: gpu?.adapter ?? null, results }, null, 2) + '\n',
   );
   if (flag('--update-engine') && gpu) {
-    writeFileSync(
-      enginePath,
-      JSON.stringify(
-        {
-          about:
-            "The new engine's own goldens (ADR 0013 test e): SHA-256 of the 8-bit ink alpha of each required case, WebGPU on SwiftShader in Chromium. Written by npm run golden -- --update-engine.",
-          adapter: gpu.adapter,
-          hashes: newHashes,
-        },
-        null,
-        2,
-      ) + '\n',
-    );
+    await writeJson(enginePath, {
+      about:
+        "The new engine's own goldens (ADR 0013 test e): SHA-256 of the 8-bit ink alpha of each required case, WebGPU on SwiftShader in Chromium. Written by npm run golden -- --update-engine.",
+      adapter: gpu.adapter,
+      hashes: newHashes,
+    });
     console.log(`wrote ${enginePath}`);
   }
   const req = results.filter((r) => r.required && !r.gate);
@@ -747,23 +753,16 @@ async function calibrate(G, node) {
     },
     parity,
   };
-  writeFileSync(join(ROOT, 'tests/golden/thresholds.json'), JSON.stringify(file, null, 2) + '\n');
-  writeFileSync(
-    join(ROOT, 'tests/golden/calibration.json'),
-    JSON.stringify(
-      {
-        about:
-          "ADR 0013 / 0015 / 0018 calibration: per family, summaries (n, min, p5, median, p95, max) of each measure. engineRekey: the new engine (CPU, equal to WebGPU at L1) drawing v21's replayed variation and re-keying its placement stream: per configuration, each of `standIns` draws stands in for v21 against the mean of each measure over the `keys` draws of keys 0..K − 1 (a full re-draw). negativeControls: one structural or pen change per control, drawn with the same K keys, against the first stand-in, with how many applicable configurations the thresholds caught. v21Reroll: v21 at az and az + 0.3° where its stipple re-rolled (a partial re-draw, one draw against one).",
-        keys: K,
-        standIns: R,
-        controlsEvery,
-        configurations: cases.map((c) => `${c.preset} s${c.params.seed} incl ${c.params.incl}`),
-        families: numbers,
-      },
-      null,
-      2,
-    ) + '\n',
-  );
+  await writeJson(join(ROOT, 'tests/golden/thresholds.json'), file);
+  await writeJson(join(ROOT, 'tests/golden/calibration.json'), {
+    about:
+      "ADR 0013 / 0015 / 0018 calibration: per family, summaries (n, min, p5, median, p95, max) of each measure. engineRekey: the new engine (CPU, equal to WebGPU at L1) drawing v21's replayed variation and re-keying its placement stream: per configuration, each of `standIns` draws stands in for v21 against the mean of each measure over the `keys` draws of keys 0..K − 1 (a full re-draw). negativeControls: one structural or pen change per control, drawn with the same K keys, against the first stand-in, with how many applicable configurations the thresholds caught. v21Reroll: v21 at az and az + 0.3° where its stipple re-rolled (a partial re-draw, one draw against one).",
+    keys: K,
+    standIns: R,
+    controlsEvery,
+    configurations: cases.map((c) => `${c.preset} s${c.params.seed} incl ${c.params.incl}`),
+    families: numbers,
+  });
   for (const [family, n] of Object.entries(numbers))
     if (n.negativeControls)
       for (const [name, x] of Object.entries(n.negativeControls))
