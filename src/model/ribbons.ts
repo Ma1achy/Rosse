@@ -16,7 +16,7 @@ import type { VectorSheet } from '../marks/vector';
 import { ZOOM_MAX, UNIT_SCALE, type Camera } from '../view/camera';
 import { wobbleAmplitude } from '../view/warp';
 import { curves, edgeOnAlpha, type Curve, type CurvePicks, type Vec3 } from './curves';
-import { dustLanes, type DustLanes } from './lanes';
+import { dustLanes, type DustLanes, type DustPicks } from './lanes';
 import { penWeights, type Variation } from './variation';
 
 const f = Math.fround;
@@ -24,7 +24,12 @@ const f = Math.fround;
 /** Curve flags. */
 export const CurveFlag = { taper: 1, stretch: 2, pieces: 4, edgeAlpha: 8 } as const;
 
-const u32Layout = (name: string, size: number, align: number, fields: [string, string][]) => ({
+const u32Layout = (
+  name: string,
+  size: number,
+  align: number,
+  fields: readonly (readonly [string, string])[],
+) => ({
   name,
   size,
   align,
@@ -83,8 +88,8 @@ export const HATCH_LAYOUT: StructLayout = u32Layout('Hatch', 48, 4, [
 ]);
 export const HATCH_WORDS = HATCH_LAYOUT.size / 4;
 
-/** The `Rib` uniform of ribbons.wgsl: counts of the model tier, and the view's numbers. */
-export const RIB_LAYOUT: StructLayout = u32Layout('Rib', 64, 4, [
+/** The `Rib` uniform's fields, in order (ribbons.wgsl). */
+const RIB_FIELDS = [
   ['n_points', 'u32'],
   ['n_curves', 'u32'],
   ['n_segs', 'u32'],
@@ -101,7 +106,13 @@ export const RIB_LAYOUT: StructLayout = u32Layout('Rib', 64, 4, [
   ['sheet_h', 'f32'],
   ['n_dot_pool', 'u32'],
   ['pad0', 'u32'],
-]);
+] as const;
+
+/** The `Rib` uniform of ribbons.wgsl: counts of the model tier, and the view's numbers. */
+export const RIB_LAYOUT: StructLayout = u32Layout('Rib', 64, 4, RIB_FIELDS);
+
+/** The `Rib` uniform's values by field, typed from its layout (`ribUniform`). */
+export type RibUniform = { [K in (typeof RIB_FIELDS)[number][0]]: number };
 
 /** A textured ribbon segment, written by `expand`: the `RibbonSeg` struct (plate units). */
 export const RIBBON_SEG_LAYOUT: StructLayout = {
@@ -239,7 +250,7 @@ export interface RibbonDesc {
   penLine: number;
   sheetW: number;
   sheetH: number;
-  /** pieces of the strokes sheet, per row */
+  /** pieces of the strokes sheet, per row (the lens sizes its branch slots from them, M9) */
   strokePieces: number[];
   /** the scene's noise field (the wobble of ribbons, pieces and hatches) */
   noise: NoiseField;
@@ -254,9 +265,11 @@ export function describeRibbons(
   incl: number,
   picks?: CurvePicks,
   noise: NoiseField = packNoise(),
+  key: number = P.seed,
+  dustPicks?: DustPicks,
 ): RibbonDesc {
   const C = curves(P, V, strokes, incl, picks, noise);
-  const lanes = dustLanes(P, V, penlines, incl, noise);
+  const lanes = dustLanes(P, V, penlines, incl, noise, key, dustPicks);
   const pen = packPen(penlines);
   const pcs = packPieces(strokes);
   const penLine = penWeights(P.pen).line;
@@ -384,7 +397,7 @@ export function hasDustCulls(R: RibbonDesc): boolean {
 }
 
 /** The `Rib` uniform for a view. */
-export function ribUniform(R: RibbonDesc, cam: Camera, P: Params, nDotPool: number) {
+export function ribUniform(R: RibbonDesc, cam: Camera, P: Params, nDotPool: number): RibUniform {
   return {
     n_points: R.nPoints,
     n_curves: R.nCurves,

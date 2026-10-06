@@ -353,7 +353,8 @@ export function rasteriseRibbons(
           lod = lodB;
         }
         const t = sampleLevel(atlas, layer, u, v, lod);
-        const a = f(f(smoothstep(lo, hi, t) * f(alpha)) * f(params.gain));
+        // at most 1, as ribbon.wgsl (v21's RGBA8 canvas clamps the edge-on stroke past 90°)
+        const a = Math.min(f(f(smoothstep(lo, hi, t) * f(alpha)) * f(params.gain)), 1);
         if (a === 0) continue;
         const oo = (y * W + x) * 4;
         const k = f(1 - a);
@@ -366,9 +367,42 @@ export function rasteriseRibbons(
   }
 }
 
+/** v21's four sample positions (the standard 4× MSAA pattern), from the pixel centre (ADR 0019). */
+export const PEN_SAMPLES: readonly (readonly [number, number])[] = [
+  [-0.125, -0.375],
+  [0.375, -0.125],
+  [-0.375, 0.125],
+  [0.125, 0.375],
+];
+
 /**
- * Pen-line capsules (CAPSULE_WORDS each, plate units), in order: the twin of render/ribbon.wgsl
- * `vs_capsule`/`fs_capsule`, coverage clamp(w + 0.5 − distance, 0, 1) (ADR 0006).
+ * Whether the sample (sx, sy) lies in the quad of the segment from (ax, ay), unit direction
+ * (tx, ty), length l, extended by e at both ends, half-width w: render/ribbon.wgsl `pen_inside`,
+ * in the same f32 steps.
+ */
+function penSample(
+  sx: number,
+  sy: number,
+  ax: number,
+  ay: number,
+  tx: number,
+  ty: number,
+  l: number,
+  e: number,
+  w: number,
+): boolean {
+  const dx = f(sx - ax);
+  const dy = f(sy - ay);
+  const u = f(f(dx * tx) + f(dy * ty));
+  const v = f(f(dy * tx) - f(dx * ty));
+  return u >= -e && u <= f(l + e) && Math.abs(v) <= w;
+}
+
+/**
+ * Pen lines (CAPSULE_WORDS each, plate units), one layer: the twin of render/ribbon.wgsl
+ * `vs_capsule`/`fs_pen_mask`/`fs_pen_resolve` (ADR 0019). Each segment is v21's quad, extended by
+ * 0.9 w at both ends; the layer's quads are unioned per sample at v21's four positions (a 4-bit
+ * mask per pixel), and the covered fraction is inked over what is there.
  */
 export function rasteriseCapsules(
   target: InkBuffer,
@@ -379,6 +413,9 @@ export function rasteriseCapsules(
   const px = f(params.pxPerUnit);
   const ink = params.ink ?? [1, 1, 1];
   const { width: W, height: H, data } = target;
+  const mask = new Uint8Array(W * H);
+  const s0 = PEN_SAMPLES.map((s) => f(s[0]));
+  const s1 = PEN_SAMPLES.map((s) => f(s[1]));
   for (let s = 0; s < count; s++) {
     const o = s * 8;
     const ax = f((caps[o] ?? 0) * px);
@@ -389,8 +426,12 @@ export function rasteriseCapsules(
     const alpha = caps[o + 5] ?? 0;
     const vx = f(bx - ax);
     const vy = f(by - ay);
-    const l2 = f(f(vx * vx) + f(vy * vy));
-    const r = w + 2;
+    const l = f(Math.sqrt(f(f(vx * vx) + f(vy * vy))));
+    if (!(l > 0) || alpha <= 0) continue;
+    const tx = f(vx / l);
+    const ty = f(vy / l);
+    const e = f(f(0.9) * w);
+    const r = w + e + 2;
     const x0 = Math.max(0, Math.floor(Math.min(ax, bx) - r));
     const x1 = Math.min(W - 1, Math.ceil(Math.max(ax, bx) + r));
     const y0 = Math.max(0, Math.floor(Math.min(ay, by) - r));
@@ -399,21 +440,25 @@ export function rasteriseCapsules(
       const cy = f(y + 0.5);
       for (let x = x0; x <= x1; x++) {
         const cx = f(x + 0.5);
-        const t =
-          l2 > 0 ? Math.min(Math.max(f(f(f(f(cx - ax) * vx) + f(f(cy - ay) * vy)) / l2), 0), 1) : 0;
-        const ex = f(f(ax + f(t * vx)) - cx);
-        const ey = f(f(ay + f(t * vy)) - cy);
-        const d = f(Math.sqrt(f(f(ex * ex) + f(ey * ey))));
-        const cov = Math.min(Math.max(f(f(w + 0.5) - d), 0), 1);
-        if (cov <= 0) continue;
-        const a = f(f(cov * f(alpha)) * f(params.gain));
-        const oo = (y * W + x) * 4;
-        const k = f(1 - a);
-        data[oo] = f(f(ink[0] * a) + f((data[oo] ?? 0) * k));
-        data[oo + 1] = f(f(ink[1] * a) + f((data[oo + 1] ?? 0) * k));
-        data[oo + 2] = f(f(ink[2] * a) + f((data[oo + 2] ?? 0) * k));
-        data[oo + 3] = f(a + f((data[oo + 3] ?? 0) * k));
+        let m = 0;
+        for (let k = 0; k < 4; k++)
+          if (penSample(f(cx + (s0[k] ?? 0)), f(cy + (s1[k] ?? 0)), ax, ay, tx, ty, l, e, w))
+            m |= 1 << k;
+        if (m) mask[y * W + x] = (mask[y * W + x] ?? 0) | m;
       }
     }
+  }
+  const gain = f(params.gain);
+  for (let i = 0; i < W * H; i++) {
+    const m = mask[i] ?? 0;
+    if (!m) continue;
+    const n = (m & 1) + ((m >> 1) & 1) + ((m >> 2) & 1) + ((m >> 3) & 1);
+    const a = f(f(n * 0.25) * gain);
+    const oo = i * 4;
+    const k = f(1 - a);
+    data[oo] = f(f(ink[0] * a) + f((data[oo] ?? 0) * k));
+    data[oo + 1] = f(f(ink[1] * a) + f((data[oo + 1] ?? 0) * k));
+    data[oo + 2] = f(f(ink[2] * a) + f((data[oo + 2] ?? 0) * k));
+    data[oo + 3] = f(a + f((data[oo + 3] ?? 0) * k));
   }
 }

@@ -14,7 +14,7 @@
  */
 import type { Instance } from '../marks/instance';
 import type { InkLayer } from '../render/layers';
-import { cullsUniform, ribUniform } from '../model/ribbons';
+import { CAPSULE_WORDS, cullsUniform, ribUniform } from '../model/ribbons';
 import { ribbonModel, runRibbons, type RibbonModel, type RibbonView } from './kernels/ribbons';
 import { coreInstances } from '../model/parts';
 import {
@@ -208,10 +208,23 @@ export class CpuStipple {
     const streams = VD.parts.streams.length ? streamLayers(vo) : [];
     const lens = this.lens?.view(cam, mTime);
     const LL = lens?.layers;
+    // the hatching's and the placed drawings' pen-line quads are one layer, one union per
+    // sample, as on the GPU (ADR 0019)
+    const placed = vectorLayers(vo, VD.nDots, VD.nBlobs);
+    const hatch = line.find((l) => l.kind === 'capsules');
+    const parts = placed.find((l) => l.kind === 'capsules');
+    const merged: InkLayer[] = [];
+    if (hatch?.kind === 'capsules' && parts?.kind === 'capsules') {
+      const caps = new Float32Array((hatch.count + parts.count) * CAPSULE_WORDS);
+      caps.set(hatch.caps.subarray(0, hatch.count * CAPSULE_WORDS));
+      caps.set(parts.caps.subarray(0, parts.count * CAPSULE_WORDS), hatch.count * CAPSULE_WORDS);
+      merged.push({ kind: 'capsules', caps, count: hatch.count + parts.count, gain: 1 });
+    } else if (hatch ?? parts) merged.push((hatch ?? parts) as InkLayer);
     const layers: InkLayer[] = [
-      ...line.filter((l) => !pieces.includes(l)),
+      ...line.filter((l) => !pieces.includes(l) && l !== hatch),
+      ...merged,
       ...(LL?.line ?? []),
-      ...vectorLayers(vo, VD.nDots, VD.nBlobs),
+      ...placed.filter((l) => l !== parts),
       ...(LL?.vectors ?? []),
       ...pieces,
       ...(LL?.pieces ?? []),

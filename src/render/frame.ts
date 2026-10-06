@@ -22,6 +22,8 @@ import type { Surface } from './surface';
 
 /** A layer ready to draw. */
 interface Batch {
+  /** work outside the ink pass, before this layer (the pen lines' coverage, ADR 0019) */
+  prepass?(encoder: GPUCommandEncoder): void;
   encode(pass: GPURenderPassEncoder): void;
   destroy(): void;
 }
@@ -103,7 +105,11 @@ export class GpuRenderer {
         gain: l.gain,
       };
       if (l.kind === 'gpu-capsules')
-        return new CapsuleBatch(this.ribbons, l.buffer, l.count, opts, l.indirect);
+        return new CapsuleBatch(
+          this.ribbons,
+          [{ buffer: l.buffer, count: l.count, indirect: l.indirect }, ...(l.more ?? [])],
+          opts,
+        );
       if (l.kind === 'capsules' || l.kind === 'ribbons')
         throw new Error('the WebGPU engine draws GPU ribbon buffers only');
       const atlas = this.atlases.get(l.atlas);
@@ -126,22 +132,39 @@ export class GpuRenderer {
     });
   }
 
-  /** Inks every layer, in order, into the ink target. */
+  /**
+   * Inks every layer, in order, into the ink target. A layer with a prepass (the pen lines) ends
+   * the ink pass, runs its own, and the ink pass resumes (load) for it and the layers after it.
+   */
   drawInk(): void {
     const encoder = this.device.createCommandEncoder({ label: 'ink' });
-    const pass = encoder.beginRenderPass({
-      label: 'ink',
-      colorAttachments: [
-        {
-          view: this.inkView,
-          loadOp: 'clear',
-          storeOp: 'store',
-          clearValue: [0, 0, 0, 0],
-        },
-      ],
-    });
-    for (const b of this.batches) b.encode(pass);
-    pass.end();
+    let cleared = false;
+    const begin = () => {
+      const pass = encoder.beginRenderPass({
+        label: 'ink',
+        colorAttachments: [
+          {
+            view: this.inkView,
+            loadOp: cleared ? 'load' : 'clear',
+            storeOp: 'store',
+            clearValue: [0, 0, 0, 0],
+          },
+        ],
+      });
+      cleared = true;
+      return pass;
+    };
+    let pass: GPURenderPassEncoder | null = null;
+    for (const b of this.batches) {
+      if (b.prepass) {
+        pass?.end();
+        pass = null;
+        b.prepass(encoder);
+      }
+      pass ??= begin();
+      b.encode(pass);
+    }
+    (pass ?? begin()).end();
     this.device.queue.submit([encoder.finish()]);
   }
 

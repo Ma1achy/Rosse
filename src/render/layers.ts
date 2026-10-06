@@ -68,6 +68,12 @@ export interface GpuCapsuleLayer {
   count: number;
   gain: number;
   indirect?: GPUBuffer;
+  /**
+   * More capsule buffers of the same layer, unioned with the first (ADR 0019): v21 expands every
+   * vector drawing, the hatching and the placed parts alike, into one line buffer, so their
+   * quads are one union per sample.
+   */
+  more?: { buffer: GPUBuffer; count: number; indirect?: GPUBuffer }[];
 }
 
 export type InkLayer =

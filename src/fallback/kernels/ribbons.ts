@@ -24,6 +24,7 @@
  * Angles are never formed: a direction is a unit vector, turned by a stored (cos, sin), so both
  * engines need no `atan2` and give the same bits.
  */
+import type { RibUniform } from '../../model/ribbons';
 import { KNOT_POOL } from '../../model/galaxy';
 import {
   CAPSULE_WORDS,
@@ -45,7 +46,7 @@ const sqrt = (x: number) => f(Math.sqrt(x));
 const clamp = (x: number, a: number, b: number) => Math.min(Math.max(x, a), b);
 
 /** The view's numbers of the `Rib` uniform (src/model/ribbons.ts `ribUniform`). */
-export type RibUniform = Record<string, number>;
+export type { RibUniform };
 
 /** Typed views of the model tier's buffers. */
 export interface RibbonModel {
@@ -99,10 +100,10 @@ export function measureCurves(
   stU: Uint32Array,
 ): number {
   const { cu, cf } = M;
-  const W = rib.sheet_w ?? 512;
-  const H = rib.sheet_h ?? 64;
+  const W = rib.sheet_w;
+  const H = rib.sheet_h;
   let total = 0;
-  for (let c = 0; c < (rib.n_curves ?? 0); c++) {
+  for (let c = 0; c < rib.n_curves; c++) {
     const o = c * CURVE_WORDS;
     const first = cu[o] ?? 0;
     const n = cu[o + 1] ?? 0;
@@ -117,11 +118,7 @@ export function measureCurves(
     }
     let tot = n > 0 ? (arc[first + n - 1] ?? 0) : 0;
     if (tot === 0) tot = 1;
-    const cw = clamp(
-      f(f(f((rib.pen_line ?? 2.4) * (cf[o + 4] ?? 1)) * H) / (cf[o + 6] ?? 10)),
-      6,
-      90,
-    );
+    const cw = clamp(f(f(f(rib.pen_line * (cf[o + 4] ?? 1)) * H) / (cf[o + 6] ?? 10)), 6, 90);
     const kpx = f(cw / H);
     const pat = f(W * kpx);
     let reps =
@@ -136,7 +133,7 @@ export function measureCurves(
     stF[so + 1] = cw;
     stF[so + 2] = kpx;
     stU[so + 3] = reps;
-    stF[so + 5] = flags & CurveFlag.edgeAlpha ? (rib.edge_alpha ?? 0) : (cf[o + 5] ?? 1);
+    stF[so + 5] = flags & CurveFlag.edgeAlpha ? rib.edge_alpha : (cf[o + 5] ?? 1);
     stU[so + 6] = 0;
     stU[so + 7] = 0;
   }
@@ -168,7 +165,7 @@ export function expandSegment(
   outU: Uint32Array,
 ): void {
   const { cu } = M;
-  const c = lastAtOrBefore(rib.n_curves ?? 0, i, (k) => cu[k * CURVE_WORDS + 7] ?? 0);
+  const c = lastAtOrBefore(rib.n_curves, i, (k) => cu[k * CURVE_WORDS + 7] ?? 0);
   const o = c * CURVE_WORDS;
   const first = cu[o] ?? 0;
   const n = cu[o + 1] ?? 0;
@@ -178,7 +175,7 @@ export function expandSegment(
   const cw = stF[so + 1] ?? 6;
   const reps = stU[so + 3] ?? 1;
   const j = i - (cu[o + 7] ?? 0);
-  const wob = rib.wobble ?? 0;
+  const wob = rib.wobble;
   const oo = i * RIBBON_SEG_WORDS;
   // a curve with fewer points than its slots (the lensed branches of M9): nothing past its end
   if (j + 1 >= n) {
@@ -229,7 +226,7 @@ export function placePiece(
 ): boolean {
   if (i >= total) return false;
   const { cu, R } = M;
-  const nc = rib.n_curves ?? 0;
+  const nc = rib.n_curves;
   const c = lastAtOrBefore(nc, i, (k) => stU[k * CURVE_STATE_WORDS + 4] ?? 0);
   const o = c * CURVE_WORDS;
   const so = c * CURVE_STATE_WORDS;
@@ -237,8 +234,8 @@ export function placePiece(
   const n = cu[o + 1] ?? 0;
   const np = cu[o + 9] ?? 1;
   const taper = ((cu[o + 3] ?? 0) & CurveFlag.taper) !== 0;
-  const W = rib.sheet_w ?? 512;
-  const H = rib.sheet_h ?? 64;
+  const W = rib.sheet_w;
+  const H = rib.sheet_h;
   const tot = stF[so] ?? 1;
   const kpx = stF[so + 2] ?? 0;
   const reps = stU[so + 3] ?? 1;
@@ -279,7 +276,7 @@ export function placePiece(
   const ny = f(tx / tl);
   const tap = taper ? f(f(1.1) - f(f(f(0.45) * sPos) / tot)) : 1;
   const off = f(f(f(pcy - f(H / 2)) * kpx) * tap);
-  const [px, py] = smWarp(f(x + f(nx * off)), f(y + f(ny * off)), rib.wobble ?? 0, M.R.noise);
+  const [px, py] = smWarp(f(x + f(nx * off)), f(y + f(ny * off)), rib.wobble, M.R.noise);
   const size = f(f(pcs * kpx) * tap);
   const cs = tl0 === 0 ? 1 : f(tx / tl);
   const sn = tl0 === 0 ? 0 : f(ty / tl);
@@ -326,7 +323,7 @@ export function hatchFrame(
   const sd = hf[o + 11] ?? 0;
   const ux = f(f(d0x * cd) - f(d0y * sd));
   const uy = f(f(d0x * sd) + f(d0y * cd));
-  const z = rib.zoom ?? 1;
+  const z = rib.zoom;
   const on = f((hf[o + 6] ?? 0) * z);
   const oy = f((hf[o + 7] ?? 0) * z);
   const of = f((hf[o + 8] ?? 0) * z);
@@ -365,10 +362,10 @@ export function hatchCapsule(
   outF: Float32Array,
 ): void {
   const { hu, R } = M;
-  const h = lastAtOrBefore(rib.n_hatch ?? 0, i, (k) => hu[k * HATCH_WORDS + 3] ?? 0);
+  const h = lastAtOrBefore(rib.n_hatch, i, (k) => hu[k * HATCH_WORDS + 3] ?? 0);
   const H = hatchFrame(h, M, rib, q);
   const s = (R.pen.table[H.tile * 8] ?? 0) + i - (hu[h * HATCH_WORDS + 3] ?? 0);
-  const wob = rib.wobble ?? 0;
+  const wob = rib.wobble;
   const g = R.pen.segs;
   const a = tf(H, g[s * 4] ?? 0, g[s * 4 + 1] ?? 0, wob, M.R.noise);
   const b = tf(H, g[s * 4 + 2] ?? 0, g[s * 4 + 3] ?? 0, wob, M.R.noise);
@@ -377,7 +374,7 @@ export function hatchCapsule(
   outF[oo + 1] = a[1];
   outF[oo + 2] = b[0];
   outF[oo + 3] = b[1];
-  outF[oo + 4] = f(f((rib.pen_line ?? 2.4) / 2) * f(HATCH_PEN));
+  outF[oo + 4] = f(f(rib.pen_line / 2) * f(HATCH_PEN));
   outF[oo + 5] = 1;
   outF[oo + 6] = 0;
   outF[oo + 7] = 0;
@@ -393,12 +390,12 @@ export function hatchDot(
   outU: Uint32Array,
 ): void {
   const { hu, R } = M;
-  const h = lastAtOrBefore(rib.n_hatch ?? 0, i, (k) => hu[k * HATCH_WORDS + 4] ?? 0);
+  const h = lastAtOrBefore(rib.n_hatch, i, (k) => hu[k * HATCH_WORDS + 4] ?? 0);
   const H = hatchFrame(h, M, rib, q);
   const d = ((R.pen.table[H.tile * 8 + 2] ?? 0) + i - (hu[h * HATCH_WORDS + 4] ?? 0)) * 4;
   const D = R.pen.dots;
-  const [px, py] = tf(H, D[d] ?? 0, D[d + 1] ?? 0, rib.wobble ?? 0, M.R.noise);
-  const nPool = Math.max(1, rib.n_dot_pool ?? 1);
+  const [px, py] = tf(H, D[d] ?? 0, D[d + 1] ?? 0, rib.wobble, M.R.noise);
+  const nPool = Math.max(1, rib.n_dot_pool);
   const t = M.pool[KNOT_POOL + ((D[d + 3] ?? 0) % nPool)] ?? 0;
   const k0 = clamp(f(f(f(f(f(2) * (D[d + 2] ?? 0)) * H.sc) * f(0.42)) / f(2.6)), f(0.8), f(1.6));
   const k = f(k0 * f(Math.max(0.55, HATCH_PEN)));
@@ -424,11 +421,11 @@ export function hatchBlob(
   outU: Uint32Array,
 ): void {
   const { hu, R } = M;
-  const h = lastAtOrBefore(rib.n_hatch ?? 0, i, (k) => hu[k * HATCH_WORDS + 5] ?? 0);
+  const h = lastAtOrBefore(rib.n_hatch, i, (k) => hu[k * HATCH_WORDS + 5] ?? 0);
   const H = hatchFrame(h, M, rib, q);
   const b = ((R.pen.table[H.tile * 8 + 4] ?? 0) + i - (hu[h * HATCH_WORDS + 5] ?? 0)) * 8;
   const B = R.pen.blobs;
-  const [px, py] = tf(H, B[b] ?? 0, B[b + 1] ?? 0, rib.wobble ?? 0, M.R.noise);
+  const [px, py] = tf(H, B[b] ?? 0, B[b + 1] ?? 0, rib.wobble, M.R.noise);
   const t = M.pool[(B[b + 6] ?? 0) % KNOT_POOL] ?? 0;
   const lim = f(f(3) / H.sc);
   const sx = Math.max(f(f(f(2) * (B[b + 2] ?? 0)) * f(0.85)), lim);
