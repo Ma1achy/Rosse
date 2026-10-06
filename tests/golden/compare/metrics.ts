@@ -61,24 +61,34 @@ export function blur(a: Grey, sigma: number): Grey {
   const { width: w, height: h } = a;
   const tmp = new Float32Array(w * h);
   const out = grey(w, h);
-  for (let y = 0; y < h; y++)
+  const src = a.data;
+  // the taps inside the image only, in the same order (the golden runner measures every render
+  // K times over, so the loops are kept tight; the sums are those of the plain loop, bit for bit)
+  for (let y = 0; y < h; y++) {
+    const row = y * w;
     for (let x = 0; x < w; x++) {
       let s = 0;
-      for (let i = -r; i <= r; i++) {
-        const xx = x + i;
-        if (xx >= 0 && xx < w) s += (k[i + r] ?? 0) * (a.data[y * w + xx] ?? 0);
-      }
-      tmp[y * w + x] = s;
+      const i0 = Math.max(-r, -x);
+      const i1 = Math.min(r, w - 1 - x);
+      for (let i = i0; i <= i1; i++) s += (k[i + r] as number) * (src[row + x + i] as number);
+      tmp[row + x] = s;
     }
-  for (let y = 0; y < h; y++)
-    for (let x = 0; x < w; x++) {
-      let s = 0;
-      for (let i = -r; i <= r; i++) {
-        const yy = y + i;
-        if (yy >= 0 && yy < h) s += (k[i + r] ?? 0) * (tmp[yy * w + x] ?? 0);
-      }
-      out.data[y * w + x] = s;
+  }
+  // down the columns a row at a time (contiguous reads), each pixel's sum in f64 in the same
+  // order of taps
+  const dst = out.data;
+  const acc = new Float64Array(w);
+  for (let y = 0; y < h; y++) {
+    const i0 = Math.max(-r, -y);
+    const i1 = Math.min(r, h - 1 - y);
+    acc.fill(0);
+    for (let i = i0; i <= i1; i++) {
+      const kv = k[i + r] as number;
+      const src2 = (y + i) * w;
+      for (let x = 0; x < w; x++) acc[x] = (acc[x] as number) + kv * (tmp[src2 + x] as number);
     }
+    dst.set(acc, y * w);
+  }
   return out;
 }
 
@@ -163,16 +173,14 @@ function edt1d(f: Float64Array, n: number, d: Float64Array, v: Int32Array, z: Fl
   z[0] = -Infinity;
   z[1] = Infinity;
   for (let q = 1; q < n; q++) {
-    const fq = f[q] ?? 0;
-    const inter = () => {
-      const vk = v[k] ?? 0;
-      return (fq + q * q - ((f[vk] ?? 0) + vk * vk)) / (2 * q - 2 * vk);
-    };
-    let s = inter();
+    const fq = (f[q] as number) + q * q;
+    let vk = v[k] as number;
+    let s = (fq - ((f[vk] as number) + vk * vk)) / (2 * q - 2 * vk);
     // z[0] is −∞, so this stops at k = 0 at the latest
-    while (s <= (z[k] ?? -Infinity)) {
+    while (s <= (z[k] as number)) {
       k--;
-      s = inter();
+      vk = v[k] as number;
+      s = (fq - ((f[vk] as number) + vk * vk)) / (2 * q - 2 * vk);
     }
     k++;
     v[k] = q;
@@ -190,37 +198,56 @@ function edt1d(f: Float64Array, n: number, d: Float64Array, v: Int32Array, z: Fl
 /**
  * Euclidean distance from each pixel of `mask` (true) to the nearest pixel outside it, in pixels
  * (0 outside). Pixels beyond the image count as outside.
+ *
+ * Separable and exact (Felzenszwalb and Huttenlocher 2012): along each row, the distance to the
+ * nearest outside pixel (two sweeps; the padding makes it finite), stored transposed so that the
+ * second pass, the lower envelope of parabolas down each column, reads contiguous memory. Squared
+ * distances are integers held exactly in f64, so the result does not depend on the order of the
+ * passes.
  */
 export function distanceTransform(mask: Uint8Array, w: number, h: number): Float32Array {
-  // large, but small enough that INF + q² keeps q² exact in f64
-  const INF = 1e12;
+  // padded by one outside pixel on every side
   const W = w + 2;
   const H = h + 2;
-  // pad by one outside pixel on every side
-  const g = new Float64Array(W * H);
-  for (let y = 0; y < H; y++)
-    for (let x = 0; x < W; x++) {
-      const inside = x > 0 && y > 0 && x <= w && y <= h && mask[(y - 1) * w + (x - 1)];
-      g[y * W + x] = inside ? INF : 0;
+  // gT[x * H + y]: squared distance along row y to the nearest outside pixel, column x
+  const gT = new Float64Array(W * H);
+  const row = new Int32Array(W);
+  for (let y = 1; y <= h; y++) {
+    const m = (y - 1) * w;
+    // forward: distance to the nearest outside pixel at or left of x
+    let last = 0;
+    row[0] = 0;
+    for (let x = 1; x < W; x++) {
+      const inside = x <= w && mask[m + x - 1];
+      if (!inside) last = x;
+      row[x] = x - last;
     }
-  const n = Math.max(W, H);
-  const f = new Float64Array(n);
-  const d = new Float64Array(n);
-  const v = new Int32Array(n);
-  const z = new Float64Array(n + 1);
-  for (let x = 0; x < W; x++) {
-    for (let y = 0; y < H; y++) f[y] = g[y * W + x] ?? 0;
-    edt1d(f, H, d, v, z);
-    for (let y = 0; y < H; y++) g[y * W + x] = d[y] ?? 0;
-  }
-  for (let y = 0; y < H; y++) {
-    for (let x = 0; x < W; x++) f[x] = g[y * W + x] ?? 0;
-    edt1d(f, W, d, v, z);
-    for (let x = 0; x < W; x++) g[y * W + x] = d[x] ?? 0;
+    // backward, then squared, transposed
+    last = W - 1;
+    for (let x = W - 1; x >= 0; x--) {
+      const r = row[x] as number;
+      if (r === 0) last = x;
+      const d = Math.min(r, last - x);
+      gT[x * H + y] = d * d;
+    }
   }
   const out = new Float32Array(w * h);
-  for (let y = 0; y < h; y++)
-    for (let x = 0; x < w; x++) out[y * w + x] = Math.sqrt(g[(y + 1) * W + x + 1] ?? 0);
+  const f = new Float64Array(H);
+  const d = new Float64Array(H);
+  const v = new Int32Array(H);
+  const z = new Float64Array(H + 1);
+  for (let x = 1; x <= w; x++) {
+    const base = x * H;
+    let any = false;
+    for (let y = 0; y < H; y++) {
+      const g = gT[base + y] as number;
+      f[y] = g;
+      if (g) any = true;
+    }
+    if (!any) continue;
+    edt1d(f, H, d, v, z);
+    for (let y = 1; y <= h; y++) out[(y - 1) * w + x - 1] = Math.sqrt(d[y] as number);
+  }
   return out;
 }
 
@@ -263,31 +290,65 @@ export interface StrokeWidths {
  * dots of the stipple: at 1× a dot's distance can only be 1, √2 or 2.
  */
 export function strokeWidths(a: Grey, factor = 4): StrokeWidths {
-  const up = factor > 1 ? upsample(a, factor) : a;
-  const { width: w, height: h } = up;
+  // the mask of the bilinear upsampling (`upsample`), without storing the upsampled image: the
+  // same arithmetic, rounded to f32 as `upsample`'s output is, then thresholded
+  const w = a.width * factor;
+  const h = a.height * factor;
   const mask = new Uint8Array(w * h);
-  for (let i = 0; i < w * h; i++) mask[i] = (up.data[i] ?? 0) >= 0.5 ? 1 : 0;
+  if (factor > 1) {
+    const src = a.data;
+    const aw = a.width;
+    const ah = a.height;
+    // per column and per row: the clamped source indices and the weight
+    const xa = new Int32Array(w);
+    const xb = new Int32Array(w);
+    const txs = new Float64Array(w);
+    for (let X = 0; X < w; X++) {
+      const fx = (X + 0.5) / factor - 0.5;
+      const x0 = Math.floor(fx);
+      txs[X] = fx - x0;
+      xa[X] = Math.min(aw - 1, Math.max(0, x0));
+      xb[X] = Math.min(aw - 1, Math.max(0, x0 + 1));
+    }
+    for (let Y = 0; Y < h; Y++) {
+      const fy = (Y + 0.5) / factor - 0.5;
+      const y0 = Math.floor(fy);
+      const ty = fy - y0;
+      const ra = Math.min(ah - 1, Math.max(0, y0)) * aw;
+      const rb = Math.min(ah - 1, Math.max(0, y0 + 1)) * aw;
+      for (let X = 0; X < w; X++) {
+        const tx = txs[X] as number;
+        const ia = xa[X] as number;
+        const ib = xb[X] as number;
+        const top = (src[ra + ia] as number) * (1 - tx) + (src[ra + ib] as number) * tx;
+        const bot = (src[rb + ia] as number) * (1 - tx) + (src[rb + ib] as number) * tx;
+        mask[Y * w + X] = Math.fround(top * (1 - ty) + bot * ty) >= 0.5 ? 1 : 0;
+      }
+    }
+  } else for (let i = 0; i < w * h; i++) mask[i] = (a.data[i] ?? 0) >= 0.5 ? 1 : 0;
   const dt = distanceTransform(mask, w, h);
-  const out: number[] = [];
+  const buf = new Float32Array(w * h);
+  let n = 0;
   for (let y = 0; y < h; y++)
     for (let x = 0; x < w; x++) {
-      const d = dt[y * w + x] ?? 0;
+      const d = dt[y * w + x] as number;
       if (d <= 0) continue;
       let ridge = true;
-      for (let j = -1; j <= 1 && ridge; j++)
+      for (let j = -1; j <= 1 && ridge; j++) {
+        const yy = y + j;
+        if (yy < 0 || yy >= h) continue;
         for (let i = -1; i <= 1; i++) {
-          if (!i && !j) continue;
           const xx = x + i;
-          const yy = y + j;
-          if (xx < 0 || yy < 0 || xx >= w || yy >= h) continue;
-          if ((dt[yy * w + xx] ?? 0) > d) {
+          if ((!i && !j) || xx < 0 || xx >= w) continue;
+          if ((dt[yy * w + xx] as number) > d) {
             ridge = false;
             break;
           }
         }
-      if (ridge) out.push((2 * d) / factor);
+      }
+      if (ridge) buf[n++] = (2 * d) / factor;
     }
-  const widths = Float32Array.from(out).sort();
+  const widths = buf.slice(0, n).sort();
   return { widths, median: bandMean(widths, 0.4, 0.6), p90: bandMean(widths, 0.85, 0.95) };
 }
 

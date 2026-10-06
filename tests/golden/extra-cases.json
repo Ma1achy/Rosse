@@ -1,5 +1,5 @@
 {
-  "about": "Extra reference captures (npm run capture:reference -- --extra tests/golden/extra-cases.json): a preset with overrides set after the preset and the seed, at seeds 7 and 4242 unless `seeds` says otherwise, home and orbit cameras, and (from M3) the zoom camera for the seeds a case lists in `zoom`: home at zoom 2 through v21's __GEN.zoom, so VIEW.scale = 168 (open question Q8). They are the required golden cases (tests/golden/README.md, ADR 0015). 'stipple': lines, knots and envelope off, as the roadmap's M2 acceptance says (the arms, the spurs and the clumps' marks are drawn; the lines, the knots and the envelope come with later milestones' own cases); 'Radio jet' also has its jet off (the Sersic profile). Seeds 3 and 11 give v21 hands of 2 and 3 pens. 'stipple-arms' is Grand design with vary 0 (no spurs, clumps or dust patches, lopsidedness or warp, and every dot drawing) and dustScribble 0 (no dust lanes). From M4, 'ribbons' (seeds 7 and 4242, home, orbit and zoom): the M4 presets with bubbles 0, whole 0 and envelope 0 (rings drawings at the clumps, whole drawings and envelopes, vector parts that M5 draws and these cases leave to its own); Barred spiral draws its bar and ring as ribbons (barStyle and ringStyle 'ribbon') instead of the vector drawings of its default style. From M5, 'vectors': the M5 presets as v21 draws them, with their drawn parts; 'Shell galaxy' draws its drawn shells (shells 1) instead of its simulated ones (shellsOn 0; the shell simulation is M8). From M7 none of these cases switches off the drawn stars among the dots (starMix), the deep field (field) or the foreground stars (fgstars): they were overrides of M2 to M5, retired when M7 built the stars and the sky (ADR 0031), and the captures were made again with them on. The stars, artefacts, layered scenes and the deep field are tests/golden/m7-cases.json.",
+  "about": "Extra reference captures (npm run capture:reference -- --extra tests/golden/extra-cases.json): a preset with overrides set after the preset and the seed, at seeds 7 and 4242 unless `seeds` says otherwise, home and orbit cameras, and (from M3) the zoom camera for the seeds a case lists in `zoom`: home at zoom 2 through v21's __GEN.zoom, so VIEW.scale = 168 (open question Q8). They are the required golden cases (tests/golden/README.md, ADR 0015). 'stipple': lines, knots and envelope off, as the roadmap's M2 acceptance says (the arms, the spurs and the clumps' marks are drawn; the lines, the knots and the envelope come with later milestones' own cases); 'Radio jet' also has its jet off (the Sersic profile). Seeds 3 and 11 give v21 hands of 2 and 3 pens. 'stipple-arms' is Grand design with vary 0 (no spurs, clumps or dust patches, lopsidedness or warp, and every dot drawing) and dustScribble 0 (no dust lanes). From M4, 'ribbons' (seeds 7 and 4242, home, orbit and zoom): the M4 presets with bubbles 0, whole 0 and envelope 0 (rings drawings at the clumps, whole drawings and envelopes, vector parts that M5 draws and these cases leave to its own); Barred spiral draws its bar and ring as ribbons (barStyle and ringStyle 'ribbon') instead of the vector drawings of its default style. From M4's review (QA D3), 'lines': the same presets and overrides as 'ribbons' with the stipple, the knots along the arms and the sparkle stars off (stipple 0, knots 0, sparkle 0), and also starMix, field and fgstars 0, which isolate the line-work from the stars and the sky (they are kept here on purpose, see ADR 0034, proposed), so that the line-work (curves, pieces, hatching, the drawn core, and the ring knots' and clumps' own marks) is compared on its own at home and orbit. Seeds 7 and 4242 are gated; seeds 3, 11, 23 and 101 are captured for the calibration only (\"calibration\": true, ADR 0018): the line-work is drawn the same way at every placement key, so its thresholds come from the renderers' own differences on held-out seeds. From M5, 'vectors': the M5 presets as v21 draws them, with their drawn parts; 'Shell galaxy' draws its drawn shells (shells 1) instead of its simulated ones (shellsOn 0; the shell simulation is M8). From M7 none of these cases (but 'lines', which isolates the line-work) switches off the drawn stars among the dots (starMix), the deep field (field) or the foreground stars (fgstars): they were overrides of M2 to M5, retired when M7 built the stars and the sky (ADR 0031), and the captures were made again with them on. The stars, artefacts, layered scenes and the deep field are tests/golden/m7-cases.json.",
   "cases": [
     {
       "preset": "Smooth, round",
@@ -124,6 +124,234 @@
         "bubbles": 0,
         "whole": 0,
         "envelope": 0
+      }
+    },
+    {
+      "preset": "Grand design",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      }
+    },
+    {
+      "preset": "Grand design",
+      "variant": "lines",
+      "seeds": [3, 11, 23, 101],
+      "calibration": true,
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      }
+    },
+    {
+      "preset": "Barred spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon",
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      }
+    },
+    {
+      "preset": "Barred spiral",
+      "variant": "lines",
+      "seeds": [3, 11, 23, 101],
+      "calibration": true,
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon",
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      }
+    },
+    {
+      "preset": "Flocculent",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      }
+    },
+    {
+      "preset": "Flocculent",
+      "variant": "lines",
+      "seeds": [3, 11, 23, 101],
+      "calibration": true,
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      }
+    },
+    {
+      "preset": "Tightly wound",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      }
+    },
+    {
+      "preset": "Tightly wound",
+      "variant": "lines",
+      "seeds": [3, 11, 23, 101],
+      "calibration": true,
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      }
+    },
+    {
+      "preset": "Loose, open arms",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      }
+    },
+    {
+      "preset": "Loose, open arms",
+      "variant": "lines",
+      "seeds": [3, 11, 23, 101],
+      "calibration": true,
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      }
+    },
+    {
+      "preset": "Dusty spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      }
+    },
+    {
+      "preset": "Dusty spiral",
+      "variant": "lines",
+      "seeds": [3, 11, 23, 101],
+      "calibration": true,
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      }
+    },
+    {
+      "preset": "Hand wobble",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      }
+    },
+    {
+      "preset": "Hand wobble",
+      "variant": "lines",
+      "seeds": [3, 11, 23, 101],
+      "calibration": true,
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
       }
     },
     {

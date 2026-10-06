@@ -10,7 +10,10 @@
 //   (-n_j, -n_j+1, +n_j+1): the fragment finds the triangle holding its centre with edge functions
 //   (the first triangle wins on the shared diagonal), interpolates (u, v) barycentrically, and takes
 //   the mip level from that triangle's texel-per-pixel Jacobian (the longer of its columns);
-// - a capsule's coverage is analytic: clamp(w + 0.5 - distance to the segment, 0, 1).
+// - a pen line (the dust hatching) is v21's: each segment a quad extended by 0.9 w at both ends,
+//   sampled at v21's four MSAA positions and unioned per sample (ADR 0019): `fs_pen_mask` writes
+//   one channel per sample into a coverage target with MAX blending, and `fs_pen_resolve` inks
+//   the covered fraction over the ink target.
 // The ink edge is the reference's: smoothstep(0.12, 0.55) of the sampled ink, times the alpha.
 
 struct RibbonDraw {
@@ -180,7 +183,9 @@ fn fs_ribbon(in: RibbonOut) -> @location(0) vec4<f32> {
     lod = tri_lod(p1, p3, p2, t1 * draw.cell, t3 * draw.cell, t2 * draw.cell, wb.w);
   }
   let ink = textureSampleLevel(strokes, strokes_sampler, uv, in.layer, lod).r;
-  let a = smoothstep(draw.edge.x, draw.edge.y, ink) * in.alpha * draw.gain;
+  // at most 1: the edge-on stroke's alpha, lines · (incl − 72)/18, passes 1 beyond 90°, and
+  // v21's RGBA8 canvas clamps it where this rgba16float target would not (review m1)
+  let a = min(smoothstep(draw.edge.x, draw.edge.y, ink) * in.alpha * draw.gain, 1.0);
   return vec4<f32>(draw.ink.rgb * a, a);
 }
 
@@ -213,26 +218,68 @@ fn vs_capsule(@builtin(vertex_index) v: u32) -> CapsuleOut {
   return out;
 }
 
-// Distance from c to the segment ab.
-fn seg_dist(c: vec2<f32>, a: vec2<f32>, b: vec2<f32>) -> f32 {
-  let vx = b.x - a.x;
-  let vy = b.y - a.y;
-  let l2 = vx * vx + vy * vy;
-  var t = 0.0;
-  if (l2 > 0.0) {
-    t = clamp(((c.x - a.x) * vx + (c.y - a.y) * vy) / l2, 0.0, 1.0);
+// v21's four sample positions (the standard 4x MSAA pattern), from the pixel centre
+const PEN_S0 = vec2<f32>(-0.125, -0.375);
+const PEN_S1 = vec2<f32>(0.375, -0.125);
+const PEN_S2 = vec2<f32>(-0.375, 0.125);
+const PEN_S3 = vec2<f32>(0.125, 0.375);
+
+// 1 if the sample s lies in the quad of the segment a -> b (unit direction t, length l), extended by
+// e at both ends, half-width w; 0 otherwise. The twin of raster.ts `penSample`.
+fn pen_inside(s: vec2<f32>, a: vec2<f32>, t: vec2<f32>, l: f32, e: f32, w: f32) -> f32 {
+  let dx = s.x - a.x;
+  let dy = s.y - a.y;
+  let u = dx * t.x + dy * t.y;
+  let v = dy * t.x - dx * t.y;
+  if (u >= -e && u <= l + e && abs(v) <= w) {
+    return 1.0;
   }
-  let ex = (a.x + t * vx) - c.x;
-  let ey = (a.y + t * vy) - c.y;
-  return sqrt(ex * ex + ey * ey);
+  return 0.0;
 }
 
 @fragment
-fn fs_capsule(in: CapsuleOut) -> @location(0) vec4<f32> {
-  let cov = clamp(in.w + 0.5 - seg_dist(in.position.xy, in.ab.xy, in.ab.zw), 0.0, 1.0);
-  if (cov <= 0.0) {
+fn fs_pen_mask(in: CapsuleOut) -> @location(0) vec4<f32> {
+  let a = in.ab.xy;
+  let vx = in.ab.z - a.x;
+  let vy = in.ab.w - a.y;
+  let l = sqrt(vx * vx + vy * vy);
+  // a segment of length 0 has no area (v21's quad collapses), and alpha 0 draws nothing
+  if (!(l > 0.0) || in.alpha <= 0.0) {
     discard;
   }
-  let a = cov * in.alpha * draw.gain;
+  let t = vec2<f32>(vx / l, vy / l);
+  let e = 0.9 * in.w;
+  let c = in.position.xy;
+  let m = vec4<f32>(
+    pen_inside(c + PEN_S0, a, t, l, e, in.w),
+    pen_inside(c + PEN_S1, a, t, l, e, in.w),
+    pen_inside(c + PEN_S2, a, t, l, e, in.w),
+    pen_inside(c + PEN_S3, a, t, l, e, in.w),
+  );
+  if (all(m == vec4<f32>(0.0))) {
+    discard;
+  }
+  return m;
+}
+
+// The pen lines' coverage target, one channel per sample (ADR 0019).
+@group(0) @binding(5) var pen_mask: texture_2d<f32>;
+
+@vertex
+fn vs_pen_resolve(@builtin(vertex_index) v: u32) -> @builtin(position) vec4<f32> {
+  // one triangle over the whole target
+  let x = f32((v << 1u) & 2u);
+  let y = f32(v & 2u);
+  return vec4<f32>(x * 2.0 - 1.0, 1.0 - y * 2.0, 0.0, 1.0);
+}
+
+@fragment
+fn fs_pen_resolve(@builtin(position) p: vec4<f32>) -> @location(0) vec4<f32> {
+  let m = textureLoad(pen_mask, vec2<i32>(p.xy), 0);
+  let c = (m.r + m.g + m.b + m.a) * 0.25;
+  if (c <= 0.0) {
+    discard;
+  }
+  let a = c * draw.gain;
   return vec4<f32>(draw.ink.rgb * a, a);
 }

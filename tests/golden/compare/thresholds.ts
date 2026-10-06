@@ -52,31 +52,40 @@ export interface Thresholds {
 }
 
 export interface ThresholdFile {
+  /**
+   * K (ADR 0018): the parity comparison sets v21 against the mean of each measure over K engine
+   * draws (the canonical one and K − 1 re-draws of the placement stream), and the parity
+   * thresholds are calibrated for that statistic. Absent or 1: one draw.
+   */
+  keys?: number;
   strict: Thresholds;
   parity: Record<string, Thresholds & { byPreset?: Record<string, Partial<Thresholds>> }>;
 }
 
 /**
  * Classes the parameters make impossible, which must then be 0 in both drawings: knots need
- * `knots` (or a ring's knots, or a star's heart, or a cosmic ray's), sparkle stars `sparkle` (a
- * galaxy's only) and drawn stars `starMix` (generate, app23.js:L266–272), a ring (its knots'
+ * `knots` (or a group that makes its own, `groupKnots`, app23.js:L282–297; or a ring's knots, or a
+ * star's heart, or a cosmic ray's), sparkle stars `sparkle` (a galaxy's only) and drawn stars `starMix` (generate, app23.js:L266–272), a ring (its knots'
  * stars), a star or an artefact, or an overlay that draws one (starSprites, L419–436).
  */
-export function impossibleClasses(P: {
-  knots: number;
-  sparkle: number;
-  starMix: number;
-  subject?: string;
-  ring?: number;
-  merger?: number;
-  ovStar?: number;
-  ovArtefact?: string;
-}): Set<string> {
+export function impossibleClasses(
+  P: {
+    knots: number;
+    sparkle: number;
+    starMix: number;
+    subject?: string;
+    ring?: number;
+    merger?: number;
+    ovStar?: number;
+    ovArtefact?: string;
+  },
+  groupKnots = false,
+): Set<string> {
   const out = new Set<string>();
   const star = P.subject === 'star' || P.subject === 'artefact';
   const overlay = (P.ovStar ?? 0) > 0.02 || (!!P.ovArtefact && P.ovArtefact !== 'none');
   const ring = (P.ring ?? 0) > 0.1 && !P.merger;
-  if (!(P.knots > 0) && !star && !overlay && !ring) out.add('knots');
+  if (!(P.knots > 0) && !star && !overlay && !ring && !groupKnots) out.add('knots');
   if (!(P.sparkle > 0) || star) out.add('stars');
   if (!(P.starMix > 0.01) && !star && !overlay && !ring) out.add('rstars');
   return out;

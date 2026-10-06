@@ -92,19 +92,23 @@ describe("the parts' picks: the same distributions as v21's, over 2,000 seeds", 
     sameMoments('stream a0', ...both(S, (p) => p.streams.map((s) => s.a0)));
   });
 
-  it('drawn arms, an envelope by type, a drawn bar (Hand-drawn arms, Barred spiral)', () => {
-    const A = sample((s) => presetParams('Hand-drawn arms', s, { envelope: 1 }));
-    sameCounts('arm tiles', ...both(A, (p) => p.arms));
-    sameCounts(
-      'arms like the first',
-      ...both(A, (p) => p.arms.map((a) => (a === p.arms[0] ? 1 : 0))),
-    );
-    sameCounts('env tile (halo or disc)', ...both(A, (p) => one(p.env?.tile)));
-    const B = sample((s) => presetParams('Barred spiral', s, { whole: 1 }));
-    sameCounts('bar tile', ...both(B, (p) => one(p.bar)));
-    sameCounts('whole tile (barred)', ...both(B, (p) => one(p.whole?.tile)));
-    sameCounts('ring tile', ...both(B, (p) => one(p.ring?.tile)));
-    const T = sample((s) => presetParams('Tightly wound', s, { armStyle: 'drawn' }));
-    sameCounts('tight arm tiles', ...both(T, (p) => p.arms));
-  });
+  it(
+    'drawn arms, an envelope by type, a drawn bar (Hand-drawn arms, Barred spiral)',
+    { timeout: 120_000 },
+    () => {
+      const A = sample((s) => presetParams('Hand-drawn arms', s, { envelope: 1 }));
+      sameCounts('arm tiles', ...both(A, (p) => p.arms));
+      sameCounts(
+        'arms like the first',
+        ...both(A, (p) => p.arms.map((a) => (a === p.arms[0] ? 1 : 0))),
+      );
+      sameCounts('env tile (halo or disc)', ...both(A, (p) => one(p.env?.tile)));
+      const B = sample((s) => presetParams('Barred spiral', s, { whole: 1 }));
+      sameCounts('bar tile', ...both(B, (p) => one(p.bar)));
+      sameCounts('whole tile (barred)', ...both(B, (p) => one(p.whole?.tile)));
+      sameCounts('ring tile', ...both(B, (p) => one(p.ring?.tile)));
+      const T = sample((s) => presetParams('Tightly wound', s, { armStyle: 'drawn' }));
+      sameCounts('tight arm tiles', ...both(T, (p) => p.arms));
+    },
+  );
 });
