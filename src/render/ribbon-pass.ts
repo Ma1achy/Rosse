@@ -44,12 +44,44 @@ const MAX: GPUBlendState = {
 };
 
 export class RibbonPipeline {
+  /**
+   * The pen lines' coverage target for a plate of this size, shared by every pen-line layer (they
+   * run one after another in one command stream, and each clears it first) and kept across layer
+   * rebuilds, which happen on every camera move: only a new plate size makes a new texture.
+   */
+  penMaskTarget(width: number, height: number): GPUTextureView {
+    const w = Math.max(1, width);
+    const h = Math.max(1, height);
+    if (this.mask?.width !== w || this.mask.height !== h) {
+      this.mask?.texture.destroy();
+      const texture = this.device.createTexture({
+        label: 'pen-line coverage',
+        size: [w, h],
+        format: PEN_MASK_FORMAT,
+        usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
+      });
+      this.mask = { texture, view: texture.createView(), width: w, height: h };
+    }
+    return this.mask.view;
+  }
+
+  destroy(): void {
+    this.mask?.texture.destroy();
+    this.mask = null;
+  }
+
   readonly ribbon: GPURenderPipeline;
   readonly penMask: GPURenderPipeline;
   readonly penResolve: GPURenderPipeline;
   readonly ribbonLayout: GPUBindGroupLayout;
   readonly capsuleLayout: GPUBindGroupLayout;
   readonly resolveLayout: GPUBindGroupLayout;
+  private mask: {
+    texture: GPUTexture;
+    view: GPUTextureView;
+    width: number;
+    height: number;
+  } | null = null;
   readonly sampler: GPUSampler;
 
   constructor(readonly device: GPUDevice) {
@@ -192,13 +224,13 @@ export class RibbonBatch {
 }
 
 /**
- * One layer of pen lines (ADR 0019): `prepass` unions its quads per sample into the layer's own
- * coverage target, outside the ink pass; `encode` resolves that coverage over the ink.
+ * One layer of pen lines (ADR 0019): `prepass` unions its quads per sample into the pipeline's
+ * coverage target (shared, and kept across rebuilds), outside the ink pass; `encode` resolves that
+ * coverage over the ink.
  */
 export class CapsuleBatch {
   private readonly uniforms: GPUBuffer;
   private readonly group: GPUBindGroup;
-  private readonly mask: GPUTexture;
   private readonly maskView: GPUTextureView;
   private readonly resolveGroup: GPUBindGroup;
 
@@ -217,13 +249,7 @@ export class CapsuleBatch {
         { binding: 4, resource: { buffer } },
       ],
     });
-    this.mask = d.createTexture({
-      label: 'pen-line coverage',
-      size: [Math.max(1, opts.targetWidth), Math.max(1, opts.targetHeight)],
-      format: PEN_MASK_FORMAT,
-      usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
-    });
-    this.maskView = this.mask.createView();
+    this.maskView = pipe.penMaskTarget(opts.targetWidth, opts.targetHeight);
     this.resolveGroup = d.createBindGroup({
       layout: pipe.resolveLayout,
       entries: [
@@ -257,6 +283,5 @@ export class CapsuleBatch {
 
   destroy(): void {
     this.uniforms.destroy();
-    this.mask.destroy();
   }
 }
