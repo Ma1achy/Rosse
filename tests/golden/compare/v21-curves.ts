@@ -17,6 +17,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Params } from '../../../src/core/params';
 import type { CurvePicks } from '../../../src/model/curves';
+import type { RingKnotPick } from '../../../src/model/clumps';
+import type { DustPicks } from '../../../src/model/lanes';
 import type { Variation } from '../../../src/model/variation';
 
 interface V21Curve {
@@ -36,7 +38,14 @@ type V21Eval = (
   VAR: Variation,
   AT: unknown,
   scale: number,
-) => { curves: V21Curve[]; lanes: () => V21Lanes };
+) => {
+  curves: V21Curve[];
+  lanes: () => V21Lanes;
+  /** dustLanes() again, recording every number its stream gave (uniforms and Gaussians) */
+  recordLanes: () => number[];
+  mulberry32: (a: number) => () => number;
+  gauss: (r: () => number) => number;
+};
 
 let cached: V21Eval | null = null;
 
@@ -76,15 +85,26 @@ export function v21Lines(
   V: Variation,
   strokesKind: readonly string[],
   zoom = 1,
-): { curves: V21Curve[]; lanes: () => V21Lanes } {
+): ReturnType<V21Eval> {
   if (!cached) {
     const src = readFileSync(join(root, 'assets/reference/rosse-source/app23.js'), 'utf8');
     const body = `var P, AT, VAR, VIEW = { W: 800, cx: 400, cy: 400, scale: 84 };
       var LANES = { key: null, v: { strokes: [], pts: [] } };
       ${NAMES.map((n) => cut(src, n)).join('\n')}
+      // recording: every number a stream gives, a Gaussian as gauss() returns it (not its two
+      // uniforms); dustLanes has one stream, so this is its sequence in the order it is used
+      var REC = null, IN_GAUSS = false, mulberry32_ = mulberry32, gauss_ = gauss;
+      mulberry32 = function (a) { var f = mulberry32_(a); return function () { var x = f(); if (REC && !IN_GAUSS) REC.push(x); return x; }; };
+      gauss = function (r) { IN_GAUSS = true; var x = gauss_(r); IN_GAUSS = false; if (REC) REC.push(x); return x; };
       return function (p, v, at, scale) {
         P = p; VAR = v; AT = at; VIEW.scale = scale; LANES = { key: null, v: { strokes: [], pts: [] } };
-        return { curves: curves(), lanes: function () { return dustLanes(); } };
+        return {
+          curves: curves(),
+          lanes: function () { return dustLanes(); },
+          recordLanes: function () { LANES = { key: null, v: { strokes: [], pts: [] } }; REC = []; try { dustLanes(); return REC; } finally { REC = null; } },
+          mulberry32: mulberry32_,
+          gauss: gauss_,
+        };
       };`;
     // eslint-disable-next-line @typescript-eslint/no-implied-eval
     cached = (new Function(body) as () => V21Eval)();
@@ -107,5 +127,78 @@ export function v21CurvePicks(
         c.w === 0.7 && Math.abs(Math.hypot(c.pts[0]?.[0] ?? 0, c.pts[0]?.[1] ?? 0) - sp.R0) < 1e-9,
     ),
   );
-  return { strokes: C.map((c) => c.k), spurs };
+  // the outline arcs and the tidal tail are v21's last curves (app23.js:L789–799): their angles
+  // are drawn from the same stream as the strokes, so they are v21's choices too
+  const angle = (p: number[] | undefined) => Math.atan2(p?.[1] ?? 0, p?.[0] ?? 0);
+  const tail = P.tail > 0.05 ? C[C.length - 1] : undefined;
+  const nOut = P.outline > 0.05 ? 2 : 0;
+  const outEnd = C.length - (tail ? 1 : 0);
+  const outline = C.slice(outEnd - nOut, outEnd).map((c) => {
+    const st = angle(c.pts[0]);
+    const end = angle(c.pts[c.pts.length - 1]);
+    const len = (((end - st) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    return { st, len };
+  });
+  return {
+    strokes: C.map((c) => c.k),
+    spurs,
+    ...(nOut ? { outline } : {}),
+    ...(tail ? { tail: angle(tail.pts[0]) } : {}),
+  };
+}
+
+/**
+ * v21's dust choices (ADR 0018): the numbers of dustLanes' stream in the order it used them
+ * (app23.js:L951), each hatch's pen line from `rrL` (L1047–1048) and each carving line's from `rd`
+ * (L201–203). The hatches' screen positions are not used: the engine lays them out from the same
+ * numbers in the galaxy frame.
+ */
+export function v21DustPicks(
+  root: string,
+  P: Params,
+  V: Variation,
+  strokesKind: readonly string[],
+  nPen: number,
+): DustPicks {
+  const L = v21Lines(root, P, V, strokesKind);
+  const lane = L.recordLanes();
+  const hatches = L.lanes().strokes.length;
+  const rrL = L.mulberry32(P.seed * 919 + 3);
+  const rd = L.mulberry32(P.seed * 431 + 9);
+  return {
+    lane,
+    tiles: Array.from({ length: hatches }, () => Math.floor(rrL() * nPen)),
+    lines: Array.from({ length: 3 }, () => Math.floor(rd() * nPen)),
+  };
+}
+
+/**
+ * v21's ring-knot clusters (generate, app23.js:L282–288), replaying `rr0 = mulberry32(seed·577 +
+ * 41)` with v21's own mulberry32 and gauss: per cluster, its angle and radius, then the marks loop,
+ * whose bound is drawn afresh at every turn and whose marks take 8 numbers each (two Gaussians,
+ * the kind, and a pool pick, size and rotation), then the centre star's brightness.
+ */
+export function v21RingKnots(
+  root: string,
+  P: Params,
+  V: Variation,
+  strokesKind: readonly string[],
+): RingKnotPick[] {
+  if (!(P.ring > 0.1 && !P.merger)) return [];
+  const L = v21Lines(root, P, V, strokesKind);
+  const rr0 = L.mulberry32(P.seed * 577 + 41);
+  const out: RingKnotPick[] = [];
+  const nkc = Math.round(6 + 10 * P.ring);
+  for (let kc = 0; kc < nkc; kc++) {
+    const t = rr0() * 6.2832;
+    const R = P.ringR * (1 + L.gauss(rr0) * 0.02);
+    let count = 0;
+    while (count < 5 + Math.floor(rr0() * 8)) {
+      for (let i = 0; i < 8; i++) rr0();
+      count++;
+    }
+    rr0();
+    out.push({ t, R, count });
+  }
+  return out;
 }
