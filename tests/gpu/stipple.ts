@@ -98,7 +98,8 @@ run('stipple kernels (GPU = CPU, L1)', async () => {
     const gSu = new Uint32Array(gS.buffer);
     const gP = await gpu.readProjected();
     const gPf = new Float32Array(gP.instances);
-    const gCounts = await gpu.readCounts();
+    // the galaxy's own marks: the lens's are compared in tests/gpu/lens*.ts
+    const gCounts = await gpu.readCounts(false);
     const gOut = await gpu.readInstances();
 
     const cS = runStipple(scene.galaxy);

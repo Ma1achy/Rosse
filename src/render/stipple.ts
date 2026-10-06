@@ -367,7 +367,7 @@ export class GpuStipple {
     pass.dispatchWorkgroups(Math.ceil(m.n / 64) || 1);
     this.ribbons.encodeExpand(pass);
     this.vectors.encode(pass);
-    this.lens?.encode(pass);
+    if (this.scene.lens && this.lens?.loaded) this.lens.encode(pass);
     pass.end();
     d.queue.submit([enc.finish()]);
   }
@@ -449,19 +449,21 @@ export class GpuStipple {
     return copy;
   }
 
-  async readCounts(): Promise<{ perClass: Uint32Array; counts: MarkCounts }> {
+  /** `withLens: false` counts the galaxy's own marks alone (the stipple kernels' tests). */
+  async readCounts(withLens = true): Promise<{ perClass: Uint32Array; counts: MarkCounts }> {
     const m = this.need();
     const a = new Uint32Array(await this.read(m.args, CLASS_COUNT * 16));
     const perClass = new Uint32Array(CLASS_COUNT);
     for (let c = 0; c < CLASS_COUNT; c++) perClass[c] = a[c * 4 + 1] ?? 0;
     const R = this.scene?.ribbons;
     // the lens's marks join the galaxy's, as v21 appends them to the same rows (M9)
-    const lensCounts = this.scene?.lens && this.lens?.loaded ? await this.lens.readCounts() : [];
-    const withLens = Uint32Array.from(perClass, (n, c) => n + (lensCounts[c] ?? 0));
+    const lensCounts =
+      withLens && this.scene?.lens && this.lens?.loaded ? await this.lens.readCounts() : [];
+    const total = Uint32Array.from(perClass, (n, c) => n + (lensCounts[c] ?? 0));
     return {
-      perClass: withLens,
+      perClass: total,
       counts: {
-        ...markCounts(withLens),
+        ...markCounts(total),
         curves: R?.nCurves ?? 0,
         pieces: await this.ribbons.readPieceCount(),
         ribbonSegments: R?.nSegs ?? 0,
