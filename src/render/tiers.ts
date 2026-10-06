@@ -4,7 +4,8 @@
  * A frame's inputs are the parameters, the zoom (page state, a view input) and an optional extra
  * model key (the golden runner's hand and placement key). Going from the last inputs to the next,
  * `dirtyTier` (src/core/schema.ts) reads each changed parameter's tier: a model parameter, or an
- * inclination crossing an `incE` bucket, rebuilds the model tier and everything after it; a view
+ * inclination change after which the structure signature changes (`structureKey`, ADR 0017),
+ * rebuilds the model tier and everything after it; a view
  * parameter or the zoom re-runs only the view tier (projection, culls, compaction, CPU-placed
  * parts). Present inputs (surface, size) are the caller's: they never reach here.
  *

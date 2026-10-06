@@ -164,8 +164,8 @@ export class CpuStipple {
 
 /**
  * The CPU engine's stipple by tier (src/render/tiers.ts), the twin of `GpuStipple.frame`: the
- * model tier (`CpuStipple`, the samples) is kept until a model parameter changes or the
- * inclination crosses an `incE` bucket; a camera move re-runs only the view.
+ * model tier (`CpuStipple`, the samples) is kept until a model parameter changes or the structure
+ * signature changes (`structureKey`, ADR 0017); a camera move re-runs only the view.
  */
 export class CpuStippleTiers {
   readonly tiers = new TierState();

@@ -119,6 +119,7 @@ describe("orbit controls, event for event against v21's own handlers", () => {
     expect(ourCv.tabIndex).toBe(0);
     // an accessible name with the key hints (v21 has none; an addition)
     expect(ourCv.getAttribute('aria-label')).toMatch(/drag to orbit.*arrows.*zoom/);
+    expect(ourCv.getAttribute('role')).toBe('application');
   });
 
   it('drag: orbit and tilt, clamped at 0 and 180°, wrapping at 360°', () => {

@@ -120,8 +120,9 @@ export class GpuStipple {
 
   /**
    * One frame's compute work, by tier (src/render/tiers.ts): the model tier (scene description
-   * and stipple samples) only when a model parameter changed or the inclination crossed an `incE`
-   * bucket; the view tier (projection, culls, compaction) when the camera or zoom moved.
+   * and stipple samples) only when a model parameter changed or the structure signature changes
+   * (`structureKey`, ADR 0017); the view tier (projection, culls, compaction) when the camera or
+   * zoom moved.
    */
   frame(P: Params, zoom: number, meta: DrawingsMeta, opts: SceneOptions = {}): TierWork {
     // other drawings (a reload of the atlases) are another model

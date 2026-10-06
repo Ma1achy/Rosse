@@ -203,3 +203,39 @@ export class Gpu {
     }
   }
 }
+
+/**
+ * Whether a failed GPU call looks like a device loss: an `AbortError` (a `mapAsync` cut short,
+ * "Buffer was unmapped" or "Device is lost"), or a message that says the device was lost.
+ */
+export function looksLikeLoss(err: unknown): boolean {
+  if (typeof err !== 'object' || err === null) return false;
+  const e = err as { name?: unknown; message?: unknown };
+  if (e.name === 'AbortError') return true;
+  return typeof e.message === 'string' && /device (is |was )?lost/i.test(e.message);
+}
+
+/**
+ * After a failed frame: resolves true if `device.lost` resolves, false if it does not within the
+ * wait. The loss is often reported after the call that revealed it, and on a busy machine that
+ * can take well over a frame, so an error that looks like a loss (`looksLikeLoss`) waits `long`
+ * (2 s by default); any other error waits `short` (200 ms) before the page falls back.
+ */
+export function awaitLoss(
+  device: Pick<GPUDevice, 'lost'>,
+  err: unknown,
+  opts: { short?: number; long?: number } = {},
+): Promise<boolean> {
+  const wait = looksLikeLoss(err) ? (opts.long ?? 2000) : (opts.short ?? 200);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  return Promise.race([
+    device.lost.then(() => true),
+    new Promise<boolean>((res) => {
+      timer = setTimeout(() => {
+        res(false);
+      }, wait);
+    }),
+  ]).finally(() => {
+    clearTimeout(timer);
+  });
+}
