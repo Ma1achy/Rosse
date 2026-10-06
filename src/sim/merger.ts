@@ -812,6 +812,11 @@ export interface CoreOffsets {
 
 export interface MergerDesc {
   p: MergerParams;
+  /**
+   * The key of the test stars' counter RNG (initial conditions, marks): the seed, or another when
+   * the goldens re-key the placement and keep every structural choice (ADR 0015).
+   */
+  key: number;
   /** the reference's track, and the track the stars follow (thinned when the budget says so) */
   ref: CoreTrack;
   track: CoreTrack;
@@ -830,7 +835,11 @@ export interface MergerDesc {
 }
 
 /** What the model tier needs to integrate a merger: the track, the stars' frames and the snapshot plan. */
-export function describeMerger(P: Params | MergerParams, picks?: MergerPicks): MergerDesc {
+export function describeMerger(
+  P: Params | MergerParams,
+  picks?: MergerPicks,
+  key?: number,
+): MergerDesc {
   const p = mergerParamsOf(P);
   const ref = coreTrack(p);
   const { n, total } = starCounts(p);
@@ -862,7 +871,20 @@ export function describeMerger(P: Params | MergerParams, picks?: MergerPicks): M
     for (let g = 0; g < 2; g++) put(off.snapc1 + s * 2 + g, track.chosen.snaps, s * 12 + g * 6);
   for (let s = 0; s < track.future.nSnaps; s++)
     for (let g = 0; g < 2; g++) put(off.snapc2 + s * 2 + g, track.future.snaps, s * 12 + g * 6);
-  return { p, ref, track, budget, n, total, gals, cores, off, rows, picks };
+  return {
+    p,
+    key: (key ?? p.seed) >>> 0,
+    ref,
+    track,
+    budget,
+    n,
+    total,
+    gals,
+    cores,
+    off,
+    rows,
+    picks,
+  };
 }
 
 /** The memory the stars take on the GPU, in bytes (ADR 0009's budget). */

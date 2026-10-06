@@ -18,6 +18,8 @@ import { packNoise, type NoiseTable } from '../core/noise';
 import { describeGalaxy, type GalaxyDesc } from './galaxy';
 import { describeRibbons, type RibbonDesc } from './ribbons';
 import { makeVariation, type DrawingsMeta, type Variation } from './variation';
+import type { MergerSceneOptions } from './merger';
+import type { ShellSceneOptions } from './shells';
 
 export interface GalaxyScene {
   P: Params;
@@ -65,6 +67,19 @@ export interface SceneOptions {
   rmax?: number;
   /** Calibration only (negative controls): every dot's quad scaled by this. */
   dotScale?: number;
+  /**
+   * A merging galaxy (M8): which of the two (0 or 1). Its vector drawings are carried by that
+   * galaxy's tides (`WarpKind.tide`); the bitmap marks and ribbons are carried after the kernels
+   * (src/render/tide.ts, src/fallback/stipple.ts), which the engines know from their own setup.
+   */
+  tide?: 0 | 1;
+  /**
+   * A merger (`P.merger`, M8): the draws the picture is made with: v21's, replayed, in the goldens
+   * (src/model/merger.ts `MergerSceneOptions`). Read by the merger engines, not by `buildScene`.
+   */
+  merger?: MergerSceneOptions;
+  /** the simulated shells (`P.shellsOn`, M8): v21's stroke rows for the arcs, replayed in the goldens */
+  shells?: ShellSceneOptions;
 }
 
 export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {}): GalaxyScene {
@@ -84,7 +99,7 @@ export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {
     opts.curvePicks,
     galaxy.noise,
   );
-  const vectors = describeVectors(P, variation, meta, P.incl, opts.partPicks);
+  const vectors = describeVectors(P, variation, meta, P.incl, opts.partPicks, opts.tide);
   return { P, variation, galaxy, ribbons, vectors, meta };
 }
 

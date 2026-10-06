@@ -90,7 +90,7 @@ const GALAXY_TYPE = { spiral: 0, lenticular: 1, elliptical: 2 } as const;
 /** The `MSim` values of a description. */
 export function simUniform(d: MergerDesc): Record<string, number> {
   return {
-    seed: d.p.seed >>> 0,
+    seed: d.key,
     n: d.total,
     n0: d.n[0],
     dt: f(MERGER_DT),
@@ -189,7 +189,7 @@ export class CpuMergerStars {
   /** The initial conditions of star `i` (app23.js:L320–338), on the counter RNG. */
   initStar(i: number): void {
     const d = this.d;
-    const seed = d.p.seed >>> 0;
+    const seed = d.key;
     const g = i >= d.n[0] ? 1 : 0;
     const G = d.gals[g];
     const u01 = (k: number) => randF32(seed, Stream.mergerInit, i, k);
