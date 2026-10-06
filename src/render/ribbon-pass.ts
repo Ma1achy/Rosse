@@ -8,6 +8,7 @@ import { bufferWithData, packStruct } from '../gpu/buffers';
 import type { GpuAtlas } from '../marks/atlas';
 import type { StructLayout } from '../marks/instance';
 import { INK_FORMAT } from './sprites';
+import { KEY_STYLE, styleKey, withStyle, type PassStyle } from './pass-style';
 
 /** The `RibbonDraw` uniform of ribbon.wgsl. */
 export const RIBBON_DRAW_LAYOUT: StructLayout = {
@@ -23,8 +24,7 @@ export const RIBBON_DRAW_LAYOUT: StructLayout = {
     { name: 'cell', type: 'vec2<f32>', offset: 40, size: 8 },
     { name: 'max_lod', type: 'f32', offset: 48, size: 4 },
     { name: 'pad0', type: 'f32', offset: 52, size: 4 },
-    { name: 'pad1', type: 'f32', offset: 56, size: 4 },
-    { name: 'pad2', type: 'f32', offset: 60, size: 4 },
+    { name: 'off', type: 'vec2<f32>', offset: 56, size: 8 },
   ],
 };
 
@@ -93,6 +93,7 @@ interface DrawOpts {
   pxPerUnit: number;
   gain: number;
   ink?: readonly [number, number, number];
+  off?: readonly [number, number];
 }
 
 function drawUniforms(
@@ -112,18 +113,46 @@ function drawUniforms(
       cell: [atlas?.cellWidth ?? 1, atlas?.cellHeight ?? 1],
       max_lod: atlas?.maxLod ?? 0,
       pad0: 0,
-      pad1: 0,
-      pad2: 0,
+      off: opts.off ?? [0, 0],
     }),
     GPUBufferUsage.UNIFORM,
     label,
   );
 }
 
+/**
+ * The uniforms and bind group of a layer for one pass of the plates (ink, gain, offset): made on
+ * first use and kept, so switching plates builds a few uniform buffers and no instance data.
+ */
+class PassGroups<G> {
+  private readonly made = new Map<string, { uniforms: GPUBuffer; group: G }>();
+
+  constructor(
+    private readonly opts: DrawOpts,
+    private readonly build: (opts: DrawOpts) => { uniforms: GPUBuffer; group: G },
+  ) {}
+
+  get(style: PassStyle): G {
+    const key = styleKey(style);
+    let e = this.made.get(key);
+    if (!e) {
+      e = this.build(withStyle(this.opts, style));
+      this.made.set(key, e);
+    }
+    return e.group;
+  }
+
+  destroy(): void {
+    this.made.forEach((e) => {
+      e.uniforms.destroy();
+    });
+    this.made.clear();
+  }
+}
+
 /** One layer of textured ribbon segments (the strokes atlas must fit one texture array). */
 export class RibbonBatch {
-  private readonly uniforms: GPUBuffer;
-  private readonly group: GPUBindGroup;
+  private readonly groups: PassGroups<GPUBindGroup>;
 
   constructor(
     private readonly pipe: RibbonPipeline,
@@ -134,27 +163,42 @@ export class RibbonBatch {
   ) {
     const arr = atlas.arrays[0];
     if (!arr || atlas.arrays.length !== 1) throw new Error('strokes must fit one texture array');
-    this.uniforms = drawUniforms(pipe.device, opts, atlas, 'ribbon uniforms');
-    this.group = pipe.device.createBindGroup({
-      layout: pipe.ribbonLayout,
-      entries: [
-        { binding: 0, resource: { buffer: this.uniforms } },
-        { binding: 1, resource: { buffer } },
-        { binding: 2, resource: arr.view },
-        { binding: 3, resource: pipe.sampler },
-      ],
+    this.groups = new PassGroups(opts, (o) => {
+      const uniforms = drawUniforms(pipe.device, o, atlas, 'ribbon uniforms');
+      const group = pipe.device.createBindGroup({
+        layout: pipe.ribbonLayout,
+        entries: [
+          { binding: 0, resource: { buffer: uniforms } },
+          { binding: 1, resource: { buffer } },
+          { binding: 2, resource: arr.view },
+          { binding: 3, resource: pipe.sampler },
+        ],
+      });
+      return { uniforms, group };
     });
   }
 
-  encode(pass: GPURenderPassEncoder): void {
+  /** The batch as the frame's `Batch` methods (its pop is the caller's). */
+  bind() {
+    return {
+      encode: (pass: GPURenderPassEncoder, style: PassStyle) => {
+        this.encode(pass, style);
+      },
+      destroy: () => {
+        this.destroy();
+      },
+    };
+  }
+
+  encode(pass: GPURenderPassEncoder, style: PassStyle = KEY_STYLE): void {
     if (!this.count) return;
     pass.setPipeline(this.pipe.ribbon);
-    pass.setBindGroup(0, this.group);
+    pass.setBindGroup(0, this.groups.get(style));
     pass.draw(this.count * 6);
   }
 
   destroy(): void {
-    this.uniforms.destroy();
+    this.groups.destroy();
   }
 }
 
@@ -163,8 +207,7 @@ export class RibbonBatch {
  * arguments [6·n, 1, 0, 0] say (a compaction's output, `count` being the buffer's capacity).
  */
 export class CapsuleBatch {
-  private readonly uniforms: GPUBuffer;
-  private readonly group: GPUBindGroup;
+  private readonly groups: PassGroups<GPUBindGroup>;
 
   constructor(
     private readonly pipe: RibbonPipeline,
@@ -173,25 +216,40 @@ export class CapsuleBatch {
     opts: DrawOpts,
     private readonly indirect?: GPUBuffer,
   ) {
-    this.uniforms = drawUniforms(pipe.device, opts, null, 'capsule uniforms');
-    this.group = pipe.device.createBindGroup({
-      layout: pipe.capsuleLayout,
-      entries: [
-        { binding: 0, resource: { buffer: this.uniforms } },
-        { binding: 4, resource: { buffer } },
-      ],
+    this.groups = new PassGroups(opts, (o) => {
+      const uniforms = drawUniforms(pipe.device, o, null, 'capsule uniforms');
+      const group = pipe.device.createBindGroup({
+        layout: pipe.capsuleLayout,
+        entries: [
+          { binding: 0, resource: { buffer: uniforms } },
+          { binding: 4, resource: { buffer } },
+        ],
+      });
+      return { uniforms, group };
     });
   }
 
-  encode(pass: GPURenderPassEncoder): void {
+  /** The batch as the frame's `Batch` methods (its pop is the caller's). */
+  bind() {
+    return {
+      encode: (pass: GPURenderPassEncoder, style: PassStyle) => {
+        this.encode(pass, style);
+      },
+      destroy: () => {
+        this.destroy();
+      },
+    };
+  }
+
+  encode(pass: GPURenderPassEncoder, style: PassStyle = KEY_STYLE): void {
     if (!this.count) return;
     pass.setPipeline(this.pipe.capsule);
-    pass.setBindGroup(0, this.group);
+    pass.setBindGroup(0, this.groups.get(style));
     if (this.indirect) pass.drawIndirect(this.indirect, 0);
     else pass.draw(this.count * 6);
   }
 
   destroy(): void {
-    this.uniforms.destroy();
+    this.groups.destroy();
   }
 }

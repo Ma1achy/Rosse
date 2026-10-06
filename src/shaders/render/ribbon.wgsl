@@ -23,9 +23,10 @@ struct RibbonDraw {
   cell: vec2<f32>,
   max_lod: f32,
   pad0: f32,
-  pad1: f32,
-  pad2: f32,
+  // the plate's offset, plate units (the slipped plates' `uOff`, app23.js:L1096)
+  off: vec2<f32>,
 }
+
 
 // RIBBON_SEG_LAYOUT (src/model/ribbons.ts)
 struct RibbonSeg {
@@ -85,10 +86,10 @@ struct RibbonOut {
 fn vs_ribbon(@builtin(vertex_index) v: u32) -> RibbonOut {
   let s = segs[v / 6u];
   let k = draw.px_per_unit;
-  let p0 = s.a.xy * k;
-  let p1 = s.a.zw * k;
-  let p2 = s.b.xy * k;
-  let p3 = s.b.zw * k;
+  let p0 = (s.a.xy + draw.off) * k;
+  let p1 = (s.a.zw + draw.off) * k;
+  let p2 = (s.b.xy + draw.off) * k;
+  let p3 = (s.b.zw + draw.off) * k;
   let m0 = (p0 + p1) * 0.5;
   let m1 = (p2 + p3) * 0.5;
   let d = m1 - m0;
@@ -195,8 +196,8 @@ struct CapsuleOut {
 fn vs_capsule(@builtin(vertex_index) v: u32) -> CapsuleOut {
   let s = caps[v / 6u];
   let k = draw.px_per_unit;
-  let a = s.a * k;
-  let b = s.b * k;
+  let a = (s.a + draw.off) * k;
+  let b = (s.b + draw.off) * k;
   let w = s.w * k;
   let d = b - a;
   let dl = length(d);

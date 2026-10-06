@@ -16,6 +16,7 @@
  */
 import type { AtlasData, ImageData8 } from '../marks/atlas';
 import type { Instance } from '../marks/instance';
+import { compositeInk, type Plates } from '../render/plates';
 import {
   blendMultiply,
   blendSoftLight,
@@ -43,6 +44,8 @@ export interface SpriteParams {
   gain: number;
   /** ink colour; (1, 1, 1) is the key ink */
   ink?: readonly [number, number, number];
+  /** the plate's offset, plate units (the slipped plates) */
+  off?: readonly [number, number];
 }
 
 type M2 = [number, number, number, number];
@@ -122,13 +125,15 @@ export function rasteriseSprites(
   if (!top) return;
   const px = f(params.pxPerUnit);
   const ink = params.ink ?? [1, 1, 1];
+  const offX = f(params.off?.[0] ?? 0);
+  const offY = f(params.off?.[1] ?? 0);
   const [lo, hi] = atlas.edge;
   const { width: W, height: H, data } = target;
   const maxLod = atlas.levels.length - 1;
   for (const s of instances) {
     const m: M2 = [f(f(s.m[0]) * px), f(f(s.m[1]) * px), f(f(s.m[2]) * px), f(f(s.m[3]) * px)];
-    const cx = f(f(s.x) * px);
-    const cy = f(f(s.y) * px);
+    const cx = f(f(f(s.x) + offX) * px);
+    const cy = f(f(f(s.y) + offY) * px);
     const inv = inverse2(m);
     const lod = spriteLod(s.m, px, top.width, maxLod);
     // bounding box of the quad, in pixels
@@ -167,6 +172,8 @@ export interface CompositeParams {
   dpr: number;
   /** plate size in CSS pixels */
   plateCss: number;
+  /** the plates the ink was printed with: the coloured plates' target holds the colours (default `ink`) */
+  plates?: Plates;
 }
 
 /**
@@ -178,7 +185,7 @@ export function composite(ink: InkBuffer, p: CompositeParams, out: Uint8ClampedA
   const { width: pw, height: ph, data: pd } = p.paper;
   const k = texelPerPx(pw, p.dpr);
   const field = p.surface.field.map(f);
-  const key = p.surface.palette.ink.map(f);
+  const key = compositeInk(p.plates ?? 'ink', p.surface.palette).map(f);
   const blend = p.surface.blend === 'multiply' ? blendMultiply : blendSoftLight;
   const wrap = (i: number, n: number) => ((i % n) + n) % n;
   const tex = (x: number, y: number, c: number) => f((pd[(y * pw + x) * 4 + c] ?? 0) / 255);
@@ -293,6 +300,8 @@ export function rasteriseRibbons(
   if (!top) return;
   const px = f(params.pxPerUnit);
   const ink = params.ink ?? [1, 1, 1];
+  const offX = f(params.off?.[0] ?? 0);
+  const offY = f(params.off?.[1] ?? 0);
   const [lo, hi] = atlas.edge;
   const { width: W, height: H, data } = target;
   const maxLod = atlas.levels.length - 1;
@@ -300,7 +309,9 @@ export function rasteriseRibbons(
   const ch = f(top.height);
   for (let s = 0; s < count; s++) {
     const o = s * 12;
-    const p = Array.from({ length: 8 }, (_, k) => f((segsF[o + k] ?? 0) * px));
+    const p = Array.from({ length: 8 }, (_, k) =>
+      f(f((segsF[o + k] ?? 0) + (k % 2 ? offY : offX)) * px),
+    );
     const [p0x = 0, p0y = 0, p1x = 0, p1y = 0, p2x = 0, p2y = 0, p3x = 0, p3y = 0] = p;
     const u0 = segsF[o + 8] ?? 0;
     const u1 = segsF[o + 9] ?? 0;
@@ -375,13 +386,15 @@ export function rasteriseCapsules(
 ): void {
   const px = f(params.pxPerUnit);
   const ink = params.ink ?? [1, 1, 1];
+  const offX = f(params.off?.[0] ?? 0);
+  const offY = f(params.off?.[1] ?? 0);
   const { width: W, height: H, data } = target;
   for (let s = 0; s < count; s++) {
     const o = s * 8;
-    const ax = f((caps[o] ?? 0) * px);
-    const ay = f((caps[o + 1] ?? 0) * px);
-    const bx = f((caps[o + 2] ?? 0) * px);
-    const by = f((caps[o + 3] ?? 0) * px);
+    const ax = f(f((caps[o] ?? 0) + offX) * px);
+    const ay = f(f((caps[o + 1] ?? 0) + offY) * px);
+    const bx = f(f((caps[o + 2] ?? 0) + offX) * px);
+    const by = f(f((caps[o + 3] ?? 0) + offY) * px);
     const w = f((caps[o + 4] ?? 0) * px);
     const alpha = caps[o + 5] ?? 0;
     const vx = f(bx - ax);

@@ -100,6 +100,7 @@ export function lineLayers(rv: RibbonView, M: RibbonModel): InkLayer[] {
       kind: 'sprites',
       atlas: 'pieces',
       gain: 1,
+      pop: 'young',
       instances: instanceList(rv.pieces, rv.piecesU, rv.nPieces),
     });
   return out;
@@ -133,12 +134,14 @@ export function streamLayers(vo: VectorOut): InkLayer[] {
       kind: 'sprites',
       atlas: 'dots',
       gain: 1,
+      pop: 'old',
       instances: instanceList(vo.sdots, vo.sdotsU, vo.nSdots),
     },
     {
       kind: 'sprites',
       atlas: 'knots',
       gain: 1,
+      pop: 'old',
       instances: instanceList(vo.sknots, vo.sknotsU, vo.nSknots),
     },
   ];
@@ -191,6 +194,7 @@ export class CpuStipple {
       kind: 'sprites',
       atlas: l.atlas,
       gain: 1,
+      pop: l.pop,
       instances: list(l.cls),
     }));
     const streams = VD.parts.streams.length ? streamLayers(vo) : [];
@@ -203,7 +207,8 @@ export class CpuStipple {
       ...stipple.slice(3),
     ];
     const cores = coreInstances(P, meta, cam, galaxy.noise, VD.parts.picks.nuclear);
-    if (cores.length) layers.push({ kind: 'sprites', atlas: 'cores', gain: 1, instances: cores });
+    if (cores.length)
+      layers.push({ kind: 'sprites', atlas: 'cores', gain: 1, pop: 'old', instances: cores });
     const tiles = (l: InkLayer[], atlas: string) =>
       l.flatMap((x) =>
         x.kind === 'sprites' && x.atlas === atlas ? x.instances.map((i) => i.layer) : [],

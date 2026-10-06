@@ -2,9 +2,11 @@
  * One frame on the GPU (ADR 0007, 0010): the ink layers in order into the offscreen rgba16float
  * ink target (plate × DPR, no MSAA), then the composite onto the surface.
  *
- * Tiers, as far as M1 has them: `setLayers` builds the instance buffers (view tier), `drawInk`
- * re-inks the target, and `present` composites it onto a surface (present tier). Switching
- * surface calls only `present`: nothing else is rebuilt.
+ * Tiers: `setLayers` builds the instance buffers (view tier), `drawInk` re-inks the target with the
+ * passes of a plates mode (src/render/plates.ts), and `present` composites it onto a surface
+ * (both present tier). Switching surface on the `ink` plate calls only `present`; switching plates
+ * calls `drawInk` and `present` and builds a few uniform buffers: no compute pass and no instance
+ * buffer is rebuilt.
  */
 import {
   uploadAtlas,
@@ -14,6 +16,8 @@ import {
   type ImageData8,
 } from '../marks/atlas';
 import { CompositePass } from './composite';
+import type { PassStyle } from './pass-style';
+import { DEFAULT_LOOK, platePasses, type InkLook, type Plates } from './plates';
 import type { InkLayer } from './layers';
 import { CapsuleBatch, RibbonBatch, RibbonPipeline } from './ribbon-pass';
 import { PLATE } from '../view/camera';
@@ -22,7 +26,9 @@ import type { Surface } from './surface';
 
 /** A layer ready to draw. */
 interface Batch {
-  encode(pass: GPURenderPassEncoder): void;
+  /** the population the colour plate inks it as */
+  pop: NonNullable<InkLayer['pop']>;
+  encode(pass: GPURenderPassEncoder, style: PassStyle): void;
   destroy(): void;
 }
 
@@ -45,6 +51,8 @@ export class GpuRenderer {
   private readonly atlases = new Map<AtlasName, GpuAtlas>();
   private layers: readonly InkLayer[] = [];
   private batches: Batch[] = [];
+  /** the plates the ink target was last printed with, and what the composite is told */
+  private plates: Plates = 'ink';
 
   constructor(
     readonly device: GPUDevice,
@@ -102,22 +110,27 @@ export class GpuRenderer {
         pxPerUnit: this.pxPerUnit,
         gain: l.gain,
       };
+      const pop = l.pop ?? 'line';
       if (l.kind === 'gpu-capsules')
-        return new CapsuleBatch(this.ribbons, l.buffer, l.count, opts, l.indirect);
+        return {
+          pop,
+          ...new CapsuleBatch(this.ribbons, l.buffer, l.count, opts, l.indirect).bind(),
+        };
       if (l.kind === 'capsules' || l.kind === 'ribbons')
         throw new Error('the WebGPU engine draws GPU ribbon buffers only');
       const atlas = this.atlases.get(l.atlas);
       if (!atlas) throw new Error(`atlas ${l.atlas} not loaded`);
       if (l.kind === 'gpu-ribbons')
-        return new RibbonBatch(this.ribbons, atlas, l.buffer, l.count, opts);
+        return { pop, ...new RibbonBatch(this.ribbons, atlas, l.buffer, l.count, opts).bind() };
       const sprites = this.sprites;
       const b =
         l.kind === 'gpu-sprites'
           ? new IndirectSpriteBatch(sprites, atlas, l.source, opts)
           : new SpriteBatch(sprites, atlas, l.instances, opts);
       return {
-        encode: (pass) => {
-          b.encode(pass, sprites);
+        pop,
+        encode: (pass, style) => {
+          b.encode(pass, sprites, style);
         },
         destroy: () => {
           b.destroy();
@@ -126,8 +139,12 @@ export class GpuRenderer {
     });
   }
 
-  /** Inks every layer, in order, into the ink target. */
-  drawInk(): void {
+  /**
+   * Inks every layer, in order, into the ink target, once per pass of the plates (the reference's
+   * scene(), app23.js:L1302–1307). The default is the key ink on Paper, one pass.
+   */
+  drawInk(look: InkLook = DEFAULT_LOOK): void {
+    this.plates = look.plates;
     const encoder = this.device.createCommandEncoder({ label: 'ink' });
     const pass = encoder.beginRenderPass({
       label: 'ink',
@@ -140,7 +157,9 @@ export class GpuRenderer {
         },
       ],
     });
-    for (const b of this.batches) b.encode(pass);
+    for (const p of platePasses(look.plates, look.palette))
+      for (const b of this.batches)
+        b.encode(pass, { ink: p.inkOf(b.pop), gain: p.gain, off: p.off });
     pass.end();
     this.device.queue.submit([encoder.finish()]);
   }
@@ -156,6 +175,7 @@ export class GpuRenderer {
       surface,
       this.size.plateCss,
       this.size.dpr,
+      this.plates,
     );
     this.device.queue.submit([encoder.finish()]);
   }

@@ -12,49 +12,52 @@
  */
 import type { AtlasName } from '../marks/atlas';
 import type { Instance } from '../marks/instance';
+import type { Pop } from './plates';
 import type { GpuInstances } from './sprites';
 
-export interface SpriteLayer {
+/** What every layer carries: its weight and the population it is inked as (the plates' ink). */
+interface LayerBase {
+  /** the reference's uGain (1 for the key ink) */
+  gain: number;
+  /** the population: the colour plate's ink for the layer; the line work, when absent */
+  pop?: Pop;
+}
+
+export interface SpriteLayer extends LayerBase {
   kind: 'sprites';
   atlas: AtlasName;
   instances: readonly Instance[];
-  /** the reference's uGain (1 for the key ink) */
-  gain: number;
 }
 
 /** Sprites written on the GPU by a compute pass and drawn indirectly (WebGPU engine only). */
-export interface GpuSpriteLayer {
+export interface GpuSpriteLayer extends LayerBase {
   kind: 'gpu-sprites';
   atlas: AtlasName;
   source: GpuInstances;
-  gain: number;
 }
 
 /** Textured ribbon segments (RIBBON_SEG_LAYOUT), CPU engine. */
-export interface RibbonLayer {
+export interface RibbonLayer extends LayerBase {
   kind: 'ribbons';
   atlas: 'strokes';
   segs: Float32Array;
   segsU: Uint32Array;
   count: number;
-  gain: number;
 }
 
 /** Textured ribbon segments in a GPU buffer, `count` of them (WebGPU engine). */
-export interface GpuRibbonLayer {
+export interface GpuRibbonLayer extends LayerBase {
   kind: 'gpu-ribbons';
   atlas: 'strokes';
   buffer: GPUBuffer;
   count: number;
-  gain: number;
 }
 
 /** Pen-line capsules (CAPSULE_LAYOUT), CPU engine. */
-export interface CapsuleLayer {
+export interface CapsuleLayer extends LayerBase {
   kind: 'capsules';
   caps: Float32Array;
   count: number;
-  gain: number;
 }
 
 /**
@@ -62,11 +65,10 @@ export interface CapsuleLayer {
  * indirect draw arguments `[6·n, 1, 0, 0]` at `indirect` say, written by a compaction, with
  * `count` the buffer's capacity.
  */
-export interface GpuCapsuleLayer {
+export interface GpuCapsuleLayer extends LayerBase {
   kind: 'gpu-capsules';
   buffer: GPUBuffer;
   count: number;
-  gain: number;
   indirect?: GPUBuffer;
 }
 

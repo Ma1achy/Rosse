@@ -240,6 +240,7 @@ export class GpuRibbons {
       kind: 'gpu-sprites',
       atlas,
       gain: 1,
+      ...(atlas === 'pieces' ? { pop: 'young' as const } : {}),
       source: {
         buffer,
         offset: 0,

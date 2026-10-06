@@ -378,7 +378,7 @@ export class GpuStipple {
       ...this.vectors.streamLayers(),
       ...stipple.slice(3),
       ...(cores.length
-        ? [{ kind: 'sprites', atlas: 'cores', gain: 1, instances: cores } as InkLayer]
+        ? [{ kind: 'sprites', atlas: 'cores', gain: 1, pop: 'old', instances: cores } as InkLayer]
         : []),
     ];
   }
@@ -397,6 +397,7 @@ export class GpuStipple {
       kind: 'gpu-sprites',
       atlas: l.atlas,
       gain: 1,
+      pop: l.pop,
       source: {
         buffer: m.out,
         offset: l.cls * bytes,

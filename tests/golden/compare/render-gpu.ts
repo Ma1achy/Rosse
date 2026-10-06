@@ -16,6 +16,8 @@ import {
   type SceneOptions,
 } from '../../../src/model/scene';
 import { GpuRenderer } from '../../../src/render/frame';
+import type { Plates } from '../../../src/render/plates';
+import { PALETTES } from '../../../src/render/palette';
 import { GpuStipple } from '../../../src/render/stipple';
 import { cameraOf } from '../../../src/view/camera';
 
@@ -96,7 +98,8 @@ async function main(): Promise<void> {
       stipple.setScene(scene);
       stipple.setView(cam);
       renderer.setLayers(stipple.inkLayers());
-      renderer.drawInk();
+      // the plates the case was captured with: α is the union of the passes (v21's canvas)
+      renderer.drawInk({ plates: P.plates as Plates, palette: PALETTES.light });
       const half = new Uint16Array((await readTexture(device, renderer.ink, 8)).buffer);
       const n = renderer.width * renderer.height;
       const alpha = new Uint8Array(n);
