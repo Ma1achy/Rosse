@@ -1,0 +1,40 @@
+{
+  "name": "rosse",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Rosse, the hand-drawn galaxy engine, reimplemented on WebGPU.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "validate:wgsl": "node tools/validate-wgsl.mjs",
+    "golden": "node tests/golden/compare/compare.mjs",
+    "capture:reference": "node tools/capture-reference/capture.mjs",
+    "profile:reference": "node tools/profile-reference/profile.mjs",
+    "spike": "node spikes/vector-lines/run.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.20.5",
+    "@webgpu/types": "^0.1.66",
+    "eslint": "^10.1.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^16.5.0",
+    "playwright": "1.56.1",
+    "pngjs": "^7.0.0",
+    "prettier": "^3.6.2",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vite": "^7.2.2",
+    "vitest": "^4.0.8"
+  }
+}

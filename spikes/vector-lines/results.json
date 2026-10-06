@@ -1,0 +1,715 @@
+{
+  "adapter": {
+    "vendor": "google",
+    "architecture": "swiftshader",
+    "device": "",
+    "description": "",
+    "timestampQuery": true,
+    "float32Filterable": true,
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.7390.37 Safari/537.36"
+  },
+  "drawing": {
+    "src": "AB-1",
+    "type": "galaxy:barred-spiral",
+    "polylines": 39,
+    "segments": 110,
+    "dots": 9,
+    "blobs": 0,
+    "densifiedSegments": 314,
+    "centrelineLengthTile": 3.058,
+    "warpedCentrelineLengthTile": 3.2007
+  },
+  "bake": {
+    "512": {
+      "ms": 12.9,
+      "bytes": 524288
+    },
+    "2048": {
+      "ms": 55,
+      "bytes": 8388608
+    }
+  },
+  "memory": {
+    "perDrawing": {
+      "segmentsVec4f32": 1760,
+      "polylinePointsF32": 1192,
+      "densifiedSegmentsVec4f32": 5024,
+      "dotsVec4f32": 144,
+      "sdf512_r16f": 524288,
+      "sdf2048_r16f": 8388608,
+      "sdf512_withMips": 699051,
+      "sdf2048_withMips": 11184811
+    },
+    "library": {
+      "drawings": 429,
+      "segments": 23431,
+      "points": 28510,
+      "dots": 6038,
+      "blobs": 328,
+      "segmentsVec4f32": 374896,
+      "polylinePointsF32": 228080,
+      "sdf512_r16f": 224919552,
+      "sdf2048_r16f": 3598712832,
+      "perAtlas": {
+        "whole": {
+          "drawings": 156,
+          "segments": 11719,
+          "dots": 2514
+        },
+        "arms": {
+          "drawings": 44,
+          "segments": 1005,
+          "dots": 2280
+        },
+        "rings": {
+          "drawings": 51,
+          "segments": 2862,
+          "dots": 301
+        },
+        "bars": {
+          "drawings": 10,
+          "segments": 271,
+          "dots": 98
+        },
+        "env": {
+          "drawings": 21,
+          "segments": 1563,
+          "dots": 498
+        },
+        "arcs": {
+          "drawings": 15,
+          "segments": 532,
+          "dots": 109
+        },
+        "shells": {
+          "drawings": 5,
+          "segments": 175,
+          "dots": 85
+        },
+        "companions": {
+          "drawings": 10,
+          "segments": 625,
+          "dots": 93
+        },
+        "trails": {
+          "drawings": 13,
+          "segments": 287,
+          "dots": 32
+        },
+        "penlines": {
+          "drawings": 25,
+          "segments": 1441,
+          "dots": 15
+        },
+        "sstars": {
+          "drawings": 77,
+          "segments": 2765,
+          "dots": 0
+        },
+        "misc": {
+          "drawings": 2,
+          "segments": 186,
+          "dots": 13
+        }
+      }
+    },
+    "renderTargets": {
+      "plate1600_rgba8": 10240000,
+      "plate1600_msaa4_rgba8": 40960000
+    }
+  },
+  "fidelity": {
+    "48": {
+      "R": {
+        "meanWidthPx": 2.16,
+        "refWidthPx": 2.16,
+        "inkRatio": 1,
+        "iou50": 1,
+        "softIoU": 1,
+        "madInk": 0
+      },
+      "R3": {
+        "meanWidthPx": 2.108,
+        "refWidthPx": 2.108,
+        "inkRatio": 1,
+        "iou50": 1,
+        "softIoU": 1,
+        "madInk": 0
+      },
+      "A": {
+        "meanWidthPx": 2.527,
+        "refWidthPx": 2.16,
+        "inkRatio": 1.17,
+        "iou50": 0.804,
+        "softIoU": 0.825,
+        "madInk": 0.132,
+        "vsRoundCaps": {
+          "refWidthPx": 2.429,
+          "inkRatio": 1.041,
+          "iou50": 0.894,
+          "softIoU": 0.908,
+          "madInk": 0.069
+        }
+      },
+      "A2": {
+        "meanWidthPx": 2.622,
+        "refWidthPx": 2.16,
+        "inkRatio": 1.214,
+        "iou50": 0.812,
+        "softIoU": 0.82,
+        "madInk": 0.139,
+        "vsRoundCaps": {
+          "refWidthPx": 2.429,
+          "inkRatio": 1.08,
+          "iou50": 0.917,
+          "softIoU": 0.92,
+          "madInk": 0.062
+        }
+      },
+      "A2m": {
+        "meanWidthPx": 2.374,
+        "refWidthPx": 2.16,
+        "inkRatio": 1.099,
+        "iou50": 0.879,
+        "softIoU": 0.874,
+        "madInk": 0.089,
+        "vsRoundCaps": {
+          "refWidthPx": 2.429,
+          "inkRatio": 0.977,
+          "iou50": 0.946,
+          "softIoU": 0.946,
+          "madInk": 0.039
+        }
+      },
+      "B512": {
+        "meanWidthPx": 2.369,
+        "refWidthPx": 2.16,
+        "inkRatio": 1.097,
+        "iou50": 0.876,
+        "softIoU": 0.876,
+        "madInk": 0.088,
+        "vsRoundCaps": {
+          "refWidthPx": 2.429,
+          "inkRatio": 0.975,
+          "iou50": 0.944,
+          "softIoU": 0.948,
+          "madInk": 0.038
+        }
+      },
+      "B2048": {
+        "meanWidthPx": 2.369,
+        "refWidthPx": 2.16,
+        "inkRatio": 1.097,
+        "iou50": 0.876,
+        "softIoU": 0.876,
+        "madInk": 0.088,
+        "vsRoundCaps": {
+          "refWidthPx": 2.429,
+          "inkRatio": 0.975,
+          "iou50": 0.944,
+          "softIoU": 0.948,
+          "madInk": 0.038
+        }
+      },
+      "A3": {
+        "meanWidthPx": 2.509,
+        "refWidthPx": 2.108,
+        "inkRatio": 1.19,
+        "iou50": 0.777,
+        "softIoU": 0.827,
+        "madInk": 0.133,
+        "vsRoundCaps": {
+          "refWidthPx": 2.364,
+          "inkRatio": 1.061,
+          "iou50": 0.847,
+          "softIoU": 0.906,
+          "madInk": 0.071
+        }
+      },
+      "B3": {
+        "meanWidthPx": 2.314,
+        "refWidthPx": 2.108,
+        "inkRatio": 1.098,
+        "iou50": 0.863,
+        "softIoU": 0.839,
+        "madInk": 0.116,
+        "vsRoundCaps": {
+          "refWidthPx": 2.364,
+          "inkRatio": 0.979,
+          "iou50": 0.933,
+          "softIoU": 0.914,
+          "madInk": 0.062
+        }
+      }
+    },
+    "220": {
+      "R": {
+        "meanWidthPx": 2.367,
+        "refWidthPx": 2.367,
+        "inkRatio": 1,
+        "iou50": 1,
+        "softIoU": 1,
+        "madInk": 0
+      },
+      "R3": {
+        "meanWidthPx": 2.355,
+        "refWidthPx": 2.355,
+        "inkRatio": 1,
+        "iou50": 1,
+        "softIoU": 1,
+        "madInk": 0
+      },
+      "A": {
+        "meanWidthPx": 2.519,
+        "refWidthPx": 2.367,
+        "inkRatio": 1.065,
+        "iou50": 0.855,
+        "softIoU": 0.885,
+        "madInk": 0.083,
+        "vsRoundCaps": {
+          "refWidthPx": 2.474,
+          "inkRatio": 1.019,
+          "iou50": 0.896,
+          "softIoU": 0.922,
+          "madInk": 0.057
+        }
+      },
+      "A2": {
+        "meanWidthPx": 2.543,
+        "refWidthPx": 2.367,
+        "inkRatio": 1.074,
+        "iou50": 0.912,
+        "softIoU": 0.909,
+        "madInk": 0.064,
+        "vsRoundCaps": {
+          "refWidthPx": 2.474,
+          "inkRatio": 1.028,
+          "iou50": 0.954,
+          "softIoU": 0.949,
+          "madInk": 0.036
+        }
+      },
+      "A2m": {
+        "meanWidthPx": 2.477,
+        "refWidthPx": 2.367,
+        "inkRatio": 1.047,
+        "iou50": 0.93,
+        "softIoU": 0.925,
+        "madInk": 0.052,
+        "vsRoundCaps": {
+          "refWidthPx": 2.474,
+          "inkRatio": 1.001,
+          "iou50": 0.969,
+          "softIoU": 0.96,
+          "madInk": 0.028
+        }
+      },
+      "B512": {
+        "meanWidthPx": 2.478,
+        "refWidthPx": 2.367,
+        "inkRatio": 1.047,
+        "iou50": 0.935,
+        "softIoU": 0.927,
+        "madInk": 0.051,
+        "vsRoundCaps": {
+          "refWidthPx": 2.474,
+          "inkRatio": 1.002,
+          "iou50": 0.974,
+          "softIoU": 0.962,
+          "madInk": 0.026
+        }
+      },
+      "B2048": {
+        "meanWidthPx": 2.478,
+        "refWidthPx": 2.367,
+        "inkRatio": 1.047,
+        "iou50": 0.932,
+        "softIoU": 0.926,
+        "madInk": 0.051,
+        "vsRoundCaps": {
+          "refWidthPx": 2.474,
+          "inkRatio": 1.002,
+          "iou50": 0.971,
+          "softIoU": 0.962,
+          "madInk": 0.027
+        }
+      },
+      "A3": {
+        "meanWidthPx": 2.535,
+        "refWidthPx": 2.355,
+        "inkRatio": 1.077,
+        "iou50": 0.834,
+        "softIoU": 0.881,
+        "madInk": 0.086,
+        "vsRoundCaps": {
+          "refWidthPx": 2.461,
+          "inkRatio": 1.03,
+          "iou50": 0.87,
+          "softIoU": 0.918,
+          "madInk": 0.059
+        }
+      },
+      "B3": {
+        "meanWidthPx": 2.469,
+        "refWidthPx": 2.355,
+        "inkRatio": 1.048,
+        "iou50": 0.911,
+        "softIoU": 0.909,
+        "madInk": 0.063,
+        "vsRoundCaps": {
+          "refWidthPx": 2.461,
+          "inkRatio": 1.003,
+          "iou50": 0.949,
+          "softIoU": 0.945,
+          "madInk": 0.039
+        }
+      }
+    },
+    "1100": {
+      "R": {
+        "meanWidthPx": 2.394,
+        "refWidthPx": 2.394,
+        "inkRatio": 1,
+        "iou50": 1,
+        "softIoU": 1,
+        "madInk": 0
+      },
+      "R3": {
+        "meanWidthPx": 2.392,
+        "refWidthPx": 2.392,
+        "inkRatio": 1,
+        "iou50": 1,
+        "softIoU": 1,
+        "madInk": 0
+      },
+      "A": {
+        "meanWidthPx": 2.456,
+        "refWidthPx": 2.394,
+        "inkRatio": 1.026,
+        "iou50": 0.887,
+        "softIoU": 0.91,
+        "madInk": 0.063,
+        "vsRoundCaps": {
+          "refWidthPx": 2.441,
+          "inkRatio": 1.006,
+          "iou50": 0.903,
+          "softIoU": 0.927,
+          "madInk": 0.052
+        }
+      },
+      "A2": {
+        "meanWidthPx": 2.459,
+        "refWidthPx": 2.394,
+        "inkRatio": 1.027,
+        "iou50": 0.948,
+        "softIoU": 0.942,
+        "madInk": 0.04,
+        "vsRoundCaps": {
+          "refWidthPx": 2.441,
+          "inkRatio": 1.007,
+          "iou50": 0.965,
+          "softIoU": 0.96,
+          "madInk": 0.028
+        }
+      },
+      "A2m": {
+        "meanWidthPx": 2.448,
+        "refWidthPx": 2.394,
+        "inkRatio": 1.022,
+        "iou50": 0.952,
+        "softIoU": 0.944,
+        "madInk": 0.038,
+        "vsRoundCaps": {
+          "refWidthPx": 2.441,
+          "inkRatio": 1.003,
+          "iou50": 0.969,
+          "softIoU": 0.962,
+          "madInk": 0.026
+        }
+      },
+      "B512": {
+        "meanWidthPx": 2.073,
+        "refWidthPx": 2.394,
+        "inkRatio": 0.866,
+        "iou50": 0.885,
+        "softIoU": 0.826,
+        "madInk": 0.118,
+        "vsRoundCaps": {
+          "refWidthPx": 2.441,
+          "inkRatio": 0.849,
+          "iou50": 0.886,
+          "softIoU": 0.827,
+          "madInk": 0.118
+        }
+      },
+      "B2048": {
+        "meanWidthPx": 2.445,
+        "refWidthPx": 2.394,
+        "inkRatio": 1.021,
+        "iou50": 0.954,
+        "softIoU": 0.947,
+        "madInk": 0.036,
+        "vsRoundCaps": {
+          "refWidthPx": 2.441,
+          "inkRatio": 1.002,
+          "iou50": 0.971,
+          "softIoU": 0.964,
+          "madInk": 0.024
+        }
+      },
+      "A3": {
+        "meanWidthPx": 2.464,
+        "refWidthPx": 2.392,
+        "inkRatio": 1.03,
+        "iou50": 0.862,
+        "softIoU": 0.902,
+        "madInk": 0.07,
+        "vsRoundCaps": {
+          "refWidthPx": 2.437,
+          "inkRatio": 1.011,
+          "iou50": 0.878,
+          "softIoU": 0.918,
+          "madInk": 0.059
+        }
+      },
+      "B3": {
+        "meanWidthPx": 2.452,
+        "refWidthPx": 2.392,
+        "inkRatio": 1.025,
+        "iou50": 0.899,
+        "softIoU": 0.897,
+        "madInk": 0.072,
+        "vsRoundCaps": {
+          "refWidthPx": 2.437,
+          "inkRatio": 1.006,
+          "iou50": 0.915,
+          "softIoU": 0.913,
+          "madInk": 0.061
+        }
+      }
+    }
+  },
+  "timing": [
+    {
+      "method": "A",
+      "n": 1,
+      "size": 1100,
+      "frames": 60,
+      "meanMs": 7.89,
+      "medianMs": 7.4,
+      "gpuMeanMs": 6.188,
+      "vertices": 660
+    },
+    {
+      "method": "A2",
+      "n": 1,
+      "size": 1100,
+      "frames": 60,
+      "meanMs": 2.8,
+      "medianMs": 2.6,
+      "gpuMeanMs": 1.173,
+      "vertices": 660
+    },
+    {
+      "method": "A2m",
+      "n": 1,
+      "size": 1100,
+      "frames": 60,
+      "meanMs": 2.92,
+      "medianMs": 2.6,
+      "gpuMeanMs": 1.325,
+      "vertices": 660
+    },
+    {
+      "method": "B512",
+      "n": 1,
+      "size": 1100,
+      "frames": 60,
+      "meanMs": 26.33,
+      "medianMs": 21.6,
+      "gpuMeanMs": 23.708,
+      "vertices": 6
+    },
+    {
+      "method": "B2048",
+      "n": 1,
+      "size": 1100,
+      "frames": 60,
+      "meanMs": 32.89,
+      "medianMs": 31.5,
+      "gpuMeanMs": 30.77,
+      "vertices": 6
+    },
+    {
+      "method": "A3",
+      "n": 1,
+      "size": 1100,
+      "frames": 60,
+      "meanMs": 9.28,
+      "medianMs": 8.1,
+      "gpuMeanMs": 8.047,
+      "vertices": 1884
+    },
+    {
+      "method": "B3",
+      "n": 1,
+      "size": 1100,
+      "frames": 35,
+      "meanMs": 115.66,
+      "medianMs": 114.6,
+      "gpuMeanMs": 114.247,
+      "vertices": 6
+    },
+    {
+      "method": "A",
+      "n": 1000,
+      "size": 48,
+      "frames": 10,
+      "meanMs": 411.6,
+      "medianMs": 411.7,
+      "gpuMeanMs": 407.497,
+      "vertices": 660000
+    },
+    {
+      "method": "A2",
+      "n": 1000,
+      "size": 48,
+      "frames": 20,
+      "meanMs": 211.25,
+      "medianMs": 208.5,
+      "gpuMeanMs": 209.817,
+      "vertices": 660000
+    },
+    {
+      "method": "A2m",
+      "n": 1000,
+      "size": 48,
+      "frames": 19,
+      "meanMs": 218.76,
+      "medianMs": 217.9,
+      "gpuMeanMs": 217.197,
+      "vertices": 660000
+    },
+    {
+      "method": "B512",
+      "n": 1000,
+      "size": 48,
+      "frames": 53,
+      "meanMs": 75.99,
+      "medianMs": 74.4,
+      "gpuMeanMs": 74.763,
+      "vertices": 6000
+    },
+    {
+      "method": "B2048",
+      "n": 1000,
+      "size": 48,
+      "frames": 34,
+      "meanMs": 118.86,
+      "medianMs": 120.8,
+      "gpuMeanMs": 117.633,
+      "vertices": 6000
+    },
+    {
+      "method": "A3",
+      "n": 1000,
+      "size": 48,
+      "frames": 5,
+      "meanMs": 1016.56,
+      "medianMs": 994.9,
+      "gpuMeanMs": 1014.632,
+      "vertices": 1884000
+    },
+    {
+      "method": "B3",
+      "n": 1000,
+      "size": 48,
+      "frames": 13,
+      "meanMs": 331.75,
+      "medianMs": 319.5,
+      "gpuMeanMs": 330.357,
+      "vertices": 6000
+    },
+    {
+      "method": "A",
+      "n": 6000,
+      "size": 48,
+      "frames": 5,
+      "meanMs": 2449.62,
+      "medianMs": 2469.7,
+      "gpuMeanMs": 2447.331,
+      "vertices": 3960000
+    },
+    {
+      "method": "A2",
+      "n": 6000,
+      "size": 48,
+      "frames": 5,
+      "meanMs": 1236.82,
+      "medianMs": 1241.1,
+      "gpuMeanMs": 1235.518,
+      "vertices": 3960000
+    },
+    {
+      "method": "A2m",
+      "n": 6000,
+      "size": 48,
+      "frames": 5,
+      "meanMs": 1655.46,
+      "medianMs": 1556.4,
+      "gpuMeanMs": 1646.83,
+      "vertices": 3960000
+    },
+    {
+      "method": "B512",
+      "n": 6000,
+      "size": 48,
+      "frames": 8,
+      "meanMs": 542.7,
+      "medianMs": 531.7,
+      "gpuMeanMs": 541.061,
+      "vertices": 36000
+    },
+    {
+      "method": "B2048",
+      "n": 6000,
+      "size": 48,
+      "frames": 5,
+      "meanMs": 1127.86,
+      "medianMs": 1185.7,
+      "gpuMeanMs": 1126.269,
+      "vertices": 36000
+    },
+    {
+      "method": "A3",
+      "n": 6000,
+      "size": 48,
+      "frames": 5,
+      "meanMs": 7145.74,
+      "medianMs": 7365.3,
+      "gpuMeanMs": 7144.487,
+      "vertices": 11304000
+    },
+    {
+      "method": "B3",
+      "n": 6000,
+      "size": 48,
+      "frames": 5,
+      "meanMs": 3008.66,
+      "medianMs": 2879.5,
+      "gpuMeanMs": 3002.474,
+      "vertices": 36000
+    }
+  ],
+  "notes": [],
+  "error": null,
+  "runner": {
+    "date": "2026-10-03T22:20:41.602Z",
+    "chromium": "141.0.7390.37",
+    "args": [
+      "--enable-unsafe-webgpu",
+      "--use-webgpu-adapter=swiftshader",
+      "--enable-features=Vulkan"
+    ]
+  }
+}
