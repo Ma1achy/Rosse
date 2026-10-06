@@ -52,6 +52,12 @@ export interface Thresholds {
 }
 
 export interface ThresholdFile {
+  /**
+   * K (ADR 0018): the parity comparison sets v21 against the mean of each measure over K engine
+   * draws (the canonical one and K − 1 re-draws of the placement stream), and the parity
+   * thresholds are calibrated for that statistic. Absent or 1: one draw.
+   */
+  keys?: number;
   strict: Thresholds;
   parity: Record<string, Thresholds & { byPreset?: Record<string, Partial<Thresholds>> }>;
 }

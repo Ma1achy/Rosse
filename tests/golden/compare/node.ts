@@ -12,7 +12,7 @@ import { presetFamily, presetParams } from '../../../src/core/presets';
 import type { MarkCounts, SceneOptions } from '../../../src/model/scene';
 import type { Variation } from '../../../src/model/variation';
 import { CpuGolden } from './engine-cpu';
-import { v21CurvePicks } from './v21-curves';
+import { v21CurvePicks, v21DustPicks, v21RingKnots } from './v21-curves';
 import { v21NoiseTables } from './v21-noise';
 import type { NoiseTable } from '../../../src/core/noise';
 import type { CurvePicks } from '../../../src/model/curves';
@@ -124,14 +124,20 @@ export class GoldenNode {
 
   /**
    * Everything the comparison draws with besides the parameters: v21's variation (ADR 0015), and
-   * from M4 v21's stroke choices and noise field.
+   * from M4 (ADR 0018) v21's stroke choices, noise field, dust choices (each hatch's numbers and
+   * pen line, the carving lines' pen lines) and ring-knot clusters. With them, every random choice
+   * the two engines make differently is v21's, and only the marks differ: the placement key
+   * re-draws nothing else.
    */
   referenceOptions(P: Params): SceneOptions {
     const variation = this.v21Variation(P);
+    const kinds = this.cpu.meta.strokes?.kind ?? [];
     return {
       variation,
       curvePicks: this.v21CurvePicks(P, variation),
       noise: this.v21Noise(P.seed),
+      dustPicks: v21DustPicks(this.root, P, variation, kinds, this.cpu.meta.penlines?.n ?? 0),
+      ringKnotPicks: v21RingKnots(this.root, P, variation, kinds),
     };
   }
 
@@ -181,56 +187,70 @@ export class GoldenNode {
   }
 
   /**
-   * Calibration (ADR 0013, 0015), source (ii): the new engine re-keying only its placement stream,
-   * drawing v21's replayed variation, so every structural choice stays and the dots are re-drawn.
-   * Pairs (key 0, key k) for k = 1..K per configuration. Also every negative control (ADR 0015)
-   * that applies to the configuration, re-keyed, against key 0.
+   * Calibration (ADR 0013, 0015, 0018), source (ii): the new engine re-keying only its placement
+   * stream, drawing v21's replayed variation, so every structural choice stays and the dots are
+   * re-drawn. As the comparison (ADR 0018) sets one drawing (v21's) against the mean over K
+   * engine draws, so does the calibration: each of `standIns` drawings (keys `STAND_IN_KEY + r`)
+   * stands in for v21, against the K draws of keys 0..K − 1 (the comparison's own keys). Every
+   * negative control (ADR 0015) that applies is drawn with the same K keys, against the first
+   * stand-in. Each entry holds the K comparisons, in key order, so that the runner can take the
+   * mean over any K' ≤ K of them (the first K').
    */
   calibrateEngine(
     cases: { preset: string; base: string; family: string; params: Params; zoom?: number }[],
     keys: number,
+    standIns: number,
     log: (s: string) => void,
   ) {
-    const pairs: Record<string, (Comparison & { preset: string })[]> = {};
-    const controls: Record<string, Record<string, { config: string; c: Comparison }[]>> = {};
+    const pairs: Record<string, { preset: string; config: string; cs: Comparison[] }[]> = {};
+    const controls: Record<string, Record<string, { config: string; cs: Comparison[] }[]>> = {};
     for (const c of cases) {
       const opts = this.referenceOptions(c.params);
       const zoom = c.zoom ?? 1;
-      const base = measure(this.cpu.render(c.params, opts, zoom).alpha);
-      const baseQ = momentsOf(base.alpha, base.extent.r90).q;
-      for (let k = 1; k <= keys; k++) {
-        const r = this.cpu.render(
-          c.params,
-          { ...opts, placementKey: (c.params.seed + k * 7_919_000) >>> 0 },
-          zoom,
-        );
+      const draw = (P: Params, o: SceneOptions, k: number) =>
+        measure(this.cpu.render(P, keyed(o, P.seed, k), zoom).alpha);
+      const stand = Array.from({ length: standIns }, (_, r) =>
+        draw(c.params, opts, STAND_IN_KEY + r),
+      );
+      const drawn = Array.from({ length: keys }, (_, k) => draw(c.params, opts, k));
+      const config = `${c.preset} s${String(c.params.seed)} incl ${String(c.params.incl)}${zoom === 1 ? '' : ` zoom ${String(zoom)}`}`;
+      for (const ref of stand)
         // tagged with the preset, for the per-preset axis-ratio tolerances
         (pairs[c.family] ??= []).push({
-          ...compareMeasures(base, measure(r.alpha)),
           preset: c.base,
-        });
-      }
-      const config = `${c.preset} s${String(c.params.seed)} incl ${String(c.params.incl)}${zoom === 1 ? '' : ` zoom ${String(zoom)}`}`;
-      for (const ctl of NEGATIVE_CONTROLS) {
-        if (!ctl.applies(c.params, baseQ)) continue;
-        const P = ctl.params ? ctl.params(c.params) : c.params;
-        const r = this.cpu.render(
-          P,
-          {
-            ...this.referenceOptions(P),
-            placementKey: (c.params.seed + 1) >>> 0,
-            ...(ctl.scene ?? {}),
-          },
-          zoom,
-        );
-        ((controls[c.family] ??= {})[ctl.name] ??= []).push({
           config,
-          c: compareMeasures(base, measure(r.alpha)),
+          cs: drawn.map((m) => compareMeasures(ref, m)),
         });
+      const ref = stand[0];
+      if (!ref) continue;
+      const refQ = momentsOf(ref.alpha, ref.extent.r90).q;
+      for (const ctl of NEGATIVE_CONTROLS) {
+        if (!ctl.applies(c.params, refQ)) continue;
+        const P = ctl.params ? ctl.params(c.params) : c.params;
+        const o = { ...this.referenceOptions(P), ...(ctl.scene ?? {}) };
+        const cs: Comparison[] = [];
+        for (let k = 0; k < keys; k++) cs.push(compareMeasures(ref, draw(P, o, k)));
+        ((controls[c.family] ??= {})[ctl.name] ??= []).push({ config, cs });
       }
       log(`  ${config}`);
     }
     return { pairs, controls };
+  }
+
+  /**
+   * The comparison's re-draws (ADR 0018): the CPU engine drawing a required case with keys
+   * 1..K − 1, each compared with v21's capture; key 0, the canonical draw, is each engine's own.
+   */
+  redraws(name: string, keys: number): { c: Comparison; counts: Record<string, number> }[] {
+    const rec = this.record(name);
+    const opts = this.referenceOptions(rec.params);
+    const ref = measure(this.reference(name));
+    const out: { c: Comparison; counts: Record<string, number> }[] = [];
+    for (let k = 1; k < keys; k++) {
+      const r = this.cpu.render(rec.params, keyed(opts, rec.params.seed, k), rec.zoom ?? 1);
+      out.push({ c: compareMeasures(ref, measure(r.alpha)), counts: engineCounts(r.counts) });
+    }
+    return out;
   }
 
   /** Calibration, source (i): v21's own re-roll pairs (capture tool --reroll). */
@@ -259,6 +279,85 @@ export class GoldenNode {
     }
     return { pairs, used };
   }
+}
+
+/**
+ * The placement key of draw k of a configuration (ADR 0018): k = 0 is the engine's own key (the
+ * canonical draw, which L0, the engine hashes and test (e) use); other keys re-key the placement
+ * stream only, as the calibration's re-draws always have.
+ */
+export function rekey(seed: number, k: number): number | undefined {
+  return k === 0 ? undefined : (seed + k * 7_919_000) >>> 0;
+}
+
+/** Scene options drawing with key k (`rekey`). */
+export function keyed(o: SceneOptions, seed: number, k: number): SceneOptions {
+  const key = rekey(seed, k);
+  return key === undefined ? o : { ...o, placementKey: key };
+}
+
+/** The calibration's stand-ins for v21 use keys from here on, apart from any comparison's K. */
+export const STAND_IN_KEY = 1000;
+
+/** The mean of an angle of period 180° (twice the angle, averaged on the circle), in [lo, lo + 180). */
+function meanAxis(degrees: number[], lo: number): number {
+  let s = 0;
+  let c = 0;
+  for (const d of degrees) {
+    s += Math.sin((d * Math.PI) / 90);
+    c += Math.cos((d * Math.PI) / 90);
+  }
+  const m = (Math.atan2(s, c) * 90) / Math.PI;
+  return ((((m - lo) % 180) + 180) % 180) + lo;
+}
+
+/**
+ * The mean of each measure over K comparisons with the same reference (ADR 0018): arithmetic
+ * means, and axial means for the position angles.
+ */
+export function meanComparison(cs: Comparison[]): Comparison {
+  const first = cs[0];
+  if (!first) throw new Error('meanComparison: no comparisons');
+  if (cs.length === 1) return first;
+  const mean = (f: (c: Comparison) => number) => cs.reduce((a, c) => a + f(c), 0) / cs.length;
+  return {
+    inkRel: mean((c) => c.inkRel),
+    ssim: mean((c) => c.ssim),
+    ssimCoarse: mean((c) => c.ssimCoarse),
+    medianRel: mean((c) => c.medianRel),
+    p90Rel: mean((c) => c.p90Rel),
+    r25Rel: mean((c) => c.r25Rel),
+    r50Rel: mean((c) => c.r50Rel),
+    r90Rel: mean((c) => c.r90Rel),
+    outerDiff: mean((c) => c.outerDiff),
+    qDiff: mean((c) => c.qDiff),
+    qInnerDiff: mean((c) => c.qInnerDiff),
+    paDiff: meanAxis(
+      cs.map((c) => c.paDiff),
+      -90,
+    ),
+    ref: first.ref,
+    render: {
+      ink: mean((c) => c.render.ink),
+      median: mean((c) => c.render.median),
+      p90: mean((c) => c.render.p90),
+      r50: mean((c) => c.render.r50),
+      r90: mean((c) => c.render.r90),
+      q: mean((c) => c.render.q),
+      pa: meanAxis(
+        cs.map((c) => c.render.pa),
+        0,
+      ),
+    },
+  };
+}
+
+/** The mean count of each class over K draws (ADR 0018). */
+export function meanCounts(list: Record<string, number>[]): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const c of list) for (const [k, v] of Object.entries(c)) out[k] = (out[k] ?? 0) + v;
+  for (const k of Object.keys(out)) out[k] = (out[k] ?? 0) / list.length;
+  return out;
 }
 
 /** Summary statistics of a list. */

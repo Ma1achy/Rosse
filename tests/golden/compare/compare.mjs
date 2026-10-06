@@ -2,7 +2,7 @@
 /**
  * Golden comparison entry point (`npm run golden`): the metric of
  * docs/adr/0013-golden-image-metric.md as calibrated in docs/adr/0015-golden-metric-as-calibrated-in-m2.md
- * (see ../README.md).
+ * and amended by docs/adr/0018-comparison-draws-and-the-mean-of-k-redraws.md (see ../README.md).
  *
  * 1. Checks that the reference captures in tests/golden/reference/ are complete and match their
  *    manifest (every ink image present, pixel hashes identical, no page errors).
@@ -16,7 +16,11 @@
  * 3. For each case:
  *    - parity (L2): WebGPU against v21, and the CPU engine against v21, at the family's parity
  *      thresholds (../thresholds.json): ink, coarse density SSIM, stroke widths, counts, and the
- *      moment and extent test; the σ = 4 px density SSIM is reported, not gated (ADR 0015);
+ *      moment and extent test; the σ = 4 px density SSIM is reported, not gated (ADR 0015). Each
+ *      measure is the mean over K draws (ADR 0018, K = thresholds.json `keys`): the engine's
+ *      canonical draw (key 0) and K − 1 re-draws of the placement stream by the CPU engine
+ *      (equal to WebGPU at L1), measured first in parallel processes (--jobs); the canonical
+ *      draw alone is printed for information;
  *    - strict (L1): the CPU engine against WebGPU at the strict thresholds;
  *    - L0: WebGPU rendered twice is bit-identical; (e) against the engine's own goldens
  *      (../engine-hashes.json) when they exist.
@@ -30,6 +34,11 @@
  *   --calibrate       measure "same galaxy, other dots" pairs and the negative controls, and write
  *                     ../thresholds.json and ../calibration.json; needs tests/golden/actual/reroll/
  *                     from `npm run capture:reference -- --reroll` for the v21 source
+ *     --keys K        the K of the mean (default 6, ADR 0018)
+ *     --resume        keep what a stopped calibration measured (test-results/calibration-shard-*)
+ *     --reuse-shards  only aggregate the last calibration's measurements (test-results/
+ *                     calibration-shard-*.json, made with at least K keys) for this K
+ *   --jobs n          parallel processes for the re-draws and the calibration (default 4)
  *   --no-gpu          the CPU engine only (no browser)
  *   --only a,b        only the cases whose name contains one of these (for working on a few; the
  *                     run then checks fewer than the required set)
@@ -91,12 +100,64 @@ try {
   /** @type {typeof import('./node.ts')} */
   const G = await server.vite.ssrLoadModule('/tests/golden/compare/node.ts');
   const node = new G.GoldenNode(ROOT);
-  failed = flag('--calibrate') ? (await calibrate(G, node), 0) : await compareAll(G, node);
+  if (flag('--redraws')) {
+    redrawShard(node);
+    failed = 0;
+  } else failed = flag('--calibrate') ? (await calibrate(G, node), 0) : await compareAll(G, node);
 } finally {
   if (browser) await browser.close();
   await server.close();
 }
 process.exit(failed ? 1 : 0);
+
+/** The required cases of this run (--only narrows them). */
+function requiredCases() {
+  const onlyIdx = args.indexOf('--only');
+  const only = onlyIdx >= 0 ? (args[onlyIdx + 1] ?? '').split(',') : null;
+  return manifest.captures.filter(
+    (/** @type {any} */ c) => c.variant && (!only || only.some((o) => c.name.includes(o))),
+  );
+}
+
+/**
+ * One process's share of the comparison's re-draws (ADR 0018): every n-th required case, keys
+ * 1..K − 1, CPU engine, written to test-results/redraws-shard-k.json.
+ *
+ * @param {import('./node.ts').GoldenNode} node
+ */
+function redrawShard(node) {
+  const [k = 0, n = 1] = (opt('--shard') ?? '0/1').split('/').map(Number);
+  const keys = node.thresholds.keys ?? 1;
+  /** @type {Record<string, any>} */
+  const out = {};
+  requiredCases().forEach((/** @type {any} */ c, /** @type {number} */ i) => {
+    if (i % n === k) out[c.name] = node.redraws(c.name, keys);
+  });
+  writeFileSync(join(ROOT, `test-results/redraws-shard-${k}.json`), JSON.stringify(out));
+}
+
+/**
+ * Runs this script in `jobs` parallel processes with the given arguments and `--shard k/jobs`.
+ *
+ * @param {string[]} extra
+ * @param {number} jobs
+ */
+function shards(extra, jobs) {
+  return Promise.all(
+    Array.from(
+      { length: jobs },
+      (_, k) =>
+        new Promise((ok, fail) => {
+          const child = spawn(
+            process.execPath,
+            [import.meta.filename, ...extra, '--shard', `${k}/${jobs}`],
+            { stdio: 'inherit' },
+          );
+          child.on('exit', (code) => (code ? fail(new Error(`shard ${k}: ${code}`)) : ok(code)));
+        }),
+    ),
+  );
+}
 
 async function gpuPage() {
   browser = await launch();
@@ -130,13 +191,28 @@ function line(/** @type {any} */ c) {
  */
 async function compareAll(G, node) {
   const useGpu = !flag('--no-gpu');
+  const required = requiredCases();
+  // ADR 0018: the re-draws of every required case first, in parallel processes (CPU engine)
+  const keys = node.thresholds.keys ?? 1;
+  /** @type {Record<string, { c: any, counts: Record<string, number> }[]>} */
+  const redraws = {};
+  const t0 = performance.now();
+  if (keys > 1) {
+    const jobs = Math.max(1, Math.min(Number(opt('--jobs') ?? 4), required.length));
+    mkdirSync(join(ROOT, 'test-results'), { recursive: true });
+    const pass = args.filter((a, i) => a === '--only' || args[i - 1] === '--only');
+    await shards(['--redraws', ...pass], jobs);
+    for (let k = 0; k < jobs; k++)
+      Object.assign(
+        redraws,
+        JSON.parse(readFileSync(join(ROOT, `test-results/redraws-shard-${k}.json`), 'utf8')),
+      );
+    console.log(
+      `re-draws: ${required.length} cases × ${keys - 1} keys in ${((performance.now() - t0) / 1000).toFixed(0)} s (${jobs} processes)`,
+    );
+  }
   const gpu = useGpu ? await gpuPage() : null;
   if (gpu) console.log(`WebGPU adapter: ${gpu.adapter}`);
-  const onlyIdx = args.indexOf('--only');
-  const only = onlyIdx >= 0 ? (args[onlyIdx + 1] ?? '').split(',') : null;
-  const required = manifest.captures.filter(
-    (/** @type {any} */ c) => c.variant && (!only || only.some((o) => c.name.includes(o))),
-  );
   const informational = flag('--all')
     ? manifest.captures.filter((/** @type {any} */ c) => !c.variant && c.surface === 'paper')
     : [];
@@ -195,15 +271,20 @@ async function compareAll(G, node) {
     }
     row.cpuMs = Math.round(cpu.ms);
     let pass = true;
+    // ADR 0018: the mean over the engine's canonical draw and the CPU engine's K − 1 re-draws
+    const more = isRequired ? (redraws[c.name] ?? []) : [];
+    if (isRequired && more.length !== keys - 1) throw new Error(`${c.name}: re-draws missing`);
     for (const e of engines) {
-      const cmp = G.compareMeasures(refM, e.measures);
+      const single = G.compareMeasures(refM, e.measures);
+      const cmp = G.meanComparison([single, ...more.map((x) => x.c)]);
       const ev = G.evaluate(
         cmp,
         refCounts,
-        G.engineCounts(e.counts),
+        G.meanCounts([G.engineCounts(e.counts), ...more.map((x) => x.counts)]),
         parity,
         G.impossibleClasses(rec.params),
       );
+      row[`single_${e.engine}`] = single;
       row[`parity_${e.engine}`] = {
         ...cmp,
         pass: ev.pass,
@@ -217,6 +298,10 @@ async function compareAll(G, node) {
       console.log(
         `${c.name.padEnd(44)} ${e.engine.padEnd(9)} ${line(cmp)}  ${counts.padEnd(32)} ${ev.pass ? 'pass' : `FAIL ${ev.failures.join('; ')}`}`,
       );
+      if (more.length)
+        console.log(
+          `${''.padEnd(44)} ${'  key 0'.padEnd(9)} ${line(single)}  (one draw, information)`,
+        );
       if (!ev.pass || flag('--report-all'))
         node.writeReport(
           `${c.name}__${e.engine}`,
@@ -228,7 +313,10 @@ async function compareAll(G, node) {
           },
           cmp,
           ev,
-          [`thresholds: ${JSON.stringify(parity)}`],
+          [
+            `thresholds: ${JSON.stringify(parity)}`,
+            `the measures are means over ${String(more.length + 1)} draws (ADR 0018); the images are the canonical draw`,
+          ],
         );
     }
     // the engine's own variation, for information
@@ -324,7 +412,7 @@ async function compareAll(G, node) {
   const req = results.filter((r) => r.required && !r.gate);
   const reqFails = req.filter((r) => !r.pass).length;
   console.log(
-    `\n${req.length - reqFails}/${req.length} required golden cases pass; ${gates.length - gateFails}/${gates.length} drawn-star gates pass${informational.length ? ` (${results.length - req.length - gates.length} informational)` : ''}`,
+    `\n${req.length - reqFails}/${req.length} required golden cases pass (mean of ${String(keys)} draws); ${gates.length - gateFails}/${gates.length} drawn-star gates pass${informational.length ? ` (${results.length - req.length - gates.length} informational)` : ''}; ${((performance.now() - t0) / 1000).toFixed(0)} s`,
   );
   return fails;
 }
@@ -337,7 +425,9 @@ async function compareAll(G, node) {
  * @param {import('./node.ts').GoldenNode} node
  */
 async function calibrate(G, node) {
-  const K = 3;
+  /** ADR 0018: the K of the mean, and the stand-ins for v21 per configuration */
+  const K = Number(opt('--keys') ?? 6);
+  const R = 3;
   /** The single-galaxy presets the M2 engine draws (stipple). */
   const presets = [
     'Grand design',
@@ -384,44 +474,63 @@ async function calibrate(G, node) {
     });
   }
   console.log(
-    `calibration: ${cases.length} configurations × ${K} re-keys and the negative controls`,
+    `calibration: ${cases.length} configurations × (${R} stand-ins, ${K} keys) and the negative controls × ${K} keys`,
   );
   // the engine pairs are measured in parallel processes (--jobs, default 4), each taking every
   // n-th configuration (--shard k/n) and writing its comparisons to test-results/
   const shard = opt('--shard');
   if (shard) {
-    const [k, n] = shard.split('/').map(Number);
-    const mine = cases.filter((_, i) => i % (n ?? 1) === k);
-    const part = node.calibrateEngine(mine, K, (s) => console.log(`[${shard}] ${s}`));
+    const [k = 0, n = 1] = shard.split('/').map(Number);
     mkdirSync(join(ROOT, 'test-results'), { recursive: true });
-    writeFileSync(join(ROOT, `test-results/calibration-shard-${k}.json`), JSON.stringify(part));
+    const file = join(ROOT, `test-results/calibration-shard-${k}.json`);
+    // written after every configuration; with --resume, the configurations a stopped run
+    // measured with this K are kept (a full calibration takes hours)
+    /** @type {{ keys: number, standIns: number, done: number[], pairs: Record<string, any[]>, controls: Record<string, Record<string, any[]>> }} */
+    let part = { keys: K, standIns: R, done: [], pairs: {}, controls: {} };
+    if (flag('--resume') && existsSync(file)) {
+      const old = JSON.parse(readFileSync(file, 'utf8'));
+      if (old.keys === K && old.standIns === R && Array.isArray(old.done)) part = old;
+    }
+    for (let i = k; i < cases.length; i += n) {
+      const c = cases[i];
+      if (!c || part.done.includes(i)) continue;
+      const one = node.calibrateEngine([c], K, R, (s) => console.log(`[${shard}] ${s}`));
+      for (const [f, list] of Object.entries(one.pairs)) (part.pairs[f] ??= []).push(...list);
+      for (const [f, byName] of Object.entries(one.controls))
+        for (const [name, list] of Object.entries(byName))
+          ((part.controls[f] ??= {})[name] ??= []).push(...list);
+      part.done.push(i);
+      writeFileSync(file, JSON.stringify(part));
+    }
     return;
   }
   const jobs = Number(opt('--jobs') ?? 4);
-  await Promise.all(
-    Array.from(
-      { length: jobs },
-      (_, k) =>
-        new Promise((ok, fail) => {
-          const child = spawn(
-            process.execPath,
-            [import.meta.filename, '--calibrate', '--shard', `${k}/${jobs}`],
-            { stdio: 'inherit' },
-          );
-          child.on('exit', (code) => (code ? fail(new Error(`shard ${k}: ${code}`)) : ok(code)));
-        }),
-    ),
-  );
+  if (!flag('--reuse-shards'))
+    await shards(
+      ['--calibrate', '--keys', String(K), ...(flag('--resume') ? ['--resume'] : [])],
+      jobs,
+    );
+  // the mean over the first K keys of each entry (ADR 0018)
+  const mean = (/** @type {any[]} */ cs) => {
+    if (cs.length < K) throw new Error(`calibration shards hold ${cs.length} keys, not ${K}`);
+    return G.meanComparison(cs.slice(0, K));
+  };
   /** @type {{ pairs: Record<string, any[]>, controls: Record<string, Record<string, any[]>> }} */
   const eng = { pairs: {}, controls: {} };
-  for (let k = 0; k < jobs; k++) {
+  for (let k = 0; existsSync(join(ROOT, `test-results/calibration-shard-${k}.json`)); k++) {
+    if (k >= jobs && !flag('--reuse-shards')) break;
     const part = JSON.parse(
       readFileSync(join(ROOT, `test-results/calibration-shard-${k}.json`), 'utf8'),
     );
-    for (const [f, list] of Object.entries(part.pairs)) (eng.pairs[f] ??= []).push(...list);
+    for (const [f, list] of Object.entries(part.pairs))
+      (eng.pairs[f] ??= []).push(
+        ...list.map((/** @type {any} */ e) => ({ ...mean(e.cs), preset: e.preset })),
+      );
     for (const [f, byName] of Object.entries(part.controls))
       for (const [name, list] of Object.entries(byName))
-        ((eng.controls[f] ??= {})[name] ??= []).push(...list);
+        ((eng.controls[f] ??= {})[name] ??= []).push(
+          ...list.map((/** @type {any} */ e) => ({ config: e.config, c: mean(e.cs) })),
+        );
   }
   console.log('calibration: v21 re-roll pairs');
   const v21 = node.calibrateReroll(join(ROOT, 'tests/golden/actual/reroll'), () => {});
@@ -549,7 +658,8 @@ async function calibrate(G, node) {
   }
   const file = {
     about:
-      'Golden thresholds (ADR 0013, as calibrated in ADR 0015). parity: the new engine against v21 (L2), per family; strict: the CPU engine against WebGPU (L1). Gated: ink, coarse SSIM (b′), widths, counts, and the moment and extent test (r25, r50, r90, outer ink, axis ratio q, position angle pa where the reference q < paBelowQ). Written by `npm run golden -- --calibrate`; the numbers behind them are in calibration.json and docs/milestones/m2/README.md. Families marked provisional have no engine yet.',
+      'Golden thresholds (ADR 0013, as calibrated in ADR 0015 and amended by ADR 0018). keys: the K of the parity comparison, which sets v21 against the mean of each measure over K engine draws, and for which the parity thresholds are calibrated. parity: the new engine against v21 (L2), per family; strict: the CPU engine against WebGPU (L1), one draw each. Gated: ink, coarse SSIM (b′), widths, counts, and the moment and extent test (r25, r50, r90, outer ink, axis ratio q, position angle pa where the reference q < paBelowQ). Written by `npm run golden -- --calibrate`; the numbers behind them are in calibration.json and docs/milestones/m2/README.md. Families marked provisional have no engine yet.',
+    keys: K,
     strict: {
       ink: 0.005,
       ssimCoarse: 0.98,
@@ -576,8 +686,9 @@ async function calibrate(G, node) {
     JSON.stringify(
       {
         about:
-          "ADR 0013 / 0015 calibration: per family, summaries (n, min, p5, median, p95, max) of each measure. engineRekey: the new engine (CPU, equal to WebGPU at L1) drawing v21's replayed variation and re-keying its placement stream, 3 keys per configuration (a full re-draw). negativeControls: one structural or pen change per control, re-keyed, against the base, with how many applicable configurations the thresholds caught. v21Reroll: v21 at az and az + 0.3° where its stipple re-rolled (a partial re-draw).",
+          "ADR 0013 / 0015 / 0018 calibration: per family, summaries (n, min, p5, median, p95, max) of each measure. engineRekey: the new engine (CPU, equal to WebGPU at L1) drawing v21's replayed variation and re-keying its placement stream: per configuration, each of `standIns` draws stands in for v21 against the mean of each measure over the `keys` draws of keys 0..K − 1 (a full re-draw). negativeControls: one structural or pen change per control, drawn with the same K keys, against the first stand-in, with how many applicable configurations the thresholds caught. v21Reroll: v21 at az and az + 0.3° where its stipple re-rolled (a partial re-draw, one draw against one).",
         keys: K,
+        standIns: R,
         configurations: cases.map((c) => `${c.preset} s${c.params.seed} incl ${c.params.incl}`),
         families: numbers,
       },
