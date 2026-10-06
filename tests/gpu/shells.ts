@@ -85,9 +85,9 @@ run('shell galaxy (GPU = CPU twin, L1)', async () => {
       arcs.length === cpu.arcs.length &&
       arcs.every(
         (a, i) =>
-          a.side === cpu.arcs[i]?.side &&
-          Math.abs(a.R - (cpu.arcs[i]?.R ?? 0)) < 1e-4 &&
-          Math.abs(a.open - (cpu.arcs[i]?.open ?? 0)) < 5e-3,
+          a.side === (cpu.arcs[i] as { side: number }).side &&
+          Math.abs(a.R - (cpu.arcs[i] as { R: number }).R) < 1e-4 &&
+          Math.abs(a.open - (cpu.arcs[i] as { open: number }).open) < 5e-3,
       );
     // the dots: tiles and turns exactly, places within the drift
     const gd = await gpu.readDots();

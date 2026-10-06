@@ -11,7 +11,7 @@ import type { Params } from '../../src/core/params';
 import { presetParams } from '../../src/core/presets';
 import { CpuMerger } from '../../src/fallback/merger';
 import { CpuMergerStars } from '../../src/fallback/kernels/merger';
-import { MERGER_SLOTS, runMergerSprites } from '../../src/fallback/kernels/merger-sprites';
+import { runMergerSprites } from '../../src/fallback/kernels/merger-sprites';
 import { TIDE_GN, TIDE_GV } from '../../src/fallback/kernels/tide';
 import { mergerViewUniform } from '../../src/model/merger';
 import { Cls } from '../../src/model/classes';
@@ -106,7 +106,6 @@ describe('mergerSprites against v21, from the same starts', () => {
       const sig = (a: number, b: number) => 4 * Math.sqrt(a + b + 1) + 0.002 * (a + b);
       for (const k of ['dots', 'young', 'knots', 'stars', 'rstars'] as const)
         expect(Math.abs(mine[k] - theirs[k]), k).toBeLessThanOrEqual(sig(mine[k], theirs[k]));
-      void MERGER_SLOTS;
 
       // the tidal grids: the engine's, from its own star table, against v21's `tidal` at every vertex
       m.tide.buildGrid();

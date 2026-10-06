@@ -9,7 +9,6 @@
  * Compared word for word: the bins (exact), the grids (f32 within 1e-3 px, and how many vertices
  * differ at all), then 6,000 instances, 3,000 ribbon segments and 3,000 capsules carried by the grids.
  */
-import { packStruct } from '../../src/gpu/buffers';
 import { readBuffer } from '../../src/gpu/readback';
 import {
   TIDE_GV,
@@ -159,7 +158,6 @@ run('tidal map and carried marks (GPU = CPU twin, L1)', async () => {
   apply.encode(p2, buf, { key: 'c', entry: 'warp_caps', buffer: bc, n: 3000, g, r2 });
   p2.end();
   dev.queue.submit([e2.finish()]);
-  void packStruct;
   const gi = new Float32Array(await readBuffer(dev, bi, inst.byteLength));
   const gs = new Float32Array(await readBuffer(dev, bs, segs.byteLength));
   const gc = new Float32Array(await readBuffer(dev, bc, caps.byteLength));
