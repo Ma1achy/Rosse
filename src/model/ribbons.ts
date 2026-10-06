@@ -16,7 +16,7 @@ import type { VectorSheet } from '../marks/vector';
 import { ZOOM_MAX, UNIT_SCALE, type Camera } from '../view/camera';
 import { wobbleAmplitude } from '../view/warp';
 import { curves, edgeOnAlpha, type Curve, type CurvePicks, type Vec3 } from './curves';
-import { dustLanes, type DustLanes } from './lanes';
+import { dustLanes, type DustLanes, type DustPicks } from './lanes';
 import { penWeights, type Variation } from './variation';
 
 const f = Math.fround;
@@ -254,9 +254,11 @@ export function describeRibbons(
   incl: number,
   picks?: CurvePicks,
   noise: NoiseField = packNoise(),
+  key: number = P.seed,
+  dustPicks?: DustPicks,
 ): RibbonDesc {
   const C = curves(P, V, strokes, incl, picks, noise);
-  const lanes = dustLanes(P, V, penlines, incl, noise);
+  const lanes = dustLanes(P, V, penlines, incl, noise, key, dustPicks);
   const pen = packPen(penlines);
   const pcs = packPieces(strokes);
   const penLine = penWeights(P.pen).line;

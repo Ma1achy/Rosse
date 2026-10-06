@@ -11,6 +11,8 @@ import { Cls } from './classes';
 import type { StrokesMeta } from '../marks/strokes';
 import type { VectorSheet } from '../marks/vector';
 import type { CurvePicks } from './curves';
+import type { RingKnotPick } from './clumps';
+import type { DustPicks } from './lanes';
 import { packNoise, type NoiseTable } from '../core/noise';
 import { describeGalaxy, type GalaxyDesc } from './galaxy';
 import { describeRibbons, type RibbonDesc } from './ribbons';
@@ -40,10 +42,19 @@ export interface SceneOptions {
    */
   curvePicks?: CurvePicks;
   /**
-   * The key of the placement streams (the stipple), the seed by default. Re-keying keeps every
-   * structural choice and re-draws the dots: the calibration of ADR 0013 and 0015.
+   * The key of the placement streams, the seed by default: the stipple, ring knots and clumps, and
+   * the dust lanes' own draws (each hatch's offset, angle, length and pen line, and which pen
+   * lines carve the stipple). Re-keying keeps every structural choice and re-draws the marks: the
+   * re-draws of ADR 0013, 0015 and 0018.
    */
   placementKey?: number;
+  /**
+   * Draw the dust lanes' hatches and carving lines with these choices (src/model/lanes.ts
+   * `DustPicks`); the golden runner passes v21's own (ADR 0018).
+   */
+  dustPicks?: DustPicks;
+  /** Place the ring-knot clusters as given (src/model/clumps.ts); the golden runner passes v21's. */
+  ringKnotPicks?: RingKnotPick[];
   /**
    * Draw with these noise tables in place of the lattice's hashed corners (src/core/noise.ts): the
    * golden runner passes v21's own corners (tests/golden/compare/v21-noise.ts), so flocculence,
@@ -58,9 +69,12 @@ export interface SceneOptions {
 
 export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {}): GalaxyScene {
   const variation = opts.variation ?? makeVariation(P, meta);
-  const galaxy = describeGalaxy(P, variation, meta);
+  const key = (opts.placementKey ?? P.seed) >>> 0;
+  const galaxy = describeGalaxy(P, variation, meta, {
+    key,
+    ...(opts.ringKnotPicks ? { ringKnots: opts.ringKnotPicks } : {}),
+  });
   if (opts.noise) galaxy.noise = packNoise(opts.noise);
-  if (opts.placementKey !== undefined) galaxy.g.key = opts.placementKey >>> 0;
   if (opts.rmax !== undefined) galaxy.g.rmax = Math.fround(opts.rmax);
   if (opts.dotScale !== undefined)
     galaxy.dotBase = galaxy.dotBase.map((x) => Math.fround(x * (opts.dotScale ?? 1)));
@@ -72,6 +86,8 @@ export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {
     P.incl,
     opts.curvePicks,
     galaxy.noise,
+    key,
+    opts.dustPicks,
   );
   return { P, variation, galaxy, ribbons, meta };
 }
