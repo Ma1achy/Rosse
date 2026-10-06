@@ -80,3 +80,7 @@ npm run capture:reference -- --reroll                                # v21 re-ro
 - **v21's variation.** The runner replays v21's `makeVariation` offline on v21's own stream (`compare/v21.ts`) and draws with it, so both engines draw the same galaxy with the same pens. The engine's own variation is printed for information. From M4 it also draws with v21's stroke choices (v21's own `curves()`, `compare/v21-curves.ts`) and v21's noise corners (`compare/v21-noise.ts`), further discrete random choices (ADR 0015, M4 addendum). The capture tool still records v21's hand (`hand`, truncated by the page at 400 tiles) as a cross-check of the replay (`tests/unit/v21-replay.test.ts`).
 
 **Reports.** A failing case writes `diff/<name>.html`: both renders, both density maps, the signed density difference, and both stroke-width histograms. `diff/` is git-ignored and uploaded by CI as an artifact. Attach the report to your pull request.
+
+## Lens goldens (M9)
+
+`variant=lens` captures the six `Lens: …` presets and `A sketch, lensed` at seeds 7 and 4242, home then orbit, each on a fresh page (v21 fixes its lensed sources at the view where it first placed them, so the order matters). The runner draws them with v21's lens picks (`compare/v21-lens.ts`, ADR 0051), and the thresholds of the `lens` family come from `npm run golden -- --calibrate --family lens` (ADR 0015's procedure; the other families are left as they are). The overrides are in ADR 0052.

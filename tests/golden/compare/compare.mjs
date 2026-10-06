@@ -414,7 +414,13 @@ async function calibrate(G, node) {
         new Promise((ok, fail) => {
           const child = spawn(
             process.execPath,
-            [import.meta.filename, '--calibrate', '--shard', `${k}/${jobs}`],
+            [
+              import.meta.filename,
+              '--calibrate',
+              '--shard',
+              `${k}/${jobs}`,
+              ...(onlyFamily ? ['--family', onlyFamily] : []),
+            ],
             { stdio: 'inherit' },
           );
           child.on('exit', (code) => (code ? fail(new Error(`shard ${k}: ${code}`)) : ok(code)));
