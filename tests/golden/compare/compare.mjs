@@ -424,9 +424,10 @@ async function calibrate(G, node) {
     return;
   }
   const jobs = Number(opt('--jobs') ?? 4);
+  // --reuse-shards merges the shards already written to test-results/ (a parent that was stopped)
   await Promise.all(
     Array.from(
-      { length: jobs },
+      { length: process.argv.includes('--reuse-shards') ? 0 : jobs },
       (_, k) =>
         new Promise((ok, fail) => {
           const child = spawn(
