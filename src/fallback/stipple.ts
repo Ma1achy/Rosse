@@ -35,6 +35,7 @@ import { dynView, rstarRows } from '../model/dynvec';
 import { packStarJobs, starJobs } from '../model/stars';
 import { runStarMarks } from './kernels/star-marks';
 import { wobbleAmplitude } from '../view/warp';
+import { runSky, skyInputs, type SkyOut } from './kernels/sky';
 import { Cls } from '../model/classes';
 import { classCapacity, compact } from './kernels/scan';
 import { runStipple } from './kernels/stipple';
@@ -60,6 +61,12 @@ export interface CpuStippleView {
   starRows: number;
   /** proposals the breathing room cleared (M7) */
   cleared: number;
+  /** the deep field and the foreground stars (M7): null without a sky */
+  sky: SkyOut | null;
+  /** the galaxies' drawings of the deep field, expanded */
+  skyDrawings: VectorOut | null;
+  /** the sky's layers alone: the background, then the foreground stars */
+  skyLayers: InkLayer[];
 }
 
 /** Instances from a buffer of INSTANCE_WORDS words each. */
@@ -242,6 +249,52 @@ export class CpuStipple {
     );
     const starDV = dynView(P, spec, starIn, liveStars, galaxy.g.key, galaxy.g.n_dot_pool);
     const so = runVectors(vectorInputs(VD.lib, starDV, galaxy.pool, galaxy.dotBase, galaxy.noise));
+    // the deep field, the foreground stars (M7): the galaxies' dots, their drawings (a dynamic set)
+    const sky = this.scene.sky;
+    let skyOut: SkyOut | null = null;
+    let skyVec: VectorOut | null = null;
+    const bgLayers: InkLayer[] = [];
+    const fgLayers: InkLayer[] = [];
+    if (sky) {
+      skyOut = runSky(
+        skyInputs(
+          sky,
+          {
+            V,
+            key: galaxy.g.key,
+            wobble: wobbleAmplitude(P.distort),
+            nDotPool: galaxy.g.n_dot_pool,
+            massive: sky.massive,
+          },
+          galaxy.pool,
+          galaxy.dotBase,
+          galaxy.noise,
+        ),
+      );
+      const sv = dynView(P, sky.spec, skyOut.rows, skyOut.nRows, galaxy.g.key, galaxy.g.n_dot_pool);
+      skyVec = runVectors(vectorInputs(VD.lib, sv, galaxy.pool, galaxy.dotBase, galaxy.noise));
+      if (skyOut.nDots)
+        bgLayers.push({
+          kind: 'sprites',
+          atlas: 'dots',
+          gain: 1,
+          instances: instanceList(skyOut.dots, skyOut.dotsU, skyOut.nDots),
+        });
+      bgLayers.push(
+        ...vectorLayers(
+          skyVec,
+          skyOut.nRows * sky.spec.strideDots,
+          skyOut.nRows * sky.spec.strideBlobs,
+        ),
+      );
+      if (skyOut.nFg)
+        fgLayers.push({
+          kind: 'sprites',
+          atlas: 'fgstars',
+          gain: 1,
+          instances: instanceList(skyOut.fg, skyOut.fgU, skyOut.nFg),
+        });
+    }
     const line = lineLayers(rv, this.lines);
     const pieces = line.filter((l) => l.kind === 'sprites' && l.atlas === 'pieces');
     const stipple = STIPPLE_LAYERS.map((l): InkLayer => ({
@@ -252,6 +305,7 @@ export class CpuStipple {
     }));
     const streams = VD.parts.streams.length ? streamLayers(vo) : [];
     const layers: InkLayer[] = [
+      ...bgLayers,
       ...line.filter((l) => !pieces.includes(l)),
       ...vectorLayers(vo, VD.nDots, VD.nBlobs),
       ...vectorLayers(so, liveStars * spec.strideDots, liveStars * spec.strideBlobs),
@@ -262,6 +316,7 @@ export class CpuStipple {
     ];
     const cores = coreInstances(P, meta, cam, galaxy.noise, VD.parts.picks.nuclear);
     if (cores.length) layers.push({ kind: 'sprites', atlas: 'cores', gain: 1, instances: cores });
+    layers.push(...fgLayers);
     const tiles = (l: InkLayer[], atlas: string) =>
       l.flatMap((x) =>
         x.kind === 'sprites' && x.atlas === atlas ? x.instances.map((i) => i.layer) : [],
@@ -313,6 +368,9 @@ export class CpuStipple {
       stars: so,
       starRows: liveStars,
       cleared,
+      sky: skyOut,
+      skyDrawings: skyVec,
+      skyLayers: [...bgLayers, ...fgLayers],
     };
   }
 }

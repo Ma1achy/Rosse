@@ -25,6 +25,7 @@ import { CULLS_LAYOUT } from '../fallback/kernels/project';
 import { GpuRibbons } from './ribbons';
 import { GpuVectors } from './vectors';
 import { GpuStarSet } from './star-set';
+import { GpuSky } from './sky';
 import { vectorView } from '../model/vectors';
 import { coreInstances } from '../model/parts';
 import {
@@ -142,6 +143,8 @@ export class GpuStipple {
     readonly vectors: GpuVectors,
     /** the drawn stars (M7) */
     readonly stars: GpuStarSet,
+    /** the deep field, the foreground stars (M7) */
+    readonly sky: GpuSky,
   ) {}
 
   static create(device: GPUDevice): GpuStipple {
@@ -162,6 +165,7 @@ export class GpuStipple {
       GpuRibbons.create(device),
       GpuVectors.create(device),
       GpuStarSet.create(device),
+      GpuSky.create(device),
     );
   }
 
@@ -432,6 +436,17 @@ export class GpuStipple {
       Cls.rstar,
       cap,
     );
+    this.sky.load(
+      scene.P,
+      scene.sky,
+      scene.vectors.lib,
+      view,
+      pool,
+      dotBase,
+      noise,
+      G.g.key,
+      G.g.n_dot_pool,
+    );
     const enc = d.createCommandEncoder({ label: 'stipple model' });
     const pass = enc.beginComputePass({ label: 'stipple' });
     pass.setPipeline(P.stipple);
@@ -459,6 +474,7 @@ export class GpuStipple {
     const d = this.device;
     const { P: params, galaxy } = this.scene;
     this.stars.setView(params, galaxy.g.key, galaxy.g.n_dot_pool);
+    this.sky.setView(params, cam);
     // the marks of a star or an artefact for this view, after the samples (M7)
     const sj = this.scene.stars ? starJobs(this.scene.stars, params, cam, this.scene.home) : null;
     const nStar = sj?.nSlots ?? 0;
@@ -551,6 +567,7 @@ export class GpuStipple {
     this.ribbons.encodeExpand(pass);
     this.vectors.encode(pass);
     this.stars.encode(pass);
+    this.sky.encode(pass);
     pass.end();
     d.queue.submit([enc.finish()]);
   }
@@ -575,6 +592,7 @@ export class GpuStipple {
     const { P, meta, galaxy, vectors } = this.scene;
     const cores = coreInstances(P, meta, this.camera, galaxy.noise, vectors.parts.picks.nuclear);
     return [
+      ...this.sky.background(),
       ...line.filter((l) => !pieces.includes(l)),
       ...this.vectors.layers(),
       ...this.stars.layers(),
@@ -585,6 +603,7 @@ export class GpuStipple {
       ...(cores.length
         ? [{ kind: 'sprites', atlas: 'cores', gain: 1, instances: cores } as InkLayer]
         : []),
+      ...this.sky.foreground(),
     ];
   }
 
@@ -759,6 +778,7 @@ export class GpuStipple {
     ])
       b.destroy();
     this.stars.unload();
+    this.sky.unload();
     this.ribbons.destroy();
     this.vectors.unload();
     this.model = null;
@@ -769,5 +789,6 @@ export class GpuStipple {
     this.destroyModel();
     this.vectors.destroy();
     this.stars.destroy();
+    this.sky.destroy();
   }
 }

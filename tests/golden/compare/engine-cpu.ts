@@ -25,7 +25,15 @@ import { VECTOR_ATLASES, type VectorLibrary, type VectorSheet } from '../../../s
 import { cameraOf } from '../../../src/view/camera';
 import { grey, type Grey } from './metrics';
 
-export const ATLASES: AtlasName[] = ['dots', 'knots', 'stars', 'cores', 'pieces', 'strokes'];
+export const ATLASES: AtlasName[] = [
+  'dots',
+  'knots',
+  'stars',
+  'cores',
+  'fgstars',
+  'pieces',
+  'strokes',
+];
 
 export function loadAtlases(root: string): AtlasData[] {
   const dir = join(root, 'assets-built');
@@ -62,6 +70,7 @@ export function metaOf(atlases: AtlasData[], penlines?: VectorSheet, vectors?: V
       knots: by('knots'),
       stars: by('stars'),
       cores: by('cores'),
+      fgstars: by('fgstars'),
       strokes: by('strokes'),
     },
     penlines,

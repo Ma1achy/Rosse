@@ -40,10 +40,16 @@ import {
   chain,
   discM,
   incE,
+  orient,
+  perspective,
   project,
+  rotationOf,
+  toScreen,
+  toView,
   type Camera,
   type Mat2,
 } from '../view/camera';
+import type { CompanionPick } from './sky';
 import { smWarp, wobbleAmplitude } from '../view/warp';
 import { armPhaseCpu } from './curves';
 import type { DrawingsMeta, Variation } from './variation';
@@ -456,6 +462,7 @@ export function vectorRows(
   meta: DrawingsMeta,
   parts: PartsDesc,
   cam: Camera,
+  companions: readonly CompanionPick[] = [],
 ): VectorRow[] {
   const lib: Partial<VectorLibrary> = meta.vectors ?? {};
   const pk = parts.picks;
@@ -559,6 +566,25 @@ export function vectorRows(
   // the zoom (reference notes 20.15)
   for (const t of pk.trails)
     add('trails', { ...centre, x: t.x, y: t.y, tile: t.tile, m: simple(t.size, t.rot) });
+  // the sky's companions (skyParts, app23.js:L913–919): placed in 3D, seen through the perspective
+  // camera, in front of or behind the galaxy (both are drawn with the parts' line ink here: the ink
+  // does not show the order)
+  if (companions.length) {
+    const R = rotationOf(cam);
+    for (const c of companions) {
+      const v = toView(c.w, R);
+      const k = perspective(v[2]);
+      const q = toScreen(v, k, R, sc);
+      add('companions', {
+        x: q[0],
+        y: q[1],
+        alpha: 1,
+        ps: 1,
+        tile: c.tile,
+        m: orient(c.n, sc * c.scale * k, c.spin, 0.35, cam, R),
+      });
+    }
+  }
   if (pk.arrow) {
     const a = pk.arrow;
     add('misc', { ...centre, x: a.x, y: a.y, tile: 1, ps: 0.5, m: simple(a.size, a.rot) });

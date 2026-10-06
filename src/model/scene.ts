@@ -12,12 +12,13 @@ import { Cls } from './classes';
 import type { StrokesMeta } from '../marks/strokes';
 import type { VectorLibrary, VectorSheet } from '../marks/vector';
 import type { PartPicks } from './parts';
-import { describeVectors, type VectorDesc } from './vectors';
+import { describeVectors, packedLibrary, type VectorDesc } from './vectors';
 import type { CurvePicks } from './curves';
 import { packNoise, type NoiseTable } from '../core/noise';
 import { describeGalaxy, rstarBound, type GalaxyDesc } from './galaxy';
 import { sheetStrides, type DynSpec } from './dynvec';
 import { describeStars, starSlotCapacity, type StarPicks, type StarsDesc } from './stars';
+import { describeSky, type SkyCatalogue, type SkyDesc } from './sky';
 import { cameraOf, orientationOf, type Orientation } from '../view/camera';
 import { describeRibbons, type RibbonDesc } from './ribbons';
 import { makeVariation, type DrawingsMeta, type Variation } from './variation';
@@ -35,6 +36,8 @@ export interface GalaxyScene {
   rstars: DynSpec;
   /** a star or an artefact, and the overlays (M7); null when the parameters draw none */
   stars: StarsDesc | null;
+  /** the deep field, the foreground stars and the companions (M7); null when there are none */
+  sky: SkyDesc | null;
   /** the most mark slots the stars' marks can take (at the largest zoom): buffer sizes */
   starSlots: number;
   /**
@@ -81,6 +84,11 @@ export interface SceneOptions {
    * runner passes v21's own, replayed from `starSprites` (tests/golden/compare/v21-stars.ts).
    */
   starPicks?: StarPicks;
+  /**
+   * Draw this sky catalogue (src/model/sky.ts): the golden runner passes v21's own, replayed from
+   * `buildSky` and `skyParts` (tests/golden/compare/v21-sky.ts).
+   */
+  sky?: SkyCatalogue;
   /**
    * The overlays' home orientation (the camera they are placed at). The default is the
    * orientation of the parameters, which pins an overlay to the plate: a page that orbits passes
@@ -146,7 +154,16 @@ export function buildScene(P0: Params, meta: DrawingsMeta, opts: SceneOptions = 
     opts.curvePicks,
     galaxy.noise,
   );
-  const vectors = describeVectors(Pg, variation, meta, P.incl, opts.partPicks);
+  const lib = packedLibrary(meta.vectors);
+  const sky = describeSky(P, meta, lib, meta.fgstars?.count ?? 0, galaxy.g.key, opts.sky);
+  const vectors = describeVectors(
+    Pg,
+    variation,
+    meta,
+    P.incl,
+    opts.partPicks,
+    sky?.catalogue.companions,
+  );
   const stars = describeStars(P, variation, meta, opts.starPicks, galaxy.g.key);
   const home = opts.home ?? orientationOf(cameraOf(P));
   const strides = sheetStrides(vectors.lib, ['sstars']);
@@ -166,6 +183,7 @@ export function buildScene(P0: Params, meta: DrawingsMeta, opts: SceneOptions = 
     meta,
     rstars,
     stars,
+    sky,
     starSlots: stars ? starSlotCapacity(stars, P, home) : 0,
     home,
   };
@@ -233,6 +251,7 @@ export function drawingsMeta(
     dots: { meta: Record<string, unknown[]> };
     knots: { layers: number; meta?: Record<string, unknown[]> };
     stars: { layers: number; meta?: Record<string, unknown[]> };
+    fgstars?: { layers: number };
     cores: { meta: Record<string, unknown[]> };
     strokes?: { meta: Record<string, unknown[]>; levels: { width: number; height: number }[] };
   },
@@ -266,6 +285,7 @@ export function drawingsMeta(
       count: atlases.stars.layers,
       ...(atlases.stars.meta?.src ? { src: atlases.stars.meta.src as string[] } : {}),
     },
+    ...(atlases.fgstars ? { fgstars: { count: atlases.fgstars.layers } } : {}),
     cores: {
       ...(atlases.cores.meta.src ? { src: atlases.cores.meta.src as string[] } : {}),
       kind: atlases.cores.meta.kind as string[],

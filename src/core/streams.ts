@@ -42,6 +42,8 @@ export const Stream = {
    * keyed by the placement key, so a re-key re-draws them as it re-draws the stipple.
    */
   partMarks: 16,
+  /** The deep field's dots: one index per galaxy and dot (src/fallback/kernels/sky.ts). */
+  skyDots: 17,
 } as const;
 
 export type StreamName = keyof typeof Stream;

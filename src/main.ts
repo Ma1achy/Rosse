@@ -63,7 +63,7 @@ declare global {
   }
 }
 
-const ATLASES: AtlasName[] = ['dots', 'knots', 'stars', 'cores', 'pieces', 'strokes'];
+const ATLASES: AtlasName[] = ['dots', 'knots', 'stars', 'cores', 'fgstars', 'pieces', 'strokes'];
 /** v21 caps the device pixel ratio at 2 (app23.js:L1224). */
 const MAX_DPR = 2;
 
@@ -391,6 +391,7 @@ async function start(): Promise<void> {
         knots: by('knots'),
         stars: by('stars'),
         cores: by('cores'),
+        fgstars: by('fgstars'),
         strokes: by('strokes'),
       },
       vectors.penlines,
