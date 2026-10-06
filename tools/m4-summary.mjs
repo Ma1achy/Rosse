@@ -18,6 +18,7 @@
  *
  * Plain Node plus Vite's SSR loader for the engine's TypeScript, as tests/golden/compare/compare.mjs.
  */
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { createServer } from 'vite';
@@ -38,7 +39,10 @@ const node = new G.GoldenNode(ROOT);
 
 /** @param {string} file @param {unknown} data */
 function write(file, data) {
-  writeFileSync(join(ROOT, 'docs/data', file), JSON.stringify(data, null, 2) + '\n');
+  const path = join(ROOT, 'docs/data', file);
+  writeFileSync(path, JSON.stringify(data, null, 2) + '\n');
+  // formatted where it is generated, so that `npm run lint` (Prettier) passes on the committed file
+  execFileSync(join(ROOT, 'node_modules/.bin/prettier'), ['--write', path], { stdio: 'ignore' });
   console.log(`wrote docs/data/${file}`);
 }
 const r4 = (/** @type {number} */ x) => Math.round(x * 1e4) / 1e4;
