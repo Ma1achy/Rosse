@@ -285,7 +285,7 @@ async function compareAll(G, node) {
         refCounts,
         G.meanCounts([G.engineCounts(e.counts), ...more.map((x) => x.counts)]),
         parity,
-        G.impossibleClasses(rec.params),
+        G.impossibleClasses(rec.params, node.groupKnots(rec.params)),
       );
       row[`single_${e.engine}`] = single;
       row[`parity_${e.engine}`] = {
@@ -664,6 +664,20 @@ async function calibrate(G, node) {
       const h = /** @type {Record<string, number>} */ (rule(held));
       for (const k of Object.keys(t))
         t[k] = k === 'ssimCoarse' ? Math.min(t[k] ?? 0, h[k] ?? 0) : Math.max(t[k] ?? 0, h[k] ?? 0);
+      // the held-out sample is small and its tails heavy (a sparse drawing's inner axis ratio
+      // jumps when a stroke crosses the aperture): no tolerance below 1.1 × its largest value
+      const hs = stats(held);
+      for (const [k, m] of /** @type {const} */ ([
+        ['median', 'medianAbs'],
+        ['p90', 'p90Abs'],
+        ['r25', 'r25Abs'],
+        ['r50', 'r50Abs'],
+        ['r90', 'r90Abs'],
+        ['outer', 'outerAbs'],
+        ['q', 'qAbs'],
+        ['qInner', 'qInnerAbs'],
+      ]))
+        t[k] = Math.max(t[k] ?? 0, ceil3(1.1 * (hs[m]?.max ?? 0)));
     }
     parity[family] = { ...base, ...t, ...(held.length ? { heldOut: held.length } : {}) };
     // per-preset axis-ratio tolerances: near-round galaxies are noisier in q than flat ones, so

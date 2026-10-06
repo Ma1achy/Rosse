@@ -155,6 +155,15 @@ export class GoldenNode {
     return v21CurvePicks(this.root, P, V, this.cpu.meta.strokes?.kind ?? []);
   }
 
+  /**
+   * Whether ring knots or clumps make knots whatever `knots` says (v21's variation decides how
+   * many clumps there are): the class is then possible with `knots: 0`.
+   */
+  groupKnots(P: Params): boolean {
+    if (P.ring > 0.1 && !P.merger) return true;
+    return (P.arms >= 1 || P.irr > 0) && P.bulge < 0.9 && this.v21Variation(P).clumps.length > 0;
+  }
+
   /** v21's own variation for these parameters, replayed offline (./v21.ts). */
   v21Variation(P: Params): Variation {
     return v21Variation(P, this.cpu.meta);

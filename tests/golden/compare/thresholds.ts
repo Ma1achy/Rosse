@@ -64,15 +64,19 @@ export interface ThresholdFile {
 
 /**
  * Classes the parameters make impossible, which must then be 0 in both drawings: knots need
- * `knots`, sparkle stars `sparkle` and drawn stars `starMix` (generate, app23.js:L266–272).
+ * `knots` (or a group that makes its own: ring knots and clumps, `groupKnots`, app23.js:L282–297),
+ * sparkle stars `sparkle` and drawn stars `starMix` (generate, app23.js:L266–272).
  */
-export function impossibleClasses(P: {
-  knots: number;
-  sparkle: number;
-  starMix: number;
-}): Set<string> {
+export function impossibleClasses(
+  P: {
+    knots: number;
+    sparkle: number;
+    starMix: number;
+  },
+  groupKnots = false,
+): Set<string> {
   const out = new Set<string>();
-  if (!(P.knots > 0)) out.add('knots');
+  if (!(P.knots > 0) && !groupKnots) out.add('knots');
   if (!(P.sparkle > 0)) out.add('stars');
   if (!(P.starMix > 0.01)) out.add('rstars');
   return out;

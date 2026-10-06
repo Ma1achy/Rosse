@@ -187,6 +187,10 @@ describe('golden metric (ADR 0013)', () => {
     expect(evaluate(c, { stars: 0 }, { stars: 1 }, t, new Set(['stars'])).pass).toBe(false);
     expect(countAllowance(0, 3, t)).toBeCloseTo(3 * Math.sqrt(3), 6);
     expect(countAllowance(0, 3, t, true)).toBe(0);
+    // ring knots and clumps make knots whatever `knots` says
+    expect([...impossibleClasses({ knots: 0, sparkle: 0.02, starMix: 0 }, true)]).toEqual([
+      'rstars',
+    ]);
     expect([...impossibleClasses({ knots: 0, sparkle: 0.02, starMix: 0 })].sort()).toEqual([
       'knots',
       'rstars',
