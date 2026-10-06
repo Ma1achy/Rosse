@@ -7,29 +7,10 @@
 //
 // CPU twin: src/fallback/kernels/project.ts.
 
+// #import "common/camera.wgsl"
 // #import "common/instance.wgsl"
 // #import "common/math.wgsl"
 // #import "common/stipple-types.wgsl"
-
-// The camera: VIEW_LAYOUT in src/view/camera.ts (trigonometry evaluated on the CPU, in f32).
-struct View {
-  cos_i: f32,
-  sin_i: f32,
-  cos_az: f32,
-  sin_az: f32,
-  cos_pa: f32,
-  sin_pa: f32,
-  winding: f32,
-  scale: f32,
-  cx: f32,
-  cy: f32,
-  dust: f32,
-  pad0: f32,
-  n: u32,
-  cap: u32,
-  pad1: u32,
-  pad2: u32,
-}
 
 @group(0) @binding(0) var<uniform> view: View;
 @group(0) @binding(1) var<storage, read> samples: array<Sample>;
@@ -85,21 +66,11 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
       return;
     }
   }
-  var X: f32;
-  var Y: f32;
-  if ((s.cls & FLAG_SERSIC2D) != 0u) {
-    X = s.pos.x;
-    Y = s.pos.y;
-  } else {
-    let x0 = s.pos.x * view.winding;
-    X = x0 * view.cos_az - s.pos.y * view.sin_az;
-    let ya = x0 * view.sin_az + s.pos.y * view.cos_az;
-    Y = ya * view.cos_i - s.pos.z * view.sin_i;
+  var q = s.pos.xy;
+  if ((s.cls & FLAG_SERSIC2D) == 0u) {
+    q = rot_fwd(view, s.pos).xy;
   }
-  let pos = vec2<f32>(
-    view.cx + (X * view.cos_pa - Y * view.sin_pa) * view.scale,
-    view.cy + (X * view.sin_pa + Y * view.cos_pa) * view.scale,
-  );
+  let pos = to_plate(view, q);
   let c = cos_f(s.rot);
   let sn = sin_f(s.rot);
   projected[i] = Instance(pos, s.tile, 1.0, vec4<f32>(c * s.size, sn * s.size, -(sn * s.size), c * s.size));

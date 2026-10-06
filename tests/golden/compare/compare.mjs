@@ -160,13 +160,18 @@ async function compareAll(G, node) {
     /** @type {Record<string, any>} */
     const row = { name: c.name, preset: rec.preset, required: isRequired };
 
-    const cpu = node.renderCpu(rec.params, opts);
+    const zoom = rec.zoom ?? 1;
+    const cpu = node.renderCpu(rec.params, opts, zoom);
     const cpuM = G.measure(cpu.alpha);
     /** @type {{ engine: string, alpha: any, measures: any, counts: any }[]} */
     const engines = [{ engine: 'cpu', alpha: cpu.alpha, measures: cpuM, counts: cpu.counts }];
     if (gpu) {
       const render = () =>
-        gpu.page.evaluate(({ P, o }) => window.__golden?.render(P, o), { P: rec.params, o: opts });
+        gpu.page.evaluate(({ P, o, z }) => window.__golden?.render(P, o, z), {
+          P: rec.params,
+          o: opts,
+          z: zoom,
+        });
       /** @type {any} */
       const r1 = await render();
       /** @type {any} */
@@ -219,7 +224,7 @@ async function compareAll(G, node) {
         );
     }
     // the engine's own variation, for information
-    const own = node.renderCpu(rec.params);
+    const own = node.renderCpu(rec.params, {}, zoom);
     const ownCmp = G.compareMeasures(refM, G.measure(own.alpha));
     row.ownVariation = ownCmp;
     console.log(`${''.padEnd(44)} ${'own var.'.padEnd(9)} ${line(ownCmp)}  (information only)`);

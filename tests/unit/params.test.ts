@@ -123,7 +123,7 @@ describe('schema', () => {
     expect(dirtyTier({ ...a, incl: 69 }, { ...a, incl: 71 })).toBe('model');
     expect(incE(100)).toBe(80);
     expect(incE(-30)).toBe(30);
-    expect(inclBucket(88)).toBe(5);
+    expect(inclBucket(88)).toBe(6);
     expect(inclBucket(108)).toBe(1);
   });
 

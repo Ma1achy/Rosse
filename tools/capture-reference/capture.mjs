@@ -14,10 +14,13 @@
  *   node tools/capture-reference/capture.mjs --extra tests/golden/extra-cases.json [--verify]
  *   node tools/capture-reference/capture.mjs --reroll [--out dir] [--only …]
  *   --verify  capture again into a temporary folder and compare pixel hashes with the manifest.
- *   --extra   capture the cases of a file ({ cases: [{ preset, variant, overrides }] }): a preset
- *             with parameter overrides set after it (and after the seed), named
- *             <preset-slug>--<variant>__s<seed>__<camera>. They are added to (or replaced in) the
- *             existing manifest, which records the file.
+ *   --extra   capture the cases of a file ({ cameras?, cases: [{ preset, variant, overrides,
+ *             seeds?, zoom? }] }): a preset with parameter overrides set after it (and after the
+ *             seed), named <preset-slug>--<variant>__s<seed>__<camera>, at its seeds (7 and 4242
+ *             by default) and the file's cameras (home and orbit by default), plus the "zoom"
+ *             camera (home at zoom 2, through __GEN.zoom) for the seeds a case lists in `zoom`.
+ *             They are added to (or replaced in) the existing manifest, which records the file.
+ *   --cameras capture only these cameras (comma-separated), e.g. --cameras zoom.
  *   --reroll  for calibration (ADR 0013): every preset at the home camera and again at az + 0.3°,
  *             which in v21 re-rolls the stipple when dust lanes are on (reference notes 20.1).
  *             Written to tests/golden/actual/reroll/ by default (not committed), with no manifest.
@@ -56,6 +59,11 @@ export const SEEDS = [7, 4242];
 /** Cameras: the preset's own view, then an orbit of 35° round the axis and 20° of tilt. */
 export const CAMERAS = /** @type {const} */ (['home', 'orbit']);
 export const ORBIT = { az: 35, incl: 20 };
+/**
+ * The zoom camera of --extra (open question Q8): the home view at zoom 2 (v21's ZOOM, so
+ * VIEW.scale = 168, app23.js:L1227), set up from a fresh preset.
+ */
+export const ZOOM_CAMERA = 2;
 /** The re-roll camera of --reroll: a 0.3° orbit (ADR 0013). */
 export const REROLL = { az: 0.3 };
 /** A few presets also captured on the Chalkboard surface. */
@@ -144,12 +152,13 @@ async function captureJob(browser, url, job, out) {
   const results = [];
   for (const camera of job.cameras) {
     const state = await page.evaluate(
-      ({ preset, seed, camera, orbit, overrides, reroll }) => {
+      ({ preset, seed, camera, orbit, overrides, reroll, zoom }) => {
         const G = /** @type {any} */ (window).__GEN;
-        if (camera === 'home') {
+        if (camera === 'home' || camera === 'zoom') {
           G.preset(preset);
           G.set({ seed });
           if (overrides) G.set(overrides);
+          if (camera === 'zoom') G.zoom(zoom);
         } else if (camera === 'reroll') {
           const P = G.P();
           G.set({ az: (P.az || 0) + reroll.az });
@@ -178,6 +187,7 @@ async function captureJob(browser, url, job, out) {
         orbit: ORBIT,
         overrides: job.overrides ?? null,
         reroll: REROLL,
+        zoom: ZOOM_CAMERA,
       },
     );
     const base = job.variant ? `${slug(job.preset)}--${slug(job.variant)}` : slug(job.preset);
@@ -195,12 +205,13 @@ async function captureJob(browser, url, job, out) {
       surface: job.chalk ? 'chalkboard' : 'paper',
       ...(job.variant ? { variant: job.variant, overrides: job.overrides } : {}),
       sequence:
-        camera === 'home'
+        camera === 'home' || camera === 'zoom'
           ? [
               `load page (theme ${job.chalk ? 'dark' : 'light'})`,
               `__GEN.preset(${JSON.stringify(job.preset)})`,
               `__GEN.set({ seed: ${job.seed} })`,
               ...(job.overrides ? [`__GEN.set(${JSON.stringify(job.overrides)})`] : []),
+              ...(camera === 'zoom' ? [`__GEN.zoom(${String(ZOOM_CAMERA)})`] : []),
             ]
           : camera === 'reroll'
             ? ['after home', `__GEN.set({ az: az + ${REROLL.az} })`]
@@ -208,19 +219,54 @@ async function captureJob(browser, url, job, out) {
                 'after home',
                 `__GEN.set({ az: az + ${ORBIT.az}, incl: clamp(incl + ${ORBIT.incl}, 0, 180) })`,
               ],
-      zoom: 1,
+      zoom: camera === 'zoom' ? ZOOM_CAMERA : 1,
       canvas: state.canvas,
       stats: state.stats,
       hand: state.hand,
       params: state.P,
       pageErrors: errors.slice(),
       inkPixelSha256: pixelHash(ink),
+      captured: new Date().toISOString(),
     };
     writeFileSync(join(out, `${name}.json`), JSON.stringify(record, null, 2) + '\n');
     results.push(record);
   }
   await context.close();
   return results;
+}
+
+/**
+ * The manifest's record of the --extra runs: per camera, when it was last captured and with which
+ * browser. A run that captures only some cameras (`--cameras zoom`) updates only theirs; each
+ * capture also carries its own `captured` time. A manifest from before this record existed (one
+ * `generated` for the whole file, from a run of home and orbit) is carried over as those cameras'
+ * run, by this function, not by hand. An `--only` run stamps `runs[camera].generated` although it
+ * re-made only some of that camera's captures: the per-capture `captured` times are authoritative.
+ *
+ * @param {any} previous the manifest's `extra`, if any
+ * @param {string} file
+ * @param {any[]} records this run's captures
+ * @param {string} version the browser's version
+ */
+function extraProvenance(previous, file, records, version) {
+  /** @type {Record<string, { generated: string, browser: unknown }>} */
+  const runs = { ...(previous?.runs ?? {}) };
+  if (previous?.generated && !previous.runs)
+    for (const camera of CAMERAS)
+      runs[camera] = { generated: previous.generated, browser: previous.browser };
+  const now = new Date().toISOString();
+  const browser = { name: 'chromium', version, args: BROWSER_ARGS, deviceScaleFactor: 1 };
+  for (const camera of new Set(records.map((r) => String(r.camera))))
+    runs[camera] = { generated: now, browser };
+  return {
+    file,
+    cameras: {
+      home: "the preset's own incl, az, pa",
+      orbit: `az + ${String(ORBIT.az)}°, incl + ${String(ORBIT.incl)}° (clamped), from home`,
+      zoom: `home at zoom ${String(ZOOM_CAMERA)} (__GEN.zoom)`,
+    },
+    runs: Object.fromEntries(Object.entries(runs).sort(([a], [b]) => a.localeCompare(b))),
+  };
 }
 
 async function main() {
@@ -243,18 +289,39 @@ async function main() {
   const only = opt('--only')
     ?.split(',')
     .map((s) => s.trim());
+  const onlyCameras = opt('--cameras')
+    ?.split(',')
+    .map((s) => s.trim());
   const names = Object.keys(presets).filter((n) => !only || only.includes(n));
   /** @type {Job[]} */
   let jobs;
   if (extraFile) {
-    /** @type {{ cases: { preset: string, variant: string, overrides: Record<string, unknown>, seeds?: number[] }[] }} */
+    /**
+     * @type {{ cameras?: string[], cases: { preset: string, variant: string,
+     *   overrides: Record<string, unknown>, seeds?: number[], zoom?: number[] }[] }}
+     */
     const extra = JSON.parse(readFileSync(resolve(ROOT, extraFile), 'utf8'));
+    const fileCams = extra.cameras ?? [...CAMERAS];
+    for (const c of fileCams)
+      if (!['home', 'orbit'].includes(c)) throw new Error(`unknown camera ${c}`);
+    /** the cameras of one (case, seed): the file's, plus zoom where the case's `zoom` lists the seed */
+    const camsFor = (/** @type {number[] | undefined} */ zoomSeeds, /** @type {number} */ seed) => {
+      const cams = [...fileCams, ...(zoomSeeds?.includes(seed) ? ['zoom'] : [])].filter(
+        (c) => !onlyCameras || onlyCameras.includes(c),
+      );
+      // orbit is reached from home, so it needs home captured first in the same page
+      if (cams.includes('orbit') && !cams.includes('home'))
+        throw new Error('the orbit camera needs the home camera');
+      return cams;
+    };
     jobs = extra.cases
       .filter((c) => !only || only.includes(c.preset))
       .flatMap((c) => {
         if (!presets[c.preset]) throw new Error(`unknown preset ${c.preset}`);
-        const { seeds, ...rest } = c;
-        return (seeds ?? SEEDS).map((seed) => ({ ...rest, seed, chalk: false, cameras: CAMERAS }));
+        const { seeds, zoom, ...rest } = c;
+        return (seeds ?? SEEDS)
+          .map((seed) => ({ ...rest, seed, chalk: false, cameras: camsFor(zoom, seed) }))
+          .filter((j) => j.cameras.length);
       });
   } else if (reroll) {
     jobs = names.flatMap((preset) =>
@@ -316,8 +383,10 @@ async function main() {
     ...(r.variant ? { variant: r.variant, overrides: r.overrides } : {}),
     seed: r.seed,
     camera: r.camera,
+    ...(r.zoom !== 1 ? { zoom: r.zoom } : {}),
     surface: r.surface,
     inkPixelSha256: r.inkPixelSha256,
+    ...(r.captured ? { captured: r.captured } : {}),
     stats: r.stats,
     pageErrors: r.pageErrors.length,
   });
@@ -338,11 +407,7 @@ async function main() {
       ...manifest.captures.filter((/** @type {any} */ c) => !names.has(c.name)),
       ...records.map(entry),
     ]);
-    manifest.extra = {
-      file: extraFile,
-      generated: new Date().toISOString(),
-      browser: { name: 'chromium', version, args: BROWSER_ARGS, deviceScaleFactor: 1 },
-    };
+    manifest.extra = extraProvenance(manifest.extra, extraFile, records, version);
     writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
     console.log(`${records.length} extra captures added to ${manifestPath}`);
     return;

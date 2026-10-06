@@ -88,7 +88,15 @@
   <body>
     <!-- The page proper arrives in milestone M11; until then: the plate, a preset, a seed and a surface switch. -->
     <main>
-      <canvas id="plate" class="plate" width="800" height="800"></canvas>
+      <canvas
+        id="plate"
+        class="plate"
+        width="800"
+        height="800"
+        tabindex="0"
+        role="application"
+        aria-label="Galaxy plate: drag to orbit, shift-drag to roll, arrows to turn, Q and E to roll, + and − to zoom, 0 to reset the zoom"
+      ></canvas>
       <div class="bar" role="group" aria-label="Galaxy">
         <label
           >Preset

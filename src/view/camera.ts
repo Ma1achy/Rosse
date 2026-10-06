@@ -1,15 +1,34 @@
 /**
- * The camera: inclination, azimuth (orbit about the galaxy's axis), position angle (twist on the
- * plate), winding (mirror) and zoom.
+ * The camera: inclination, azimuth (orbit about the galaxy's axis), position angle (roll on the
+ * plate), winding (mirror) and zoom, and every projection the reference builds from them
+ * (docs/reference-notes.md section 5).
  *
- * `project` is the reference's (app23.js:L153): mirror x by the winding, orbit by `az` about the
- * galaxy's axis, tilt by `incl` about x (y' = y cos i − z sin i), roll by `pa`, then scale by
- * `VIEW.scale` = 84 × zoom and centre on the 800-unit plate (y down). Orthographic.
+ * **One rotation.** v21 writes the same rotation out five times: `project` (app23.js:L153),
+ * `discM` (L126), `rotFwd`/`rotInv` (L440–441), `toView`/`toScreen` (L859–860). Here the
+ * trigonometry is evaluated once per orientation (`rotation`) and every stage reads it:
  *
- * The trigonometry is evaluated once on the CPU and rounded to f32 (`viewDesc`), and both engines
- * read those numbers, so the WebGPU and CPU engines start from identical rotations. Still to come
- * (M3): `discM`, `rotFwd`/`rotInv`, `toView`, the deep-field perspective (`CAM = 30`) and orbit
- * input, which belongs to the page and only writes camera parameters.
+ * - `rotFwd(p, R)`: galaxy frame → view frame (x right, y down, z towards the viewer): mirror x by
+ *   the winding, orbit by `az` about the galaxy's axis, tilt by `incl` about x;
+ * - `rotInv(v, R)`: its inverse;
+ * - `toView(w, R)`: `rotFwd` without the mirror (the sky, L859);
+ * - `toScreen(v, k, R, scale)`: roll by `pa`, scale by `VIEW.scale · k`, centre on the plate (L860);
+ * - `project(p, cam)` = `toScreen(rotFwd(p), 1)`: the orthographic galaxy (L153);
+ * - `perspective(depth)` = CAM / (CAM − depth): the deep field's perspective factor (L884);
+ * - `viewDesc(cam)`: the same numbers rounded to f32 once, the `View` uniform both engines read.
+ *
+ * The operations are in v21's order, so these functions give v21's numbers to the last bit
+ * (tests/unit/camera.test.ts against tests/vectors/camera.json, made by evaluating v21's own
+ * functions: `npm run vectors:camera`).
+ *
+ * **Inclination and structure.** v21 switches structure at fixed inclinations, mostly through
+ * `incE()` (L856), the inclination folded into 0–90° (`INCE_USES`, with `inclBucket` numbering
+ * the intervals between them), and once on the raw cos i (L1000, `CI_PREDICATES`). The model
+ * tier's key is `structureKey`, the answer of every one of these switches (ADR 0010, ADR 0017):
+ * a change of it rebuilds the model. Every other use of the inclination is continuous and
+ * belongs to the view tier (`INCL_CONTINUOUS`).
+ *
+ * **Zoom.** Not a parameter in v21 (`ZOOM`, L857) but page state: `VIEW.scale` = 84 · zoom
+ * (L1227), clamped to 0.15–12 by every control (L1853–1874). It is a view-tier input here.
  */
 import type { Params } from '../core/params';
 import type { StructLayout } from '../marks/instance';
@@ -20,6 +39,15 @@ const f = Math.fround;
 export const PLATE = 800;
 /** Plate units per galaxy unit at zoom 1 (`VIEW.scale`, app23.js:L122). */
 export const UNIT_SCALE = 84;
+/** The zoom range of every zoom control (app23.js:L1853, L1861, L1865, L1873). */
+export const ZOOM_MIN = 0.15;
+export const ZOOM_MAX = 12;
+/** The deep field's perspective camera (app23.js:L857): distance on the view axis, in galaxy units. */
+export const CAM = 30;
+/** The sky's shell of background galaxies and the foreground stars' radius (app23.js:L857). */
+export const SKY_RMIN = 40;
+export const SKY_RMAX = 240;
+export const R_FG = 42;
 
 export interface Camera {
   incl: number;
@@ -29,9 +57,486 @@ export interface Camera {
   zoom: number;
 }
 
+/** v21's orientation `{ incl, az, w, pa }` (`orientNow`, app23.js:L442). */
+export interface Orientation {
+  incl: number;
+  az: number;
+  w: number;
+  pa: number;
+}
+
 export function cameraOf(P: Params, zoom = 1): Camera {
   return { incl: P.incl, az: P.az || 0, pa: P.pa, winding: P.winding, zoom };
 }
+
+export function orientationOf(cam: Camera): Orientation {
+  return { incl: cam.incl, az: cam.az || 0, w: cam.winding, pa: cam.pa };
+}
+
+/** v21's `VIEW.scale` for a zoom (app23.js:L1227). */
+export function viewScale(zoom: number): number {
+  return UNIT_SCALE * zoom;
+}
+
+export function clamp(x: number, a: number, b: number): number {
+  return Math.max(a, Math.min(b, x));
+}
+
+export function clampZoom(z: number): number {
+  return clamp(z, ZOOM_MIN, ZOOM_MAX);
+}
+
+/** An angle in degrees wrapped into [0, 360), as the orbit control does (app23.js:L1837). */
+export function wrapDeg(a: number): number {
+  return ((a % 360) + 360) % 360;
+}
+
+/** The trigonometry of one orientation, evaluated once (in v21's expression order). */
+export interface Rotation {
+  /** cos and sin of incl */
+  ci: number;
+  si: number;
+  /** cos and sin of az */
+  cz: number;
+  sz: number;
+  /** cos and sin of pa */
+  cp: number;
+  sp: number;
+  /** winding (x mirror) */
+  w: number;
+}
+
+const rad = (deg: number) => (deg * Math.PI) / 180;
+
+export function rotation(o: Orientation): Rotation {
+  const i = rad(o.incl);
+  const az = rad(o.az || 0);
+  const pa = rad(o.pa);
+  return {
+    ci: Math.cos(i),
+    si: Math.sin(i),
+    cz: Math.cos(az),
+    sz: Math.sin(az),
+    cp: Math.cos(pa),
+    sp: Math.sin(pa),
+    w: o.w,
+  };
+}
+
+export const rotationOf = (cam: Camera): Rotation => rotation(orientationOf(cam));
+
+export type Vec3 = [number, number, number];
+export type Vec2 = [number, number];
+/** A 2 × 2 matrix, column-major as GLSL `mat2` (app23.js:L89–92). */
+export type Mat2 = [number, number, number, number];
+
+/** Galaxy frame → view frame (app23.js:L440): [x, y down the plate, depth towards the viewer]. */
+export function rotFwd(p: readonly number[], R: Rotation): Vec3 {
+  const x0 = (p[0] ?? 0) * R.w;
+  const y0 = p[1] ?? 0;
+  const z = p[2] ?? 0;
+  const x = x0 * R.cz - y0 * R.sz;
+  const ya = x0 * R.sz + y0 * R.cz;
+  return [x, ya * R.ci - z * R.si, ya * R.si + z * R.ci];
+}
+
+/** View frame → galaxy frame (app23.js:L441), the inverse of `rotFwd`. */
+export function rotInv(v: readonly number[], R: Rotation): Vec3 {
+  const v0 = v[0] ?? 0;
+  const v1 = v[1] ?? 0;
+  const v2 = v[2] ?? 0;
+  const ya = v1 * R.ci + v2 * R.si;
+  const pz = -v1 * R.si + v2 * R.ci;
+  const x0 = v0 * R.cz + ya * R.sz;
+  const y0 = -v0 * R.sz + ya * R.cz;
+  return [x0 / R.w, y0, pz];
+}
+
+/** World → view without the mirror (app23.js:L859), for the sky. */
+export function toView(w: readonly number[], R: Rotation): Vec3 {
+  return rotFwd(w, R.w === 1 ? R : { ...R, w: 1 });
+}
+
+/** View → plate with a perspective factor `k` (app23.js:L860): roll by pa, scale, centre. */
+export function toScreen(v: readonly number[], k: number, R: Rotation, scale: number): Vec2 {
+  const fk = scale * k;
+  const v0 = v[0] ?? 0;
+  const v1 = v[1] ?? 0;
+  return [PLATE / 2 + (v0 * R.cp - v1 * R.sp) * fk, PLATE / 2 + (v0 * R.sp + v1 * R.cp) * fk];
+}
+
+/** The deep field's perspective factor for a view-frame depth (app23.js:L884). */
+export function perspective(depth: number): number {
+  return CAM / (CAM - depth);
+}
+
+/** The reference's `project(p)` (app23.js:L153), in f64: galaxy frame → plate. Orthographic. */
+export function project(p: readonly number[], cam: Camera, R: Rotation = rotationOf(cam)): Vec2 {
+  const v = rotFwd(p, R);
+  return toScreen(v, 1, R, viewScale(cam.zoom));
+}
+
+function Rm(t: number): Mat2 {
+  const c = Math.cos(t);
+  const s = Math.sin(t);
+  return [c, s, -s, c];
+}
+function Sm(x: number, y: number): Mat2 {
+  return [x, 0, 0, y];
+}
+function mul(A: Mat2, B: Mat2): Mat2 {
+  return [
+    A[0] * B[0] + A[2] * B[1],
+    A[1] * B[0] + A[3] * B[1],
+    A[0] * B[2] + A[2] * B[3],
+    A[1] * B[2] + A[3] * B[3],
+  ];
+}
+/** v21's `chain` (app23.js:L92): the product of the matrices, left to right. */
+export function chain(...ms: Mat2[]): Mat2 {
+  let M: Mat2 = [1, 0, 0, 1];
+  for (const m of ms) M = mul(M, m);
+  return M;
+}
+
+/**
+ * The disc plane → plate at unit scale (app23.js:L126): `R(pa)·S(1, cos i)·R(az)·S(winding, 1)`.
+ * Lays drawings on the disc.
+ */
+export function discM(cam: Camera): Mat2 {
+  return chain(
+    Rm(rad(cam.pa)),
+    Sm(1, Math.cos(rad(cam.incl))),
+    Rm(rad(cam.az || 0)),
+    Sm(cam.winding, 1),
+  );
+}
+
+/** Two unit vectors spanning the plane with normal `n` (app23.js:L861). */
+export function basis(n: readonly number[]): [Vec3, Vec3] {
+  const n0 = n[0] ?? 0;
+  const n1 = n[1] ?? 0;
+  const n2 = n[2] ?? 0;
+  const a = Math.abs(n2) < 0.9 ? [0, 0, 1] : [1, 0, 0];
+  const [a0 = 0, a1 = 0, a2 = 0] = a;
+  let e1: Vec3 = [n1 * a2 - n2 * a1, n2 * a0 - n0 * a2, n0 * a1 - n1 * a0];
+  const l = Math.hypot(e1[0], e1[1], e1[2]);
+  e1 = [e1[0] / l, e1[1] / l, e1[2] / l];
+  return [e1, [n1 * e1[2] - n2 * e1[1], n2 * e1[0] - n0 * e1[2], n0 * e1[1] - n1 * e1[0]]];
+}
+
+/**
+ * A 2 × 2 laying a drawing on a plane with world normal `nw` (app23.js:L863): foreshortened by
+ * |n_z| (at least `flat`, 0.12 by default), mirrored when the plane faces away.
+ */
+export function orient(
+  nw: readonly number[],
+  size: number,
+  spin: number,
+  flat: number | undefined,
+  cam: Camera,
+  R: Rotation = rotationOf(cam),
+): Mat2 {
+  const n = toView(nw, R);
+  const cosI = Math.abs(n[2]);
+  const phi = Math.atan2(n[1], n[0]) + Math.PI / 2 + rad(cam.pa);
+  return chain(
+    Rm(phi),
+    Sm(size, size * Math.max(flat || 0.12, cosI)),
+    Sm(n[2] < 0 ? -1 : 1, 1),
+    Rm(spin),
+  );
+}
+
+/**
+ * A point placed at plate offset (sx, sy) and `depth` as seen from `home`, seen now
+ * (app23.js:L446). v21 remembers `home` from navigation history (`homeFor`); here it is explicit
+ * (docs/architecture.md, deliberate divergence 2).
+ */
+export function scenePoint(
+  home: Orientation,
+  sx: number,
+  sy: number,
+  depth: number,
+  cam: Camera,
+): Vec2 {
+  const pa0 = rad(home.pa);
+  const lx = sx * Math.cos(pa0) + sy * Math.sin(pa0);
+  const ly = -sx * Math.sin(pa0) + sy * Math.cos(pa0);
+  const R = rotationOf(cam);
+  const v = rotFwd(rotInv([lx, ly, depth], rotation(home)), R);
+  const pa = rad(cam.pa);
+  const sc = viewScale(cam.zoom);
+  return [
+    PLATE / 2 + (v[0] * Math.cos(pa) - v[1] * Math.sin(pa)) * sc,
+    PLATE / 2 + (v[0] * Math.sin(pa) + v[1] * Math.cos(pa)) * sc,
+  ];
+}
+
+/**
+ * A lensed source fixed in 3D a distance D behind the lens, placed at (bx, by) from `home`: its
+ * lens-plane offset as seen now (app23.js:L450).
+ */
+export function srcNow(home: Orientation, bx: number, by: number, D: number, cam: Camera): Vec2 {
+  const v = rotFwd(rotInv([bx, by, -D], rotation(home)), rotationOf(cam));
+  return [v[0], v[1]];
+}
+
+// ---------------------------------------------------------------------------------------------
+// incE and its buckets
+
+/** The reference's `incE()` (app23.js:L856): the inclination folded into 0–90°. */
+export function incE(incl: number): number {
+  let i = ((incl % 360) + 360) % 360;
+  if (i > 180) i = 360 - i;
+  return i > 90 ? 180 - i : i;
+}
+
+/** One use of `incE()` in v21: where, the test it makes, and what it switches. */
+export interface IncEUse {
+  line: number;
+  test: (e: number) => boolean;
+  /** the test as written in app23.js */
+  source: string;
+  what: string;
+  /** the milestone that implements it */
+  milestone: string;
+}
+
+/**
+ * Every use of `incE()` in app23.js (12, besides its definition at L856). Checked against the
+ * source by tests/unit/camera.test.ts.
+ */
+export const INCE_USES: readonly IncEUse[] = [
+  {
+    line: 201,
+    source: 'incE() > 72',
+    test: (e) => e > 72,
+    milestone: 'M4',
+    what: 'dust-carving pen lines: one lane along the midplane instead of one per arm (up to 3)',
+  },
+  {
+    line: 207,
+    source: 'incE() > 72',
+    test: (e) => e > 72,
+    milestone: 'M4',
+    what: 'dust-carving pen lines laid along the midplane',
+  },
+  {
+    line: 788,
+    source: 'incE() > 80',
+    test: (e) => e > 80,
+    milestone: 'M4',
+    what: 'the edge-on midplane stroke',
+  },
+  {
+    line: 928,
+    source: 'incE() > 74',
+    test: (e) => e > 74,
+    milestone: 'M4',
+    what: 'dust clouds: edge-on scribble count (3 instead of 5 + 9·dustScribble)',
+  },
+  {
+    line: 950,
+    source: 'incE() > 74',
+    test: (e) => e > 74,
+    milestone: 'M4',
+    what: 'hatched dust lanes on the edge-on midplane',
+  },
+  {
+    line: 960,
+    source: 'incE() <= 74',
+    test: (e) => e <= 74,
+    milestone: 'M4',
+    what: 'the hatched lane just inside a ring',
+  },
+  {
+    line: 965,
+    source: 'incE() > 74',
+    test: (e) => e > 74,
+    milestone: 'M4',
+    what: 'no hatched arm lanes when edge-on',
+  },
+  {
+    line: 1000,
+    source: 'incE() > 70',
+    test: (e) => e > 70,
+    milestone: 'M5',
+    what: "whole-drawing type 'smooth:elongated' (with bulgeFlat < 0.6)",
+  },
+  {
+    line: 1001,
+    source: 'incE() > 78',
+    test: (e) => e > 78,
+    milestone: 'M5',
+    what: "whole-drawing types 'edge-on', 'edge-on:dust-lane', 'edge-on:thick'",
+  },
+  {
+    line: 1028,
+    source: 'incE() < 80',
+    test: (e) => e < 80,
+    milestone: 'M2',
+    what: 'the drawn core (none from 80° up)',
+  },
+  {
+    line: 1029,
+    source: 'incE() > 70',
+    test: (e) => e > 70,
+    milestone: 'M2',
+    what: "the drawn core's style: dotted above 70°",
+  },
+  {
+    line: 1031,
+    source: 'incE() > 78',
+    test: (e) => e > 78,
+    milestone: 'M5',
+    what: 'the core flattened to 0.55 on edge-on galaxies',
+  },
+];
+
+/**
+ * The bucket edges, in increasing order: every use above is one of these predicates or its
+ * complement. 80 appears twice because L1028 tests `< 80` and L788 `> 80`, so exactly 80° is a
+ * bucket of its own.
+ */
+const BUCKET_EDGES: readonly ((e: number) => boolean)[] = [
+  (e) => e > 70,
+  (e) => e > 72,
+  (e) => e > 74,
+  (e) => e > 78,
+  (e) => e >= 80,
+  (e) => e > 80,
+];
+
+/** Number of `incE` buckets (`inclBucket` is in 0 … INCL_BUCKETS − 1). */
+export const INCL_BUCKETS = BUCKET_EDGES.length + 1;
+
+/**
+ * Which side of each `incE()` threshold `incl` is on: part of the model tier's key (ADR 0010).
+ * Two inclinations in the same bucket give the same answer at every use in `INCE_USES`.
+ */
+export function inclBucket(incl: number): number {
+  const e = incE(incl);
+  let b = 0;
+  for (const edge of BUCKET_EDGES) if (edge(e)) b++;
+  return b;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Inclination and structure: the model tier's key (ADR 0010, ADR 0017)
+
+/** What a structure predicate reads besides the inclination. */
+export type StructureParams = Pick<Params, 'incl' | 'kind' | 'bulge' | 'bulgeFlat'>;
+
+/**
+ * A discrete switch of structure on the inclination that does not go through `incE()`. v21 has
+ * one: L1000 picks the whole drawing `smooth:elongated` when `bulgeFlat · max(cos i, 0.05) < 0.5`,
+ * with the raw cos i (so 30° and 150° differ, and for bulgeFlat 0.9 the answer flips at 56.25°,
+ * inside the first incE bucket). The test is evaluated only where v21 evaluates it: its guard in
+ * the same expression is `kind` auto and bulge ≥ 0.95.
+ */
+export interface InclPredicate {
+  line: number;
+  source: string;
+  /** null when v21 does not evaluate the test for these parameters */
+  test: (P: StructureParams) => boolean | null;
+  what: string;
+  milestone: string;
+}
+
+export const CI_PREDICATES: readonly InclPredicate[] = [
+  {
+    line: 1000,
+    source: 'P.bulgeFlat * Math.max(ci(), 0.05) < 0.5',
+    test: (P) =>
+      P.kind === 'auto' && P.bulge >= 0.95
+        ? P.bulgeFlat * Math.max(Math.cos(rad(P.incl)), 0.05) < 0.5
+        : null,
+    milestone: 'M5',
+    what: "whole-drawing type 'smooth:elongated' from the projected flattening",
+  },
+];
+
+/**
+ * The structure signature of an inclination for these parameters: the answer of every discrete
+ * inclination switch in v21 (`INCE_USES` and `CI_PREDICATES`). The model tier is rebuilt when it
+ * changes (`dirtyTier`). Everything else the inclination does is continuous and belongs to the
+ * view tier (`INCL_CONTINUOUS`).
+ */
+export function structureKey(P: StructureParams): string {
+  const e = incE(P.incl);
+  const bits: string[] = INCE_USES.map((u) => (u.test(e) ? '1' : '0'));
+  for (const c of CI_PREDICATES) {
+    const t = c.test(P);
+    bits.push(t === null ? '-' : t ? '1' : '0');
+  }
+  return bits.join('');
+}
+
+/**
+ * Every other use of the inclination in app23.js. Each is continuous, so a view-tier input, or
+ * not a drawing input at all. `token` is the expression as written. tests/unit/camera.test.ts
+ * checks that every `P.incl`, `ci()` and `incE()` in app23.js is listed here or is a structure
+ * predicate (`INCE_USES`, `CI_PREDICATES`).
+ */
+export const INCL_CONTINUOUS: readonly {
+  line: number;
+  token: string;
+  what: string;
+  /** how many times the token appears on the line, when more than once */
+  count?: number;
+}[] = [
+  { line: 123, token: 'P.incl', what: 'the definition of `ci()`' },
+  { line: 123, token: 'ci()', what: 'the definition of `ci()`' },
+  { line: 126, token: 'ci()', what: '`discM`: the disc plane to the plate (view)' },
+  { line: 154, token: 'P.incl', what: '`project` (view: project.wgsl)' },
+  {
+    line: 177,
+    token: 'P.incl',
+    what: "`generate`'s cos i and sin i, used only by the dust optical depth at L262 (a pure view cull in project.wgsl)",
+  },
+  {
+    line: 442,
+    token: 'P.incl',
+    what: '`orientNow` (homes of overlays and lensed sources, M7, M9). Not purely continuous in v21: through `srcNow` it feeds the DISCRETE lens seed at L647, `mulberry32(P.seed * 733 + Math.round(bc[0] * 997))`, so orbiting re-rolls the lensed marks. M9 diverges deliberately: orbiting never re-rolls (docs/architecture.md)',
+  },
+  { line: 498, token: 'P.incl', what: 'the merger framed from its 3D extent (view, M8)' },
+  {
+    line: 788,
+    token: 'P.incl',
+    what: "the edge-on midplane stroke's alpha `lines · (incl − 72) / 18` (view, M4)",
+  },
+  { line: 856, token: 'P.incl', what: 'the definition of `incE()`' },
+  { line: 856, token: 'incE()', what: 'the definition of `incE()`' },
+  { line: 859, token: 'P.incl', what: '`toView` (the sky, view, M7)' },
+  {
+    line: 924,
+    token: 'P.incl',
+    what: 'the dust clouds cache key: clouds are placed in screen space (view, M4)',
+  },
+  {
+    line: 945,
+    token: 'P.incl',
+    what: 'the dust lanes cache key: lanes are hatched in screen space (view, M4)',
+  },
+  { line: 995, token: 'ci()', what: 'an envelope flattened by max(bulgeFlat, cos i) (view, M5)' },
+  {
+    line: 1007,
+    token: 'ci()',
+    what: 'a smooth whole drawing flattened by max(bulgeFlat, cos i) (view, M5)',
+  },
+  {
+    line: 1033,
+    token: 'ci()',
+    what: 'the core flattened by max(bulgeFlat, cos i) (view: model/parts.ts)',
+  },
+  { line: 1474, token: 'P.incl', what: "the page's summary text (not drawing)" },
+  { line: 1849, token: 'P.incl', count: 2, what: 'the orbit drag (input: ui/orbit.ts)' },
+  { line: 1871, token: 'P.incl', count: 4, what: 'the arrow keys (input: ui/orbit.ts)' },
+];
+
+// ---------------------------------------------------------------------------------------------
+// The View uniform
 
 /** The `View` uniform of project.wgsl: the camera as f32 numbers. */
 export const VIEW_LAYOUT: StructLayout = {
@@ -65,22 +570,18 @@ export const VIEW_LAYOUT: StructLayout = {
 
 export type ViewDesc = Record<string, number>;
 
-const RAD = Math.PI / 180;
-
 /** The camera's numbers, rounded to f32. `dust` is the galaxy's extinction (for the τ cull). */
 export function viewDesc(cam: Camera, dust: number, n: number, cap: number): ViewDesc {
-  const i = cam.incl * RAD;
-  const az = cam.az * RAD;
-  const pa = cam.pa * RAD;
+  const R = rotationOf(cam);
   return {
-    cos_i: f(Math.cos(i)),
-    sin_i: f(Math.sin(i)),
-    cos_az: f(Math.cos(az)),
-    sin_az: f(Math.sin(az)),
-    cos_pa: f(Math.cos(pa)),
-    sin_pa: f(Math.sin(pa)),
+    cos_i: f(R.ci),
+    sin_i: f(R.si),
+    cos_az: f(R.cz),
+    sin_az: f(R.sz),
+    cos_pa: f(R.cp),
+    sin_pa: f(R.sp),
     winding: f(cam.winding),
-    scale: f(UNIT_SCALE * cam.zoom),
+    scale: f(viewScale(cam.zoom)),
     cx: PLATE / 2,
     cy: PLATE / 2,
     dust: f(dust),
@@ -103,24 +604,4 @@ export function packView(v: ViewDesc): ArrayBuffer {
     else fl[field.offset / 4] = x;
   }
   return buf;
-}
-
-/** The reference's `project(p)` in f64, for tests and CPU-side placement. */
-export function project(p: readonly [number, number, number], cam: Camera): [number, number] {
-  const i = cam.incl * RAD;
-  const c = Math.cos(i);
-  const s = Math.sin(i);
-  const az = cam.az * RAD;
-  const cz = Math.cos(az);
-  const sz = Math.sin(az);
-  const x0 = p[0] * cam.winding;
-  const y0 = p[1];
-  const x = x0 * cz - y0 * sz;
-  const ya = x0 * sz + y0 * cz;
-  const y = ya * c - p[2] * s;
-  const a = cam.pa * RAD;
-  const ca = Math.cos(a);
-  const sa = Math.sin(a);
-  const sc = UNIT_SCALE * cam.zoom;
-  return [PLATE / 2 + (x * ca - y * sa) * sc, PLATE / 2 + (x * sa + y * ca) * sc];
 }

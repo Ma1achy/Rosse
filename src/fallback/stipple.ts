@@ -7,8 +7,18 @@
 import type { Instance } from '../marks/instance';
 import type { InkLayer } from '../render/layers';
 import { coreInstances } from '../model/parts';
-import { STIPPLE_LAYERS, markCounts, type GalaxyScene, type MarkCounts } from '../model/scene';
-import { viewDesc, type Camera } from '../view/camera';
+import {
+  STIPPLE_LAYERS,
+  buildScene,
+  markCounts,
+  type GalaxyScene,
+  type MarkCounts,
+  type SceneOptions,
+} from '../model/scene';
+import type { Params } from '../core/params';
+import type { DrawingsMeta } from '../model/variation';
+import { TierState, type TierWork } from '../render/tiers';
+import { cameraOf, viewDesc, type Camera } from '../view/camera';
 import { INSTANCE_WORDS, runProject } from './kernels/project';
 import { classCapacity, compact } from './kernels/scan';
 import { runStipple } from './kernels/stipple';
@@ -66,5 +76,39 @@ export class CpuStipple {
       classes: p.classes,
       projected: p.f32,
     };
+  }
+}
+
+/**
+ * The CPU engine's stipple by tier (src/render/tiers.ts), the twin of `GpuStipple.frame`: the
+ * model tier (`CpuStipple`, the samples) is kept until a model parameter changes or the structure
+ * signature changes (`structureKey`, ADR 0017); a camera move re-runs only the view.
+ */
+export class CpuStippleTiers {
+  readonly tiers = new TierState();
+  stipple: CpuStipple | null = null;
+  view: CpuStippleView | null = null;
+
+  constructor(private readonly meta: DrawingsMeta) {}
+
+  frame(
+    P: Params,
+    zoom: number,
+    opts: SceneOptions = {},
+  ): { view: CpuStippleView; work: TierWork } {
+    const work = this.tiers.run(
+      { P, zoom, modelKey: JSON.stringify(opts) },
+      {
+        model: () => {
+          this.stipple = new CpuStipple(buildScene(P, this.meta, opts));
+        },
+        view: () => {
+          if (!this.stipple) throw new Error('no model tier');
+          this.view = this.stipple.view(cameraOf(P, zoom));
+        },
+      },
+    );
+    if (!this.view) throw new Error('no view tier');
+    return { view: this.view, work };
   }
 }

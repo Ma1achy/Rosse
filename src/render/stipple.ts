@@ -15,8 +15,18 @@ import { bufferWithData } from '../gpu/buffers';
 import { INSTANCE_LAYOUT } from '../marks/instance';
 import { CLASS_COUNT } from '../model/classes';
 import { packGalaxy } from '../model/galaxy';
-import { STIPPLE_LAYERS, markCounts, type GalaxyScene, type MarkCounts } from '../model/scene';
-import { packView, viewDesc, type Camera } from '../view/camera';
+import {
+  STIPPLE_LAYERS,
+  buildScene,
+  markCounts,
+  type GalaxyScene,
+  type MarkCounts,
+  type SceneOptions,
+} from '../model/scene';
+import type { Params } from '../core/params';
+import type { DrawingsMeta } from '../model/variation';
+import { cameraOf, packView, viewDesc, type Camera } from '../view/camera';
+import { TierState, type TierWork } from './tiers';
 import { SAMPLE_LAYOUT } from '../fallback/kernels/stipple';
 import { BLOCK_STRIDE, blockCount, classCapacity } from '../fallback/kernels/scan';
 import type { GpuSpriteLayer } from './layers';
@@ -63,6 +73,10 @@ interface ModelBuffers {
 export class GpuStipple {
   private model: ModelBuffers | null = null;
   private scene: GalaxyScene | null = null;
+  /** what `frame` last built (ADR 0010) */
+  readonly tiers = new TierState();
+  /** the drawings' metadata the model tier was built with (part of its key) */
+  private meta: DrawingsMeta | null = null;
 
   private constructor(
     readonly device: GPUDevice,
@@ -86,8 +100,47 @@ export class GpuStipple {
     return new GpuStipple(device, { stipple, project, local, blocks, scatter });
   }
 
+  /**
+   * One frame's compute work, by tier (src/render/tiers.ts): the model tier (scene description
+   * and stipple samples) only when a model parameter changed or the structure signature changes
+   * (`structureKey`, ADR 0017); the view tier (projection, culls, compaction) when the camera or
+   * zoom moved.
+   */
+  frame(P: Params, zoom: number, meta: DrawingsMeta, opts: SceneOptions = {}): TierWork {
+    // other drawings (a reload of the atlases) are another model
+    if (meta !== this.meta) this.tiers.invalidate();
+    return this.tiers.run(
+      { P, zoom, modelKey: JSON.stringify(opts) },
+      {
+        model: () => {
+          this.loadScene(buildScene(P, meta, opts));
+          this.meta = meta;
+        },
+        view: () => {
+          this.runView(cameraOf(P, zoom));
+        },
+      },
+    );
+  }
+
+  /** The model tier's sample buffer (tests: it must survive a camera move). */
+  get samplesBuffer(): GPUBuffer | null {
+    return this.model?.samples ?? null;
+  }
+
+  /** The scene the model tier holds. */
+  get current(): GalaxyScene | null {
+    return this.scene;
+  }
+
   /** Model tier: uploads the scene description and samples the stipple. */
   setScene(scene: GalaxyScene): void {
+    this.tiers.invalidate();
+    this.meta = null;
+    this.loadScene(scene);
+  }
+
+  private loadScene(scene: GalaxyScene): void {
     this.destroyModel();
     this.scene = scene;
     const d = this.device;
@@ -97,10 +150,12 @@ export class GpuStipple {
     const blocks = blockCount(n);
     const buf = (size: number, usage: number, label: string) =>
       d.createBuffer({ label, size: Math.max(16, size), usage });
-    const galaxy = bufferWithData(d, packGalaxy(G.g), GPUBufferUsage.UNIFORM, 'galaxy');
-    const shape = bufferWithData(d, G.shape, STORAGE, 'galaxy shape');
-    const pool = bufferWithData(d, G.pool, STORAGE, 'galaxy pools');
-    const dotBase = bufferWithData(d, G.dotBase, STORAGE, 'dot sizes');
+    // COPY_SRC: the tier tests read the model buffers back (never on the frame path)
+    const SRC = GPUBufferUsage.COPY_SRC;
+    const galaxy = bufferWithData(d, packGalaxy(G.g), GPUBufferUsage.UNIFORM | SRC, 'galaxy');
+    const shape = bufferWithData(d, G.shape, STORAGE | SRC, 'galaxy shape');
+    const pool = bufferWithData(d, G.pool, STORAGE | SRC, 'galaxy pools');
+    const dotBase = bufferWithData(d, G.dotBase, STORAGE | SRC, 'dot sizes');
     const samples = buf(n * SAMPLE_LAYOUT.size, STORAGE | GPUBufferUsage.COPY_SRC, 'samples');
     const view = buf(64, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'view');
     const scan = bufferWithData(
@@ -195,6 +250,12 @@ export class GpuStipple {
 
   /** View tier: projection, culls and compaction for a camera. */
   setView(cam: Camera): void {
+    // a view `frame` did not choose: its record of the last view no longer holds
+    this.tiers.invalidate();
+    this.runView(cam);
+  }
+
+  private runView(cam: Camera): void {
     const m = this.model;
     if (!m || !this.scene) throw new Error('setScene first');
     const d = this.device;
@@ -259,6 +320,20 @@ export class GpuStipple {
     return { perClass, counts: markCounts(perClass) };
   }
 
+  /** Test only: every model-tier buffer (galaxy uniform, shape, pools, dot sizes, samples). */
+  async readModel(): Promise<
+    Record<'galaxy' | 'shape' | 'pool' | 'dotBase' | 'samples', ArrayBuffer>
+  > {
+    const m = this.need();
+    return {
+      galaxy: await this.read(m.galaxy, m.galaxy.size),
+      shape: await this.read(m.shape, m.shape.size),
+      pool: await this.read(m.pool, m.pool.size),
+      dotBase: await this.read(m.dotBase, m.dotBase.size),
+      samples: await this.read(m.samples, m.n * SAMPLE_LAYOUT.size),
+    };
+  }
+
   async readSamples(): Promise<ArrayBuffer> {
     const m = this.need();
     return this.read(m.samples, m.n * SAMPLE_LAYOUT.size);
@@ -304,6 +379,7 @@ export class GpuStipple {
   }
 
   destroy(): void {
+    this.tiers.invalidate();
     this.destroyModel();
   }
 }

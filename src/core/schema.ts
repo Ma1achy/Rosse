@@ -10,11 +10,12 @@
  *
  * Tiers (ADR 0010): a change marks its tier and every tier below it dirty.
  * - `view`: the camera (`incl`, `az`, `pa`, `winding`) and the merger timeline `mTime`. An `incl`
- *   change that crosses one of the reference's `incE()` thresholds also dirties the model; see
- *   `inclBucket`.
+ *   change that changes a discrete switch of structure also dirties the model; see
+ *   `structureKey` in src/view/camera.ts (ADR 0017).
  * - `present`: the plates mode.
  * - `model`: everything else.
  */
+import { structureKey } from '../view/camera';
 import { DEF, PARAM_KEYS, type ParamKey, type Params } from './params';
 
 export type Tier = 'model' | 'view' | 'present';
@@ -217,23 +218,9 @@ export function tierOf(key: ParamKey): Tier {
 
 const RANK: Record<Tier, number> = { model: 0, view: 1, present: 2 };
 
-/**
- * The reference's `incE()` (app23.js:L856): the inclination folded into 0–90°.
- */
-export function incE(incl: number): number {
-  let i = ((incl % 360) + 360) % 360;
-  if (i > 180) i = 360 - i;
-  return i > 90 ? 180 - i : i;
-}
-
-/** The `incE()` thresholds at which the reference switches structure (reference notes 5.1). */
-export const INCL_THRESHOLDS = [70, 72, 74, 78, 80] as const;
-
-/** Which side of each `incE()` threshold `incl` is on: part of the model tier's key (ADR 0010). */
-export function inclBucket(incl: number): number {
-  const e = incE(incl);
-  return INCL_THRESHOLDS.filter((t) => e > t).length;
-}
+// incE and its buckets live with the camera (src/view/camera.ts); re-exported for the schema's
+// users. camera.ts imports only types from core, so there is no cycle at run time.
+export { incE, inclBucket } from '../view/camera';
 
 /**
  * The highest tier that must be rebuilt when going from `a` to `b` (null when nothing changed).
@@ -244,7 +231,8 @@ export function dirtyTier(a: Params, b: Params): Tier | null {
   for (const k of PARAM_KEYS) {
     if (a[k] === b[k]) continue;
     let t = tierOf(k);
-    if (k === 'incl' && inclBucket(a.incl) !== inclBucket(b.incl)) t = 'model';
+    // a switch of structure on the inclination (incE thresholds, L1000's cos i): the model
+    if (k === 'incl' && structureKey(a) !== structureKey(b)) t = 'model';
     if (best === null || RANK[t] < RANK[best]) best = t;
   }
   return best;

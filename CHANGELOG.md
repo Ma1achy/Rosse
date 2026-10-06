@@ -6,6 +6,21 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- M3, camera and orbit:
+  - `view/camera`: one rotation for every stage. It covers `project`, `rotFwd`/`rotInv`, `toView`/`toScreen`, the deep-field perspective (CAM = 30), `discM`, `basis`, `orient`, and `scenePoint`/`srcNow` with an explicit home. Zoom (`VIEW.scale` = 84 · zoom, 0.15–12); `incE`, every use of it in v21 (`INCE_USES`, 12 lines) and its 7 buckets (exactly 80° is its own). `common/camera.wgsl` is the same rotation in WGSL. `tests/vectors/camera.json` (`npm run vectors:camera`) holds v21's own camera functions evaluated, and all 5,384 numbers match bit for bit.
+  - The view tier (ADR 0010): `render/tiers.ts` runs the model tier only when the schema's tier tags or an `incE` bucket crossing say so, and the view tier on camera, `mTime` or zoom changes. Both engines use it (`GpuStipple.frame`, `CpuStippleTiers`). Tests hash the stipple samples before and after camera moves, on the GPU and the CPU.
+  - `ui/orbit.ts`: v21's orbit controls. They cover drag orbit and tilt, shift- or right-drag roll, pinch and twist, wheel and ctrl-wheel zoom, Safari gestures, double-click, and the arrow, Q/E, +/− and 0 keys. They are tested event for event against v21's own handler code. Camera moves are coalesced to at most one queued frame. The page also takes `?zoom=`, `?az=`, `?incl=` and `?pa=`.
+  - Zoom goldens (open question Q8): `capture:reference --extra` has a `zoom` camera (home at `__GEN.zoom(2)`) and `--cameras`. Cases opt in per seed with `"zoom": [7, 4242]`. There are 6 new v21 captures of the M2 stipple-only set, and the golden runner renders each case at its capture's zoom. All 34 required cases pass, including the 6 zoom cases under ADR 0015's moment gate.
+  - Review fixes:
+    - The model tier's inclination key is a structure signature (ADR 0017), covering L1000's raw cos i switch that `incE` buckets missed. A scan test classifies every use of the inclination in v21.
+    - `schedule()` coalesces every frame request.
+    - The URL camera parsing is strict.
+    - Per-camera run records and per-capture times in the golden manifest.
+    - `GpuStipple` keys its model on the drawings' metadata.
+    - The GPU hash test covers every model buffer.
+    - The plate has an accessible name.
+  - `npm run test:gpu`: the tier hash test with indicative orbit timings, and a Playwright check that drags, rolls and zooms the page and compares the camera with v21's formulas.
+
 - M2, the stipple from the model and the comparison harness:
   - `core/params`, `core/schema`, `core/presets`: the typed `DEF` (109 keys, v21's defaults), every key's range (from v21's controls) and cache tier (ADR 0010, with `incE` buckets dirtying the model), and the 45 presets verbatim, checked against `app23.js`.
   - `model/variation`: `makeVariation` on the counter RNG, one index per group of fields (changing the arms no longer changes the hand); the hand of 1–3 readable pens and the knot pool; `dotSprite`.
@@ -37,6 +52,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- `inclBucket` moved to `view/camera` and gained a bucket for exactly 80° (L1028 tests `< 80`, L788 `> 80`). `core/schema` re-exports it.
 - New binaries are committed as ordinary blobs (no LFS rules) and kept small.
 - ADR 0007: Paper is the field `#e6dece` with the paper texture in `multiply` (not `overlay`, which applies only to a dark theme v21 never sets), plus the plate's inset rim; Chalkboard adds a 60 px inset vignette. The DPR cap of 2 is recorded.
 

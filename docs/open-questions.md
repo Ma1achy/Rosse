@@ -83,6 +83,8 @@ The captures use seeds {7, 4242} and cameras {preset view, az + 35° and incl + 
 
 **Recommendation:** (a) plus (b), the zoom camera only for the 10 presets with the most line work. That adds about 20 captures.
 
+**M3:** the zoom camera exists (`--extra` with `"cameras": ["home", "orbit", "zoom"]`, home at `__GEN.zoom(2)`), so far for the M2 stipple-only set (6 captures, all passing). The line-work presets get theirs as their milestones (M4, M5) add them to the required set.
+
 ### Q9. Scope of the rebuild beyond drawing
 
 v21 also has:

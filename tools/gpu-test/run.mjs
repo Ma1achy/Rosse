@@ -6,21 +6,27 @@
  * Writes test-results/gpu.json.
  *
  * Also runs the surface check of ./surface-css.mjs (the composite against Chromium's own
- * rendering of the reference CSS).
+ * rendering of the reference CSS) and the orbit check of ./orbit.mjs (the page, dragged with the
+ * mouse).
  *
- * Usage: node tools/gpu-test/run.mjs [page …]   (default: every tests/gpu/*.html, and surface-css)
+ * Usage: node tools/gpu-test/run.mjs [page …]   (default: every tests/gpu/*.html, surface-css and
+ * orbit)
  */
 import { mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, launch, prepareAssets, startServer } from './browser.mjs';
+import { orbitCheck } from './orbit.mjs';
 import { surfaceCssCheck } from './surface-css.mjs';
 
 const TIMEOUT = 180_000;
 
 const requested = process.argv.slice(2).filter((a) => !a.startsWith('-'));
 const withCss = !requested.length || requested.includes('surface-css');
+const withOrbit = !requested.length || requested.includes('orbit');
 const pages = requested.length
-  ? requested.filter((p) => p !== 'surface-css').map((p) => (p.endsWith('.html') ? p : `${p}.html`))
+  ? requested
+      .filter((p) => p !== 'surface-css' && p !== 'orbit')
+      .map((p) => (p.endsWith('.html') ? p : `${p}.html`))
   : readdirSync(join(ROOT, 'tests/gpu'))
       .filter((f) => f.endsWith('.html'))
       .sort();
@@ -69,6 +75,18 @@ try {
     } catch (e) {
       results.push({ page: 'surface-css', pass: false, lines: [String(e)], errors: [] });
       console.log(`FAIL  surface-css: ${String(e)}`);
+    }
+  }
+  if (withOrbit) {
+    const t0 = Date.now();
+    try {
+      const r = await orbitCheck(browser, server.url);
+      results.push({ page: 'orbit', ...r, errors: [] });
+      console.log(`${r.pass ? 'PASS' : 'FAIL'}  ${r.name}  (${String(Date.now() - t0)} ms)`);
+      for (const l of r.lines) console.log(`      ${l}`);
+    } catch (e) {
+      results.push({ page: 'orbit', pass: false, lines: [String(e)], errors: [] });
+      console.log(`FAIL  orbit: ${String(e)}`);
     }
   }
 } finally {
