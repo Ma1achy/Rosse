@@ -72,7 +72,7 @@ try {
     if (variant === 'ribbons') {
       // M4: the golden runner's draw, with v21's variation, stroke choices and noise (as the
       // comparison draws), the ink alpha shown over the plate's field colour
-      const opts = node.referenceOptions(rec.params);
+      const opts = node.referenceOptions(rec.params, rec.zoom ?? 1);
       await page.goto(`${server.url}/tests/golden/render.html`);
       await page.waitForFunction(() => window.__golden !== undefined, undefined, {
         timeout: 120_000,

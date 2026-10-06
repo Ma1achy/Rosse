@@ -37,6 +37,7 @@ import {
   type Thresholds,
 } from './thresholds';
 import { v21Variation } from './v21';
+import { v21PartPicks } from './v21-parts';
 
 export { compareMeasures, countAllowance, evaluate, impossibleClasses, measure };
 export type { Comparison, Evaluation, Grey, ImageMeasures, Thresholds };
@@ -123,15 +124,16 @@ export class GoldenNode {
   }
 
   /**
-   * Everything the comparison draws with besides the parameters: v21's variation (ADR 0015), and
-   * from M4 v21's stroke choices and noise field.
+   * Everything the comparison draws with besides the parameters: v21's variation (ADR 0015), from
+   * M4 v21's stroke choices and noise field, and from M5 v21's part picks at this zoom (ADR 0019).
    */
-  referenceOptions(P: Params): SceneOptions {
+  referenceOptions(P: Params, zoom = 1): SceneOptions {
     const variation = this.v21Variation(P);
     return {
       variation,
       curvePicks: this.v21CurvePicks(P, variation),
       noise: this.v21Noise(P.seed),
+      partPicks: v21PartPicks(P, variation, this.cpu.meta, zoom),
     };
   }
 
@@ -194,8 +196,8 @@ export class GoldenNode {
     const pairs: Record<string, (Comparison & { preset: string })[]> = {};
     const controls: Record<string, Record<string, { config: string; c: Comparison }[]>> = {};
     for (const c of cases) {
-      const opts = this.referenceOptions(c.params);
       const zoom = c.zoom ?? 1;
+      const opts = this.referenceOptions(c.params, zoom);
       const base = measure(this.cpu.render(c.params, opts, zoom).alpha);
       const baseQ = momentsOf(base.alpha, base.extent.r90).q;
       for (let k = 1; k <= keys; k++) {
@@ -217,7 +219,7 @@ export class GoldenNode {
         const r = this.cpu.render(
           P,
           {
-            ...this.referenceOptions(P),
+            ...this.referenceOptions(P, zoom),
             placementKey: (c.params.seed + 1) >>> 0,
             ...(ctl.scene ?? {}),
           },

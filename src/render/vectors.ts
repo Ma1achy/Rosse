@@ -145,7 +145,7 @@ export class GpuVectors {
       return b;
     };
     const buf = (bytes: number, usage: number, label: string) =>
-      keep(d.createBuffer({ label, size: Math.max(16, bytes), usage }));
+      keep(d.createBuffer({ label, size: Math.max(256, bytes), usage }));
     const src = STORAGE | GPUBufferUsage.COPY_SRC;
     const [table, segs, dens, dots, blobs] = this.library(D.lib) as [
       GPUBuffer,

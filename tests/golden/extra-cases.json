@@ -1,5 +1,5 @@
 {
-  "about": "Extra reference captures (npm run capture:reference -- --extra tests/golden/extra-cases.json): a preset with overrides set after the preset and the seed, at seeds 7 and 4242 unless `seeds` says otherwise, home and orbit cameras, and (from M3) the zoom camera for the seeds a case lists in `zoom`: home at zoom 2 through v21's __GEN.zoom(2), so VIEW.scale = 168 (open question Q8). They are the required golden cases (tests/golden/README.md, ADR 0015). 'stipple': lines, knots and envelope off, as the roadmap's M2 acceptance says, and also starMix (drawn stars among the dots), field (the deep field) and fgstars (foreground stars), which are vector or sky marks of later milestones; these extra overrides await the owner's sign-off (ADR 0016, proposed). Seeds 3 and 11 give v21 hands of 2 and 3 pens. 'Radio jet' also has its jet off (the Sersic profile). 'stipple-arms' is Grand design with vary 0 (no spurs, clumps or dust patches, lopsidedness or warp, and every dot drawing) and dustScribble 0 (no dust lanes), so its stipple has arms and nothing M2 does not draw. From M4, 'ribbons' (seeds 7 and 4242, home, orbit and zoom): the M4 presets (docs/roadmap.md) with what M4 does not draw switched off: starMix 0 (drawn stars among the stipple, vector sstars; ring knots and clumps keep theirs, classified and counted but not drawn), field 0 (the deep field), fgstars 0 (foreground stars), bubbles 0 (rings drawings at the clumps, vector), whole 0 and envelope 0 (whole drawings and envelopes, vector; already 0 in these presets). Barred spiral draws its bar and ring as ribbons (barStyle and ringStyle 'ribbon') instead of the vector drawings of its default style. Lines, knots, dust lanes and their hatching, carving lines (Dusty spiral), the drawn core and the hand wobble (Hand wobble) stay on.",
+  "about": "Extra reference captures (npm run capture:reference -- --extra tests/golden/extra-cases.json): a preset with overrides set after the preset and the seed, at seeds 7 and 4242 unless `seeds` says otherwise, home and orbit cameras, and (from M3) the zoom camera for the seeds a case lists in `zoom`: home at zoom 2 through v21's __GEN.zoom(2), so VIEW.scale = 168 (open question Q8). They are the required golden cases (tests/golden/README.md, ADR 0015). 'stipple': lines, knots and envelope off, as the roadmap's M2 acceptance says, and also starMix (drawn stars among the dots), field (the deep field) and fgstars (foreground stars), which are vector or sky marks of later milestones; these extra overrides await the owner's sign-off (ADR 0016, proposed). Seeds 3 and 11 give v21 hands of 2 and 3 pens. 'Radio jet' also has its jet off (the Sersic profile). 'stipple-arms' is Grand design with vary 0 (no spurs, clumps or dust patches, lopsidedness or warp, and every dot drawing) and dustScribble 0 (no dust lanes), so its stipple has arms and nothing M2 does not draw. From M4, 'ribbons' (seeds 7 and 4242, home, orbit and zoom): the M4 presets (docs/roadmap.md) with what M4 does not draw switched off: starMix 0 (drawn stars among the stipple, vector sstars; ring knots and clumps keep theirs, classified and counted but not drawn), field 0 (the deep field), fgstars 0 (foreground stars), bubbles 0 (rings drawings at the clumps, vector), whole 0 and envelope 0 (whole drawings and envelopes, vector; already 0 in these presets). Barred spiral draws its bar and ring as ribbons (barStyle and ringStyle 'ribbon') instead of the vector drawings of its default style. Lines, knots, dust lanes and their hatching, carving lines (Dusty spiral), the drawn core and the hand wobble (Hand wobble) stay on. From M5, 'vectors' (seeds 7 and 4242, home, orbit and zoom): the M5 presets (docs/roadmap.md) as v21 draws them, with their drawn parts (envelopes, drawn arms, bars and rings, bubbles at the clumps, the jet, the streams, drawn shells, the hatching and the core), with only what M5 does not draw switched off: starMix 0 (drawn stars among the stipple, vector sstars of M7; ring knots and clumps keep theirs, counted), field 0 (the deep field, M7) and fgstars 0 (foreground stars, M7). 'Shell galaxy' draws its drawn shells (shells 1) instead of its simulated ones (shellsOn 0; the shell simulation is M8). These overrides await the owner's sign-off (ADR 0020, proposed).",
   "cases": [
     {
       "preset": "Smooth, round",
@@ -160,6 +160,88 @@
         "bubbles": 0,
         "whole": 0,
         "envelope": 0
+      }
+    },
+    {
+      "preset": "Hand-drawn arms",
+      "variant": "vectors",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Ringed",
+      "variant": "vectors",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Disc, no arms",
+      "variant": "vectors",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Barred spiral",
+      "variant": "vectors",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Edge-on with dust",
+      "variant": "vectors",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Radio jet",
+      "variant": "vectors",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Stellar streams",
+      "variant": "vectors",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Shell galaxy",
+      "variant": "vectors",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "shellsOn": 0,
+        "shells": 1
       }
     }
   ]

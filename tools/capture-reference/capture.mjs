@@ -23,6 +23,8 @@
  *   --only    presets, comma-separated, or separated by | when a name holds a comma
  *             (--only "Grand design|Loose, open arms").
  *   --cameras capture only these cameras (comma-separated), e.g. --cameras zoom.
+ *   --variant with --extra, capture only the cases of these variants (comma-separated), e.g.
+ *             --variant vectors.
  *   --reroll  for calibration (ADR 0013): every preset at the home camera and again at az + 0.3°,
  *             which in v21 re-rolls the stipple when dust lanes are on (reference notes 20.1).
  *             Written to tests/golden/actual/reroll/ by default (not committed), with no manifest.
@@ -242,7 +244,7 @@ async function captureJob(browser, url, job, out) {
  * browser. A run that captures only some cameras (`--cameras zoom`) updates only theirs; each
  * capture also carries its own `captured` time. A manifest from before this record existed (one
  * `generated` for the whole file, from a run of home and orbit) is carried over as those cameras'
- * run, by this function, not by hand. An `--only` run stamps `runs[camera].generated` although it
+ * run, by this function, not by hand. An `--only` or `--variant` run stamps `runs[camera].generated` although it
  * re-made only some of that camera's captures: the per-capture `captured` times are authoritative.
  *
  * @param {any} previous the manifest's `extra`, if any
@@ -315,8 +317,12 @@ async function main() {
         throw new Error('the orbit camera needs the home camera');
       return cams;
     };
+    const variants = opt('--variant')
+      ?.split(',')
+      .map((s) => s.trim());
     jobs = extra.cases
       .filter((c) => !only || only.includes(c.preset))
+      .filter((c) => !variants || variants.includes(c.variant))
       .flatMap((c) => {
         if (!presets[c.preset]) throw new Error(`unknown preset ${c.preset}`);
         const { seeds, zoom, ...rest } = c;

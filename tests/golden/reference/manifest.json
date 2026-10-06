@@ -575,6 +575,158 @@
       "pageErrors": 0
     },
     {
+      "name": "barred-spiral--vectors__s4242__home",
+      "preset": "Barred spiral",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "70f0681e8414430b3d88498a5ce1fba7c74b4efefd0df41be4071ab4d1c47a09",
+      "captured": "2026-10-06T12:36:03.503Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 9373,
+        "knots": 128,
+        "stars": 12,
+        "curves": 3,
+        "used": 66,
+        "ms": 5568
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--vectors__s4242__orbit",
+      "preset": "Barred spiral",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "39a36bb5f6e3bc86ee83d6f772c5b15a000c7e9f52e7f83cf6ad05257d124c0a",
+      "captured": "2026-10-06T12:36:19.220Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 9309,
+        "knots": 132,
+        "stars": 11,
+        "curves": 3,
+        "used": 64,
+        "ms": 59
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--vectors__s4242__zoom",
+      "preset": "Barred spiral",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "1b77ef6152a7bb2d80f0207b802948b8c3711e874098ad7ea4dfc92fc45687c0",
+      "captured": "2026-10-06T12:36:37.021Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 9373,
+        "knots": 128,
+        "stars": 12,
+        "curves": 3,
+        "used": 66,
+        "ms": 126
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--vectors__s7__home",
+      "preset": "Barred spiral",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "bbaf8e3c04adeb21cb61a079fb632076b9b171f39579d2ebeedf16bece962fb5",
+      "captured": "2026-10-06T12:36:04.870Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 9564,
+        "knots": 177,
+        "stars": 9,
+        "curves": 4,
+        "used": 64,
+        "ms": 2894
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--vectors__s7__orbit",
+      "preset": "Barred spiral",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "d7453aeb6ca77daa76273c916c38b47eb0ed09f97ef5aaea9da2fab6e5f8d01d",
+      "captured": "2026-10-06T12:36:17.182Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 9535,
+        "knots": 167,
+        "stars": 9,
+        "curves": 4,
+        "used": 62,
+        "ms": 92
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--vectors__s7__zoom",
+      "preset": "Barred spiral",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "5d3e361b34520ca1c3722fd2082764f8ea8ac2cfa236ac5f1d9395c1a5e76569",
+      "captured": "2026-10-06T12:36:37.187Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 9564,
+        "knots": 177,
+        "stars": 9,
+        "curves": 4,
+        "used": 64,
+        "ms": 38
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "cigar-shaped__s4242__home",
       "preset": "Cigar-shaped",
       "seed": 4242,
@@ -1231,6 +1383,158 @@
       "pageErrors": 0
     },
     {
+      "name": "disc-no-arms--vectors__s4242__home",
+      "preset": "Disc, no arms",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "35bcc7c4264b911ed8cf4798545ba247fc039a8a0552f3310fa906914ab65c96",
+      "captured": "2026-10-06T12:36:02.935Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9469,
+        "knots": 0,
+        "stars": 3,
+        "curves": 2,
+        "used": 8,
+        "ms": 75
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--vectors__s4242__orbit",
+      "preset": "Disc, no arms",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "6e18c18112b601353972e6986b404a55dc604659e215d3e527fb6871177904fd",
+      "captured": "2026-10-06T12:36:18.718Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9469,
+        "knots": 0,
+        "stars": 3,
+        "curves": 2,
+        "used": 8,
+        "ms": 121
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--vectors__s4242__zoom",
+      "preset": "Disc, no arms",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "ceec17c67f0f1a1c21b24df72dc7685a3121f151e54ee4eea6e120c703d23cc5",
+      "captured": "2026-10-06T12:36:35.171Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9469,
+        "knots": 0,
+        "stars": 3,
+        "curves": 2,
+        "used": 8,
+        "ms": 15
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--vectors__s7__home",
+      "preset": "Disc, no arms",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "7b60f6507801e77202e0c2b51adae561b4009f8c593ce721ca53df2cd1b45c45",
+      "captured": "2026-10-06T12:35:53.778Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9442,
+        "knots": 0,
+        "stars": 1,
+        "curves": 2,
+        "used": 6,
+        "ms": 18
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--vectors__s7__orbit",
+      "preset": "Disc, no arms",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "40aac30f910e3f7692f6b71a932ba2517fe7256e1c7ef7a4b00054953b60bfa0",
+      "captured": "2026-10-06T12:36:08.136Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9442,
+        "knots": 0,
+        "stars": 1,
+        "curves": 2,
+        "used": 6,
+        "ms": 42
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--vectors__s7__zoom",
+      "preset": "Disc, no arms",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "b22bbd74db1551d261ff288ba722717274d0f0be1d4ed0a377918d0434638342",
+      "captured": "2026-10-06T12:36:19.965Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9442,
+        "knots": 0,
+        "stars": 1,
+        "curves": 2,
+        "used": 6,
+        "ms": 22
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "dusty-spiral__s4242__home",
       "preset": "Dusty spiral",
       "seed": 4242,
@@ -1541,6 +1845,158 @@
         "curves": 4,
         "used": 86,
         "ms": 135
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "edge-on-with-dust--vectors__s4242__home",
+      "preset": "Edge-on with dust",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "c3e79d3cfc737d03495b1d527968027dda8d30256b240757178bee8a832bbf91",
+      "captured": "2026-10-06T12:37:13.511Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 3377,
+        "knots": 87,
+        "stars": 1,
+        "curves": 4,
+        "used": 45,
+        "ms": 66
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "edge-on-with-dust--vectors__s4242__orbit",
+      "preset": "Edge-on with dust",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "059c9c5f2d84f2bd908462c60855cfb32d8054d2c8b4e34e8a033801e6972970",
+      "captured": "2026-10-06T12:37:21.301Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 5695,
+        "knots": 83,
+        "stars": 13,
+        "curves": 3,
+        "used": 43,
+        "ms": 100
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "edge-on-with-dust--vectors__s4242__zoom",
+      "preset": "Edge-on with dust",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "9ebd196119adc728e7bdc625e708d9fc968abe55ed35ddb6906f183b4512ed8a",
+      "captured": "2026-10-06T12:37:34.477Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 3377,
+        "knots": 87,
+        "stars": 1,
+        "curves": 4,
+        "used": 45,
+        "ms": 56
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "edge-on-with-dust--vectors__s7__home",
+      "preset": "Edge-on with dust",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "09dd898620858832622fa398894773c89cbd6a10e82a09be537d71176b9b4cac",
+      "captured": "2026-10-06T12:36:54.845Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 3484,
+        "knots": 137,
+        "stars": 3,
+        "curves": 5,
+        "used": 51,
+        "ms": 104
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "edge-on-with-dust--vectors__s7__orbit",
+      "preset": "Edge-on with dust",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "93c2c1a0d95afcaea0202ac5f3931200e09a31fffe7b1d3f089b619c4945d8e8",
+      "captured": "2026-10-06T12:37:07.226Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 5836,
+        "knots": 151,
+        "stars": 13,
+        "curves": 4,
+        "used": 46,
+        "ms": 64
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "edge-on-with-dust--vectors__s7__zoom",
+      "preset": "Edge-on with dust",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "a4bccde632f6d1c4d9faf5a7028a7e1cc1d9172f90c1fb39067fd2335724b30d",
+      "captured": "2026-10-06T12:37:13.686Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 3484,
+        "knots": 137,
+        "stars": 3,
+        "curves": 5,
+        "used": 51,
+        "ms": 129
       },
       "pageErrors": 0
     },
@@ -2253,6 +2709,158 @@
         "curves": 0,
         "used": 103,
         "ms": 181
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-drawn-arms--vectors__s4242__home",
+      "preset": "Hand-drawn arms",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "a4846b64c18abe04be3f35d225092415360161b9ae43d93b52b94ec321e472a0",
+      "captured": "2026-10-06T12:34:48.047Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9133,
+        "knots": 187,
+        "stars": 23,
+        "curves": 0,
+        "used": 61,
+        "ms": 1335
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-drawn-arms--vectors__s4242__orbit",
+      "preset": "Hand-drawn arms",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "0dcd923fbe1210b889d0ae6a1abfe590d022a4f8d6aab76b2f706e8a36ead683",
+      "captured": "2026-10-06T12:34:55.902Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9080,
+        "knots": 187,
+        "stars": 25,
+        "curves": 0,
+        "used": 62,
+        "ms": 112
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-drawn-arms--vectors__s4242__zoom",
+      "preset": "Hand-drawn arms",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "fdc6d48fd7d91a27197f196f87fb3e640216e212f2dfb65d0164b3e972a0bc48",
+      "captured": "2026-10-06T12:35:16.191Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9133,
+        "knots": 187,
+        "stars": 23,
+        "curves": 0,
+        "used": 61,
+        "ms": 123
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-drawn-arms--vectors__s7__home",
+      "preset": "Hand-drawn arms",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "f2a352bf7d8e231dd7d1997673b719caab1262b2c2f0782f0d92c558770dc36d",
+      "captured": "2026-10-06T12:34:47.091Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9216,
+        "knots": 115,
+        "stars": 20,
+        "curves": 0,
+        "used": 60,
+        "ms": 2833
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-drawn-arms--vectors__s7__orbit",
+      "preset": "Hand-drawn arms",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "45dcdc4971d3c7c9a9235d4c848aa181e9fe019f29605fb5c67e87c75cdd950a",
+      "captured": "2026-10-06T12:34:55.148Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9135,
+        "knots": 114,
+        "stars": 17,
+        "curves": 0,
+        "used": 58,
+        "ms": 139
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-drawn-arms--vectors__s7__zoom",
+      "preset": "Hand-drawn arms",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "2a55c31537e81e88b1918f2140a3db7569489fe7ea1498548098c15027e831e9",
+      "captured": "2026-10-06T12:35:18.662Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9216,
+        "knots": 115,
+        "stars": 20,
+        "curves": 0,
+        "used": 60,
+        "ms": 189
       },
       "pageErrors": 0
     },
@@ -4437,6 +5045,158 @@
       "pageErrors": 0
     },
     {
+      "name": "radio-jet--vectors__s4242__home",
+      "preset": "Radio jet",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "70eb8b051a5a629b7e4e60a29058b5518c50677a48db50c30d7917069658e9ce",
+      "captured": "2026-10-06T12:37:13.458Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 72
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "radio-jet--vectors__s4242__orbit",
+      "preset": "Radio jet",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "0cb40b2eb35a75e933f2d90954f9cb3f348883a691ec325f47058423f8a00cf5",
+      "captured": "2026-10-06T12:37:22.705Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 111
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "radio-jet--vectors__s4242__zoom",
+      "preset": "Radio jet",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "97fe3f53b431395ea3538420d8fb835371122f89a9de0004f57512baaa747f33",
+      "captured": "2026-10-06T12:37:34.417Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 33
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "radio-jet--vectors__s7__home",
+      "preset": "Radio jet",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "17b8cf293b5fc752654b6993770aeb1d52da6e4645129329b9c5c7350199ba22",
+      "captured": "2026-10-06T12:37:12.390Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 25
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "radio-jet--vectors__s7__orbit",
+      "preset": "Radio jet",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "e06bf51bebf23ef9c22128e9628e0105dc8c4fcdf89d4534c1bb54c1625ce4ab",
+      "captured": "2026-10-06T12:37:22.581Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 33
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "radio-jet--vectors__s7__zoom",
+      "preset": "Radio jet",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "7d7139316225ebe19e062b84315800ffde08fb3ebf438edfc4d3210caa7f69f6",
+      "captured": "2026-10-06T12:37:34.506Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 61
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "ringed__s4242__home",
       "preset": "Ringed",
       "seed": 4242,
@@ -4509,6 +5269,158 @@
       "pageErrors": 0
     },
     {
+      "name": "ringed--vectors__s4242__home",
+      "preset": "Ringed",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "32ef2b74eb715d50007d1f7468f90b91dcaa51cdadc4d5c0927a412cb6024993",
+      "captured": "2026-10-06T12:34:47.762Z",
+      "stats": {
+        "rstars": 15,
+        "dots": 9460,
+        "knots": 47,
+        "stars": 5,
+        "curves": 2,
+        "used": 53,
+        "ms": 35
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "ringed--vectors__s4242__orbit",
+      "preset": "Ringed",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "cbb0d30d24ae9650632283b32fec2b785b2a0232d22a9462043b120d950e9270",
+      "captured": "2026-10-06T12:34:55.687Z",
+      "stats": {
+        "rstars": 15,
+        "dots": 9459,
+        "knots": 47,
+        "stars": 5,
+        "curves": 2,
+        "used": 54,
+        "ms": 99
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "ringed--vectors__s4242__zoom",
+      "preset": "Ringed",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "ea9f3f0c74e93cf1bb3e3186498e0c8fb3ef4243ac60e6337c990c2957785c8b",
+      "captured": "2026-10-06T12:35:18.937Z",
+      "stats": {
+        "rstars": 15,
+        "dots": 9460,
+        "knots": 47,
+        "stars": 5,
+        "curves": 2,
+        "used": 53,
+        "ms": 50
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "ringed--vectors__s7__home",
+      "preset": "Ringed",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "17b8800aa6b65158645fdfd201042ec36a2ef7c89677ff8a6cd18d16bd0e5681",
+      "captured": "2026-10-06T12:34:46.516Z",
+      "stats": {
+        "rstars": 15,
+        "dots": 9479,
+        "knots": 57,
+        "stars": 4,
+        "curves": 2,
+        "used": 62,
+        "ms": 2826
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "ringed--vectors__s7__orbit",
+      "preset": "Ringed",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "eec3dc8b4ab8c1f9a0f0f7f71c4ddb78ac606989b6d32059871f130f4c83464f",
+      "captured": "2026-10-06T12:34:55.383Z",
+      "stats": {
+        "rstars": 15,
+        "dots": 9463,
+        "knots": 57,
+        "stars": 4,
+        "curves": 2,
+        "used": 60,
+        "ms": 98
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "ringed--vectors__s7__zoom",
+      "preset": "Ringed",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "cf3ab2fe6e772b4f39895b9e613c1fbf4d843ab1bace7b198348ae1302bdc6ad",
+      "captured": "2026-10-06T12:35:18.781Z",
+      "stats": {
+        "rstars": 15,
+        "dots": 9479,
+        "knots": 57,
+        "stars": 4,
+        "curves": 2,
+        "used": 62,
+        "ms": 65
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "shell-galaxy__s4242__home",
       "preset": "Shell galaxy",
       "seed": 4242,
@@ -4577,6 +5489,170 @@
         "curves": 4,
         "used": 46,
         "ms": 106
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--vectors__s4242__home",
+      "preset": "Shell galaxy",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "shellsOn": 0,
+        "shells": 1
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "b5a6580bfd2b67cba9297c94b6f16c64a6e0aa114e295f16132c7ec6fd8288dc",
+      "captured": "2026-10-06T12:38:08.320Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 13
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--vectors__s4242__orbit",
+      "preset": "Shell galaxy",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "shellsOn": 0,
+        "shells": 1
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "1b0bcbf97f0b3284443d558fe8ffc172c83c44e34cf792d68b88820f04337f1f",
+      "captured": "2026-10-06T12:38:14.247Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 33
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--vectors__s4242__zoom",
+      "preset": "Shell galaxy",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "shellsOn": 0,
+        "shells": 1
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "a48dbb5d719cd0e2635101ac7fd35884c25612628da02ecc62f10b58ae6e1de1",
+      "captured": "2026-10-06T12:38:26.752Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 16
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--vectors__s7__home",
+      "preset": "Shell galaxy",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "shellsOn": 0,
+        "shells": 1
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "d612ca90a67b85487476f6487c28e79d79e8f80be6bb6cce3bf11c73955956f2",
+      "captured": "2026-10-06T12:38:08.881Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 21
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--vectors__s7__orbit",
+      "preset": "Shell galaxy",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "shellsOn": 0,
+        "shells": 1
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "5c8a0a845451020ae52ce14accb7e5e028c0b2e2aaa74385ca7ed569e9c996d8",
+      "captured": "2026-10-06T12:38:14.645Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 58
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--vectors__s7__zoom",
+      "preset": "Shell galaxy",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "shellsOn": 0,
+        "shells": 1
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "4657e7a9f0c80117bbd5fd6f1c9a0b5df5be2bee31102bbc93b188e42ae4dd4b",
+      "captured": "2026-10-06T12:38:28.127Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 19
       },
       "pageErrors": 0
     },
@@ -5287,6 +6363,158 @@
       "pageErrors": 0
     },
     {
+      "name": "stellar-streams--vectors__s4242__home",
+      "preset": "Stellar streams",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "2d71d7ae2976c935d0120513ffdf43dbab015dde3f05621af714ffc6eccce5f3",
+      "captured": "2026-10-06T12:38:08.168Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 7000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 15,
+        "ms": 43
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "stellar-streams--vectors__s4242__orbit",
+      "preset": "Stellar streams",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "d29279f4ccfc691c78df821ecb1ba68565733cc9d776db34ab3ddd755238fd2c",
+      "captured": "2026-10-06T12:38:13.779Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 7000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 15,
+        "ms": 20
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "stellar-streams--vectors__s4242__zoom",
+      "preset": "Stellar streams",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "161c349cc48f93b79751d0cabdec7c9239b5854d54ff3028115488f2f84cbae8",
+      "captured": "2026-10-06T12:38:28.261Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 7000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 19,
+        "ms": 15
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "stellar-streams--vectors__s7__home",
+      "preset": "Stellar streams",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "f56d10872a2921f9081cc444c2f0f80fedd8cf5517e8501595a4c7b693507f65",
+      "captured": "2026-10-06T12:37:43.604Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 7000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 16,
+        "ms": 27
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "stellar-streams--vectors__s7__orbit",
+      "preset": "Stellar streams",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "2ea7831265b78451e4d1d31037c551513ef33c5e5f6d534f005b30df71eac741",
+      "captured": "2026-10-06T12:37:49.644Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 7000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 16,
+        "ms": 8
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "stellar-streams--vectors__s7__zoom",
+      "preset": "Stellar streams",
+      "variant": "vectors",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "6df3486db51afe73d855fc8e0690b1d510fca6f2fdb270f8992b62971f75eebd",
+      "captured": "2026-10-06T12:38:02.640Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 7000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 17,
+        "ms": 17
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "tightly-wound__s4242__home",
       "preset": "Tightly wound",
       "seed": 4242,
@@ -5538,7 +6766,7 @@
     },
     "runs": {
       "home": {
-        "generated": "2026-10-06T11:02:24.643Z",
+        "generated": "2026-10-06T12:38:29.464Z",
         "browser": {
           "name": "chromium",
           "version": "141.0.7390.37",
@@ -5550,7 +6778,7 @@
         }
       },
       "orbit": {
-        "generated": "2026-10-06T11:02:24.643Z",
+        "generated": "2026-10-06T12:38:29.464Z",
         "browser": {
           "name": "chromium",
           "version": "141.0.7390.37",
@@ -5562,7 +6790,7 @@
         }
       },
       "zoom": {
-        "generated": "2026-10-06T11:02:24.643Z",
+        "generated": "2026-10-06T12:38:29.464Z",
         "browser": {
           "name": "chromium",
           "version": "141.0.7390.37",
