@@ -148,13 +148,18 @@ export interface CoreTrack {
   /** the horizon `HZ` = clamp(mHorizon, 2, 30) */
   horizon: number;
   dt: number;
+  /**
+   * The union frame, from the reference's own snapshots (a track thinned by the snapshot budget
+   * keeps the reference's framing).
+   */
+  union?: MergerFrame;
 }
 
 /**
  * v21's two-core integration (app23.js:L306–314 for the start, L340–376 for the steps), in f64,
  * operation for operation. The test stars take no part: they are test particles.
  */
-export function coreTrack(p: MergerParams): CoreTrack {
+export function coreTrack(p: MergerParams, stride: readonly [number, number] = [1, 1]): CoreTrack {
   const q = p.mRatio;
   const M: [number, number] = [1, q];
   const Mt = 1 + q;
@@ -274,15 +279,15 @@ export function coreTrack(p: MergerParams): CoreTrack {
   };
 
   // the snapshot at the start is taken before the opening kick (app23.js:L358)
-  const every = Math.max(1, Math.floor(steps / 90));
+  const every = Math.max(1, Math.floor(steps / 90)) * stride[0];
   const chosen = phase(steps, every, true);
   const Cc = copy();
   const HZ = Math.max(2, Math.min(30, p.mHorizon || 2));
   const FUT = 5.0 * (HZ - 1);
   const steps2 = Math.ceil(FUT / dt);
-  const every2 = Math.max(1, Math.ceil(steps2 / Math.min(420, 90 * (HZ - 1))));
+  const every2 = Math.max(1, Math.ceil(steps2 / Math.min(420, 90 * (HZ - 1)))) * stride[1];
   const future = phase(steps2, every2, false);
-  return {
+  const track: CoreTrack = {
     M,
     A,
     t0,
@@ -293,6 +298,9 @@ export function coreTrack(p: MergerParams): CoreTrack {
     horizon: HZ,
     dt,
   };
+  // a thinned track keeps the reference's union frame
+  track.union = unionFrame(stride[0] === 1 && stride[1] === 1 ? track : coreTrack(p));
+  return track;
 }
 
 /** The cores' positions at snapshot `s` of a phase (6 numbers: core 0 then core 1). */
@@ -427,7 +435,7 @@ export function discFrame(spinDeg: number, az: number) {
   const n = [Math.sin(s) * Math.cos(az), Math.sin(s) * Math.sin(az), Math.cos(s)] as const;
   let e1 = Math.abs(n[2]) < 0.9 ? [n[1], -n[0], 0] : [0, n[2], -n[1]];
   const l1 = Math.hypot(e1[0] as number, e1[1] as number, e1[2] as number);
-  e1 = e1.map((x) => (x) / l1);
+  e1 = e1.map((x) => x / l1);
   const e2 = [
     n[1] * (e1[2] as number) - n[2] * (e1[1] as number),
     n[2] * (e1[0] as number) - n[0] * (e1[2] as number),
@@ -480,7 +488,7 @@ export function galaxyICs(
     const M = track.M[g] as number;
     return {
       type: TY[g] as MergerType,
-      first: g === 0 ? 0 : (n[0]),
+      first: g === 0 ? 0 : n[0],
       count: n[g] as number,
       mass: M,
       soft: track.A[g] as number,
@@ -702,7 +710,7 @@ export function framingAt(
     r: a.r + (b.r - a.r) * w,
   });
   if (t < 0.999 && track.chosen.nSnaps > 0) {
-    const fu = unionFrame(track);
+    const fu = track.union ?? unionFrame(track);
     const tt = clamp(t, 0, 1);
     return mix(fu, chosen, ease(tt));
   }
@@ -784,4 +792,90 @@ export function mergerGalaxyParams(P: Params, g: 0 | 1, picks?: MergerPicks): Pa
     flocc: 0,
     dustScribble: Math.min(P.dustScribble, 0.3),
   };
+}
+
+// ---------------------------------------------------------------------------------------------
+// The scene description of a merger (shared by both engines)
+
+/** Where each table starts in the `cores` array (in vec4 entries, two per kick or snapshot). */
+export interface CoreOffsets {
+  /** kick positions of the way in: (steps + 1) kicks */
+  pos1: number;
+  /** kick positions of the future */
+  pos2: number;
+  /** the cores at each snapshot of the timeline, and of the future */
+  snapc1: number;
+  snapc2: number;
+  /** entries in all */
+  total: number;
+}
+
+export interface MergerDesc {
+  p: MergerParams;
+  /** the reference's track, and the track the stars follow (thinned when the budget says so) */
+  ref: CoreTrack;
+  track: CoreTrack;
+  budget: SnapshotBudget;
+  /** stars per galaxy and in all */
+  n: [number, number];
+  total: number;
+  gals: [GalaxyIC, GalaxyIC];
+  /** the cores' f32 positions, vec4 entries (x, y, z, 0), at the offsets below */
+  cores: Float32Array<ArrayBuffer>;
+  off: CoreOffsets;
+  /** f16 table rows of the timeline and of the future */
+  rows: [number, number];
+  /** the picks the description was made with (a replay, or the engine's own) */
+  picks: MergerPicks | undefined;
+}
+
+/** What the model tier needs to integrate a merger: the track, the stars' frames and the snapshot plan. */
+export function describeMerger(P: Params | MergerParams, picks?: MergerPicks): MergerDesc {
+  const p = mergerParamsOf(P);
+  const ref = coreTrack(p);
+  const { n, total } = starCounts(p);
+  const budget = snapshotBudget(total, ref);
+  const track =
+    budget.stride[0] === 1 && budget.stride[1] === 1 ? ref : coreTrack(p, budget.stride);
+  const gals = galaxyICs(p, track, picks);
+  const rows: [number, number] = [track.chosen.nSnaps - 1, track.future.nSnaps - 1];
+  const k1 = Math.max(track.chosen.steps, 0) + 1;
+  const k2 = Math.max(track.future.steps, 0) + 1;
+  const off: CoreOffsets = {
+    pos1: 0,
+    pos2: k1 * 2,
+    snapc1: (k1 + k2) * 2,
+    snapc2: (k1 + k2 + track.chosen.nSnaps) * 2,
+    total: (k1 + k2 + track.chosen.nSnaps + track.future.nSnaps) * 2,
+  };
+  const cores = new Float32Array(off.total * 4);
+  const put = (entry: number, c: ArrayLike<number>, o: number) => {
+    cores[entry * 4] = c[o] as number;
+    cores[entry * 4 + 1] = c[o + 1] as number;
+    cores[entry * 4 + 2] = c[o + 2] as number;
+  };
+  for (let k = 0; k < k1; k++)
+    for (let g = 0; g < 2; g++) put(off.pos1 + k * 2 + g, track.chosen.pos, k * 6 + g * 3);
+  for (let k = 0; k < k2; k++)
+    for (let g = 0; g < 2; g++) put(off.pos2 + k * 2 + g, track.future.pos, k * 6 + g * 3);
+  for (let s = 0; s < track.chosen.nSnaps; s++)
+    for (let g = 0; g < 2; g++) put(off.snapc1 + s * 2 + g, track.chosen.snaps, s * 12 + g * 6);
+  for (let s = 0; s < track.future.nSnaps; s++)
+    for (let g = 0; g < 2; g++) put(off.snapc2 + s * 2 + g, track.future.snaps, s * 12 + g * 6);
+  return { p, ref, track, budget, n, total, gals, cores, off, rows, picks };
+}
+
+/** The memory the stars take on the GPU, in bytes (ADR 0009's budget). */
+export function memoryBudget(d: MergerDesc): Record<string, number> {
+  const N = d.total;
+  const out = {
+    state: N * 16 * 2,
+    ic: N * 16,
+    timelineF16: d.rows[0] * N * 8,
+    futureF16: d.rows[1] * N * 8,
+    closingF32: 2 * N * 16,
+    cores: d.cores.byteLength,
+    current: N * 16,
+  };
+  return { ...out, total: Object.values(out).reduce((a, b) => a + b, 0) };
 }
