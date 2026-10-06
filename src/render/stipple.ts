@@ -192,7 +192,11 @@ export class GpuStipple {
       GPUBufferUsage.UNIFORM,
       'scan',
     );
-    const projected = buf(n1 * INSTANCE_LAYOUT.size, STORAGE | GPUBufferUsage.COPY_SRC, 'projected');
+    const projected = buf(
+      n1 * INSTANCE_LAYOUT.size,
+      STORAGE | GPUBufferUsage.COPY_SRC,
+      'projected',
+    );
     const classes = buf(n * 4, STORAGE | GPUBufferUsage.COPY_SRC, 'classes');
     const rank = buf(n * 4, STORAGE, 'rank');
     const blockTotals = buf(blocks * 8, STORAGE, 'block totals');

@@ -320,7 +320,9 @@ async function main() {
         throw new Error('the orbit camera needs the home camera');
       return cams;
     };
-    const variants = opt('--variants')?.split(',').map((s) => s.trim());
+    const variants = opt('--variants')
+      ?.split(',')
+      .map((s) => s.trim());
     jobs = extra.cases
       .filter((c) => !only || only.includes(c.preset))
       .filter((c) => !variants || variants.includes(c.variant))
