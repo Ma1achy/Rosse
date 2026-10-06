@@ -4,7 +4,7 @@ Date: 2026-10-03
 
 ## Status
 
-Proposed. Awaiting the owner's choice (open question Q4).
+Proposed. Awaiting the owner's choice (open question Q4). The M1 evaluation of TypeGPU ([docs/notes/typegpu-evaluation.md](../notes/typegpu-evaluation.md)) recommends K1: TypeGPU's WGSL is good, but its CPU execution is not u32- or f32-exact.
 
 ## Context
 

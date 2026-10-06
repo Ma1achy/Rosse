@@ -5,7 +5,16 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['assets/', 'dist/', 'node_modules/', 'spikes/', 'tests/golden/reference/'] },
+  {
+    ignores: [
+      'assets/',
+      'assets-built/',
+      'dist/',
+      'node_modules/',
+      'spikes/',
+      'tests/golden/reference/',
+    ],
+  },
   js.configs.recommended,
   {
     files: ['**/*.ts'],

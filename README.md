@@ -2,7 +2,7 @@
 
 A galaxy-drawing engine. Every mark it draws comes from a library of real hand drawings: dots, strokes, knots, stars and whole galaxies, drawn with a fineliner, scanned and cut out. Rosse builds each galaxy in 3D, then places, transforms and inks those drawings on paper.
 
-This repository is the WebGPU rebuild of Rosse v21. **Status: M0 (planning).** It holds the plan, the repository skeleton, the reference captures and a spike. There is no engine code yet; see [docs/roadmap.md](docs/roadmap.md).
+This repository is the WebGPU rebuild of Rosse v21. **Status: M1 (paper and one mark).** The page shows the plate on Paper or Chalkboard with one hand-drawn dot (and a few more marks), drawn with WebGPU, or with the CPU engine where WebGPU is missing. The galaxy model arrives in M2; see [docs/roadmap.md](docs/roadmap.md). The CPU engine matches the WebGPU render to within 1/255, but that is proven on SwiftShader only; real GPUs are measured in M10 ([docs/milestones/m1/README.md](docs/milestones/m1/README.md)).
 
 ## Quick start
 
@@ -10,8 +10,11 @@ You need Node 22 or later. To validate shaders, you also need [naga](https://cra
 
 ```sh
 npm ci
-npm run dev                # Vite dev server (an empty plate, for now)
+npm run prepare-assets     # pack the drawings into assets-built/ (dev and build run it too)
+npm run dev                # Vite dev server: the plate; ?backend=cpu forces the CPU engine
 npm test                   # unit tests (vitest)
+npm run test:gpu           # browser tests on WebGPU (SwiftShader): RNG vectors, CPU = GPU raster
+npm run screenshots        # screenshots of the plate into docs/milestones/m1/
 npm run lint               # ESLint + Prettier check
 npm run typecheck          # tsc, strict
 npm run validate:wgsl      # every shader through naga, imports resolved
@@ -22,7 +25,7 @@ npm run profile:reference  # time and count v21's stages → docs/data/reference
 npm run spike              # the vector-lines spike: screenshots and timings
 ```
 
-The tools that drive a browser use Playwright's Chromium (`npx playwright install chromium`) with software rendering, so they need no GPU.
+The tools that drive a browser use Playwright's Chromium (`npx playwright install chromium`) with software rendering (WebGPU on SwiftShader), so they need no GPU. `npm run vectors` regenerates the shared RNG vectors in `tests/vectors/rng.json`; only do that on purpose.
 
 ## Where things are
 
@@ -35,7 +38,7 @@ The tools that drive a browser use Playwright's Chromium (`npx playwright instal
 | `docs/open-questions.md` | decisions waiting for the owner |
 | `src/` | the engine skeleton: `core`, `model`, `view`, `sim`, `marks`, `gpu`, `render`, `shaders`, `fallback`, `ui` |
 | `tests/` | unit tests, and golden images of v21 with their harness |
-| `tools/` | reference capture and profiling, WGSL resolver and validator, asset preparation |
+| `tools/` | reference capture and profiling, WGSL resolver and validator, atlas packer, GPU test runner |
 | `spikes/` | throwaway experiments; `vector-lines` decided how pen lines are drawn |
 
 ## Licence

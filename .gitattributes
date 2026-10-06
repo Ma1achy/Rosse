@@ -4,7 +4,7 @@
 # Binaries are ordinary Git blobs. Git LFS was planned for goldens and screenshots, but LFS
 # uploads are refused from the environment this project is built in; see docs/open-questions.md Q11.
 
-# Binary types elsewhere: never diff or normalise.
+# Binary types: never diff or normalise.
 *.png binary
 *.jpg binary
 *.jpeg binary

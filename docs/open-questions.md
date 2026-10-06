@@ -44,6 +44,8 @@ v21 fixes them in 3D at the camera seen _the first time_ a lens or overlay key a
 
 **Recommendation:** (c), defaulting to (a). The brief asks for WGSL in its own files, and (a) keeps that. (b) is attractive only if it proves f32-exact on the CPU.
 
+**M1 evaluation** ([notes/typegpu-evaluation.md](notes/typegpu-evaluation.md)): it does not. TypeGPU's generated WGSL is clean, but its CPU execution does u32 and f32 arithmetic in doubles (the RNG was wrong on 1,000 of 1,000 keys). The recommendation is now (a).
+
 ### Q5. What "CPU-only fallback" includes
 
 - (a) Kernels on the CPU, but rasterising with WebGL2 where available.

@@ -7,3 +7,5 @@ tests/golden/reference/
 docs/data/
 spikes/
 *.md
+tests/vectors/*.json
+assets-built/

@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * Validates every WGSL file under src/shaders with naga (https://github.com/gfx-rs/wgpu/tree/trunk/naga),
+ * Validates every WGSL file under src/shaders (and tests/gpu) with naga (https://github.com/gfx-rs/wgpu/tree/trunk/naga),
  * after resolving its `// #import` lines exactly as the build does.
  *
  * Needs the `naga` binary (`cargo install naga-cli`). CI installs and caches it. Files in
@@ -27,9 +27,11 @@ const walk = (dir) =>
 
 const tmp = mkdtempSync(join(tmpdir(), 'rosse-wgsl-'));
 let failed = 0;
-const files = walk(root).sort();
+// shaders, and the test shaders of tests/gpu/ (which import from src/shaders/common/ too)
+const tests = resolve(import.meta.dirname, '../tests/gpu');
+const files = [...walk(root).sort(), ...walk(tests).sort()];
 for (const file of files) {
-  const name = relative(root, file);
+  const name = relative(resolve(root, '../..'), file);
   const out = join(tmp, name.replaceAll('/', '__'));
   try {
     writeFileSync(out, resolveWgsl(file, root).code);

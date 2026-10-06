@@ -4,10 +4,69 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Rosse</title>
+    <style>
+      :root {
+        --paper: #efe9dc;
+        --ink: #1d1b19;
+        --ink2: #6f6a5f;
+      }
+      body {
+        margin: 0;
+        padding: 24px 16px;
+        background: var(--paper);
+        color: var(--ink);
+        font:
+          14px/1.4 system-ui,
+          sans-serif;
+      }
+      main {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .plate {
+        display: block;
+        width: 800px;
+        height: 800px;
+        max-width: 100%;
+        height: auto;
+        aspect-ratio: 1;
+      }
+      .bar {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin: 10px 0 0;
+      }
+      .bar button {
+        font: inherit;
+        padding: 4px 12px;
+        border: 1px solid var(--ink);
+        background: transparent;
+        color: var(--ink);
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      .bar button[aria-pressed='true'] {
+        background: var(--ink);
+        color: var(--paper);
+      }
+      .note {
+        margin-left: auto;
+        color: var(--ink2);
+        font-style: italic;
+      }
+    </style>
   </head>
   <body>
-    <!-- The page arrives in milestone M11; until then this only loads src/main.ts. -->
-    <canvas id="plate" width="800" height="800"></canvas>
+    <!-- The page proper arrives in milestone M11; until then this is the plate and a surface switch. -->
+    <main>
+      <canvas id="plate" class="plate" width="800" height="800"></canvas>
+      <div class="bar" role="group" aria-label="Surface">
+        <button type="button" data-surface="paper" aria-pressed="true">Paper</button>
+        <button type="button" data-surface="chalk" aria-pressed="false">Chalkboard</button>
+        <span id="note" class="note"></span>
+      </div>
+    </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
