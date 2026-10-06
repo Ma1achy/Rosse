@@ -23,7 +23,7 @@ A comparison with that ink in the reference and not in the engine would fail for
 The M4 captures (`tests/golden/extra-cases.json`) set, after the preset and the seed:
 
 - **variant `ribbons`** (seeds 7 and 4242; home, orbit, and home at zoom 2): `starMix: 0`, `field: 0`, `fgstars: 0`, `bubbles: 0`, `whole: 0`, `envelope: 0` (the last two already 0 in these presets); and, on `Barred spiral`, `barStyle: 'ribbon'` and `ringStyle: 'ribbon'`, v21's own alternative styles, which draw the bar and the ring as ribbons M4 builds while its stipple (bar, ring, ring knots) is unchanged. Not overridden: lines, knots, sparkle stars, the dust lanes with their hatching and lane cull, the carving lines, the drawn core and the hand wobble.
-- **variant `lines`** (seeds 7 and 4242 gated, home and orbit; seeds 3 and 11 captured for the calibration only, ADR 0018): the same, and also `stipple: 0`, `knots: 0` and `sparkle: 0`, so that the line-work (curves, pieces, hatching, the drawn core, and the ring knots' and clumps' own marks) is compared on its own.
+- **variant `lines`** (seeds 7 and 4242 gated, home and orbit; seeds 3, 11, 23 and 101 captured for the calibration only, ADR 0018): the same, and also `stipple: 0`, `knots: 0` and `sparkle: 0`, so that the line-work (curves, pieces, hatching, the drawn core, and the ring knots' and clumps' own marks) is compared on its own.
 
 The ring knots' and clumps' drawn stars stay in both (v21 draws a ring knot's star whatever `starMix`): they are classified and counted on both sides, and not drawn until M5 and M7.
 
