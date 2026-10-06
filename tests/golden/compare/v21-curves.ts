@@ -173,32 +173,39 @@ export function v21DustPicks(
 }
 
 /**
- * v21's ring-knot clusters (generate, app23.js:L282–288), replaying `rr0 = mulberry32(seed·577 +
- * 41)` with v21's own mulberry32 and gauss: per cluster, its angle and radius, then the marks loop,
- * whose bound is drawn afresh at every turn and whose marks take 8 numbers each (two Gaussians,
- * the kind, and a pool pick, size and rotation), then the centre star's brightness.
+ * v21's ring-knot clusters: the ring-knot block of v21's `generate()` (app23.js:L282–288, "star-forming
+ * knots strung along the ring"), cut out of app23.js and evaluated as written with v21's own
+ * `mulberry32` and `gauss`, its marks recorded by stubs of `inst` and `rstar`. Nothing is ported: the
+ * cluster's centre is where the block calls `rstar` (the star at the centre, `project` being the
+ * identity here), and its marks are the `inst` calls before that.
  */
-export function v21RingKnots(
-  root: string,
-  P: Params,
-  V: Variation,
-  strokesKind: readonly string[],
-): RingKnotPick[] {
+export function v21RingKnots(root: string, P: Params, V: Variation): RingKnotPick[] {
   if (!(P.ring > 0.1 && !P.merger)) return [];
-  const L = v21Lines(root, P, V, strokesKind);
-  const rr0 = L.mulberry32(P.seed * 577 + 41);
-  const out: RingKnotPick[] = [];
-  const nkc = Math.round(6 + 10 * P.ring);
-  for (let kc = 0; kc < nkc; kc++) {
-    const t = rr0() * 6.2832;
-    const R = P.ringR * (1 + L.gauss(rr0) * 0.02);
-    let count = 0;
-    while (count < 5 + Math.floor(rr0() * 8)) {
-      for (let i = 0; i < 8; i++) rr0();
-      count++;
-    }
-    rr0();
-    out.push({ t, R, count });
-  }
-  return out;
+  const src = readFileSync(join(root, 'assets/reference/rosse-source/app23.js'), 'utf8');
+  const from = src.indexOf('star-forming knots strung along the ring */');
+  if (from < 0) throw new Error('the ring-knot block was not found in app23.js');
+  const start = src.lastIndexOf('\n', from) + 1;
+  const end = src.indexOf('\n  // star-forming clumps', from);
+  if (end < 0) throw new Error('the end of the ring-knot block was not found in app23.js');
+  const block = src.slice(start, end);
+  const body = `${cut(src, 'mulberry32')}\n${cut(src, 'gauss')}\n
+    var out = { knots: [], young: [] }, PEN = { dot: 1 };
+    var clusters = [], marks = 0;
+    function project(p) { return [p[0], p[1]]; }
+    function simple() { return 0; }
+    function dotSprite() { return 0; }
+    function inst() { marks++; }
+    function rstar(x, y) { clusters.push({ x: x, y: y, marks: marks }); marks = 0; }
+    ${block}
+    return clusters;`;
+  // eslint-disable-next-line @typescript-eslint/no-implied-eval
+  const run = new Function('P', 'VAR', body) as (
+    p: Params,
+    v: { knotPool: number[]; dotPool: number[] },
+  ) => { x: number; y: number; marks: number }[];
+  return run(P, V).map((c) => ({
+    t: Math.atan2(c.y, c.x),
+    R: Math.hypot(c.x, c.y),
+    count: c.marks,
+  }));
 }
