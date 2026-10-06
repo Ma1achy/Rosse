@@ -4,7 +4,7 @@ Date: 2026-10-06
 
 ## Status
 
-Accepted. Amends [0006](0006-drawing-storage-on-the-gpu.md) for pen lines (the dust hatching), which stays as written for everything else: its "parity mode" for the reference's overlap quads is what this ADR turns on.
+Proposed, awaiting the owner's sign-off. Amends [0006](0006-drawing-storage-on-the-gpu.md) for pen lines (the dust hatching), which stays as written for everything else: its "parity mode" for the reference's overlap quads is what this ADR turns on.
 
 ## Context
 

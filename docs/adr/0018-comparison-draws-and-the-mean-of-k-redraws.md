@@ -4,7 +4,7 @@ Date: 2026-10-06
 
 ## Status
 
-Accepted. Supersedes in part [0015](0015-golden-metric-as-calibrated-in-m2.md): its items 5 (the reference's variation) and 6 (calibration), and the first item of its future work. What is not changed here still holds as 0015 states it.
+Proposed, awaiting the owner's sign-off. Supersedes in part [0015](0015-golden-metric-as-calibrated-in-m2.md): its items 5 (the reference's variation) and 6 (calibration), and the first item of its future work. What is not changed here still holds as 0015 states it.
 
 ## Context
 

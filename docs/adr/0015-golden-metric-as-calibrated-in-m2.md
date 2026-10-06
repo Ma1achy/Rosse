@@ -4,7 +4,7 @@ Date: 2026-10-04
 
 ## Status
 
-Accepted; superseded in part by [0018](0018-comparison-draws-and-the-mean-of-k-redraws.md). Supersedes in part [0013](0013-golden-image-metric.md): what is not changed here still holds as 0013 states it. The overrides of the M2 acceptance captures are a separate decision, [0016](0016-m2-acceptance-overrides.md), proposed and awaiting the owner's sign-off.
+Accepted; superseded in part by [0018](0018-comparison-draws-and-the-mean-of-k-redraws.md) (proposed). Supersedes in part [0013](0013-golden-image-metric.md): what is not changed here still holds as 0013 states it. The overrides of the M2 acceptance captures are a separate decision, [0016](0016-m2-acceptance-overrides.md), proposed and awaiting the owner's sign-off.
 
 ## Context
 
