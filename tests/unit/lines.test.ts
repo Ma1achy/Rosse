@@ -122,16 +122,22 @@ describe('dust lanes against v21 (app23.js:L944–985)', () => {
       });
 });
 
+/** v21's own `vnoise` (app23.js:L73–75), cut out and evaluated as written. */
+function v21Vnoise(): (x: number, y: number) => number {
+  const src = readFileSync(resolve(ROOT, 'assets/reference/rosse-source/app23.js'), 'utf8');
+  const hash2 = /\nfunction hash2\([^\n]*\n/.exec(src)?.[0] ?? '';
+  const vnoise = /\nfunction vnoise\([^\n]*\n[^\n]*\n/.exec(src)?.[0] ?? '';
+  // eslint-disable-next-line @typescript-eslint/no-implied-eval
+  const make = new Function(`${hash2}${vnoise}return vnoise;`) as () => (
+    x: number,
+    y: number,
+  ) => number;
+  return make();
+}
+
 describe('the lattice noise has v21 noise statistics (deliberate divergence 5)', () => {
   it('mean, spread and tail fractions', () => {
-    const v21 = // eslint-disable-next-line @typescript-eslint/no-implied-eval
-      (
-        new Function(
-          `${/\nfunction hash2\([^\n]*\n/.exec(readFileSync(resolve(ROOT, 'assets/reference/rosse-source/app23.js'), 'utf8'))?.[0] ?? ''}
-       ${(/\nfunction vnoise\([^\n]*\n[^\n]*\n/.exec(readFileSync(resolve(ROOT, 'assets/reference/rosse-source/app23.js'), 'utf8')) ?? [''])[0]}
-       return vnoise;`,
-        ) as () => (x: number, y: number) => number
-      )();
+    const v21 = v21Vnoise();
     const a: number[] = [];
     const b: number[] = [];
     // about 30,000 lattice cells, so the sampling error of the mean is a few thousandths
@@ -158,13 +164,7 @@ describe('the lattice noise has v21 noise statistics (deliberate divergence 5)',
   });
 
   it('a table of v21 corners reproduces v21 noise', () => {
-    const src = readFileSync(resolve(ROOT, 'assets/reference/rosse-source/app23.js'), 'utf8');
-    const v21 = // eslint-disable-next-line @typescript-eslint/no-implied-eval
-      (
-        new Function(
-          `${/\nfunction hash2\([^\n]*\n/.exec(src)?.[0] ?? ''}${(/\nfunction vnoise\([^\n]*\n[^\n]*\n/.exec(src) ?? [''])[0]}return vnoise;`,
-        ) as () => (x: number, y: number) => number
-      )();
+    const v21 = v21Vnoise();
     const field = packNoise(v21NoiseTables(ROOT, 4242));
     let worst = 0;
     for (let i = 0; i < 400; i++) {
