@@ -19,6 +19,7 @@ import { GpuRenderer } from '../../../src/render/frame';
 import type { Plates } from '../../../src/render/plates';
 import { PALETTES } from '../../../src/render/palette';
 import { GpuStipple } from '../../../src/render/stipple';
+import { SURFACES, type SurfaceName } from '../../../src/render/surface';
 import { cameraOf } from '../../../src/view/camera';
 
 export interface GoldenRender {
@@ -35,6 +36,16 @@ declare global {
     __golden?: {
       adapter: string;
       render(P: Params, opts: SceneOptions, zoom?: number): Promise<GoldenRender>;
+      /**
+       * The case as the page shows it: the ink in P.plates composited onto a surface, RGBA8,
+       * base64 (for the side-by-side images of the milestone notes).
+       */
+      plate(
+        P: Params,
+        opts: SceneOptions,
+        zoom: number,
+        surface: SurfaceName,
+      ): Promise<{ rgba: string; width: number; height: number }>;
     };
     __goldenError?: string;
   }
@@ -86,11 +97,33 @@ async function main(): Promise<void> {
     vectors,
   );
   const renderer = new GpuRenderer(device, { plateCss: 800, dpr: 1 }, paper);
+  const out = device.createTexture({
+    size: [800, 800],
+    format: 'rgba8unorm',
+    usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
+  });
   for (const a of atlases) renderer.addAtlas(a);
   const stipple = GpuStipple.create(device);
   const info = adapter.info;
   window.__golden = {
     adapter: [info.vendor, info.architecture, info.description].filter(Boolean).join(' / '),
+    async plate(P, opts, zoom, surface) {
+      const scene = buildScene(P, meta, opts);
+      stipple.setScene(scene);
+      stipple.setView(cameraOf(P, zoom));
+      renderer.setLayers(stipple.inkLayers());
+      renderer.drawInk({
+        plates: P.plates as Plates,
+        palette: surface === 'chalk' ? PALETTES.dark : PALETTES.light,
+      });
+      renderer.present(out.createView(), 'rgba8unorm', SURFACES[surface]);
+      const px = await readTexture(device, out, 4);
+      return {
+        rgba: base64(new Uint8Array(px.buffer, px.byteOffset, px.byteLength)),
+        width: 800,
+        height: 800,
+      };
+    },
     async render(P, opts, zoom = 1) {
       const t0 = performance.now();
       const scene = buildScene(P, meta, opts);
