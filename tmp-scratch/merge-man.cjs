@@ -8,6 +8,6 @@ const diff = o.captures
   .filter((c) => names.has(c.name))
   .filter((c) => JSON.stringify(c) !== JSON.stringify(t.captures.find((x) => x.name === c.name)));
 console.log('differing common', diff.length, diff.slice(0, 3).map((c) => [c.name, JSON.stringify(c), JSON.stringify(t.captures.find((x) => x.name === c.name))]));
-const out = { ...t, extra: { ...(t.extra || {}), ...(o.extra || {}) }, captures: [...t.captures, ...add].sort((a, b) => a.name.localeCompare(b.name)) };
+const out = { ...t, extra: t.extra, captures: [...t.captures, ...add].sort((a, b) => a.name.localeCompare(b.name)) };
 fs.writeFileSync('tests/golden/reference/manifest.json', JSON.stringify(out, null, 2) + '\n');
 console.log(Object.keys(out), JSON.stringify(out.extra).slice(0, 400), JSON.stringify(t.extra), JSON.stringify(o.extra));
