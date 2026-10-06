@@ -497,7 +497,7 @@ export class GpuLens {
   }
 
   /** View tier: this camera's uniforms and tables (the passes are `encode`). */
-  setView(cam: Camera): void {
+  setView(cam: Camera, mTime: number = this.need().mTime): void {
     const m = this.need();
     const { L, layout: lo } = m;
     const q = this.device.queue;
@@ -535,7 +535,7 @@ export class GpuLens {
     uf[11] = m.penDot;
     uf[12] = m.wobble;
     uf[13] = m.spike;
-    uf[14] = f32((m.mTime / 2) % 1);
+    uf[14] = f32((mTime / 2) % 1);
     uu[15] = Math.max(0, lo.quasarMark);
     uu[16] = m.nDotPool;
     uu[17] = m.nStarPool;

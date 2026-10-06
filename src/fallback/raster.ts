@@ -126,6 +126,9 @@ export function rasteriseSprites(
   const { width: W, height: H, data } = target;
   const maxLod = atlas.levels.length - 1;
   for (const s of instances) {
+    // nothing to ink (and a lensed image that was switched off has a zero matrix, whose inverse is
+    // not a number): the GPU's quad of no area covers no pixel
+    if (!(f(s.alpha) > 0)) continue;
     const m: M2 = [f(f(s.m[0]) * px), f(f(s.m[1]) * px), f(f(s.m[2]) * px), f(f(s.m[3]) * px)];
     const cx = f(f(s.x) * px);
     const cy = f(f(s.y) * px);

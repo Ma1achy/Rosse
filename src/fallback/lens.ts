@@ -145,7 +145,7 @@ export class CpuLens {
     return this.tiers.map((t) => ({ skipped: t.skipped, ids: t.idTotal, G: t.d.G }));
   }
 
-  view(cam: Camera): CpuLensView {
+  view(cam: Camera, mTime: number = this.scene.P.mTime): CpuLensView {
     const { L, layout: lo, scene } = this;
     const P = scene.P;
     const lv = lensView(L, cam);
@@ -165,7 +165,7 @@ export class CpuLens {
     if (lo.quasarMark >= 0) {
       const set = imageSetOf(Q, lo.quasarMark);
       const bc = srcs[this.marks.u[lo.quasarMark * LMARK_WORDS + 9] ?? 0]?.bc ?? [0, 0];
-      quasar = quasarImages(set, bc, L.solvers[0] as SolverDesc, f((P.mTime / 2) % 1));
+      quasar = quasarImages(set, bc, L.solvers[0] as SolverDesc, f((mTime / 2) % 1));
     }
     const wobble = wobbleAmplitude(P.distort);
     const sstars = scene.meta.vectors?.sstars?.kind ?? [];

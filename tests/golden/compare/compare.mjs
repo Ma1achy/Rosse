@@ -35,6 +35,9 @@
  *                     run then checks fewer than the required set)
  *   --report-all      a report for every case, not only failing ones
  *   --update-engine   write ../engine-hashes.json from this run (the engine's own goldens)
+ *   --family f        with --calibrate: measure only the configurations of family f (and f@zoom)
+ *                     and merge its thresholds and numbers into the existing files, leaving the
+ *                     other families as they are (a new family's calibration; M9: `lens`)
  */
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -383,6 +386,12 @@ async function calibrate(G, node) {
       zoom,
     });
   }
+  const onlyFamily = opt('--family');
+  if (onlyFamily) {
+    const keep = cases.filter((c) => c.family === onlyFamily || c.family === `${onlyFamily}@zoom`);
+    cases.length = 0;
+    cases.push(...keep);
+  }
   console.log(
     `calibration: ${cases.length} configurations × ${K} re-keys and the negative controls`,
   );
@@ -455,7 +464,9 @@ async function calibrate(G, node) {
   const parity = {};
   /** @type {Record<string, any>} */
   const numbers = {};
-  const families = ['spiral', 'smooth', 'merger', 'lens', 'star', 'artefact'];
+  const families = onlyFamily
+    ? Object.keys(eng.pairs)
+    : ['spiral', 'smooth', 'merger', 'lens', 'star', 'artefact'];
   for (const f of Object.keys(eng.pairs)) if (!families.includes(f)) families.push(f);
   for (const family of families) {
     const list = eng.pairs[family] ?? [];
@@ -547,6 +558,10 @@ async function calibrate(G, node) {
       v21Reroll: v21.pairs[family]?.length ? stats(v21.pairs[family]) : null,
     };
   }
+  const thresholdsPath = join(ROOT, 'tests/golden/thresholds.json');
+  const calibrationPath = join(ROOT, 'tests/golden/calibration.json');
+  const previous = onlyFamily ? JSON.parse(readFileSync(thresholdsPath, 'utf8')) : null;
+  const previousCal = onlyFamily ? JSON.parse(readFileSync(calibrationPath, 'utf8')) : null;
   const file = {
     about:
       'Golden thresholds (ADR 0013, as calibrated in ADR 0015). parity: the new engine against v21 (L2), per family; strict: the CPU engine against WebGPU (L1). Gated: ink, coarse SSIM (b′), widths, counts, and the moment and extent test (r25, r50, r90, outer ink, axis ratio q, position angle pa where the reference q < paBelowQ). Written by `npm run golden -- --calibrate`; the numbers behind them are in calibration.json and docs/milestones/m2/README.md. Families marked provisional have no engine yet.',
@@ -568,18 +583,23 @@ async function calibrate(G, node) {
       poisson: 0,
       poissonBelow: 0,
     },
-    parity,
+    parity: previous ? { ...previous.parity, ...parity } : parity,
   };
-  writeFileSync(join(ROOT, 'tests/golden/thresholds.json'), JSON.stringify(file, null, 2) + '\n');
+  writeFileSync(thresholdsPath, JSON.stringify(file, null, 2) + '\n');
   writeFileSync(
-    join(ROOT, 'tests/golden/calibration.json'),
+    calibrationPath,
     JSON.stringify(
       {
         about:
           "ADR 0013 / 0015 calibration: per family, summaries (n, min, p5, median, p95, max) of each measure. engineRekey: the new engine (CPU, equal to WebGPU at L1) drawing v21's replayed variation and re-keying its placement stream, 3 keys per configuration (a full re-draw). negativeControls: one structural or pen change per control, re-keyed, against the base, with how many applicable configurations the thresholds caught. v21Reroll: v21 at az and az + 0.3° where its stipple re-rolled (a partial re-draw).",
         keys: K,
-        configurations: cases.map((c) => `${c.preset} s${c.params.seed} incl ${c.params.incl}`),
-        families: numbers,
+        configurations: [
+          ...(previousCal?.configurations ?? []).filter(
+            (/** @type {string} */ c) => !cases.some((k) => c.startsWith(`${k.preset} s`)),
+          ),
+          ...cases.map((c) => `${c.preset} s${c.params.seed} incl ${c.params.incl}`),
+        ],
+        families: previousCal ? { ...previousCal.families, ...numbers } : numbers,
       },
       null,
       2,

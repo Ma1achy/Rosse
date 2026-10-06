@@ -362,6 +362,32 @@ export const NEGATIVE_CONTROLS: {
       params: (P) => ({ ...P, bulgeSize: P.bulgeSize * 1.5 }),
     },
     { name: 'halo off', applies: (P) => P.halo > 0, params: (P) => ({ ...P, halo: 0 }) },
+    // the lens (M9): a change of what is lensed, which the lensed ink must show
+    {
+      name: 'lensR ×1.12',
+      applies: (P) => P.lensOn === 1,
+      params: (P) => ({ ...P, lensR: Math.min(2.2, P.lensR * 1.12) }),
+    },
+    {
+      name: 'lensSize ×1.4',
+      applies: (P) => P.lensOn === 1 && P.lensSource !== 'drawing',
+      params: (P) => ({ ...P, lensSize: Math.min(0.6, P.lensSize * 1.4) }),
+    },
+    {
+      name: 'lensStars ×0.5',
+      applies: (P) => P.lensOn === 1 && P.lensSource !== 'drawing',
+      params: (P) => ({ ...P, lensStars: Math.max(500, P.lensStars * 0.5) }),
+    },
+    {
+      name: 'lensShear +0.1',
+      applies: (P) => P.lensOn === 1,
+      params: (P) => ({ ...P, lensShear: Math.min(0.3, P.lensShear + 0.1) }),
+    },
+    {
+      name: 'lensSrc +0.25',
+      applies: (P) => P.lensOn === 1 && P.lensSource !== 'drawing' && !P.lensCluster,
+      params: (P) => ({ ...P, lensSrc: Math.min(0.8, P.lensSrc + 0.25) }),
+    },
     { name: 'RMAX 4.2', applies: () => true, scene: { rmax: 4.2 } },
     {
       name: 'thick ×3',

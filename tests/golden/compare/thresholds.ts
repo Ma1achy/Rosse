@@ -64,11 +64,16 @@ export function impossibleClasses(P: {
   knots: number;
   sparkle: number;
   starMix: number;
+  /** a lens (M9): its source galaxies have knots and sparkle stars of their own */
+  lensOn?: number;
+  lensSource?: string;
 }): Set<string> {
   const out = new Set<string>();
-  if (!(P.knots > 0)) out.add('knots');
-  if (!(P.sparkle > 0)) out.add('stars');
-  if (!(P.starMix > 0.01)) out.add('rstars');
+  const lensed = P.lensOn === 1;
+  if (!(P.knots > 0) && !lensed) out.add('knots');
+  if (!(P.sparkle > 0) && !lensed) out.add('stars');
+  // a quasar's images are each a drawn star
+  if (!(P.starMix > 0.01) && !(lensed && P.lensSource === 'quasar')) out.add('rstars');
   return out;
 }
 

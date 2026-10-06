@@ -145,7 +145,7 @@ export class GpuStipple {
           this.meta = meta;
         },
         view: () => {
-          this.runView(cameraOf(P, zoom));
+          this.runView(cameraOf(P, zoom), P.mTime);
         },
       },
     );
@@ -322,7 +322,7 @@ export class GpuStipple {
     this.runView(cam);
   }
 
-  private runView(cam: Camera): void {
+  private runView(cam: Camera, mTime?: number): void {
     const m = this.model;
     if (!m || !this.scene) throw new Error('setScene first');
     const d = this.device;
@@ -347,7 +347,8 @@ export class GpuStipple {
       ),
     );
     this.camera = cam;
-    if (this.scene.lens && this.lens?.loaded) this.lens.setView(cam);
+    // the quasar's flare follows the moment of the timeline, a view input (mTime)
+    if (this.scene.lens && this.lens?.loaded) this.lens.setView(cam, mTime ?? params.mTime);
     const enc = d.createCommandEncoder({ label: 'stipple view' });
     const pass = enc.beginComputePass({ label: 'project + compact' });
     const P = this.pipes;

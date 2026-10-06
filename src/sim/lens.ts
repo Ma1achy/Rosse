@@ -24,7 +24,9 @@ import type { Params } from '../core/params';
 import { Draws } from '../core/rng';
 import { Stream } from '../core/streams';
 import type { Instance } from '../marks/instance';
+import { HATCH_FLAT, HATCH_PEN } from '../model/lanes';
 import { coreInstances, vectorRows, type VectorRow } from '../model/parts';
+import type { RibbonDesc } from '../model/ribbons';
 import type { GalaxyScene, SceneOptions } from '../model/scene';
 import type { DrawingsMeta } from '../model/variation';
 import { PLATE, UNIT_SCALE, project, srcNow, viewScale, type Camera } from '../view/camera';
@@ -433,6 +435,44 @@ export const sourceDepth = {
   double: (thE: number) => 3.5 * thE,
 };
 
+/**
+ * The dust hatching as drawn pen lines (the `penlines` rows `parts()` places along the lanes,
+ * app23.js:L1047–1050): each hatch is one of the pen lines, flattened to 0.28 and laid along its
+ * lane at pen scale 0.38. v21 lenses them with the other drawings; the line-work places them for
+ * the galaxy itself (src/model/ribbons.ts `Hatch`, compute/ribbons.wgsl `hatch_frame`), and here
+ * they are placed for a source's own camera, in f64.
+ */
+export function hatchRows(R: RibbonDesc, cam: Camera): VectorRow[] {
+  const z = cam.zoom;
+  return R.lanes.hatches.map((h) => {
+    const qa = project(h.a, cam);
+    const qb = project(h.b, cam);
+    const dx = qb[0] - qa[0];
+    const dy = qb[1] - qa[1];
+    const dl = Math.hypot(dx, dy);
+    const d0x = dl === 0 ? 1 : dx / dl;
+    const d0y = dl === 0 ? 0 : dy / dl;
+    const cd = Math.cos(h.dAng);
+    const sd = Math.sin(h.dAng);
+    const ux = d0x * cd - d0y * sd;
+    const uy = d0x * sd + d0y * cd;
+    const on = h.offN * z;
+    const oy = h.offY * z;
+    const of = h.offF * z;
+    const L = h.len * z;
+    const Lf = L * HATCH_FLAT;
+    return {
+      atlas: 'penlines' as const,
+      tile: h.tile,
+      x: qa[0] + -d0y * on + ux * of,
+      y: qa[1] + d0x * on + oy + uy * of,
+      m: [ux * L, uy * L, -(uy * Lf), ux * Lf] as [number, number, number, number],
+      ps: HATCH_PEN,
+      alpha: 1,
+    };
+  });
+}
+
 function describeSource(
   P: Params,
   meta: DrawingsMeta,
@@ -477,9 +517,11 @@ function describeSource(
     scene.galaxy.noise,
     scene.vectors.parts.picks.nuclear,
   ).map((inst) => ({ kind: 'core', b: ts(inst.x, inst.y), inst }));
-  const vecs: LensVec[] = vectorRows(Ps, scene.variation, meta, scene.vectors.parts, cam).map(
-    (row) => ({ row, b: ts(row.x, row.y) }),
-  );
+  const vecs: LensVec[] = [
+    ...vectorRows(Ps, scene.variation, meta, scene.vectors.parts, cam),
+    // v21's `parts()` lists the dust hatching with the other drawings, so it is lensed with them
+    ...hatchRows(scene.ribbons, cam),
+  ].map((row) => ({ row, b: ts(row.x, row.y) }));
   return { ...base, k: f(k), Ps, scene, cam, curves, extras, vecs };
 }
 
@@ -562,7 +604,7 @@ export function describeLens(
   const given = opts.picks ?? {};
   const picks: LensPicks = {
     ...(own.halos || given.halos ? { halos: given.halos ?? own.halos ?? [] } : {}),
-    sources: (own.sources ?? []).map((s, i) => given.sources?.[i] ?? s),
+    sources: given.sources ?? own.sources ?? [],
     ...(own.drawing !== undefined || given.drawing !== undefined
       ? { drawing: given.drawing ?? own.drawing ?? 0 }
       : {}),

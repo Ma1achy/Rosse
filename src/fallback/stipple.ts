@@ -165,7 +165,7 @@ export class CpuStipple {
       : null;
   }
 
-  view(cam: Camera): CpuStippleView {
+  view(cam: Camera, mTime?: number): CpuStippleView {
     const n = this.samples.n;
     const { P, galaxy, ribbons: R } = this.scene;
     const V = viewDesc(cam, galaxy.g.dust, n, classCapacity(n));
@@ -206,7 +206,7 @@ export class CpuStipple {
       instances: list(l.cls),
     }));
     const streams = VD.parts.streams.length ? streamLayers(vo) : [];
-    const lens = this.lens?.view(cam);
+    const lens = this.lens?.view(cam, mTime);
     const LL = lens?.layers;
     const layers: InkLayer[] = [
       ...line.filter((l) => !pieces.includes(l)),
@@ -305,7 +305,7 @@ export class CpuStippleTiers {
         },
         view: () => {
           if (!this.stipple) throw new Error('no model tier');
-          this.view = this.stipple.view(cameraOf(P, zoom));
+          this.view = this.stipple.view(cameraOf(P, zoom), P.mTime);
         },
       },
     );
