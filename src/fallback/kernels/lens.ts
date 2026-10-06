@@ -44,6 +44,8 @@ export const LENS_CLASSES = 7;
 export const KAPPA_FIXED = 256;
 /** The stream of emission draws (src/core/streams.ts: `lens`). */
 export const STREAM_LENS = Stream.lens;
+/** The class of a mark that is not made: a stipple sample the source's own culls removed. */
+export const MARK_NONE = 255;
 /** A mark's slots: one per image. */
 export const SLOTS = MAX_IMAGES;
 
@@ -408,6 +410,11 @@ export function queryMark(
   const si = M.u[o + 9] ?? 0;
   const S = srcs[si] as LensSrcView;
   const T = tiers[S.solver] as SolverTier;
+  // a sample its source's culls removed has no images
+  if ((M.u[o + 8] ?? 0) === MARK_NONE) {
+    Q.imgN[m] = 0;
+    return;
+  }
   findImages(T, f((M.f[o] ?? 0) + S.bc[0]), f((M.f[o + 1] ?? 0) + S.bc[1]), scratch);
   const base = m * MAX_IMAGES * IMG_WORDS;
   let sum = 0;
@@ -536,25 +543,25 @@ export interface Branch {
 export const MAX_BRANCHES = 24;
 
 /**
- * v21's greedy matcher over a curve's resampled points (L656–662): each live branch takes the
- * nearest unused image within four cells, in branch order (first of equals wins); an unmatched
- * branch ends; an unused image starts a branch. Branches are listed in birth order; a branch is
- * kept if it has at least three points. Returns the branches and the number dropped past the cap.
+ * v21's greedy matcher over a curve's resampled points (L656–662), reading the images the marks'
+ * query found (`track_curves`): each live branch takes the nearest unused image within four cells,
+ * in branch order (first of equals wins); an unmatched branch ends; an unused image starts a
+ * branch. Branches are listed in birth order. Returns the branches (every one, kept or not: the
+ * gather keeps those of at least three points) and how many births the cap refused.
  */
 export function trackCurve(
-  tiers: readonly SolverTier[],
-  solver: number,
-  bc: readonly [number, number],
-  pts: readonly (readonly [number, number])[],
-  scratch: ImageSet,
+  Q: QueryOut,
+  firstMark: number,
+  nPts: number,
+  cell4: number,
 ): { branches: Branch[]; overflow: number } {
-  const T = tiers[solver] as SolverTier;
-  const cell4 = f(T.d.cell * 4);
   const all: Branch[] = [];
   let live: number[] = [];
   let overflow = 0;
-  for (const pt of pts) {
-    findImages(T, f(bc[0] + pt[0]), f(bc[1] + pt[1]), scratch);
+  for (let p = 0; p < nPts; p++) {
+    const m = firstMark + p;
+    const n = Q.imgN[m] ?? 0;
+    const base = m * MAX_IMAGES * IMG_WORDS;
     const used: boolean[] = [];
     const next: number[] = [];
     for (const bi of live) {
@@ -562,10 +569,10 @@ export function trackCurve(
       const last = br.pts[br.pts.length - 1] as [number, number];
       let best = -1;
       let bd = cell4;
-      for (let qi = 0; qi < scratch.n; qi++) {
+      for (let qi = 0; qi < n; qi++) {
         if (used[qi]) continue;
-        const dx = f((scratch.p[2 * qi] ?? 0) - last[0]);
-        const dy = f((scratch.p[2 * qi + 1] ?? 0) - last[1]);
+        const dx = f((Q.imgF[base + qi * IMG_WORDS] ?? 0) - last[0]);
+        const dy = f((Q.imgF[base + qi * IMG_WORDS + 1] ?? 0) - last[1]);
         const d = sqrt(f(f(dx * dx) + f(dy * dy)));
         if (d < bd) {
           bd = d;
@@ -574,22 +581,27 @@ export function trackCurve(
       }
       if (best >= 0) {
         used[best] = true;
-        br.pts.push([scratch.p[2 * best] ?? 0, scratch.p[2 * best + 1] ?? 0]);
+        br.pts.push([
+          Q.imgF[base + best * IMG_WORDS] ?? 0,
+          Q.imgF[base + best * IMG_WORDS + 1] ?? 0,
+        ]);
         next.push(bi);
       }
     }
-    for (let qi = 0; qi < scratch.n; qi++)
+    for (let qi = 0; qi < n; qi++)
       if (!used[qi]) {
         if (all.length >= MAX_BRANCHES) {
           overflow++;
           continue;
         }
-        all.push({ pts: [[scratch.p[2 * qi] ?? 0, scratch.p[2 * qi + 1] ?? 0]] });
+        all.push({
+          pts: [[Q.imgF[base + qi * IMG_WORDS] ?? 0, Q.imgF[base + qi * IMG_WORDS + 1] ?? 0]],
+        });
         next.push(all.length - 1);
       }
     live = next;
   }
-  return { branches: all.filter((b) => b.pts.length >= 3), overflow };
+  return { branches: all, overflow };
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -812,4 +824,144 @@ export function quasarEmit(
   outF[o + 6] = -f(s * size);
   outF[o + 7] = f(c * size);
   return LensCls.rstar;
+}
+
+// ---------------------------------------------------------------------------------------------
+// 7. Marks, branches and warped drawings, as the GPU lays them out
+
+/**
+ * A stipple sample's mark (compute/lens-marks.wgsl `gather_marks`): its projected instance with
+ * its position taken to the source plane, `(X − 400) · k` (`ts`, buildSourceGalaxy L636). A sample
+ * its source's culls removed is class 255.
+ */
+export function sampleMark(
+  M: LensMarks,
+  at: number,
+  projF: Float32Array,
+  projU: Uint32Array,
+  i: number,
+  cls: number,
+  k: number,
+  src: number,
+): void {
+  const o = at * LMARK_WORDS;
+  const p = i * 8;
+  M.f[o] = f(f((projF[p] ?? 0) - 400) * k);
+  M.f[o + 1] = f(f((projF[p + 1] ?? 0) - 400) * k);
+  M.u[o + 2] = projU[p + 2] ?? 0;
+  M.f[o + 3] = projF[p + 3] ?? 0;
+  for (let c = 0; c < 4; c++) M.f[o + 4 + c] = projF[p + 4 + c] ?? 0;
+  M.u[o + 8] = cls;
+  M.u[o + 9] = src;
+  M.u[o + 10] = 0;
+  M.u[o + 11] = 0;
+}
+
+/** Words per entry of the curves' table: CURVE_LAYOUT (src/model/ribbons.ts). */
+export const CURVE_TABLE_WORDS = 12;
+
+/**
+ * The surviving branches (at least three points) laid out as the ribbons' curves, in curve and
+ * birth order, up to `maxBranches` in all (`gather_branches`): points in plate units, the curve's
+ * stroke, width and alpha from its source curve. The slots past the last are empty (n = 0).
+ */
+export function gatherBranches(
+  curveIn: Uint32Array,
+  curveInF: Float32Array,
+  branches: readonly (readonly Branch[])[],
+  P: PlateMap,
+  maxPts: number,
+  maxBranches: number,
+  outU: Uint32Array,
+  outF: Float32Array,
+  ptsOut: Float32Array,
+): number {
+  let count = 0;
+  for (let c = 0; c < branches.length; c++) {
+    const o = c * 12;
+    for (const br of branches[c] ?? []) {
+      const len = br.pts.length;
+      if (len < 3 || count >= maxBranches) continue;
+      const n = Math.min(len, maxPts);
+      for (let i = 0; i < n; i++) {
+        const q = br.pts[i] as [number, number];
+        const [x, y] = scr(P, q[0], q[1]);
+        ptsOut[(count * maxPts + i) * 2] = x;
+        ptsOut[(count * maxPts + i) * 2 + 1] = y;
+      }
+      const t = count * CURVE_TABLE_WORDS;
+      outU[t] = count * maxPts;
+      outU[t + 1] = n;
+      outU[t + 2] = curveIn[o + 4] ?? 0;
+      outU[t + 3] = curveIn[o + 5] ?? 0;
+      outF[t + 4] = curveInF[o + 6] ?? 1;
+      outF[t + 5] = curveInF[o + 7] ?? 1;
+      outF[t + 6] = curveInF[o + 8] ?? 1;
+      outU[t + 7] = count * (maxPts - 1);
+      outU[t + 8] = curveIn[o + 9] ?? 0;
+      outU[t + 9] = curveIn[o + 10] ?? 0;
+      outU[t + 10] = curveIn[o + 11] ?? 0;
+      outU[t + 11] = 0;
+      count++;
+    }
+  }
+  for (let k = count; k < maxBranches; k++) {
+    const t = k * CURVE_TABLE_WORDS;
+    outU[t] = k * maxPts;
+    outU[t + 1] = 0;
+    outU[t + 2] = 0;
+    outU[t + 3] = 0;
+    outF[t + 4] = 1;
+    outF[t + 5] = 1;
+    outF[t + 6] = 1;
+    outU[t + 7] = k * (maxPts - 1);
+    outU[t + 8] = 0;
+    outU[t + 9] = 0;
+    outU[t + 10] = 0;
+    outU[t + 11] = 0;
+  }
+  return count;
+}
+
+/**
+ * The warped drawings' instances (`vec_inst`): for drawing v and image j, the affine
+ * `out = c' + S (q − a)` of lensMarks (L667) in the instance's `w` (a, c' − a) and `w2` (S,
+ * column-major); an image past the list, or with |μ| > 40, is switched off (`pad0` = 1).
+ */
+export function lensVecInst(
+  instF: Float32Array,
+  instU: Uint32Array,
+  lvecs: Uint32Array,
+  lvecsF: Float32Array,
+  nVec: number,
+  Q: QueryOut,
+  P: PlateMap,
+): void {
+  for (let i = 0; i < nVec * MAX_IMAGES; i++) {
+    const v = i >>> 3;
+    const j = i & 7;
+    const m = lvecs[v * 2] ?? 0;
+    const k = lvecsF[v * 2 + 1] ?? 1;
+    const o = i * 24;
+    instU[o + 21] = 1;
+    instF.fill(0, o + 12, o + 16);
+    if (j >= (Q.imgN[m] ?? 0)) continue;
+    const w = (m * MAX_IMAGES + j) * IMG_WORDS;
+    if (!(Math.abs(Q.imgF[w + 2] ?? 0) <= VECTOR_MU_LIMIT)) continue;
+    const J: [number, number, number, number] = [
+      Q.imgF[w + 4] ?? 0,
+      Q.imgF[w + 5] ?? 0,
+      Q.imgF[w + 6] ?? 0,
+      Q.imgF[w + 7] ?? 0,
+    ];
+    const { c, S } = imageAffine(P, k, Q.imgF[w] ?? 0, Q.imgF[w + 1] ?? 0, J);
+    const tx = instF[o + 4] ?? 0;
+    const ty = instF[o + 5] ?? 0;
+    instF[o + 8] = tx;
+    instF[o + 9] = ty;
+    instF[o + 10] = f(c[0] - tx);
+    instF[o + 11] = f(c[1] - ty);
+    instF.set(S, o + 12);
+    instU[o + 21] = 0;
+  }
 }

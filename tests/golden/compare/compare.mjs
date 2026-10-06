@@ -159,7 +159,7 @@ async function compareAll(G, node) {
     // v21's own variation (ADR 0015) and, from M4, v21's own stroke choices (v21-curves.ts) and
     // noise field (v21-noise.ts): both engines draw the same galaxy with the same pens, strokes,
     // flocculence and wobble, and only the dots differ
-    const opts = node.referenceOptions(rec.params, rec.zoom ?? 1);
+    const opts = node.referenceOptions(rec.params, rec.zoom ?? 1, rec.preset);
     const ref = node.reference(c.name);
     const refM = G.measure(ref);
     const refCounts = G.countsOf(rec.stats);

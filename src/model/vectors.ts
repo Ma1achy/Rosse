@@ -47,8 +47,10 @@ export const WarpKind = {
   rewind: 1,
   /**
    * The generic hook for later milestones (`{ post }`: merger tides M8, lens Jacobians M9): a plate
-   * → plate affine about a centre, `c + S·(q − c)`, after the matrix and before the wobble, with
-   * v21's drop of segments stretched more than 1.8× (app23.js:L1208).
+   * → plate affine about a centre, `c + t + S·(q − c)` (t, `w.zw`, is zero unless the hook carries
+   * the drawing to a place of its own, as a lensed image), after the matrix and before the
+   * wobble, with v21's drop of segments stretched more than 1.8× (app23.js:L1208). An instance
+   * whose `pad0` is 1 is not drawn (M9: a lensed image that was rejected).
    */
   post: 2,
 } as const;

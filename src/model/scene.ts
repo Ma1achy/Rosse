@@ -17,6 +17,7 @@ import type { CurvePicks } from './curves';
 import { packNoise, type NoiseTable } from '../core/noise';
 import { describeGalaxy, type GalaxyDesc } from './galaxy';
 import { describeRibbons, type RibbonDesc } from './ribbons';
+import { describeLens, type LensOptions, type LensScene } from '../sim/lens';
 import { makeVariation, type DrawingsMeta, type Variation } from './variation';
 
 export interface GalaxyScene {
@@ -28,6 +29,8 @@ export interface GalaxyScene {
   /** the placed vector drawings (M5): the parts' picks and their slots */
   vectors: VectorDesc;
   meta: DrawingsMeta;
+  /** the lensed scene (M9): the sources behind the lens, their curves and drawn parts */
+  lens?: LensScene;
 }
 
 export interface SceneOptions {
@@ -65,6 +68,11 @@ export interface SceneOptions {
   rmax?: number;
   /** Calibration only (negative controls): every dot's quad scaled by this. */
   dotScale?: number;
+  /**
+   * The lens (M9): the orientation the sources are fixed at (`home`, saved with the drawing, ADR
+   * 0050) and, for the golden runner, v21's own discrete choices (`picks`, ADR 0051).
+   */
+  lens?: LensOptions;
 }
 
 export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {}): GalaxyScene {
@@ -85,7 +93,15 @@ export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {
     galaxy.noise,
   );
   const vectors = describeVectors(P, variation, meta, P.incl, opts.partPicks);
-  return { P, variation, galaxy, ribbons, vectors, meta };
+  // a merger's lens is M8's; a lensed star or artefact has none (the lens needs a galaxy)
+  const lens =
+    P.lensOn && !P.merger && P.subject === 'galaxy'
+      ? describeLens(P, meta, buildScene, {
+          ...opts.lens,
+          ...(opts.placementKey === undefined ? {} : { placementKey: opts.placementKey }),
+        })
+      : undefined;
+  return { P, variation, galaxy, ribbons, vectors, meta, ...(lens ? { lens } : {}) };
 }
 
 /**

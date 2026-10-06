@@ -35,6 +35,7 @@ import { runStipple } from './kernels/stipple';
 import { runVectors, vectorInputs, type VectorOut } from './kernels/vector';
 import { vectorView, type VectorView } from '../model/vectors';
 import { usedDrawings } from '../model/used';
+import { CpuLens, type CpuLensView } from './lens';
 
 export interface CpuStippleView {
   layers: InkLayer[];
@@ -49,6 +50,8 @@ export interface CpuStippleView {
   /** the placed vector drawings' view tier (M5) */
   vectors: VectorOut;
   vectorView: VectorView;
+  /** the lens's view tier (M9), when the scene is lensed */
+  lens?: CpuLensView;
 }
 
 /** Instances from a buffer of INSTANCE_WORDS words each. */
@@ -147,10 +150,19 @@ export function streamLayers(vo: VectorOut): InkLayer[] {
 export class CpuStipple {
   readonly samples: ReturnType<typeof runStipple>;
   readonly lines: RibbonModel;
+  /** the lens (M9): its sources are galaxies of their own, sampled and projected like this one */
+  readonly lens: CpuLens | null;
 
   constructor(readonly scene: GalaxyScene) {
     this.samples = runStipple(scene.galaxy);
     this.lines = ribbonModel(scene.ribbons, scene.galaxy.pool, scene.galaxy.dotBase);
+    this.lens = scene.lens
+      ? new CpuLens(scene, scene.meta, (s, cam) => {
+          const src = new CpuStipple(s);
+          const v = src.view(cam);
+          return { n: src.samples.n, classes: v.classes, projected: v.projected };
+        })
+      : null;
   }
 
   view(cam: Camera): CpuStippleView {
@@ -194,16 +206,26 @@ export class CpuStipple {
       instances: list(l.cls),
     }));
     const streams = VD.parts.streams.length ? streamLayers(vo) : [];
+    const lens = this.lens?.view(cam);
+    const LL = lens?.layers;
     const layers: InkLayer[] = [
       ...line.filter((l) => !pieces.includes(l)),
+      ...(LL?.line ?? []),
       ...vectorLayers(vo, VD.nDots, VD.nBlobs),
+      ...(LL?.vectors ?? []),
       ...pieces,
+      ...(LL?.pieces ?? []),
       ...stipple.slice(0, 3),
+      ...(LL?.dots ?? []),
       ...streams,
-      ...stipple.slice(3),
+      ...stipple.slice(3, 4),
+      ...(LL?.knots ?? []),
+      ...stipple.slice(4),
+      ...(LL?.stars ?? []),
     ];
     const cores = coreInstances(P, meta, cam, galaxy.noise, VD.parts.picks.nuclear);
     if (cores.length) layers.push({ kind: 'sprites', atlas: 'cores', gain: 1, instances: cores });
+    layers.push(...(LL?.cores ?? []));
     const tiles = (l: InkLayer[], atlas: string) =>
       l.flatMap((x) =>
         x.kind === 'sprites' && x.atlas === atlas ? x.instances.map((i) => i.layer) : [],
@@ -229,10 +251,13 @@ export class CpuStipple {
         ...VD.parts.picks.streams.map((s) => s.tile),
       ],
     });
+    const lc = lens?.perClass ?? [];
+    const withLens = Array.from(counts, (n, c) => n + (lc[c] ?? 0));
     return {
       layers,
+      ...(lens ? { lens } : {}),
       counts: {
-        ...markCounts(counts),
+        ...markCounts(withLens),
         curves: R.nCurves,
         pieces: rv.nPieces,
         ribbonSegments: R.nSegs,

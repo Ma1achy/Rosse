@@ -95,6 +95,8 @@ interface Inst {
   capFirst: number;
   dotFirst: number;
   blobFirst: number;
+  /** 1: not drawn (a lensed image that was rejected) */
+  off: number;
 }
 
 function inst(X: VectorInputs, k: number): Inst {
@@ -115,6 +117,7 @@ function inst(X: VectorInputs, k: number): Inst {
     capFirst: U[o + 18] ?? 0,
     dotFirst: U[o + 19] ?? 0,
     blobFirst: U[o + 20] ?? 0,
+    off: U[o + 21] ?? 0,
   };
 }
 
@@ -148,7 +151,10 @@ function post(I: Inst, q: [number, number]): [number, number] {
   const dx = f(q[0] - I.w[0]);
   const dy = f(q[1] - I.w[1]);
   const S = I.w2;
-  return [f(f(I.w[0] + f(S[0] * dx)) + f(S[2] * dy)), f(f(I.w[1] + f(S[1] * dx)) + f(S[3] * dy))];
+  return [
+    f(f(f(I.w[0] + I.w[2]) + f(S[0] * dx)) + f(S[2] * dy)),
+    f(f(f(I.w[1] + I.w[3]) + f(S[1] * dx)) + f(S[3] * dy)),
+  ];
 }
 
 /** expandVector's tf (app23.js:L1194–1198): the warp, the matrix, the wobble. */
@@ -208,6 +214,7 @@ export function expandCap(X: VectorInputs, i: number, out: Float32Array): number
       if (f(ml / ol) > f(1.8)) key = 1;
     }
   }
+  if (I.off) key = 1;
   const oo = i * CAPSULE_WORDS;
   out[oo] = a[0];
   out[oo + 1] = a[1];
@@ -223,6 +230,11 @@ export function expandCap(X: VectorInputs, i: number, out: Float32Array): number
 /** 2. Dot `i` as a `dots` sprite (INSTANCE_WORDS). */
 export function expandDot(X: VectorInputs, i: number, outF: Float32Array, outU: Uint32Array) {
   const I = instOf(X, i, 19);
+  if (I.off) {
+    outF.fill(0, i * INSTANCE_WORDS, (i + 1) * INSTANCE_WORDS);
+    outU[i * INSTANCE_WORDS + 2] = 0;
+    return;
+  }
   const d = ((X.lib.table[I.drawing * DRAWING_WORDS + 2] ?? 0) + i - I.dotFirst) * 4;
   const D = X.lib.dots;
   const [px, py] = tf(X, I, D[d] ?? 0, D[d + 1] ?? 0);
@@ -245,6 +257,11 @@ export function expandDot(X: VectorInputs, i: number, outF: Float32Array, outU: 
 /** 3. Blob `i` as a `knots` sprite. */
 export function expandBlob(X: VectorInputs, i: number, outF: Float32Array, outU: Uint32Array) {
   const I = instOf(X, i, 20);
+  if (I.off) {
+    outF.fill(0, i * INSTANCE_WORDS, (i + 1) * INSTANCE_WORDS);
+    outU[i * INSTANCE_WORDS + 2] = 0;
+    return;
+  }
   const b = ((X.lib.table[I.drawing * DRAWING_WORDS + 4] ?? 0) + i - I.blobFirst) * 8;
   const B = X.lib.blobs;
   const [px, py] = tf(X, I, B[b] ?? 0, B[b + 1] ?? 0);

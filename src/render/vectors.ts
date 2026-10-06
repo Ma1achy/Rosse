@@ -117,6 +117,11 @@ export class GpuVectors {
     return this.model?.D ?? null;
   }
 
+  /** The instance table (the lensed drawings' images are written into it by compute/lens-query.wgsl). */
+  get instances(): GPUBuffer {
+    return this.need().buffers[1] as GPUBuffer;
+  }
+
   /** The library's tables, uploaded once per set of drawings. */
   private library(lib: PackedVectors): GPUBuffer[] {
     if (this.libBuffers?.lib === lib) return this.libBuffers.bufs;

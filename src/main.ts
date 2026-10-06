@@ -22,9 +22,10 @@
  *
  * URL parameters: `preset`, `seed`, `variant=stipple` (the M2 golden overrides: no lines, knots,
  * envelope, drawn stars, deep field or foreground stars), `variant=ribbons` (the M4 overrides),
- * `variant=vectors` (the M5 overrides), `az`, `incl`, `pa`, `zoom`, `backend=cpu|webgpu`,
+ * `variant=vectors` (the M5 overrides), `variant=lens` (the M9 overrides), `az`, `incl`, `pa`, `zoom`, `backend=cpu|webgpu`,
  * `present=copy`.
  */
+import { lensHomeOf, type LensHome } from './core/home';
 import type { Params } from './core/params';
 import { PRESET_NAMES, presetParams } from './core/presets';
 import { CpuRenderer } from './fallback';
@@ -108,6 +109,12 @@ function vectorsOnly(preset: string): Partial<Params> {
   };
 }
 
+/**
+ * The M9 golden overrides (tests/golden/extra-cases.json, variant `lens`): no drawn stars among
+ * the stipple, deep field or foreground stars (M7), which the lens presets would otherwise show.
+ */
+const LENS_ONLY: Partial<Params> = { starMix: 0, field: 0, fgstars: 0 };
+
 interface Scene {
   atlases: AtlasData[];
   paper: ImageData8;
@@ -122,7 +129,7 @@ interface Engine {
    * The model and view tiers these parameters and zoom need (only the view tier when just the
    * camera moved, ADR 0010), then the ink.
    */
-  draw(P: Params, zoom: number): void;
+  draw(P: Params, zoom: number, home?: LensHome): void;
   /** how many times each tier has run */
   tierRuns(): { model: number; view: number };
   /**
@@ -189,8 +196,8 @@ function cpuEngine(scene: Scene, size: FrameSize): Engine {
   return {
     backend: 'cpu',
     size: () => r.size,
-    draw(P, zoom) {
-      const { view, work } = stipple.frame(P, zoom);
+    draw(P, zoom, home) {
+      const { view, work } = stipple.frame(P, zoom, home ? { lens: { home } } : {});
       if (work.view) r.setLayers(view.layers);
       ink();
       counts = view.counts;
@@ -234,7 +241,7 @@ async function gpuEngine(
     let renderer: GpuRenderer | null = null;
     let stipple: GpuStipple | null = null;
     /** the parameters and zoom drawn last, redrawn on a new device */
-    let drawn: { P: Params; zoom: number } | null = null;
+    let drawn: { P: Params; zoom: number; home?: LensHome | undefined } | null = null;
     /** tier runs on earlier devices */
     const pastRuns = { model: 0, view: 0 };
     let out: GPUTexture | null = null;
@@ -265,20 +272,20 @@ async function gpuEngine(
       scene.atlases.forEach((a) => {
         r.addAtlas(a);
       });
-      if (drawn) inkScene(drawn.P, drawn.zoom);
+      if (drawn) inkScene(drawn.P, drawn.zoom, drawn.home);
       if (ctxGpu) ctxGpu.configure({ device, format, alphaMode: 'opaque' });
       fitOutput(r);
     };
     /** the tiers that changed, on the GPU, then the ink */
-    const inkScene = (P: Params, zoom: number) => {
+    const inkScene = (P: Params, zoom: number, home?: LensHome) => {
       const r = current();
       const st = stipple;
       if (!st) throw new Error('no stipple passes');
-      const work = st.frame(P, zoom, scene.meta);
+      const work = st.frame(P, zoom, scene.meta, home ? { lens: { home } } : {});
       // every layer in scene() order: line-work, drawn parts, stipple, streams, cores
       if (work.view) r.setLayers(st.inkLayers());
       r.drawInk();
-      drawn = { P, zoom };
+      drawn = { P, zoom, home };
       return st;
     };
     build(gpu.device, size);
@@ -294,8 +301,8 @@ async function gpuEngine(
     return {
       backend: 'webgpu',
       size: () => current().size,
-      draw(P, zoom) {
-        inkScene(P, zoom);
+      draw(P, zoom, home) {
+        inkScene(P, zoom, home);
       },
       tierRuns() {
         const now = stipple?.tiers.runs ?? { model: 0, view: 0 };
@@ -407,7 +414,9 @@ async function start(): Promise<void> {
           ? ribbonsOnly(preset)
           : variant === 'vectors'
             ? vectorsOnly(preset)
-            : {},
+            : variant === 'lens'
+              ? LENS_ONLY
+              : {},
     );
   /** the camera from the URL, if given (src/ui/url.ts) */
   const urlView = parseUrlView(params);
@@ -422,8 +431,10 @@ async function start(): Promise<void> {
   let wanted = (() => {
     const P = params0();
     const { az = P.az, incl = P.incl, pa = P.pa, zoom = 1 } = urlView;
-    // zoom is the page's (v21's ZOOM: not a parameter, a view input)
-    return { P: { ...P, az, incl, pa }, preset, zoom };
+    // zoom is the page's (v21's ZOOM: not a parameter, a view input). A lens's sources are fixed
+    // at the preset's own camera, whatever the URL asks to look from (ADR 0050)
+    const home: LensHome | undefined = P.lensOn ? lensHomeOf(P) : undefined;
+    return { P: { ...P, az, incl, pa }, preset, zoom, home };
   })();
   let drawnBy: Engine | null = null;
   let drawn: typeof wanted | null = null;
@@ -454,7 +465,7 @@ async function start(): Promise<void> {
     const wantedSurface = surface;
     try {
       if (drawnBy !== e || drawn !== wanted) {
-        e.draw(wanted.P, wanted.zoom);
+        e.draw(wanted.P, wanted.zoom, wanted.home);
         drawnBy = e;
         drawn = wanted;
       }
@@ -556,7 +567,9 @@ async function start(): Promise<void> {
 
   select.addEventListener('change', () => {
     preset = select.value;
-    wanted = { P: params0(), preset, zoom: wanted.zoom };
+    const P = params0();
+    // choosing a lens preset fixes its sources at the camera it shows (the explicit home, Q3)
+    wanted = { P, preset, zoom: wanted.zoom, home: P.lensOn ? lensHomeOf(P) : undefined };
     schedule();
   });
   seedInput.addEventListener('change', () => {
@@ -564,7 +577,7 @@ async function start(): Promise<void> {
     seedInput.value = String(seed);
     // a new seed keeps the camera
     const { az, incl, pa } = wanted.P;
-    wanted = { P: { ...params0(), az, incl, pa }, preset, zoom: wanted.zoom };
+    wanted = { P: { ...params0(), az, incl, pa }, preset, zoom: wanted.zoom, home: wanted.home };
     schedule();
   });
 

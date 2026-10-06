@@ -9,7 +9,10 @@ import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import type { Params } from '../../../src/core/params';
 import { presetFamily, presetParams } from '../../../src/core/presets';
-import type { MarkCounts, SceneOptions } from '../../../src/model/scene';
+import { lensHomeOf } from '../../../src/core/home';
+import { buildScene, type MarkCounts, type SceneOptions } from '../../../src/model/scene';
+import { SRC_SCALE, describeLens, type LensOptions } from '../../../src/sim/lens';
+import { UNIT_SCALE } from '../../../src/view/camera';
 import type { Variation } from '../../../src/model/variation';
 import { CpuGolden } from './engine-cpu';
 import { v21CurvePicks } from './v21-curves';
@@ -38,6 +41,7 @@ import {
 } from './thresholds';
 import { v21Variation } from './v21';
 import { v21PartPicks } from './v21-parts';
+import { v21LensPlan } from './v21-lens';
 
 export { compareMeasures, countAllowance, evaluate, impossibleClasses, measure };
 export type { Comparison, Evaluation, Grey, ImageMeasures, Thresholds };
@@ -127,13 +131,46 @@ export class GoldenNode {
    * Everything the comparison draws with besides the parameters: v21's variation (ADR 0015), from
    * M4 v21's stroke choices and noise field, and from M5 v21's part picks at this zoom (ADR 0021).
    */
-  referenceOptions(P: Params, zoom = 1): SceneOptions {
+  referenceOptions(P: Params, zoom = 1, preset?: string): SceneOptions {
     const variation = this.v21Variation(P);
     return {
       variation,
       curvePicks: this.v21CurvePicks(P, variation),
       noise: this.v21Noise(P.seed),
       partPicks: v21PartPicks(P, variation, this.cpu.meta, zoom),
+      ...(P.lensOn && !P.merger && preset ? { lens: this.lensOptions(P, preset) } : {}),
+    };
+  }
+
+  /**
+   * The lens, drawn with v21's own choices (ADR 0050, 0051): the cluster's layout, each source's
+   * options and its own variation, strokes, noise and part picks, replayed from v21's streams
+   * (./v21-lens.ts), and the orientation the preset's camera gives (v21 places the sources there
+   * on the first view of a fresh page, which is how the captures were made; the orbit camera is
+   * reached from it).
+   */
+  lensOptions(P: Params, preset: string): LensOptions {
+    const home = lensHomeOf(presetParams(preset, P.seed));
+    const meta = this.cpu.meta;
+    const plan = v21LensPlan(P, this.root, meta.vectors?.whole?.type ?? []);
+    // describe once with v21's choices to learn each source's parameters, then give each the
+    // pens v21 drew it with
+    const first = describeLens(P, meta, buildScene, { home, picks: plan.picks });
+    const sources = first.sources.map((s, i) => ({
+      ...(plan.picks.sources?.[i] ?? {}),
+      ...(s.Ps ? { scene: this.sceneOptionsOf(s.Ps) } : {}),
+    }));
+    return { home, picks: { ...plan.picks, sources } };
+  }
+
+  /** v21's own variation, strokes, noise and part picks for a source galaxy (at its scale of 70). */
+  sceneOptionsOf(Ps: Params): SceneOptions {
+    const variation = this.v21Variation(Ps);
+    return {
+      variation,
+      curvePicks: this.v21CurvePicks(Ps, variation),
+      noise: this.v21Noise(Ps.seed),
+      partPicks: v21PartPicks(Ps, variation, this.cpu.meta, SRC_SCALE / UNIT_SCALE),
     };
   }
 
@@ -197,7 +234,7 @@ export class GoldenNode {
     const controls: Record<string, Record<string, { config: string; c: Comparison }[]>> = {};
     for (const c of cases) {
       const zoom = c.zoom ?? 1;
-      const opts = this.referenceOptions(c.params, zoom);
+      const opts = this.referenceOptions(c.params, zoom, c.base);
       const base = measure(this.cpu.render(c.params, opts, zoom).alpha);
       const baseQ = momentsOf(base.alpha, base.extent.r90).q;
       for (let k = 1; k <= keys; k++) {
@@ -219,7 +256,7 @@ export class GoldenNode {
         const r = this.cpu.render(
           P,
           {
-            ...this.referenceOptions(P, zoom),
+            ...this.referenceOptions(P, zoom, c.base),
             placementKey: (c.params.seed + 1) >>> 0,
             ...(ctl.scene ?? {}),
           },

@@ -242,6 +242,12 @@ fn expand(@builtin(global_invocation_id) id: vec3<u32>) {
   let st = state[c];
   let taper = (cv.flags & FLAG_TAPER) != 0u;
   let j = i - cv.seg_first;
+  // a curve with fewer points than its slots (the lensed branches of M9, whose length is found
+  // on the GPU): the segments past its end are nothing
+  if (j + 1u >= cv.n) {
+    segs[i] = RibbonSeg(vec4<f32>(0.0), vec4<f32>(0.0), vec2<f32>(0.0), cv.layer, 0.0);
+    return;
+  }
   var corners: array<vec2<f32>, 4>;
   var us: array<f32, 2>;
   for (var k = 0u; k < 2u; k++) {

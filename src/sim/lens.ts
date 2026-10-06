@@ -409,6 +409,8 @@ export interface LensPicks {
 export interface LensOptions {
   home?: LensHome;
   picks?: LensPicks;
+  /** the placement key of the main galaxy, when it is not the seed: the sources are re-keyed with it */
+  placementKey?: number;
 }
 
 export type SceneBuilder = (P: Params, meta: DrawingsMeta, opts: SceneOptions) => GalaxyScene;
@@ -441,10 +443,14 @@ function describeSource(
   o: SourceOpts,
   pick: LensPickSource | undefined,
   cell: number,
+  rekey: number | undefined,
 ): LensSource {
   const opts: SourceOpts = { ...o, ...pick?.opts };
   const Ps = sourceParams(P, seed, opts);
-  const scene = build(Ps, meta, pick?.scene ?? {});
+  const scene = build(Ps, meta, {
+    ...pick?.scene,
+    ...(rekey === undefined ? {} : { placementKey: (seed + rekey) >>> 0 }),
+  });
   const cam = sourceCamera(Ps);
   const k = sizeGU / (4.2 * SRC_SCALE);
   const ts = (X: number, Y: number): [number, number] => [
@@ -489,6 +495,7 @@ export function describeLens(
   opts: LensOptions = {},
 ): LensScene {
   const picks = opts.picks ?? {};
+  const rekey = opts.placementKey === undefined ? undefined : opts.placementKey - P.seed;
   const home = opts.home ?? lensHomeOf(P);
   const thE = P.lensR;
   const model = lensModel(P, 1, picks);
@@ -538,6 +545,7 @@ export function describeLens(
         { arms: 2, bulge: 0.25, stars: 1400, lines: 0.2, knots: 0.15 },
         nextPick(),
         cell0,
+        rekey,
       ),
     );
   } else if (P.lensSource === 'drawing') {
@@ -605,6 +613,7 @@ export function describeLens(
           o,
           pk,
           cell0,
+          rekey,
         ),
       );
     }
@@ -645,6 +654,7 @@ export function describeLens(
         },
         pk,
         cell0,
+        rekey,
       ),
     );
   }
@@ -667,6 +677,7 @@ export function describeLens(
         { arms: 0, bulge: 0.1, stars: 1600, lines: 0.15, knots: 0.3, flocc: 0.6, irr: 1 },
         nextPick(),
         s2.cell,
+        rekey,
       ),
     );
   }

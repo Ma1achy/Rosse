@@ -22,6 +22,7 @@ import { packStruct } from '../gpu/buffers';
 import { CULLS_LAYOUT } from '../fallback/kernels/project';
 import { GpuRibbons } from './ribbons';
 import { GpuVectors } from './vectors';
+import { GpuLens } from './lens';
 import { vectorView } from '../model/vectors';
 import { coreInstances } from '../model/parts';
 import {
@@ -85,6 +86,9 @@ interface ModelBuffers {
 
 export class GpuStipple {
   private model: ModelBuffers | null = null;
+  /** the lens (M9), made when a lensed scene is first loaded; its sources are sampled by `scratch` */
+  private lens: GpuLens | null = null;
+  private scratch: GpuStipple | null = null;
   private scene: GalaxyScene | null = null;
   /** what `frame` last built (ADR 0010) */
   readonly tiers = new TierState();
@@ -297,6 +301,18 @@ export class GpuStipple {
     }
     pass.end();
     d.queue.submit([enc.finish()]);
+    if (scene.lens) {
+      this.lens ??= GpuLens.create(d, {
+        run: (src, cam) => {
+          const sc = (this.scratch ??= GpuStipple.create(d));
+          sc.setScene(src);
+          sc.setView(cam);
+          const sm = sc.need();
+          return { n: sm.n, projected: sm.projected, classes: sm.classes };
+        },
+      });
+      this.lens.load(scene, scene.meta, { pool, dotBase, noise });
+    } else this.lens?.destroy();
   }
 
   /** View tier: projection, culls and compaction for a camera. */
@@ -331,6 +347,7 @@ export class GpuStipple {
       ),
     );
     this.camera = cam;
+    if (this.scene.lens && this.lens?.loaded) this.lens.setView(cam);
     const enc = d.createCommandEncoder({ label: 'stipple view' });
     const pass = enc.beginComputePass({ label: 'project + compact' });
     const P = this.pipes;
@@ -349,6 +366,7 @@ export class GpuStipple {
     pass.dispatchWorkgroups(Math.ceil(m.n / 64) || 1);
     this.ribbons.encodeExpand(pass);
     this.vectors.encode(pass);
+    this.lens?.encode(pass);
     pass.end();
     d.queue.submit([enc.finish()]);
   }
@@ -370,16 +388,25 @@ export class GpuStipple {
     const stipple = this.layers();
     const { P, meta, galaxy, vectors } = this.scene;
     const cores = coreInstances(P, meta, this.camera, galaxy.noise, vectors.parts.picks.nuclear);
+    const LL = this.scene.lens && this.lens?.loaded ? this.lens.layers() : null;
     return [
       ...line.filter((l) => !pieces.includes(l)),
+      ...(LL?.line ?? []),
       ...this.vectors.layers(),
+      ...(LL?.vectors ?? []),
       ...pieces,
+      ...(LL?.pieces ?? []),
       ...stipple.slice(0, 3),
+      ...(LL?.dots ?? []),
       ...this.vectors.streamLayers(),
-      ...stipple.slice(3),
+      ...stipple.slice(3, 4),
+      ...(LL?.knots ?? []),
+      ...stipple.slice(4),
+      ...(LL?.stars ?? []),
       ...(cores.length
         ? [{ kind: 'sprites', atlas: 'cores', gain: 1, instances: cores } as InkLayer]
         : []),
+      ...(LL?.cores ?? []),
     ];
   }
 
@@ -427,10 +454,13 @@ export class GpuStipple {
     const perClass = new Uint32Array(CLASS_COUNT);
     for (let c = 0; c < CLASS_COUNT; c++) perClass[c] = a[c * 4 + 1] ?? 0;
     const R = this.scene?.ribbons;
+    // the lens's marks join the galaxy's, as v21 appends them to the same rows (M9)
+    const lensCounts = this.scene?.lens && this.lens?.loaded ? await this.lens.readCounts() : [];
+    const withLens = Uint32Array.from(perClass, (n, c) => n + (lensCounts[c] ?? 0));
     return {
-      perClass,
+      perClass: withLens,
       counts: {
-        ...markCounts(perClass),
+        ...markCounts(withLens),
         curves: R?.nCurves ?? 0,
         pieces: await this.ribbons.readPieceCount(),
         ribbonSegments: R?.nSegs ?? 0,
@@ -485,6 +515,17 @@ export class GpuStipple {
     return { out: await this.read(m.out, CLASS_COUNT * m.cap * INSTANCE_LAYOUT.size), cap: m.cap };
   }
 
+  /** The lens of the scene, when it has one (tests). */
+  get lensTier(): GpuLens | null {
+    return this.lens;
+  }
+
+  /** Samples, projected instances and classes of the last view: what the lens gathers its marks from. */
+  get sampleBuffers(): { n: number; projected: GPUBuffer; classes: GPUBuffer } {
+    const m = this.need();
+    return { n: m.n, projected: m.projected, classes: m.classes };
+  }
+
   private need(): ModelBuffers {
     if (!this.model) throw new Error('setScene first');
     return this.model;
@@ -522,5 +563,7 @@ export class GpuStipple {
     this.tiers.invalidate();
     this.destroyModel();
     this.vectors.destroy();
+    this.lens?.destroy();
+    this.scratch?.destroy();
   }
 }
