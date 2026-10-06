@@ -405,8 +405,8 @@ export class GpuLens {
       imgs: buf(layout.nMarks * MAX_IMAGES * IMG_LAYOUT.size, STORAGE | SRC, 'lens images'),
       qmeta: buf((L.sources.length + layout.nMarks) * 4, STORAGE | SRC | DST, 'lens query meta'),
       slots: buf(nSlotsAll * 16, STORAGE | SRC, 'lens slots'),
-      blockTotals: buf(LENS_CLASSES * layout.blocks * 4, STORAGE, 'lens slot blocks'),
-      blockOffsets: buf(LENS_CLASSES * layout.blocks * 4, STORAGE, 'lens slot block offsets'),
+      blockTotals: buf(LENS_CLASSES * layout.blocks * 4, STORAGE | SRC, 'lens slot blocks'),
+      blockOffsets: buf(LENS_CLASSES * layout.blocks * 4, STORAGE | SRC, 'lens slot block offsets'),
       args: buf(
         LENS_CLASSES * 16,
         STORAGE | GPUBufferUsage.INDIRECT | SRC | DST,
@@ -636,6 +636,9 @@ export class GpuLens {
     imgs: ArrayBuffer;
     qmeta: Uint32Array;
     slots: Uint32Array;
+    /** the scan's per-class block offsets (`LENS_CLASSES × blocks`) */
+    blockOffsets: Uint32Array;
+    blocks: number;
     out: ArrayBuffer;
     qimgs: Float32Array;
     brawN: Uint32Array;
@@ -651,6 +654,10 @@ export class GpuLens {
         await this.read(b.qmeta as GPUBuffer, (m.L.sources.length + lo.nMarks) * 4),
       ),
       slots: new Uint32Array(await this.read(b.slots as GPUBuffer, (lo.nSlots + lo.nQSlots) * 16)),
+      blockOffsets: new Uint32Array(
+        await this.read(b.blockOffsets as GPUBuffer, LENS_CLASSES * lo.blocks * 4),
+      ),
+      blocks: lo.blocks,
       out: await this.read(b.out as GPUBuffer, lo.totalInstances * INSTANCE_LAYOUT.size),
       qimgs: new Float32Array(await this.read(b.qimgs as GPUBuffer, 9 * 16)),
       brawN: new Uint32Array(

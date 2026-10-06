@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- M9, lensing:
+  - `sim/lens`: the lens as scene description. Halos are cored NIEs (Keeton), a single one or a cluster of 7–11 members, with shear; sources come as planes (a galaxy, a quasar, 6–9 cluster sources each at its own depth, a double source plane at 1.42). The source galaxy is described by the engine's own scene description for its own camera, with no global swapping. `weakLensing` is the hook for the deep field that M7 brings.
+  - `lens-grid.wgsl`, `lens-bin.wgsl` (the (G+1)² grid at G = 210 or 250, bounding boxes by ordered-u32 atomics, bins skipped above 400, count, deterministic scan, scatter, sorted ids) and `lens-query.wgsl` (up to 8 images with J, μ and parity, canonical de-duplication; fixed-point κ reduction; emission ⌊κ·min(30,|μ|)+u⌋ from the counter RNG; curve-branch tracking with v21's greedy matcher; warped vector drawings through M5's `post` hook under the |μ| > 40, 22 px and 1.8× rules, hatches included). `fallback/kernels/lens.ts` and `fallback/lens.ts` are the CPU twins; `render/lens.ts` is the GPU tier.
+  - The quasar with time-delay flares (ψ), the cluster with its member galaxies, the double ring.
+  - Explicit source orientation (open question Q3, option b): a saved parameter set, `LensHome {incl, az, w}` (`core/home`). The orbit never re-rolls it. This is a deliberate divergence from v21 (ADR 0050).
+  - Goldens: 28 v21 captures (six `Lens: …` presets and `A sketch, lensed`, seeds 7 and 4242, home then orbit, a fresh page each), drawn with v21's own lens picks (`compare/v21-lens.ts`, ADR 0051). The engine's own picks are tested against v21's over many seeds; image positions, J and μ are compared against v21's solver. Overrides for the deep field, drawn stars and foreground stars are in ADR 0052.
+  - Tests: `npm run test:gpu` has the lens kernels against their twins, slot by slot. The page takes `?variant=lens`.
+
 - M5, vector marks:
   - `marks/vector`: the whole vector library (12 sheets, 429 drawings, 23,431 segments, 6,038 dots, 328 blobs) packed once into shared tables with a per-drawing range table and a densified-piece prefix (packer 4 copies every sheet with its metadata).
   - `model/parts`: v21's `parts()` as scene description. The model tier picks envelopes, whole drawings by type (with the rewind warp), drawn arms by tightness, bars, rings, the nuclear spiral, arcs, shells, the tail, trails and cosmic rays, the arrow, bubbles at the clumps, the jet and the streams, each part on its own index of the `parts` stream. The view tier lays out v21's rows for a camera (`vectorRows`), in the `MAGNIFIED` order. `model/vectors` packs them for the GPU.

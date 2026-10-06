@@ -188,19 +188,27 @@ export function runLensParity(title: string, preset: string, seeds: readonly num
       // the instances, slot by slot, each engine at its own scanned offset (a slot whose count
       // differs by one, at a knife edge of floor(κ·μ + u), would shift every later one)
       let slotDiff = 0;
+      const slotDiffs: string[] = [];
+      const badNote: string[] = [];
       const nTot = lo.nSlots + lo.nQSlots;
       for (let s = 0; s < nTot; s++) {
         const gc = q.slots[4 * s] ?? 0;
         const cc = lv.slots.counts[s] ?? 0;
         if (gc !== cc) {
           slotDiff++;
+          const dk = q.slots[4 * s + 2] ?? 0;
+          if (slotDiffs.length < 6)
+            slotDiffs.push(`s${String(s)} k${String(dk)} ${String(gc)}/${String(cc)}`);
           continue;
         }
         if (!gc) continue;
         const k = q.slots[4 * s + 2] ?? 0;
         const base = lo.cbase[k] ?? 0;
         for (let i = 0; i < gc; i++) {
-          const gj = (q.slots[4 * s + 1] ?? 0) + i;
+          const gj =
+            (q.blockOffsets[k * q.blocks + Math.floor(s / 256)] ?? 0) +
+            (q.slots[4 * s + 1] ?? 0) +
+            i;
           const cj = (lv.slots.at[s] ?? 0) + i;
           if (gj >= (lo.ccap[k] ?? 0) || cj >= (lo.ccap[k] ?? 0)) continue;
           const go = (base + gj) * INSTANCE_WORDS;
@@ -215,8 +223,13 @@ export function runLensParity(title: string, preset: string, seeds: readonly num
             d > POS_TOL ||
             (outU[go + 2] ?? 0) !== (lv.out.u[co + 2] ?? 0) ||
             k !== (lv.slots.cls[s] ?? 0)
-          )
+          ) {
             instBad++;
+            if (badNote.length < 4)
+              badNote.push(
+                `s${String(s)} k${String(k)}/${String(lv.slots.cls[s])} gj${String(gj)} cj${String(cj)} g(${(out[go] ?? 0).toFixed(1)},${(out[go + 1] ?? 0).toFixed(1)},${String(outU[go + 2])}) c(${(lv.out.f[co] ?? 0).toFixed(1)},${(lv.out.f[co + 1] ?? 0).toFixed(1)},${String(lv.out.u[co + 2])})`,
+              );
+          }
         }
       }
       const gBranches = countBranches(q.curves);
@@ -246,7 +259,7 @@ export function runLensParity(title: string, preset: string, seeds: readonly num
           `grid max |Δ| ${vertWorst.toExponential(1)}, ${String(offDiff)} of ${String(binsTotal)} bins differ (${String(idTotal)} ids); ` +
           `images max |Δp| ${posWorst.toExponential(1)}, |Δμ| ${muWorst.toExponential(1)}; ` +
           `instances per class (GPU/CPU) ${perClass.join(' ')}, worst count ${(100 * worstCount).toFixed(3)}%, ` +
-          `${String(slotDiff)} slots differ in count, ${String(instBad)}/${String(instTotal)} instances out of tolerance (max ${instPosWorst.toExponential(1)} px); ` +
+          `${String(slotDiff)} slots differ in count [${slotDiffs.join(', ')}], ${String(instBad)}/${String(instTotal)} instances out of tolerance {${badNote.join('; ')}} (max ${instPosWorst.toExponential(1)} px); ` +
           `branches ${String(gBranches)}/${String(cBranches)}, drawn capsules ${String(gCaps)}/${String(lv.vectorCaps)}, quasar images ${String(nq)}/${String(lv.quasar.length)} (${String(quasarDiff)} off); ` +
           `${(performance.now() - t0).toFixed(0)} ms`,
       );

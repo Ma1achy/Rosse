@@ -453,6 +453,8 @@ export function countSlot(
   if (j >= (Q.imgN[m] ?? 0)) return 0;
   const o = m * LMARK_WORDS;
   const cls = M.u[o + 8] ?? 0;
+  // the drawings' anchors and curve points have images but emit no marks of their own
+  if (cls > LensCls.core) return 0;
   if (cls === LensCls.rstar || cls === LensCls.core) return 1;
   const u = randF32(seed, STREAM_LENS, (EMIT_INDEX + s) >>> 0, 0);
   if (cls === LensCls.knot || cls === LensCls.star) return u > f(0.55) ? 0 : 1;
