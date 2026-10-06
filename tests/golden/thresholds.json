@@ -1,5 +1,6 @@
 {
-  "about": "Golden thresholds (ADR 0013, as calibrated in ADR 0015). parity: the new engine against v21 (L2), per family; strict: the CPU engine against WebGPU (L1). Gated: ink, coarse SSIM (b′), widths, counts, and the moment and extent test (r25, r50, r90, outer ink, axis ratio q, position angle pa where the reference q < paBelowQ). Written by `npm run golden -- --calibrate`; the numbers behind them are in calibration.json and docs/milestones/m2/README.md. Families marked provisional have no engine yet.",
+  "about": "Golden thresholds (ADR 0013, as calibrated in ADR 0015 and amended by ADR 0018). keys: the K of the parity comparison, which sets v21 against the mean of each measure over K engine draws, and for which the parity thresholds are calibrated. parity: the new engine against v21 (L2), per family; strict: the CPU engine against WebGPU (L1), one draw each. Gated: ink, coarse SSIM (b′), widths, counts, and the moment and extent test (r25, r50, r90, outer ink, axis ratio q, position angle pa where the reference q < paBelowQ). Written by `npm run golden -- --calibrate`; the numbers behind them are in calibration.json and docs/milestones/m2/README.md. Families marked provisional have no engine yet.",
+  "keys": 6,
   "strict": {
     "ink": 0.005,
     "ssimCoarse": 0.98,
@@ -25,52 +26,67 @@
       "poisson": 3,
       "poissonBelow": 2000,
       "ink": 0.05,
-      "ssimCoarse": 0.88,
+      "ssimCoarse": 0.89,
       "median": 0.1,
       "p90": 0.1,
-      "r25": 0.041,
-      "r50": 0.046,
-      "r90": 0.051,
+      "r25": 0.028,
+      "r50": 0.029,
+      "r90": 0.055,
       "outer": 0.016,
-      "q": 0.037,
-      "qInner": 0.044,
-      "paA": 1.265,
-      "paEps0": 0.042,
+      "q": 0.034,
+      "qInner": 0.041,
+      "paA": 0.866,
+      "paEps0": 0.039,
       "byPreset": {
         "Grand design": {
-          "q": 0.038,
-          "qInner": 0.033,
-          "paEps0": 0.045
+          "q": 0.036,
+          "qInner": 0.039,
+          "paEps0": 0.044
         },
         "Barred spiral": {
-          "q": 0.034,
-          "qInner": 0.031,
+          "q": 0.033,
+          "qInner": 0.025,
           "paEps0": 0.037
         },
         "Flocculent": {
-          "q": 0.032,
-          "qInner": 0.045,
-          "paEps0": 0.034
+          "q": 0.039,
+          "qInner": 0.031,
+          "paEps0": 0.049
         },
         "Tightly wound": {
-          "q": 0.047,
-          "qInner": 0.054,
-          "paEps0": 0.054
+          "q": 0.02,
+          "qInner": 0.043,
+          "paEps0": 0.022
         },
         "Ringed": {
-          "q": 0.035,
-          "qInner": 0.046,
-          "paEps0": 0.038
+          "q": 0.039,
+          "qInner": 0.037,
+          "paEps0": 0.047
         },
         "Disc, no arms": {
-          "q": 0.04,
-          "qInner": 0.036,
-          "paEps0": 0.051
+          "q": 0.026,
+          "qInner": 0.041,
+          "paEps0": 0.031
         },
         "Edge-on with dust": {
-          "q": 0.03,
-          "qInner": 0.062,
-          "paEps0": 0.034
+          "q": 0.025,
+          "qInner": 0.045,
+          "paEps0": 0.032
+        },
+        "Dusty spiral": {
+          "q": 0.044,
+          "qInner": 0.047,
+          "paEps0": 0.052
+        },
+        "Loose, open arms": {
+          "q": 0.024,
+          "qInner": 0.027,
+          "paEps0": 0.03
+        },
+        "Hand wobble": {
+          "q": 0.023,
+          "qInner": 0.044,
+          "paEps0": 0.027
         }
       }
     },
@@ -83,34 +99,34 @@
       "ssimCoarse": 0.91,
       "median": 0.1,
       "p90": 0.1,
-      "r25": 0.037,
-      "r50": 0.056,
-      "r90": 0.09,
-      "outer": 0.019,
-      "q": 0.057,
-      "qInner": 0.039,
-      "paA": 1.374,
-      "paEps0": 0.061,
+      "r25": 0.031,
+      "r50": 0.041,
+      "r90": 0.077,
+      "outer": 0.017,
+      "q": 0.046,
+      "qInner": 0.034,
+      "paA": 1.015,
+      "paEps0": 0.051,
       "byPreset": {
         "Smooth, round": {
-          "q": 0.067,
-          "qInner": 0.032,
-          "paEps0": 0.068
+          "q": 0.047,
+          "qInner": 0.026,
+          "paEps0": 0.049
         },
         "Cigar-shaped": {
-          "q": 0.047,
-          "qInner": 0.039,
-          "paEps0": 0.061
+          "q": 0.046,
+          "qInner": 0.034,
+          "paEps0": 0.06
         },
         "Radio jet": {
-          "q": 0.041,
-          "qInner": 0.044,
-          "paEps0": 0.043
+          "q": 0.026,
+          "qInner": 0.034,
+          "paEps0": 0.028
         },
         "Shell galaxy": {
-          "q": 0.042,
-          "qInner": 0.049,
-          "paEps0": 0.047
+          "q": 0.048,
+          "qInner": 0.038,
+          "paEps0": 0.052
         }
       }
     },
@@ -189,6 +205,101 @@
       "paA": 2,
       "paEps0": 0.05,
       "provisional": true
+    },
+    "spiral@zoom": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.85,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.048,
+      "r50": 0.033,
+      "r90": 0.025,
+      "outer": 0.012,
+      "q": 0.037,
+      "qInner": 0.031,
+      "paA": 0.939,
+      "paEps0": 0.041,
+      "byPreset": {
+        "Grand design": {
+          "q": 0.036,
+          "qInner": 0.034,
+          "paEps0": 0.041
+        },
+        "Flocculent": {
+          "q": 0.054,
+          "qInner": 0.026,
+          "paEps0": 0.057
+        },
+        "Barred spiral": {
+          "q": 0.046,
+          "qInner": 0.028,
+          "paEps0": 0.05
+        },
+        "Disc, no arms": {
+          "q": 0.04,
+          "qInner": 0.045,
+          "paEps0": 0.045
+        },
+        "Tightly wound": {
+          "q": 0.033,
+          "qInner": 0.02,
+          "paEps0": 0.036
+        }
+      }
+    },
+    "smooth@zoom": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.9,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.037,
+      "r50": 0.041,
+      "r90": 0.044,
+      "outer": 0.012,
+      "q": 0.035,
+      "qInner": 0.039,
+      "paA": 0.863,
+      "paEps0": 0.039,
+      "byPreset": {
+        "Cigar-shaped": {
+          "q": 0.038,
+          "qInner": 0.039,
+          "paEps0": 0.049
+        },
+        "Smooth, round": {
+          "q": 0.031,
+          "qInner": 0.046,
+          "paEps0": 0.032
+        }
+      }
+    },
+    "lines": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.96,
+      "median": 0.1,
+      "p90": 0.138,
+      "r25": 0.128,
+      "r50": 0.064,
+      "r90": 0.132,
+      "outer": 0.02,
+      "q": 0.041,
+      "qInner": 0.053,
+      "paA": 1.651,
+      "paEps0": 0.052,
+      "heldOut": 56,
+      "byPreset": {}
     }
   }
 }

@@ -61,22 +61,27 @@ async function main(): Promise<void> {
     console.error('WebGPU error:', e.error.message);
   });
   const assets = await BuiltAssets.load('/');
-  const names: AtlasName[] = ['dots', 'knots', 'stars', 'cores'];
-  const [atlases, paper] = await Promise.all([
+  const names: AtlasName[] = ['dots', 'knots', 'stars', 'cores', 'pieces', 'strokes'];
+  const [atlases, paper, penlines] = await Promise.all([
     Promise.all(names.map((n) => assets.atlas(n))),
     assets.paper(),
+    assets.vector('penlines'),
   ]);
   const by = (n: string) => {
     const a = atlases.find((x) => x.name === n);
     if (!a) throw new Error(`atlas ${n} missing`);
     return a;
   };
-  const meta = drawingsMeta({
-    dots: by('dots'),
-    knots: by('knots'),
-    stars: by('stars'),
-    cores: by('cores'),
-  });
+  const meta = drawingsMeta(
+    {
+      dots: by('dots'),
+      knots: by('knots'),
+      stars: by('stars'),
+      cores: by('cores'),
+      strokes: by('strokes'),
+    },
+    penlines,
+  );
   const renderer = new GpuRenderer(device, { plateCss: 800, dpr: 1 }, paper);
   for (const a of atlases) renderer.addAtlas(a);
   const stipple = GpuStipple.create(device);
@@ -89,8 +94,8 @@ async function main(): Promise<void> {
       const cam = cameraOf(P, zoom);
       stipple.setScene(scene);
       stipple.setView(cam);
-      const layers: InkLayer[] = [...stipple.layers()];
-      const cores = coreInstances(P, meta, cam);
+      const layers: InkLayer[] = [...stipple.lineLayers(), ...stipple.layers()];
+      const cores = coreInstances(P, meta, cam, scene.galaxy.noise);
       if (cores.length) layers.push({ kind: 'sprites', atlas: 'cores', gain: 1, instances: cores });
       renderer.setLayers(layers);
       renderer.drawInk();

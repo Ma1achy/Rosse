@@ -393,6 +393,592 @@
       "pageErrors": 0
     },
     {
+      "name": "barred-spiral--lines__s101__home",
+      "preset": "Barred spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon",
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 101,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "a4bbe6a2f847c209dd141c939f8e15dc47c323e9b566ca51eb4f16740f3b89da",
+      "captured": "2026-10-06T15:18:01.088Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 242,
+        "knots": 114,
+        "stars": 0,
+        "curves": 5,
+        "used": 55,
+        "ms": 490
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--lines__s101__orbit",
+      "preset": "Barred spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon",
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 101,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "5742a4fb3cad1b3a4f05359f41ed47c26a2711ea035640aab14247d7ed3a17a1",
+      "captured": "2026-10-06T15:18:03.030Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 242,
+        "knots": 114,
+        "stars": 0,
+        "curves": 5,
+        "used": 55,
+        "ms": 12
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--lines__s11__home",
+      "preset": "Barred spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon",
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 11,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "cd772b01ee3d025e273416e27c5a02889e6d2fc1f73f7a2c3eeabb3d549e7e85",
+      "captured": "2026-10-06T15:18:01.185Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 169,
+        "knots": 82,
+        "stars": 0,
+        "curves": 7,
+        "used": 58,
+        "ms": 25
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--lines__s11__orbit",
+      "preset": "Barred spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon",
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 11,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "ec0531bfeb4a94efdfce4cde45774d3152cca33941f34968fbf8c30f797b0712",
+      "captured": "2026-10-06T15:18:03.363Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 169,
+        "knots": 82,
+        "stars": 0,
+        "curves": 7,
+        "used": 58,
+        "ms": 13
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--lines__s23__home",
+      "preset": "Barred spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon",
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 23,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "6fa21d91330817365dca7682f7f2eaf5be8d081888fbf9bded39a996b24189e3",
+      "captured": "2026-10-06T15:18:01.320Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 219,
+        "knots": 89,
+        "stars": 0,
+        "curves": 6,
+        "used": 59,
+        "ms": 12
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--lines__s23__orbit",
+      "preset": "Barred spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon",
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 23,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "2e7cd3c663e9d69c46724330ec701596e0313328ed2942b03e94d4fef59a1af0",
+      "captured": "2026-10-06T15:18:03.391Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 219,
+        "knots": 89,
+        "stars": 0,
+        "curves": 6,
+        "used": 59,
+        "ms": 9
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--lines__s3__home",
+      "preset": "Barred spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon",
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 3,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "69018c4f75f6d574f6c6aacf18aa8b32105aadef447ef7f013a1852cac5e7bf2",
+      "captured": "2026-10-06T15:18:01.402Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 302,
+        "knots": 127,
+        "stars": 0,
+        "curves": 4,
+        "used": 50,
+        "ms": 10
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--lines__s3__orbit",
+      "preset": "Barred spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon",
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 3,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "1f1759cb4651d5f4229da62c2dfa39699dfca321f878699b176a5055e0847511",
+      "captured": "2026-10-06T15:18:03.332Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 302,
+        "knots": 127,
+        "stars": 0,
+        "curves": 4,
+        "used": 50,
+        "ms": 14
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--lines__s4242__home",
+      "preset": "Barred spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon",
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "a10279f60dff661f8625dd1312019f27847de2a3227e3ef6a85d08a7d13bb683",
+      "captured": "2026-10-06T15:17:45.744Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 272,
+        "knots": 96,
+        "stars": 0,
+        "curves": 5,
+        "used": 53,
+        "ms": 16
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--lines__s4242__orbit",
+      "preset": "Barred spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon",
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "08d1d993f5911a32b0382c336bc4e615ae21f3d8f455840fc4b632bfc724578f",
+      "captured": "2026-10-06T15:17:47.337Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 272,
+        "knots": 96,
+        "stars": 0,
+        "curves": 5,
+        "used": 53,
+        "ms": 28
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--lines__s7__home",
+      "preset": "Barred spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon",
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "3deb386b196eb35ad66dc91c9eae577571d6c586672c4636e561760ace1e074c",
+      "captured": "2026-10-06T15:17:44.371Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 359,
+        "knots": 146,
+        "stars": 0,
+        "curves": 6,
+        "used": 57,
+        "ms": 50
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--lines__s7__orbit",
+      "preset": "Barred spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon",
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "f03a52fd68ea46814dab5f6b1d6c1e1270f3dd5acdae6af188016b3df6221191",
+      "captured": "2026-10-06T15:17:47.272Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 359,
+        "knots": 146,
+        "stars": 0,
+        "curves": 6,
+        "used": 57,
+        "ms": 23
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--ribbons__s4242__home",
+      "preset": "Barred spiral",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon"
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "8c6b111d2e71223f16ad6a32f4af5da8e428d5aadd1bc70b9f6b9c953fe6a7cf",
+      "captured": "2026-10-06T11:00:25.528Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 9373,
+        "knots": 128,
+        "stars": 12,
+        "curves": 5,
+        "used": 63,
+        "ms": 109
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--ribbons__s4242__orbit",
+      "preset": "Barred spiral",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon"
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "1a96916cae5fe80c774bb87400047d1f2e94fdb91c4031d7fb3877923b29d1d1",
+      "captured": "2026-10-06T11:00:29.947Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 9309,
+        "knots": 132,
+        "stars": 11,
+        "curves": 5,
+        "used": 61,
+        "ms": 121
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--ribbons__s4242__zoom",
+      "preset": "Barred spiral",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon"
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "a18be0583a211a1fdde9455d608f1fcaf94dda176bb7ad6bad401e28cfd5b32c",
+      "captured": "2026-10-06T11:00:44.617Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 9373,
+        "knots": 128,
+        "stars": 12,
+        "curves": 5,
+        "used": 63,
+        "ms": 160
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--ribbons__s7__home",
+      "preset": "Barred spiral",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon"
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "b22c597aaac9c32045d4ace5d322f4ddd448fc8e6007b22cbc27bc7038c97616",
+      "captured": "2026-10-06T11:00:25.570Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 9564,
+        "knots": 177,
+        "stars": 9,
+        "curves": 6,
+        "used": 62,
+        "ms": 122
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--ribbons__s7__orbit",
+      "preset": "Barred spiral",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon"
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "c4176ba9ed5f77526c20ce57be822a5a6a7f6643eb4be5af81e0f7cf6b302f95",
+      "captured": "2026-10-06T11:00:29.891Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 9535,
+        "knots": 167,
+        "stars": 9,
+        "curves": 6,
+        "used": 60,
+        "ms": 126
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--ribbons__s7__zoom",
+      "preset": "Barred spiral",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "barStyle": "ribbon",
+        "ringStyle": "ribbon"
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "25d04484c0866d3754d41f92b2a99ed3f976d6c92c2267695a552ed67cb0c252",
+      "captured": "2026-10-06T11:00:44.662Z",
+      "stats": {
+        "rstars": 9,
+        "dots": 9564,
+        "knots": 177,
+        "stars": 9,
+        "curves": 6,
+        "used": 62,
+        "ms": 143
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "cigar-shaped__s4242__home",
       "preset": "Cigar-shaped",
       "seed": 4242,
@@ -1121,6 +1707,556 @@
       "pageErrors": 0
     },
     {
+      "name": "dusty-spiral--lines__s101__home",
+      "preset": "Dusty spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 101,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "8c8fb5c1fd424f00ae3f96caa3fd3e3adc3bbe11468059b735a94b704b981a39",
+      "captured": "2026-10-06T15:19:38.828Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 217,
+        "knots": 72,
+        "stars": 0,
+        "curves": 3,
+        "used": 40,
+        "ms": 8
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--lines__s101__orbit",
+      "preset": "Dusty spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 101,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "7a127477a8a7c454539c0f1147fb872faf63c5343a794b651d45676274e72f10",
+      "captured": "2026-10-06T15:19:41.451Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 217,
+        "knots": 72,
+        "stars": 0,
+        "curves": 3,
+        "used": 40,
+        "ms": 6
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--lines__s11__home",
+      "preset": "Dusty spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 11,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "e0879255700e8318e10de68fca85e9a0067a670ae3acb0dc785a011db0c6bc3b",
+      "captured": "2026-10-06T15:19:38.597Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 145,
+        "knots": 38,
+        "stars": 0,
+        "curves": 5,
+        "used": 38,
+        "ms": 12
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--lines__s11__orbit",
+      "preset": "Dusty spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 11,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "b167c5d616dfc6b99e0e8271cc8e16b6f7fa5ce498fb58832c969179535b2147",
+      "captured": "2026-10-06T15:19:40.871Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 145,
+        "knots": 38,
+        "stars": 0,
+        "curves": 5,
+        "used": 38,
+        "ms": 5
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--lines__s23__home",
+      "preset": "Dusty spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 23,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "a821a2aa7b30f8f1af598319a1af29261132f62bc26db8d80460e5dcfcd5aa16",
+      "captured": "2026-10-06T15:19:38.760Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 178,
+        "knots": 61,
+        "stars": 0,
+        "curves": 4,
+        "used": 40,
+        "ms": 6
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--lines__s23__orbit",
+      "preset": "Dusty spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 23,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "694091e89de9b2db33e466f7694cad151e6ff6c761e03ea02e972a3d62017016",
+      "captured": "2026-10-06T15:19:41.416Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 178,
+        "knots": 61,
+        "stars": 0,
+        "curves": 4,
+        "used": 40,
+        "ms": 13
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--lines__s3__home",
+      "preset": "Dusty spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 3,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "7b800fcc036fa24728556189ea86e8e020b941fb4e481764576577b25ef49c89",
+      "captured": "2026-10-06T15:19:29.766Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 275,
+        "knots": 93,
+        "stars": 0,
+        "curves": 2,
+        "used": 35,
+        "ms": 6
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--lines__s3__orbit",
+      "preset": "Dusty spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 3,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "06c1aa792aba3bbf0fd796a328069d9c5022c9830c1b22dff4a85d8e8bdda863",
+      "captured": "2026-10-06T15:19:32.091Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 275,
+        "knots": 93,
+        "stars": 0,
+        "curves": 2,
+        "used": 35,
+        "ms": 14
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--lines__s4242__home",
+      "preset": "Dusty spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "fdb68ac61f8b308aba72495292eed6b930611a2d9e4a43bf178ccefee5d83daa",
+      "captured": "2026-10-06T15:19:23.734Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 230,
+        "knots": 73,
+        "stars": 0,
+        "curves": 3,
+        "used": 37,
+        "ms": 5
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--lines__s4242__orbit",
+      "preset": "Dusty spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "7085a3feebe5b00b5822cbfe43b6fe287acedd1daa6668d6e63b0af4581e5304",
+      "captured": "2026-10-06T15:19:25.720Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 230,
+        "knots": 73,
+        "stars": 0,
+        "curves": 3,
+        "used": 37,
+        "ms": 8
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--lines__s7__home",
+      "preset": "Dusty spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "c1f374de98eb002fd91e4f4301896b0210c8049038ea0ab0d54638bccc238f90",
+      "captured": "2026-10-06T15:19:23.973Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 337,
+        "knots": 100,
+        "stars": 0,
+        "curves": 4,
+        "used": 39,
+        "ms": 10
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--lines__s7__orbit",
+      "preset": "Dusty spiral",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "df04e8c018f2fbe2b4edbf3e5ceaa88e44279dcc1bde7bfa61f89dca3a6d4f01",
+      "captured": "2026-10-06T15:19:26.791Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 337,
+        "knots": 100,
+        "stars": 0,
+        "curves": 4,
+        "used": 39,
+        "ms": 5
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--ribbons__s4242__home",
+      "preset": "Dusty spiral",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "1c4b6737dbd44fab2f293632c3c4fd2d17194ccf3930d37f5f59502bb5e02d11",
+      "captured": "2026-10-06T11:02:01.438Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 8005,
+        "knots": 147,
+        "stars": 20,
+        "curves": 3,
+        "used": 51,
+        "ms": 104
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--ribbons__s4242__orbit",
+      "preset": "Dusty spiral",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "f4adee01137bb98c2b2054527570dae9b3033de2aafd1fd6c3bc7a4c1b279813",
+      "captured": "2026-10-06T11:02:12.345Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 7704,
+        "knots": 137,
+        "stars": 14,
+        "curves": 3,
+        "used": 47,
+        "ms": 120
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--ribbons__s4242__zoom",
+      "preset": "Dusty spiral",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "57e2307d605afc9173644b9acde5070f3c3183c4b86193f5b069aadefd3e3fd4",
+      "captured": "2026-10-06T11:02:22.531Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 8568,
+        "knots": 173,
+        "stars": 25,
+        "curves": 3,
+        "used": 52,
+        "ms": 61
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--ribbons__s7__home",
+      "preset": "Dusty spiral",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "6c8dfbe81372d0425a9a5281d2695ea303627d4a1905a44239cb6c19708ac657",
+      "captured": "2026-10-06T11:02:01.602Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 8270,
+        "knots": 168,
+        "stars": 14,
+        "curves": 4,
+        "used": 49,
+        "ms": 96
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--ribbons__s7__orbit",
+      "preset": "Dusty spiral",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "f2ffa16cde440b40bfd34bb19153e56eb64568ba1d349c05d7deb30ead66b6ae",
+      "captured": "2026-10-06T11:02:08.464Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 8047,
+        "knots": 156,
+        "stars": 14,
+        "curves": 4,
+        "used": 50,
+        "ms": 125
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--ribbons__s7__zoom",
+      "preset": "Dusty spiral",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "8db505a6ed883dc2dc1d76aa03eadae4921ad3c464c5c8c8f0d3a52ba6396ce2",
+      "captured": "2026-10-06T11:02:16.941Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 8861,
+        "knots": 169,
+        "stars": 18,
+        "curves": 4,
+        "used": 52,
+        "ms": 48
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "edge-on-with-dust__s4242__home",
       "preset": "Edge-on with dust",
       "seed": 4242,
@@ -1265,6 +2401,556 @@
       "pageErrors": 0
     },
     {
+      "name": "flocculent--lines__s101__home",
+      "preset": "Flocculent",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 101,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "823bf6673f850deb4abd7bf22b5b8c320cee0d01ca1782af338d9a27a86ee8c9",
+      "captured": "2026-10-06T15:18:34.583Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 266,
+        "knots": 89,
+        "stars": 0,
+        "curves": 16,
+        "used": 47,
+        "ms": 10
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--lines__s101__orbit",
+      "preset": "Flocculent",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 101,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "eb4be4923927f97f2275b30d5663b73b26bd55935cbaf0806d6a7bec0639baa0",
+      "captured": "2026-10-06T15:18:36.130Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 266,
+        "knots": 89,
+        "stars": 0,
+        "curves": 16,
+        "used": 47,
+        "ms": 9
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--lines__s11__home",
+      "preset": "Flocculent",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 11,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "8ec4bea7d6ee3e18a273733039f4449f7d81928a9caeaa03b50b74f41c54099d",
+      "captured": "2026-10-06T15:18:16.627Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 147,
+        "knots": 39,
+        "stars": 0,
+        "curves": 19,
+        "used": 44,
+        "ms": 9
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--lines__s11__orbit",
+      "preset": "Flocculent",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 11,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "9756a22da222763f0b0e7bc8cb9db654b2af2cf61da3fd4c88e01139a5898730",
+      "captured": "2026-10-06T15:18:19.047Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 147,
+        "knots": 39,
+        "stars": 0,
+        "curves": 19,
+        "used": 44,
+        "ms": 21
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--lines__s23__home",
+      "preset": "Flocculent",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 23,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "d23ce395f447b94815ec1e0268275bbb2ea38d574d1677d7fd13d93839494cc9",
+      "captured": "2026-10-06T15:18:26.713Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 190,
+        "knots": 64,
+        "stars": 0,
+        "curves": 17,
+        "used": 50,
+        "ms": 574
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--lines__s23__orbit",
+      "preset": "Flocculent",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 23,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "326e979aca0fcfc5836b759ba3b2061c3859fc6682a1c1e4d893bb6fc303754d",
+      "captured": "2026-10-06T15:18:33.388Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 190,
+        "knots": 64,
+        "stars": 0,
+        "curves": 17,
+        "used": 50,
+        "ms": 10
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--lines__s3__home",
+      "preset": "Flocculent",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 3,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "18ecd86a2fa0a958e394620e1e2020218cb087f895222a3903466ab6c7c56707",
+      "captured": "2026-10-06T15:18:16.850Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 270,
+        "knots": 91,
+        "stars": 0,
+        "curves": 19,
+        "used": 50,
+        "ms": 12
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--lines__s3__orbit",
+      "preset": "Flocculent",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 3,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "4f5c882725e843ae18e8c814270be45fbfb6e5827a28f8919a624a21ed39c3ff",
+      "captured": "2026-10-06T15:18:19.945Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 270,
+        "knots": 91,
+        "stars": 0,
+        "curves": 19,
+        "used": 50,
+        "ms": 14
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--lines__s4242__home",
+      "preset": "Flocculent",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "864475f2ec5ac64ea90f5844422e5bfece3a8a7a17a1b9c88c45244f01d3cd45",
+      "captured": "2026-10-06T15:18:16.970Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 313,
+        "knots": 99,
+        "stars": 0,
+        "curves": 17,
+        "used": 53,
+        "ms": 20
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--lines__s4242__orbit",
+      "preset": "Flocculent",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "77a8382a0ca7b69509528fd7c5c266c3eed69a30991045bdcda28f0518ebb96d",
+      "captured": "2026-10-06T15:18:19.651Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 313,
+        "knots": 99,
+        "stars": 0,
+        "curves": 17,
+        "used": 53,
+        "ms": 19
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--lines__s7__home",
+      "preset": "Flocculent",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "df991a7c59ad0644f03568a2bab7e98d8b75696e70a455ce214b6a2b285f121a",
+      "captured": "2026-10-06T15:18:16.818Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 157,
+        "knots": 38,
+        "stars": 0,
+        "curves": 17,
+        "used": 44,
+        "ms": 16
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--lines__s7__orbit",
+      "preset": "Flocculent",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "043bbf1aa84550cbbb2d96404e967e534fdeaf8e4f063bd0b38ace99132b8bb5",
+      "captured": "2026-10-06T15:18:19.618Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 157,
+        "knots": 38,
+        "stars": 0,
+        "curves": 17,
+        "used": 44,
+        "ms": 25
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--ribbons__s4242__home",
+      "preset": "Flocculent",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "038c595dcb22cbcbf8cd2913fedd55c72e2f5b2dc6228586bb23161c1aeb7501",
+      "captured": "2026-10-06T11:00:28.350Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9239,
+        "knots": 153,
+        "stars": 21,
+        "curves": 17,
+        "used": 67,
+        "ms": 51
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--ribbons__s4242__orbit",
+      "preset": "Flocculent",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "c934bf2e9c21240466e346d884552929f71834240e262b16978aebfb1964dc45",
+      "captured": "2026-10-06T11:00:33.280Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9137,
+        "knots": 156,
+        "stars": 21,
+        "curves": 17,
+        "used": 66,
+        "ms": 103
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--ribbons__s4242__zoom",
+      "preset": "Flocculent",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "2774328e86e710850f03cad01540421119271c47816c8253e76d12c89f0baad2",
+      "captured": "2026-10-06T11:00:44.713Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9239,
+        "knots": 153,
+        "stars": 21,
+        "curves": 17,
+        "used": 67,
+        "ms": 93
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--ribbons__s7__home",
+      "preset": "Flocculent",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "c054d12d19da74e9ec82dbe0fe04be2ae71a4d931392a0188b91dad88b53495b",
+      "captured": "2026-10-06T11:00:25.497Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9115,
+        "knots": 62,
+        "stars": 14,
+        "curves": 17,
+        "used": 56,
+        "ms": 124
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--ribbons__s7__orbit",
+      "preset": "Flocculent",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "1b311014b4c19251a9e46c00119594549d1e72b7154da73f7edd4a27d27891b3",
+      "captured": "2026-10-06T11:00:30.529Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9014,
+        "knots": 76,
+        "stars": 12,
+        "curves": 17,
+        "used": 56,
+        "ms": 140
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--ribbons__s7__zoom",
+      "preset": "Flocculent",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "3146d0bc02cb54e66821c97334825f7e8fd00b91570194448e598713406444ef",
+      "captured": "2026-10-06T11:00:43.949Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9115,
+        "knots": 62,
+        "stars": 14,
+        "curves": 17,
+        "used": 56,
+        "ms": 100
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "grand-design__s4242__home",
       "preset": "Grand design",
       "seed": 4242,
@@ -1373,6 +3059,556 @@
       "pageErrors": 0
     },
     {
+      "name": "grand-design--lines__s101__home",
+      "preset": "Grand design",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 101,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "2a2ac9cebbb52167aa8026423add58c67ea34be5d7767945caa835c0acf7c25e",
+      "captured": "2026-10-06T15:17:44.873Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 217,
+        "knots": 72,
+        "stars": 0,
+        "curves": 3,
+        "used": 39,
+        "ms": 18
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--lines__s101__orbit",
+      "preset": "Grand design",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 101,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "10c66547c67e02d34447f91d105914db238bbab93aed7d5dc8e568d4cbb5d095",
+      "captured": "2026-10-06T15:17:47.302Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 217,
+        "knots": 72,
+        "stars": 0,
+        "curves": 3,
+        "used": 39,
+        "ms": 8
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--lines__s11__home",
+      "preset": "Grand design",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 11,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "58a2a7a53d08d1e0ecae4d4c8d3db2d0cf38ac4367677fcf1508f09b07af95a4",
+      "captured": "2026-10-06T15:17:24.484Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 145,
+        "knots": 38,
+        "stars": 0,
+        "curves": 5,
+        "used": 37,
+        "ms": 9
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--lines__s11__orbit",
+      "preset": "Grand design",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 11,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "b16c29cffeca0dfde9c9a4e82e7d75ca01d2d72d87fcacde5534ffb8710b643f",
+      "captured": "2026-10-06T15:17:29.281Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 145,
+        "knots": 38,
+        "stars": 0,
+        "curves": 5,
+        "used": 37,
+        "ms": 12
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--lines__s23__home",
+      "preset": "Grand design",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 23,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "949c5f967ee102834ab809c5a55ce258310a28b48a17a7818679dab9a1c6fc4b",
+      "captured": "2026-10-06T15:17:43.548Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 178,
+        "knots": 61,
+        "stars": 0,
+        "curves": 4,
+        "used": 39,
+        "ms": 7
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--lines__s23__orbit",
+      "preset": "Grand design",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 23,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "bc41fc012ce2c13fb11c79f2a2d203adcb6b909f07f1302418b8ea94b68cc7cb",
+      "captured": "2026-10-06T15:17:46.703Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 178,
+        "knots": 61,
+        "stars": 0,
+        "curves": 4,
+        "used": 39,
+        "ms": 16
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--lines__s3__home",
+      "preset": "Grand design",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 3,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "a598fb22cf62a507ccf7ac1f7c1893d1dd8eb5bdda414690b2f52f38bcf2dc0b",
+      "captured": "2026-10-06T15:17:30.086Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 275,
+        "knots": 93,
+        "stars": 0,
+        "curves": 2,
+        "used": 33,
+        "ms": 22
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--lines__s3__orbit",
+      "preset": "Grand design",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 3,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "bd60bc7aed2a435032595ccdb94d282f211ab1877090b5a9f441f6bddcfda811",
+      "captured": "2026-10-06T15:17:31.230Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 275,
+        "knots": 93,
+        "stars": 0,
+        "curves": 2,
+        "used": 33,
+        "ms": 9
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--lines__s4242__home",
+      "preset": "Grand design",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "663d7cdb7c124612da75f96a85e5be1318cf919710319bf4bb854efa9afdfdbc",
+      "captured": "2026-10-06T15:17:29.097Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 230,
+        "knots": 73,
+        "stars": 0,
+        "curves": 3,
+        "used": 36,
+        "ms": 15
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--lines__s4242__orbit",
+      "preset": "Grand design",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "a352e0f9bd4e55952cc950f835662d35e929f06f252b166cf19c84a831d989ee",
+      "captured": "2026-10-06T15:17:30.827Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 230,
+        "knots": 73,
+        "stars": 0,
+        "curves": 3,
+        "used": 36,
+        "ms": 9
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--lines__s7__home",
+      "preset": "Grand design",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "54e02ff4479915c43693edb6b1e3ead53d664547297924e2ec670289740b5a7d",
+      "captured": "2026-10-06T15:17:29.243Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 337,
+        "knots": 100,
+        "stars": 0,
+        "curves": 4,
+        "used": 37,
+        "ms": 8
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--lines__s7__orbit",
+      "preset": "Grand design",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "d9875a01f852790840f62ef3b74445b51f81453322448d2a0687ab30a6afd207",
+      "captured": "2026-10-06T15:17:31.196Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 337,
+        "knots": 100,
+        "stars": 0,
+        "curves": 4,
+        "used": 37,
+        "ms": 11
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--ribbons__s4242__home",
+      "preset": "Grand design",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "f8b5a755dac21138325d8b2e63f0d2af204e3d70118d3fd4e32b42d7566d3db3",
+      "captured": "2026-10-06T10:59:57.208Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9272,
+        "knots": 148,
+        "stars": 30,
+        "curves": 3,
+        "used": 53,
+        "ms": 73
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--ribbons__s4242__orbit",
+      "preset": "Grand design",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "364fa1a08d1ce6dc238040da3ac0d4edb36c22c51e970b8f3568cd43dc79b3ed",
+      "captured": "2026-10-06T11:00:03.139Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9189,
+        "knots": 161,
+        "stars": 28,
+        "curves": 3,
+        "used": 53,
+        "ms": 32
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--ribbons__s4242__zoom",
+      "preset": "Grand design",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "399afbce0c7a68290873c8b25719260b897a99d7d29a4ae7894fba97ef581b65",
+      "captured": "2026-10-06T11:00:06.894Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9272,
+        "knots": 148,
+        "stars": 30,
+        "curves": 3,
+        "used": 53,
+        "ms": 35
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--ribbons__s7__home",
+      "preset": "Grand design",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "46760a6288f5afda40c4d16d3e8e933984efab5196d577e8b271c64a6fb5b077",
+      "captured": "2026-10-06T10:59:50.237Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9492,
+        "knots": 175,
+        "stars": 22,
+        "curves": 4,
+        "used": 50,
+        "ms": 487
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--ribbons__s7__orbit",
+      "preset": "Grand design",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "92f9f88d6ab59a25c89afa60a562194096192bd3adc81b394780724a1410d8d2",
+      "captured": "2026-10-06T10:59:57.466Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9477,
+        "knots": 161,
+        "stars": 22,
+        "curves": 4,
+        "used": 50,
+        "ms": 95
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--ribbons__s7__zoom",
+      "preset": "Grand design",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "211d6ba5c60df6020ecd5e5f460bfcfa33bf24a0a36d505586bc70376cce4fba",
+      "captured": "2026-10-06T11:00:06.138Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9492,
+        "knots": 175,
+        "stars": 22,
+        "curves": 4,
+        "used": 50,
+        "ms": 59
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "grand-design--stipple-arms__s4242__home",
       "preset": "Grand design",
       "variant": "stipple-arms",
@@ -1390,6 +3626,7 @@
       "camera": "home",
       "surface": "paper",
       "inkPixelSha256": "a98426af8829e24ee47827b96852eb5d296f9335f11a387b507220c29e0d9368",
+      "captured": "2026-10-06T10:59:57.508Z",
       "stats": {
         "rstars": 0,
         "dots": 9470,
@@ -1397,7 +3634,7 @@
         "stars": 30,
         "curves": 0,
         "used": 41,
-        "ms": 13
+        "ms": 37
       },
       "pageErrors": 0
     },
@@ -1419,6 +3656,7 @@
       "camera": "orbit",
       "surface": "paper",
       "inkPixelSha256": "4067dd935d75a9b6e49e20efadfb6e564721fcf5f4e8b3b598fa1fb02443a701",
+      "captured": "2026-10-06T11:00:03.316Z",
       "stats": {
         "rstars": 0,
         "dots": 9470,
@@ -1426,7 +3664,7 @@
         "stars": 30,
         "curves": 0,
         "used": 41,
-        "ms": 18
+        "ms": 48
       },
       "pageErrors": 0
     },
@@ -1448,6 +3686,7 @@
       "camera": "home",
       "surface": "paper",
       "inkPixelSha256": "48b5e171530f1fda06459fb167058826f8d5df3a679a513967a95d5785577913",
+      "captured": "2026-10-06T10:59:57.797Z",
       "stats": {
         "rstars": 0,
         "dots": 9475,
@@ -1455,7 +3694,7 @@
         "stars": 25,
         "curves": 0,
         "used": 42,
-        "ms": 453
+        "ms": 56
       },
       "pageErrors": 0
     },
@@ -1477,6 +3716,7 @@
       "camera": "orbit",
       "surface": "paper",
       "inkPixelSha256": "4455612b02e71984d9a93557888efb1617560729eff14b0b3bb34bdc843f677e",
+      "captured": "2026-10-06T11:00:06.183Z",
       "stats": {
         "rstars": 0,
         "dots": 9475,
@@ -1484,7 +3724,7 @@
         "stars": 25,
         "curves": 0,
         "used": 42,
-        "ms": 29
+        "ms": 39
       },
       "pageErrors": 0
     },
@@ -1629,6 +3869,556 @@
         "curves": 5,
         "used": 104,
         "ms": 232
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--lines__s101__home",
+      "preset": "Hand wobble",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 101,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "973ba568ffd7b98b82ef43c055d0fec229e3e96774c7a293d14894c06e42534c",
+      "captured": "2026-10-06T15:20:05.924Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 108,
+        "knots": 38,
+        "stars": 0,
+        "curves": 3,
+        "used": 42,
+        "ms": 31
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--lines__s101__orbit",
+      "preset": "Hand wobble",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 101,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "ce95cc476be71c0549853257ce37003e8ce79ae97b2eecebe512391edb6fd10b",
+      "captured": "2026-10-06T15:20:06.407Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 108,
+        "knots": 38,
+        "stars": 0,
+        "curves": 3,
+        "used": 42,
+        "ms": 7
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--lines__s11__home",
+      "preset": "Hand wobble",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 11,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "0933ad0dac50968c710275e05603bc76b47e01a4418d9f9110d8bc2177b540e9",
+      "captured": "2026-10-06T15:19:56.265Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 253,
+        "knots": 79,
+        "stars": 0,
+        "curves": 4,
+        "used": 43,
+        "ms": 7
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--lines__s11__orbit",
+      "preset": "Hand wobble",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 11,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "ab56073cd802ea9090c7b1b4c6819e9b9cb24e53cd2891717404a04b0e7de7eb",
+      "captured": "2026-10-06T15:19:59.516Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 253,
+        "knots": 79,
+        "stars": 0,
+        "curves": 4,
+        "used": 43,
+        "ms": 15
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--lines__s23__home",
+      "preset": "Hand wobble",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 23,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "9421e21319985e8d81edf231a453a0572e4445d73663e1c69928f60707e2a196",
+      "captured": "2026-10-06T15:20:02.427Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 165,
+        "knots": 59,
+        "stars": 0,
+        "curves": 3,
+        "used": 45,
+        "ms": 14
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--lines__s23__orbit",
+      "preset": "Hand wobble",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 23,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "be9b0d7bacaa3dd3463add27120da3cf5727cae8ca1567cb40dbc110e7e93fed",
+      "captured": "2026-10-06T15:20:03.435Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 165,
+        "knots": 59,
+        "stars": 0,
+        "curves": 3,
+        "used": 45,
+        "ms": 15
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--lines__s3__home",
+      "preset": "Hand wobble",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 3,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "ede03ba38f1af6f946b8e81c1ec599ca0e9c4debfba9c255317a29a3e52709cc",
+      "captured": "2026-10-06T15:19:56.352Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 91,
+        "knots": 30,
+        "stars": 0,
+        "curves": 6,
+        "used": 46,
+        "ms": 12
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--lines__s3__orbit",
+      "preset": "Hand wobble",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 3,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "b752f3c67cce586ce873545d39a5167bcf6e77c30fd73b75881053afc4a1f961",
+      "captured": "2026-10-06T15:19:59.489Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 91,
+        "knots": 30,
+        "stars": 0,
+        "curves": 6,
+        "used": 46,
+        "ms": 13
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--lines__s4242__home",
+      "preset": "Hand wobble",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "316729862dfef77d7d6abe2bc1e6a3128bd57f5ba0bbb1d988036e7f1fa29a00",
+      "captured": "2026-10-06T15:19:56.073Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 308,
+        "knots": 97,
+        "stars": 0,
+        "curves": 5,
+        "used": 44,
+        "ms": 17
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--lines__s4242__orbit",
+      "preset": "Hand wobble",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "96eef29fd03c482a08a6a7f55c1ca41411f3b60e2a7e9ef450bc2ea945ee4b52",
+      "captured": "2026-10-06T15:19:58.598Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 308,
+        "knots": 97,
+        "stars": 0,
+        "curves": 5,
+        "used": 44,
+        "ms": 13
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--lines__s7__home",
+      "preset": "Hand wobble",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "aa6704c4bf1d8e9a6e8f8248dd5bccc3d5bdc3e6851762d9a40b44be440b25d4",
+      "captured": "2026-10-06T15:19:45.357Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 180,
+        "knots": 46,
+        "stars": 0,
+        "curves": 5,
+        "used": 47,
+        "ms": 30
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--lines__s7__orbit",
+      "preset": "Hand wobble",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "34611c5f10e07f034550dd50430fc2ee2596247e3f0ba9d33ac1820f72c5218e",
+      "captured": "2026-10-06T15:19:47.756Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 180,
+        "knots": 46,
+        "stars": 0,
+        "curves": 5,
+        "used": 47,
+        "ms": 25
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--ribbons__s4242__home",
+      "preset": "Hand wobble",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "6f15202c62b7518638c9720b5a9162e1091fd63cad3387f05827095a8c97628c",
+      "captured": "2026-10-06T11:02:01.935Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9024,
+        "knots": 153,
+        "stars": 24,
+        "curves": 5,
+        "used": 55,
+        "ms": 141
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--ribbons__s4242__orbit",
+      "preset": "Hand wobble",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "fe6bff7271b5d90e5444ec5aae1b889d7dbe7874cd6cf21575ed91dda078e61f",
+      "captured": "2026-10-06T11:02:12.456Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 8975,
+        "knots": 149,
+        "stars": 27,
+        "curves": 5,
+        "used": 56,
+        "ms": 98
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--ribbons__s4242__zoom",
+      "preset": "Hand wobble",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "73d4aece388b1345a4f84ffe2b6ed386b75a0fc68cc2112c00375be976c382a4",
+      "captured": "2026-10-06T11:02:23.591Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9024,
+        "knots": 153,
+        "stars": 24,
+        "curves": 5,
+        "used": 55,
+        "ms": 52
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--ribbons__s7__home",
+      "preset": "Hand wobble",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "a4006b3fd65f9a700272a92ae15dcbc20ccf93757b24bb9fb076a70bba6becba",
+      "captured": "2026-10-06T11:02:02.172Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9228,
+        "knots": 128,
+        "stars": 21,
+        "curves": 5,
+        "used": 61,
+        "ms": 89
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--ribbons__s7__orbit",
+      "preset": "Hand wobble",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "05e38d4d5bde100f14f6be549cba895d079a1f5d7f1181606369863d761b4fa6",
+      "captured": "2026-10-06T11:02:12.868Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9159,
+        "knots": 129,
+        "stars": 24,
+        "curves": 5,
+        "used": 60,
+        "ms": 88
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--ribbons__s7__zoom",
+      "preset": "Hand wobble",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "d4787ff2b98ba9cc71e78b50110c239184692b41423bf4f97489891a8f16cff6",
+      "captured": "2026-10-06T11:02:23.543Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9228,
+        "knots": 128,
+        "stars": 21,
+        "curves": 5,
+        "used": 61,
+        "ms": 54
       },
       "pageErrors": 0
     },
@@ -2529,6 +5319,556 @@
         "curves": 4,
         "used": 91,
         "ms": 147
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--lines__s101__home",
+      "preset": "Loose, open arms",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 101,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "bf1e54a4daf1ac903df180e2b08ea1c81c186f5b85e6edc1a2216957b55ac8ca",
+      "captured": "2026-10-06T15:19:23.998Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 217,
+        "knots": 72,
+        "stars": 0,
+        "curves": 3,
+        "used": 39,
+        "ms": 40
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--lines__s101__orbit",
+      "preset": "Loose, open arms",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 101,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "ed5c64957af46534f4baa70e8cdad98a1f0fb936dda8be52099dac0a7980ba9f",
+      "captured": "2026-10-06T15:19:26.764Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 217,
+        "knots": 72,
+        "stars": 0,
+        "curves": 3,
+        "used": 39,
+        "ms": 5
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--lines__s11__home",
+      "preset": "Loose, open arms",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 11,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "ad97f61b2f21b5a4a44c05d7f81c5f35d619fd8cedde89e6c8b4d0e791eab58b",
+      "captured": "2026-10-06T15:19:07.871Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 145,
+        "knots": 38,
+        "stars": 0,
+        "curves": 5,
+        "used": 34,
+        "ms": 16
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--lines__s11__orbit",
+      "preset": "Loose, open arms",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 11,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "906e8cbd34b5097f3974000408694da59e20a89c51eac8e37d449db0c137b913",
+      "captured": "2026-10-06T15:19:10.002Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 145,
+        "knots": 38,
+        "stars": 0,
+        "curves": 5,
+        "used": 34,
+        "ms": 25
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--lines__s23__home",
+      "preset": "Loose, open arms",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 23,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "b2f6fcf280d1be731b8439806c779526c6aba8baa01c5a846b3e8fe1ff271b32",
+      "captured": "2026-10-06T15:19:13.461Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 178,
+        "knots": 61,
+        "stars": 0,
+        "curves": 4,
+        "used": 37,
+        "ms": 6
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--lines__s23__orbit",
+      "preset": "Loose, open arms",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 23,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "d4b6a2a2ba9c6299c9710edbed65b9435703281441ab91dd1a728e3bf36befa7",
+      "captured": "2026-10-06T15:19:16.002Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 178,
+        "knots": 61,
+        "stars": 0,
+        "curves": 4,
+        "used": 37,
+        "ms": 9
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--lines__s3__home",
+      "preset": "Loose, open arms",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 3,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "83fb35e2eb7557400903e29be3412db2cc4e7b52abfb71c5ea51bb3d421d776e",
+      "captured": "2026-10-06T15:19:07.900Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 275,
+        "knots": 93,
+        "stars": 0,
+        "curves": 2,
+        "used": 34,
+        "ms": 5
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--lines__s3__orbit",
+      "preset": "Loose, open arms",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 3,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "a4f3b0948b2f6ea089f258f60a314454b16a827cb272ba9903477983fcafe277",
+      "captured": "2026-10-06T15:19:09.966Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 275,
+        "knots": 93,
+        "stars": 0,
+        "curves": 2,
+        "used": 34,
+        "ms": 7
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--lines__s4242__home",
+      "preset": "Loose, open arms",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "b5720329ccc5c09e3ccf0915a1e25426790517612f1551ea57a86454cabf1794",
+      "captured": "2026-10-06T15:19:07.839Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 230,
+        "knots": 73,
+        "stars": 0,
+        "curves": 3,
+        "used": 36,
+        "ms": 9
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--lines__s4242__orbit",
+      "preset": "Loose, open arms",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "4ea0e0e8301d5767b3c2bf0a3eb08076085fd53baa4427f65c60feba37d8cdfe",
+      "captured": "2026-10-06T15:19:09.443Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 230,
+        "knots": 73,
+        "stars": 0,
+        "curves": 3,
+        "used": 36,
+        "ms": 17
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--lines__s7__home",
+      "preset": "Loose, open arms",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "8bac4dcf61ea0344526e55bf12b942f59225e2664d4b52b75a7edb0efd05d4c7",
+      "captured": "2026-10-06T15:18:58.198Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 337,
+        "knots": 100,
+        "stars": 0,
+        "curves": 4,
+        "used": 34,
+        "ms": 114
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--lines__s7__orbit",
+      "preset": "Loose, open arms",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "81a6c010a2c9db948e32d9a26c1fd8efd9050b194596d0c37e9b0f68df7f9e51",
+      "captured": "2026-10-06T15:19:00.494Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 337,
+        "knots": 100,
+        "stars": 0,
+        "curves": 4,
+        "used": 34,
+        "ms": 4
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--ribbons__s4242__home",
+      "preset": "Loose, open arms",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "4cc9283e12e2950a2cb5e54b6206974f8b1188a97df4ad299a879902d14a1118",
+      "captured": "2026-10-06T11:01:14.340Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9238,
+        "knots": 208,
+        "stars": 23,
+        "curves": 3,
+        "used": 49,
+        "ms": 5609
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--ribbons__s4242__orbit",
+      "preset": "Loose, open arms",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "d58110d8c2cc7c8497fa1abdb212eb2ccc69afce33f28cafd06b1e5a559cdd22",
+      "captured": "2026-10-06T11:01:19.533Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9210,
+        "knots": 200,
+        "stars": 20,
+        "curves": 3,
+        "used": 49,
+        "ms": 92
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--ribbons__s4242__zoom",
+      "preset": "Loose, open arms",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "7ca8d54745df6fea6a44b5f325639a1b0dd6f39b0887d38f636bec308de2e835",
+      "captured": "2026-10-06T11:01:35.390Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9238,
+        "knots": 208,
+        "stars": 23,
+        "curves": 3,
+        "used": 49,
+        "ms": 88
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--ribbons__s7__home",
+      "preset": "Loose, open arms",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "471ad40eb968667d0d01baf81186ea250a2e5380bbae07f5f945a2abedd7d93f",
+      "captured": "2026-10-06T11:01:13.251Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9285,
+        "knots": 219,
+        "stars": 22,
+        "curves": 4,
+        "used": 46,
+        "ms": 117
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--ribbons__s7__orbit",
+      "preset": "Loose, open arms",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "3d64196d0e1093536dca0aa8ad5e31d1d81a7cfadc66c07981b353dca59d9066",
+      "captured": "2026-10-06T11:01:19.395Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9257,
+        "knots": 213,
+        "stars": 23,
+        "curves": 4,
+        "used": 47,
+        "ms": 81
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--ribbons__s7__zoom",
+      "preset": "Loose, open arms",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "a179189f1cc361c59b419817a5a03d16343c38845bd4d1d0b8285f5aa55248bd",
+      "captured": "2026-10-06T11:01:35.340Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9285,
+        "knots": 219,
+        "stars": 22,
+        "curves": 4,
+        "used": 46,
+        "ms": 75
       },
       "pageErrors": 0
     },
@@ -4321,6 +7661,556 @@
         "ms": 124
       },
       "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--lines__s101__home",
+      "preset": "Tightly wound",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 101,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "0b259579136d0fac849034db6f27c0f8d0409156dbb11f8dbe25d396e91db60d",
+      "captured": "2026-10-06T15:18:50.868Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 108,
+        "knots": 38,
+        "stars": 0,
+        "curves": 3,
+        "used": 42,
+        "ms": 12
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--lines__s101__orbit",
+      "preset": "Tightly wound",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 101,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "a0922256798ddf397e3396444cdb7e08118abe4875b48046e0b3f118dd30aee3",
+      "captured": "2026-10-06T15:18:52.805Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 108,
+        "knots": 38,
+        "stars": 0,
+        "curves": 3,
+        "used": 42,
+        "ms": 12
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--lines__s11__home",
+      "preset": "Tightly wound",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 11,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "cb4ab690dd80d95202b886d4fc9e2a04dbab7c2b16a30d654b3f285db1446728",
+      "captured": "2026-10-06T15:18:50.551Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 253,
+        "knots": 79,
+        "stars": 0,
+        "curves": 4,
+        "used": 41,
+        "ms": 8
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--lines__s11__orbit",
+      "preset": "Tightly wound",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 11,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "9ef410c8ace2eec750a35ca479f7bf3109537dcd6812b09c555d720d2034abf0",
+      "captured": "2026-10-06T15:18:52.767Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 253,
+        "knots": 79,
+        "stars": 0,
+        "curves": 4,
+        "used": 41,
+        "ms": 8
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--lines__s23__home",
+      "preset": "Tightly wound",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 23,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "15da952e8bc719c872fc57d81db9b64bef485c95a5f01c263021050e5f4f0b05",
+      "captured": "2026-10-06T15:18:50.698Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 165,
+        "knots": 59,
+        "stars": 0,
+        "curves": 3,
+        "used": 45,
+        "ms": 26
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--lines__s23__orbit",
+      "preset": "Tightly wound",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 23,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "796cdf574480c9054832fd8c45732c1df492f0ebd133f5031b330ef7ba329881",
+      "captured": "2026-10-06T15:18:52.257Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 165,
+        "knots": 59,
+        "stars": 0,
+        "curves": 3,
+        "used": 45,
+        "ms": 19
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--lines__s3__home",
+      "preset": "Tightly wound",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 3,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "8e03ee5120ca9c2542bc9d81a16d245a3640dcc64d5c78d3da5a8ad711cc5363",
+      "captured": "2026-10-06T15:18:43.079Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 91,
+        "knots": 30,
+        "stars": 0,
+        "curves": 6,
+        "used": 44,
+        "ms": 14
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--lines__s3__orbit",
+      "preset": "Tightly wound",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "calibration": true,
+      "seed": 3,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "7e9dac2fc78d0ea72cb8227db86621c443434898e5547ca3aa68ff98618e7881",
+      "captured": "2026-10-06T15:18:46.661Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 91,
+        "knots": 30,
+        "stars": 0,
+        "curves": 6,
+        "used": 44,
+        "ms": 12
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--lines__s4242__home",
+      "preset": "Tightly wound",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "03854599069764e5c93e936d3d56bce2ae895168a8a72b9eb7634da14bc83be8",
+      "captured": "2026-10-06T15:18:34.967Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 308,
+        "knots": 97,
+        "stars": 0,
+        "curves": 5,
+        "used": 45,
+        "ms": 7
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--lines__s4242__orbit",
+      "preset": "Tightly wound",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "77ba7d80b8da4f8ff498c93c25fc22b9778499bd5da5c404e7623f506e04a59b",
+      "captured": "2026-10-06T15:18:36.543Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 308,
+        "knots": 97,
+        "stars": 0,
+        "curves": 5,
+        "used": 45,
+        "ms": 14
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--lines__s7__home",
+      "preset": "Tightly wound",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "e68d1cbe858b10111058272be6ee2cdd56531124909cc32805848e87707fc923",
+      "captured": "2026-10-06T15:18:35.003Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 180,
+        "knots": 46,
+        "stars": 0,
+        "curves": 5,
+        "used": 48,
+        "ms": 10
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--lines__s7__orbit",
+      "preset": "Tightly wound",
+      "variant": "lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0,
+        "stipple": 0,
+        "knots": 0,
+        "sparkle": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "27feb1cbd3ad3d042e9aee152a96d88f8a3bb0ef7c541b14444f2c6943832176",
+      "captured": "2026-10-06T15:18:36.571Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 180,
+        "knots": 46,
+        "stars": 0,
+        "curves": 5,
+        "used": 48,
+        "ms": 13
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--ribbons__s4242__home",
+      "preset": "Tightly wound",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "09e2b5f486e90ff7dba56551f2e7d9924c04debdfa6a3ff9dbe71c9761e67ae6",
+      "captured": "2026-10-06T11:01:12.965Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9229,
+        "knots": 162,
+        "stars": 22,
+        "curves": 5,
+        "used": 59,
+        "ms": 83
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--ribbons__s4242__orbit",
+      "preset": "Tightly wound",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "3bccab4ccddb347207d326ce0420b7f01875f0a048ae2832df1cedb13c6733f6",
+      "captured": "2026-10-06T11:01:19.346Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9193,
+        "knots": 161,
+        "stars": 20,
+        "curves": 5,
+        "used": 58,
+        "ms": 110
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--ribbons__s4242__zoom",
+      "preset": "Tightly wound",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "7337701c62bc16ac8a8bd155a04d0857c6e21ffe772b6286431e0c5f0a65e199",
+      "captured": "2026-10-06T11:01:35.259Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9229,
+        "knots": 162,
+        "stars": 22,
+        "curves": 5,
+        "used": 59,
+        "ms": 231
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--ribbons__s7__home",
+      "preset": "Tightly wound",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "690f05aa51415fa3d12237b22c741b52575ab53a92d82b5669c2c71cb94d6cbe",
+      "captured": "2026-10-06T11:01:12.310Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9306,
+        "knots": 101,
+        "stars": 15,
+        "curves": 5,
+        "used": 60,
+        "ms": 86
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--ribbons__s7__orbit",
+      "preset": "Tightly wound",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "b4f250da9ea58a802f4fc56ce4a845d7b7417a2fdea7e76eebf6c73f4b5910ab",
+      "captured": "2026-10-06T11:01:18.288Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9281,
+        "knots": 99,
+        "stars": 14,
+        "curves": 5,
+        "used": 59,
+        "ms": 59
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--ribbons__s7__zoom",
+      "preset": "Tightly wound",
+      "variant": "ribbons",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "bubbles": 0,
+        "whole": 0,
+        "envelope": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "4d21c0c3698d0c6a55a17afaf4e4d647bfdb2a6d195a56c2d68764a43be25e34",
+      "captured": "2026-10-06T11:01:33.802Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9306,
+        "knots": 101,
+        "stars": 15,
+        "curves": 5,
+        "used": 60,
+        "ms": 62
+      },
+      "pageErrors": 0
     }
   ],
   "extra": {
@@ -4332,7 +8222,7 @@
     },
     "runs": {
       "home": {
-        "generated": "2026-10-04T01:16:33.157Z",
+        "generated": "2026-10-06T15:20:06.766Z",
         "browser": {
           "name": "chromium",
           "version": "141.0.7390.37",
@@ -4344,7 +8234,7 @@
         }
       },
       "orbit": {
-        "generated": "2026-10-04T01:16:33.157Z",
+        "generated": "2026-10-06T15:20:06.766Z",
         "browser": {
           "name": "chromium",
           "version": "141.0.7390.37",
@@ -4356,7 +8246,7 @@
         }
       },
       "zoom": {
-        "generated": "2026-10-04T03:00:28.115Z",
+        "generated": "2026-10-06T11:02:24.643Z",
         "browser": {
           "name": "chromium",
           "version": "141.0.7390.37",

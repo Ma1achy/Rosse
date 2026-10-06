@@ -35,6 +35,8 @@ export const Stream = {
   dust: 13,
   /** Value-noise lattice (flocculence, patchiness). */
   noise: 14,
+  /** Star-forming knots strung along a ring (generate, app23.js:L282–288). */
+  ringKnots: 15,
 } as const;
 
 export type StreamName = keyof typeof Stream;

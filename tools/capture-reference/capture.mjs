@@ -20,7 +20,12 @@
  *             by default) and the file's cameras (home and orbit by default), plus the "zoom"
  *             camera (home at zoom 2, through __GEN.zoom) for the seeds a case lists in `zoom`.
  *             They are added to (or replaced in) the existing manifest, which records the file.
+ *   --only    presets, comma-separated, or separated by | when a name holds a comma
+ *             (--only "Grand design|Loose, open arms").
  *   --cameras capture only these cameras (comma-separated), e.g. --cameras zoom.
+ *   --variants  with --extra: only the cases of these variants (comma-separated).
+ *             A case with `"calibration": true` is captured and recorded as such: the golden
+ *             runner calibrates on it and does not gate it (held-out seeds, ADR 0018).
  *   --reroll  for calibration (ADR 0013): every preset at the home camera and again at az + 0.3°,
  *             which in v21 re-rolls the stipple when dust lanes are on (reference notes 20.1).
  *             Written to tests/golden/actual/reroll/ by default (not committed), with no manifest.
@@ -107,7 +112,7 @@ function serve() {
 
 /**
  * @typedef {{ preset: string, seed: number, chalk: boolean, variant?: string,
- *   overrides?: Record<string, unknown>, cameras: readonly string[] }} Job
+ *   overrides?: Record<string, unknown>, calibration?: boolean, cameras: readonly string[] }} Job
  */
 
 /**
@@ -204,6 +209,7 @@ async function captureJob(browser, url, job, out) {
       camera,
       surface: job.chalk ? 'chalkboard' : 'paper',
       ...(job.variant ? { variant: job.variant, overrides: job.overrides } : {}),
+      ...(job.calibration ? { calibration: true } : {}),
       sequence:
         camera === 'home' || camera === 'zoom'
           ? [
@@ -286,9 +292,8 @@ async function main() {
   mkdirSync(out, { recursive: true });
 
   const presets = readPresets();
-  const only = opt('--only')
-    ?.split(',')
-    .map((s) => s.trim());
+  const onlyArg = opt('--only');
+  const only = onlyArg?.split(onlyArg.includes('|') ? '|' : ',').map((s) => s.trim());
   const onlyCameras = opt('--cameras')
     ?.split(',')
     .map((s) => s.trim());
@@ -298,7 +303,8 @@ async function main() {
   if (extraFile) {
     /**
      * @type {{ cameras?: string[], cases: { preset: string, variant: string,
-     *   overrides: Record<string, unknown>, seeds?: number[], zoom?: number[] }[] }}
+     *   overrides: Record<string, unknown>, seeds?: number[], zoom?: number[],
+     *   calibration?: boolean }[] }}
      */
     const extra = JSON.parse(readFileSync(resolve(ROOT, extraFile), 'utf8'));
     const fileCams = extra.cameras ?? [...CAMERAS];
@@ -314,8 +320,12 @@ async function main() {
         throw new Error('the orbit camera needs the home camera');
       return cams;
     };
+    const variants = opt('--variants')
+      ?.split(',')
+      .map((s) => s.trim());
     jobs = extra.cases
       .filter((c) => !only || only.includes(c.preset))
+      .filter((c) => !variants || variants.includes(c.variant))
       .flatMap((c) => {
         if (!presets[c.preset]) throw new Error(`unknown preset ${c.preset}`);
         const { seeds, zoom, ...rest } = c;
@@ -381,6 +391,7 @@ async function main() {
     name: r.name,
     preset: r.preset,
     ...(r.variant ? { variant: r.variant, overrides: r.overrides } : {}),
+    ...(r.calibration ? { calibration: true } : {}),
     seed: r.seed,
     camera: r.camera,
     ...(r.zoom !== 1 ? { zoom: r.zoom } : {}),

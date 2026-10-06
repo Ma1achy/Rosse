@@ -11,17 +11,28 @@
  * optical depth is a view cull (./project.ts), which reads the uniform stored here in `u_tau`, so
  * orbiting never re-rolls the stipple (ADR 0004, 0010).
  *
- * Not yet here, with the slots they need:
- * - dust lanes and dust-carving pen lines (M4): view culls; they will read a second stored uniform
- *   (the reference draws `r()` for both, app23.js:L264–265);
- * - the breathing room round bright drawn stars (M7, with the drawn stars);
- * - ring knots and clumps (M4): their own passes after this one (app23.js:L282–297).
+ * The dust lanes and the dust-carving pen lines (app23.js:L264–265) are view culls too: a sample
+ * carries flags saying which apply to it (`lane` for the disc, `carve` for the disc, bar and ring),
+ * and ./project.ts filters it on per-sample uniforms of the `stippleCull` stream.
+ *
+ * After the proposals come the marks of the ring knots and clumps (app23.js:L282–297, groups
+ * described in src/model/clumps.ts): `sampleExtra`, the twin of stipple.wgsl's `extra` entry point.
+ *
+ * Not yet here: the breathing room round bright drawn stars (M7, with the drawn stars).
  */
 import { cosF, randGaussF, sinF, tanF } from '../../core/f32math';
 import { randF32 } from '../../core/rng';
 import { NoiseSalt, vnoise } from '../../core/noise';
 import { Stream } from '../../core/streams';
-import { GalaxyFlag, KNOT_POOL, SHAPE, type GalaxyDesc } from '../../model/galaxy';
+import {
+  GROUP_WORDS,
+  GalaxyFlag,
+  KNOT_POOL,
+  SHAPE,
+  sampleCount,
+  type GalaxyDesc,
+} from '../../model/galaxy';
+import { GROUP_STRIDE, GroupKind } from '../../model/clumps';
 import type { StructLayout } from '../../marks/instance';
 import { CLASS_COUNT, Cls, SampleFlag } from '../../model/classes';
 
@@ -53,12 +64,13 @@ class Rng {
   constructor(
     readonly seed: number,
     readonly i: number,
+    readonly stream: number = Stream.stipple,
   ) {}
   next(): number {
-    return randF32(this.seed, Stream.stipple, this.i, this.d++);
+    return randF32(this.seed, this.stream, this.i, this.d++);
   }
   gauss(): number {
-    const g = randGaussF(this.seed, Stream.stipple, this.i, this.d);
+    const g = randGaussF(this.seed, this.stream, this.i, this.d);
     this.d += 2;
     return g;
   }
@@ -138,6 +150,7 @@ export function armProfile(G: GalaxyDesc, R: number, th: number): number {
       f(f(th - armPhase(G, R, 0)) * f(1.6)),
       g.seed,
       NoiseSalt.flocc,
+      G.noise,
     );
     fv = f(fv * f(f(1 - flocc) + f(flocc * Math.max(0, f(f(n - f(0.35)) * f(2.2))))));
   }
@@ -301,7 +314,7 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
       th = f(TAU * r.next());
       rt++;
       if (rt >= 6) break;
-      const nz = vnoise(f(cos(th) * f(2.2)), f(sin(th) * f(2.2)), g.seed, NoiseSalt.ring);
+      const nz = vnoise(f(cos(th) * f(2.2)), f(sin(th) * f(2.2)), g.seed, NoiseSalt.ring, G.noise);
       if (!(r.next() > f(f(0.45) + f(f(0.55) * nz)))) break;
     }
     const R = f(g.ring_r * f(1 + f(r.gauss() * f(0.035))));
@@ -327,6 +340,7 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
           f(f(R2 * sin(th2)) * f(1.4)),
           g.seed,
           NoiseSalt.patchy,
+          G.noise,
         );
         if (r.next() > f(f(1 - patchy) + f(f(patchy * pow(nz, f(2.2))) * f(2.2)))) continue;
       }
@@ -345,6 +359,7 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
         f(f(R2 * sin(th2)) * f(1.3)),
         g.seed,
         NoiseSalt.irr,
+        G.noise,
       );
       if (r.next() > f(f(0.5) + f(f(1.1) * Math.max(0, f(nz - f(0.3)))))) {
         none();
@@ -377,7 +392,8 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
     }
   }
 
-  let flagsOut = 0;
+  // the view culls of the dust lanes (disc) and the carving lines (disc, bar, ring)
+  let flagsOut = comp === 4 ? SampleFlag.lane | SampleFlag.carve : comp >= 2 ? SampleFlag.carve : 0;
   let uTau = 0;
   if (g.dust > 0 && comp !== 1) {
     // the extinction cull's random number, stored for the view tier (app23.js:L262)
@@ -413,12 +429,104 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
   put(px, py, pz, cls | flagsOut, t, size, f(r.next() * f(6.28)), uTau);
 }
 
-/** Runs the kernel over every sample: the model tier's output, SAMPLE_WORDS words per sample. */
+/**
+ * Writes extra sample `j` (a ring knot's or a clump's mark, app23.js:L282–297) at index `n + j`, as
+ * stipple.wgsl's `extra` entry point does. Its group is found by binary search on the groups'
+ * first sample; its draws are on the group's stream (ring knots or clumps), index
+ * `id · GROUP_STRIDE + local`, keyed by the placement key.
+ */
+export function sampleExtra(
+  j: number,
+  G: GalaxyDesc,
+  fo: Float32Array,
+  uo: Uint32Array,
+  gu: Uint32Array = new Uint32Array(G.groups),
+  gf: Float32Array = new Float32Array(G.groups),
+): void {
+  const g = G.g;
+  const o = (g.n + j) * SAMPLE_WORDS;
+  const ng = g.n_groups;
+  // the last group whose first sample is at or before j
+  let lo = 0;
+  let hi = ng;
+  while (hi - lo > 1) {
+    const mid = (lo + hi) >>> 1;
+    if ((gu[mid * GROUP_WORDS + 4] ?? 0) <= j) lo = mid;
+    else hi = mid;
+  }
+  const go = lo * GROUP_WORDS;
+  const cx = gf[go] ?? 0;
+  const cy = gf[go + 1] ?? 0;
+  const cz = gf[go + 2] ?? 0;
+  const s = gf[go + 3] ?? 0;
+  const local = j - (gu[go + 4] ?? 0);
+  const count = gu[go + 5] ?? 0;
+  const tag = gu[go + 7] ?? 0;
+  const kind = tag & 0xff;
+  const ring = kind === GroupKind.ringKnots;
+  const r = new Rng(
+    g.key,
+    ((tag >>> 8) * GROUP_STRIDE + local) >>> 0,
+    ring ? Stream.ringKnots : Stream.clumps,
+  );
+  const put = (
+    x: number,
+    y: number,
+    z: number,
+    cls: number,
+    tile: number,
+    size: number,
+    rot: number,
+  ) => {
+    fo[o] = x;
+    fo[o + 1] = y;
+    fo[o + 2] = z;
+    uo[o + 3] = cls >>> 0;
+    uo[o + 4] = tile >>> 0;
+    fo[o + 5] = size;
+    fo[o + 6] = rot;
+    fo[o + 7] = 0;
+  };
+  if (local >= count) {
+    // a drawn star: at the ring knot's centre, or scattered over the clump (classified only)
+    if (ring) put(cx, cy, cz, Cls.rstar, 0, 0, 0);
+    else {
+      const ss = f(s * f(1.3));
+      const x = f(cx + f(r.gauss() * ss));
+      const y = f(cy + f(r.gauss() * ss));
+      put(x, y, 0, Cls.rstar, 0, 0, 0);
+    }
+    return;
+  }
+  const x = f(cx + f(r.gauss() * s));
+  const y = f(cy + f(r.gauss() * s));
+  const z = ring ? cz : f(cz + f(r.gauss() * f(0.02)));
+  if (r.next() < (ring ? f(0.5) : f(0.25))) {
+    const tile = G.pool[Math.min(KNOT_POOL - 1, Math.floor(f(r.next() * KNOT_POOL)))] ?? 0;
+    const size = f(f(3 + f(4 * r.next())) * g.pen_dot);
+    put(x, y, z, Cls.knot, tile, size, f(r.next() * f(6.28)));
+    return;
+  }
+  const n = g.n_dot_pool;
+  const t = G.pool[KNOT_POOL + Math.min(n - 1, Math.floor(f(r.next() * n)))] ?? 0;
+  const k = f((ring ? f(0.9) : f(0.8)) + f(f(0.5) * r.next()));
+  const size = f((G.dotBase[t] ?? 0) * k);
+  put(x, y, z, Cls.young, t, size, f(r.next() * f(6.28)));
+}
+
+/**
+ * Runs the kernel over every sample: the model tier's output, SAMPLE_WORDS words per sample. The
+ * proposals come first, then the ring knots' and clumps' marks.
+ */
 export function runStipple(G: GalaxyDesc): { f32: Float32Array; u32: Uint32Array; n: number } {
-  const n = G.g.n;
+  const n0 = G.g.n;
+  const n = sampleCount(G);
   const buf = new ArrayBuffer(Math.max(1, n) * SAMPLE_LAYOUT.size);
   const fo = new Float32Array(buf);
   const uo = new Uint32Array(buf);
-  for (let i = 0; i < n; i++) sampleStipple(i, G, fo, uo);
+  for (let i = 0; i < n0; i++) sampleStipple(i, G, fo, uo);
+  const gu = new Uint32Array(G.groups);
+  const gf = new Float32Array(G.groups);
+  for (let j = 0; j < n - n0; j++) sampleExtra(j, G, fo, uo, gu, gf);
   return { f32: fo, u32: uo, n };
 }

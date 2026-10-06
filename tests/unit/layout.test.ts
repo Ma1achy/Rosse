@@ -6,7 +6,17 @@ import { INSTANCE_LAYOUT, packInstances, type StructLayout } from '../../src/mar
 import { packStruct } from '../../src/gpu/buffers';
 import { SPRITE_UNIFORMS_LAYOUT } from '../../src/render/sprites';
 import { COMPOSITE_UNIFORMS_LAYOUT } from '../../src/render/composite';
-import { GALAXY_LAYOUT } from '../../src/model/galaxy';
+import { GALAXY_LAYOUT, GROUP_LAYOUT } from '../../src/model/galaxy';
+import { CULLS_LAYOUT } from '../../src/fallback/kernels/project';
+import {
+  CAPSULE_LAYOUT,
+  CURVE_LAYOUT,
+  CURVE_STATE_LAYOUT,
+  HATCH_LAYOUT,
+  RIBBON_SEG_LAYOUT,
+  RIB_LAYOUT,
+} from '../../src/model/ribbons';
+import { RIBBON_DRAW_LAYOUT } from '../../src/render/ribbon-pass';
 import { VIEW_LAYOUT } from '../../src/view/camera';
 import { SAMPLE_LAYOUT } from '../../src/fallback/kernels/stipple';
 
@@ -73,6 +83,27 @@ describe('struct layouts (WGSL = TS)', () => {
   it('the stipple passes write the Instance the sprite shader reads', () => {
     checkLayout('compute/project.wgsl', INSTANCE_LAYOUT);
     checkLayout('compute/scan.wgsl', INSTANCE_LAYOUT);
+  });
+
+  it('M4: ring knots and clumps, dust culls', () => {
+    checkLayout('compute/stipple.wgsl', GROUP_LAYOUT);
+    checkLayout('compute/project.wgsl', CULLS_LAYOUT);
+  });
+
+  it('M4: the line-work kernels and render pipelines', () => {
+    for (const l of [
+      RIB_LAYOUT,
+      CURVE_LAYOUT,
+      CURVE_STATE_LAYOUT,
+      HATCH_LAYOUT,
+      RIBBON_SEG_LAYOUT,
+      CAPSULE_LAYOUT,
+      INSTANCE_LAYOUT,
+    ])
+      checkLayout('compute/ribbons.wgsl', l);
+    checkLayout('render/ribbon.wgsl', RIBBON_SEG_LAYOUT);
+    checkLayout('render/ribbon.wgsl', CAPSULE_LAYOUT);
+    checkLayout('render/ribbon.wgsl', RIBBON_DRAW_LAYOUT);
   });
 
   it('packs uniform structs by layout', () => {

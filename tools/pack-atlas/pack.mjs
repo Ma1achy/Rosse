@@ -11,6 +11,9 @@
  * Also the plate's paper texture (assets/embedded-other/rosse_000_asset.png, the image in
  * head23.html's `.plate` rule) as raw RGBA8, so the GPU and CPU paths read identical bytes.
  *
+ * Also the vector drawings the engine reads so far (M4: `penlines`, the pen lines of the dust
+ * hatching), copied as JSON (records and sources only) to assets-built/vector/<name>.json.
+ *
  * Output: assets-built/atlas/<name>.bin (levels in order; within a level, layers in order, each
  * width × height bytes), assets-built/surface/paper.bin, and assets-built/index.json describing
  * them. Vite serves assets-built/ as its public directory, so the page fetches `index.json`.
@@ -23,12 +26,15 @@ import { join, relative, resolve } from 'node:path';
 import pngjs from 'pngjs';
 import { cutCells, mipChain } from './pack-lib.js';
 
-const PACKER_VERSION = 2;
+const PACKER_VERSION = 3;
 const ROOT = resolve(import.meta.dirname, '../..');
 const SHEETS = join(ROOT, 'assets/drawings/bitmap');
 const PAPER = join(ROOT, 'assets/embedded-other/rosse_000_asset.png');
 const OUT = join(ROOT, 'assets-built');
 const NAMES = ['dots', 'knots', 'stars', 'cores', 'fgstars', 'pieces', 'strokes'];
+/** Vector drawings the engine reads on the CPU so far (M4: the pen lines of the dust hatching). */
+const VECTORS = ['penlines'];
+const VECTOR_DIR = join(ROOT, 'assets/drawings/vector');
 
 /** @param {Buffer} b */
 const sha = (b) => createHash('sha256').update(b).digest('hex');
@@ -38,6 +44,7 @@ const rel = (p) => relative(ROOT, p).replaceAll('\\', '/');
 // the packer's own code counts as a source: a change to the mip filter rebuilds everything
 const sources = [
   ...NAMES.flatMap((n) => [`${n}.png`, `${n}.json`].map((f) => join(SHEETS, f))),
+  ...VECTORS.map((n) => join(VECTOR_DIR, `${n}.json`)),
   PAPER,
   join(import.meta.dirname, 'pack.mjs'),
   join(import.meta.dirname, 'pack-lib.js'),
@@ -52,6 +59,7 @@ if (existsSync(indexPath) && !process.argv.includes('--force')) {
     const files = [
       ...Object.values(old.atlases ?? {}).map((a) => /** @type {{ file: string }} */ (a).file),
       old.surfaces?.paper?.file,
+      ...Object.values(old.vectors ?? {}).map((a) => /** @type {{ file: string }} */ (a).file),
     ];
     const present = files.length > 1 && files.every((f) => f && existsSync(join(OUT, f)));
     if (old.packer === PACKER_VERSION && old.sourceHash === sourceHash && present) {
@@ -65,6 +73,7 @@ if (existsSync(indexPath) && !process.argv.includes('--force')) {
 
 mkdirSync(join(OUT, 'atlas'), { recursive: true });
 mkdirSync(join(OUT, 'surface'), { recursive: true });
+mkdirSync(join(OUT, 'vector'), { recursive: true });
 
 /** @type {Record<string, unknown>} */
 const atlases = {};
@@ -109,6 +118,23 @@ for (const name of NAMES) {
   );
 }
 
+// vector drawings: the records (lines, dots, blobs) and their sources, unchanged
+/** @type {Record<string, unknown>} */
+const vectors = {};
+for (const name of VECTORS) {
+  const bytes = readFileSync(join(VECTOR_DIR, `${name}.json`));
+  const v = JSON.parse(bytes.toString('utf8'));
+  const file = `vector/${name}.json`;
+  writeFileSync(join(OUT, file), JSON.stringify({ n: v.n, src: v.src, vec: v.vec }));
+  vectors[name] = {
+    file,
+    count: v.n,
+    source: rel(join(VECTOR_DIR, `${name}.json`)),
+    sha256: sha(bytes),
+  };
+  console.log(`${name.padEnd(8)} ${String(v.n).padStart(3)} vector records`);
+}
+
 const paperBytes = readFileSync(PAPER);
 const paper = pngjs.PNG.sync.read(paperBytes);
 writeFileSync(join(OUT, 'surface/paper.bin'), paper.data);
@@ -118,6 +144,7 @@ const index = {
   packer: PACKER_VERSION,
   sourceHash,
   atlases,
+  vectors,
   surfaces: {
     paper: {
       file: 'surface/paper.bin',

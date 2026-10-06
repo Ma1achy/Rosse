@@ -28,3 +28,5 @@ const CLASS_COUNT: u32 = 6u;
 
 const FLAG_SERSIC2D: u32 = 256u;
 const FLAG_TAU: u32 = 512u;
+const FLAG_LANE: u32 = 1024u;
+const FLAG_CARVE: u32 = 2048u;

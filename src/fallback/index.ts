@@ -11,7 +11,14 @@ import type { AtlasData, AtlasName, ImageData8 } from '../marks/atlas';
 import type { InkLayer } from '../render/layers';
 import { PLATE } from '../view/camera';
 import type { Surface } from '../render/surface';
-import { composite, createInkBuffer, rasteriseSprites, type InkBuffer } from './raster';
+import {
+  composite,
+  createInkBuffer,
+  rasteriseCapsules,
+  rasteriseRibbons,
+  rasteriseSprites,
+  type InkBuffer,
+} from './raster';
 
 export * from './raster';
 
@@ -50,10 +57,17 @@ export class CpuRenderer {
   drawInk(): void {
     this.ink.data.fill(0);
     for (const l of this.layers) {
+      const params = { pxPerUnit: this.pxPerUnit, gain: l.gain };
+      if (l.kind === 'capsules') {
+        rasteriseCapsules(this.ink, l.caps, l.count, params);
+        continue;
+      }
+      if (l.kind !== 'sprites' && l.kind !== 'ribbons')
+        throw new Error('the CPU engine draws CPU instance lists only');
       const atlas = this.atlases.get(l.atlas);
       if (!atlas) throw new Error(`atlas ${l.atlas} not loaded`);
-      if (l.kind !== 'sprites') throw new Error('the CPU engine draws CPU instance lists only');
-      rasteriseSprites(this.ink, atlas, l.instances, { pxPerUnit: this.pxPerUnit, gain: l.gain });
+      if (l.kind === 'ribbons') rasteriseRibbons(this.ink, atlas, l.segs, l.segsU, l.count, params);
+      else rasteriseSprites(this.ink, atlas, l.instances, params);
     }
   }
 

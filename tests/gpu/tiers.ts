@@ -4,7 +4,8 @@
  * incE bucket (az, pa, winding, zoom, mTime, incl). After every move:
  * - the tier rule ran the view tier only;
  * - the sample buffer is the same GPU buffer, and its contents hash the same (SHA-256 read back);
- * - the projected instances moved, and without dust the per-class counts did not change.
+ * - the projected instances moved, and without dust (extinction, lanes, carving lines) the
+ *   per-class counts did not change.
  * Crossing an incE bucket rebuilds the model once.
  *
  * Also an indicative timing on SwiftShader: one orbit frame (view tier + ink) against one
@@ -15,6 +16,7 @@ import type { Params } from '../../src/core/params';
 import { presetParams } from '../../src/core/presets';
 import { BuiltAssets, type AtlasName } from '../../src/marks/atlas';
 import { coreInstances } from '../../src/model/parts';
+import { hasDustCulls } from '../../src/model/ribbons';
 import { drawingsMeta } from '../../src/model/scene';
 import type { DrawingsMeta } from '../../src/model/variation';
 import { GpuRenderer } from '../../src/render/frame';
@@ -70,22 +72,27 @@ const median = (xs: number[]) => {
 run('tiers: orbiting changes no model buffer (GPU), and the orbit frame cost', async () => {
   const { adapter, device: dev } = await device();
   const assets = await BuiltAssets.load('/');
-  const names: AtlasName[] = ['dots', 'knots', 'stars', 'cores'];
-  const [atlases, paper] = await Promise.all([
+  const names: AtlasName[] = ['dots', 'knots', 'stars', 'cores', 'pieces', 'strokes'];
+  const [atlases, paper, penlines] = await Promise.all([
     Promise.all(names.map((n) => assets.atlas(n))),
     assets.paper(),
+    assets.vector('penlines'),
   ]);
   const by = (n: string) => {
     const a = atlases.find((x) => x.name === n);
     if (!a) throw new Error(`atlas ${n} missing`);
     return a;
   };
-  const meta: DrawingsMeta = drawingsMeta({
-    dots: by('dots'),
-    knots: by('knots'),
-    stars: by('stars'),
-    cores: by('cores'),
-  });
+  const meta: DrawingsMeta = drawingsMeta(
+    {
+      dots: by('dots'),
+      knots: by('knots'),
+      stars: by('stars'),
+      cores: by('cores'),
+      strokes: by('strokes'),
+    },
+    penlines,
+  );
   const renderer = new GpuRenderer(dev, { plateCss: 800, dpr: 1 }, paper);
   for (const a of atlases) renderer.addAtlas(a);
   const lines = [`adapter: ${adapterName(adapter)}`];
@@ -97,7 +104,7 @@ run('tiers: orbiting changes no model buffer (GPU), and the orbit frame cost', a
     const t0 = performance.now();
     const w = st.frame(P, zoom, meta);
     if (w.view) {
-      const layers: InkLayer[] = [...st.layers()];
+      const layers: InkLayer[] = [...st.lineLayers(), ...st.layers()];
       const cores = coreInstances(P, meta, cameraOf(P, zoom));
       if (cores.length) layers.push({ kind: 'sprites', atlas: 'cores', gain: 1, instances: cores });
       renderer.setLayers(layers);
@@ -141,7 +148,8 @@ run('tiers: orbiting changes no model buffer (GPU), and the orbit frame cost', a
       if (pos !== pos0) moved++;
       else if (m.what !== 'mTime') bad.push(`${m.what}: the marks did not move`);
       const n = Array.from((await st.readCounts()).perClass);
-      if (!P.dust && n.join() !== n0.join())
+      const culls = st.current ? hasDustCulls(st.current.ribbons) : true;
+      if (!P.dust && !culls && n.join() !== n0.join())
         bad.push(`${m.what}: counts ${n.join()} ≠ ${n0.join()}`);
     }
     if (st.tiers.runs.model !== 1) bad.push(`model ran ${String(st.tiers.runs.model)} times`);

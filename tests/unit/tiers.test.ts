@@ -7,8 +7,11 @@ import { presetParams } from '../../src/core/presets';
 import { SCHEMA, tierOf } from '../../src/core/schema';
 import { CpuStippleTiers } from '../../src/fallback/stipple';
 import { packGalaxy } from '../../src/model/galaxy';
-import { buildScene } from '../../src/model/scene';
+import { hasDustCulls } from '../../src/model/ribbons';
+import { buildScene, drawingsMeta } from '../../src/model/scene';
 import type { DrawingsMeta } from '../../src/model/variation';
+import { atlasFromBytes, type BuiltIndex } from '../../src/marks/atlas';
+import type { VectorSheet } from '../../src/marks/vector';
 import { TierState, tierWork } from '../../src/render/tiers';
 import { structureKey } from '../../src/view/camera';
 
@@ -19,22 +22,33 @@ import { structureKey } from '../../src/view/camera';
  * tests/gpu/tiers.ts.
  */
 
-/** The drawings' metadata, from the packed atlases (`pretest` runs npm run prepare-assets). */
+/**
+ * The drawings' metadata, from the packed atlases and the pen lines (`pretest` runs npm run
+ * prepare-assets): with the strokes sheet and the pen lines, so that the line-work (curves, lanes,
+ * hatches, carving lines) is in the scene, as on the page (review m3).
+ */
 function meta(): DrawingsMeta {
-  const idx = JSON.parse(
-    readFileSync(resolve(import.meta.dirname, '../../assets-built/index.json'), 'utf8'),
-  ) as { atlases: Record<string, { layers: number; meta: Record<string, unknown[]> }> };
-  const get = (n: string) => {
-    const x = idx.atlases[n];
-    if (!x) throw new Error(n);
-    return x;
-  };
-  return {
-    dots: { src: get('dots').meta.src as string[], size: get('dots').meta.size as number[] },
-    knots: { count: get('knots').layers },
-    stars: { count: get('stars').layers },
-    cores: { kind: get('cores').meta.kind as string[], style: get('cores').meta.style as string[] },
-  };
+  const built = resolve(import.meta.dirname, '../../assets-built');
+  const idx = JSON.parse(readFileSync(resolve(built, 'index.json'), 'utf8')) as BuiltIndex;
+  const atlas = (n: 'dots' | 'knots' | 'stars' | 'cores' | 'strokes') =>
+    atlasFromBytes(
+      n,
+      idx.atlases[n],
+      new Uint8Array(readFileSync(resolve(built, idx.atlases[n].file))),
+    );
+  const penlines = JSON.parse(
+    readFileSync(resolve(built, idx.vectors.penlines?.file ?? ''), 'utf8'),
+  ) as VectorSheet;
+  return drawingsMeta(
+    {
+      dots: atlas('dots'),
+      knots: atlas('knots'),
+      stars: atlas('stars'),
+      cores: atlas('cores'),
+      strokes: atlas('strokes'),
+    },
+    penlines,
+  );
 }
 
 const M = meta();
@@ -44,10 +58,22 @@ const sha = (b: ArrayBufferView | ArrayBuffer) =>
     .update(b instanceof ArrayBuffer ? new Uint8Array(b) : new Uint8Array(b.buffer))
     .digest('hex');
 
-/** Every model-tier buffer of the scene description, hashed. */
+/** Every model-tier buffer of the scene description, the line-work's included, hashed. */
 function sceneHash(P: Params): string {
-  const G = buildScene(P, M).galaxy;
-  return [packGalaxy(G.g), G.shape, G.pool, G.dotBase].map(sha).join(' ');
+  const { galaxy: G, ribbons: R } = buildScene(P, M);
+  return [
+    packGalaxy(G.g),
+    G.shape,
+    G.pool,
+    G.dotBase,
+    G.groups,
+    R.points3,
+    R.curveBuf,
+    R.hatchBuf,
+    R.carve,
+  ]
+    .map(sha)
+    .join(' ');
 }
 
 /** Camera moves that stay inside the starting incE bucket. */
@@ -155,6 +181,8 @@ describe('the CPU engine: orbiting changes no model buffer (hashes)', () => {
     ['Disc, no arms (stipple) s4242', presetParams('Disc, no arms', 4242, STIPPLE_ONLY)],
     ['Grand design s7', presetParams('Grand design', 7)],
     ['Edge-on with dust s7 (incl 88, the dust cull)', presetParams('Edge-on with dust', 7)],
+    ['Dusty spiral s4242 (lanes and carving lines)', presetParams('Dusty spiral', 4242)],
+    ['Barred spiral s7 (ring knots, ring lane)', presetParams('Barred spiral', 7)],
   ];
   for (const [name, P] of cases)
     it(name, () => {
@@ -164,6 +192,7 @@ describe('the CPU engine: orbiting changes no model buffer (hashes)', () => {
       if (!stipple) throw new Error('no model');
       const h0 = sha(stipple.samples.f32);
       const pos0 = sha(first.view.projected);
+      const cls0 = sha(first.view.classes);
       const total = (c: Uint32Array) => c.reduce((a, b) => a + b, 0);
       const n0 = total(first.view.perClass);
       for (const m of moves(P)) {
@@ -172,8 +201,15 @@ describe('the CPU engine: orbiting changes no model buffer (hashes)', () => {
         expect(eng.stipple, m.what).toBe(stipple);
         expect(sha(stipple.samples.f32), m.what).toBe(h0);
         if (m.what !== 'mTime 0.7') expect(sha(view.projected), m.what).not.toBe(pos0);
-        // without dust nothing is culled by the view, so the count cannot change
-        if (!P.dust) expect(total(view.perClass), m.what).toBe(n0);
+        // without dust (extinction, lanes, carving lines) nothing is culled by the view, so the
+        // count cannot change
+        if (!P.dust && !hasDustCulls(stipple.scene.ribbons))
+          expect(total(view.perClass), m.what).toBe(n0);
+        // and back: the culls are pure functions of the camera, so returning restores every
+        // sample's class exactly, lanes and carving lines included (review m3)
+        const back = eng.frame(P, 1);
+        expect(back.work, `${m.what} and back`).toEqual({ model: false, view: true });
+        expect(sha(back.view.classes), `${m.what} and back`).toBe(cls0);
       }
       expect(eng.tiers.runs.model).toBe(1);
       // across a bucket: the model is rebuilt, once

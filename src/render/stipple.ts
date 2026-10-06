@@ -1,10 +1,12 @@
 /**
- * The stipple on the GPU (ADR 0003, 0010): the model tier (compute/stipple.wgsl, re-run only when
- * the scene changes) and the view tier (compute/project.wgsl, then the three entry points of
- * compute/scan.wgsl), giving one instance list per class in a single buffer
- * (`CLASS_COUNT × cap` slots) and the indirect draw arguments per class. The sprite pass draws
- * the lists with drawIndirect: nothing is read back on the frame path. The read-back helpers at
- * the end are for tests and statistics only.
+ * The galaxy on the GPU (ADR 0003, 0010): the model tier (compute/stipple.wgsl, re-run only when
+ * the scene changes: the proposals, then the ring knots' and clumps' marks) and the view tier
+ * (compute/ribbons.wgsl `project_points`, compute/project.wgsl with the dust culls, the three entry
+ * points of compute/scan.wgsl, then the rest of ribbons.wgsl), giving one instance list per class
+ * in a single buffer (`CLASS_COUNT × cap` slots), the indirect draw arguments per class, and the
+ * line-work's ribbons, capsules and pieces (./ribbons.ts). The ink passes draw them with direct or
+ * indirect draws: nothing is read back on the frame path. The read-back helpers at the end are for
+ * tests and statistics only.
  *
  * CPU twin: src/fallback/stipple.ts.
  */
@@ -14,7 +16,11 @@ import scanWgsl from '../shaders/compute/scan.wgsl';
 import { bufferWithData } from '../gpu/buffers';
 import { INSTANCE_LAYOUT } from '../marks/instance';
 import { CLASS_COUNT } from '../model/classes';
-import { packGalaxy } from '../model/galaxy';
+import { packGalaxy, sampleCount } from '../model/galaxy';
+import { cullsUniform } from '../model/ribbons';
+import { packStruct } from '../gpu/buffers';
+import { CULLS_LAYOUT } from '../fallback/kernels/project';
+import { GpuRibbons } from './ribbons';
 import {
   STIPPLE_LAYERS,
   buildScene,
@@ -29,7 +35,7 @@ import { cameraOf, packView, viewDesc, type Camera } from '../view/camera';
 import { TierState, type TierWork } from './tiers';
 import { SAMPLE_LAYOUT } from '../fallback/kernels/stipple';
 import { BLOCK_STRIDE, blockCount, classCapacity } from '../fallback/kernels/scan';
-import type { GpuSpriteLayer } from './layers';
+import type { GpuSpriteLayer, InkLayer } from './layers';
 
 const STORAGE = GPUBufferUsage.STORAGE;
 
@@ -51,8 +57,11 @@ interface ModelBuffers {
   shape: GPUBuffer;
   pool: GPUBuffer;
   dotBase: GPUBuffer;
+  groupsBuf: GPUBuffer;
+  noise: GPUBuffer;
   samples: GPUBuffer;
   view: GPUBuffer;
+  culls: GPUBuffer;
   scan: GPUBuffer;
   projected: GPUBuffer;
   classes: GPUBuffer;
@@ -63,6 +72,7 @@ interface ModelBuffers {
   out: GPUBuffer;
   groups: {
     stipple: GPUBindGroup;
+    extra: GPUBindGroup;
     project: GPUBindGroup;
     local: GPUBindGroup;
     blocks: GPUBindGroup;
@@ -82,22 +92,30 @@ export class GpuStipple {
     readonly device: GPUDevice,
     private readonly pipes: {
       stipple: GPUComputePipeline;
+      extra: GPUComputePipeline;
       project: GPUComputePipeline;
       local: GPUComputePipeline;
       blocks: GPUComputePipeline;
       scatter: GPUComputePipeline;
     },
+    /** the line-work (M4) */
+    readonly ribbons: GpuRibbons,
   ) {}
 
   static create(device: GPUDevice): GpuStipple {
-    const [stipple, project, local, blocks, scatter] = [
+    const [stipple, extra, project, local, blocks, scatter] = [
       pipeline(device, stippleWgsl, 'main', 'stipple.wgsl'),
+      pipeline(device, stippleWgsl, 'extra', 'stipple.wgsl'),
       pipeline(device, projectWgsl, 'main', 'project.wgsl'),
       pipeline(device, scanWgsl, 'scan_local', 'scan.wgsl'),
       pipeline(device, scanWgsl, 'scan_blocks', 'scan.wgsl'),
       pipeline(device, scanWgsl, 'scatter', 'scan.wgsl'),
     ];
-    return new GpuStipple(device, { stipple, project, local, blocks, scatter });
+    return new GpuStipple(
+      device,
+      { stipple, extra, project, local, blocks, scatter },
+      GpuRibbons.create(device),
+    );
   }
 
   /**
@@ -145,26 +163,40 @@ export class GpuStipple {
     this.scene = scene;
     const d = this.device;
     const G = scene.galaxy;
-    const n = G.g.n;
+    // every sample: the proposals, then the ring knots' and clumps' marks
+    const n = sampleCount(G);
+    const nExtra = G.g.n_extra;
     const cap = classCapacity(n);
     const blocks = blockCount(n);
+    // at least one element of every array, whatever n: a binding smaller than its WGSL type's
+    // minimum (one element) is invalid, and would take the line-work's view pass down with it
+    // when a scene has no stipple samples (QA D1)
     const buf = (size: number, usage: number, label: string) =>
       d.createBuffer({ label, size: Math.max(16, size), usage });
+    const n1 = Math.max(1, n);
     // COPY_SRC: the tier tests read the model buffers back (never on the frame path)
     const SRC = GPUBufferUsage.COPY_SRC;
     const galaxy = bufferWithData(d, packGalaxy(G.g), GPUBufferUsage.UNIFORM | SRC, 'galaxy');
     const shape = bufferWithData(d, G.shape, STORAGE | SRC, 'galaxy shape');
     const pool = bufferWithData(d, G.pool, STORAGE | SRC, 'galaxy pools');
     const dotBase = bufferWithData(d, G.dotBase, STORAGE | SRC, 'dot sizes');
-    const samples = buf(n * SAMPLE_LAYOUT.size, STORAGE | GPUBufferUsage.COPY_SRC, 'samples');
+    const groupsBuf = bufferWithData(d, G.groups, STORAGE | SRC, 'ring knots and clumps');
+    const noise = bufferWithData(d, G.noise.u, STORAGE | SRC, 'noise field');
+    const samples = buf(n1 * SAMPLE_LAYOUT.size, STORAGE | GPUBufferUsage.COPY_SRC, 'samples');
     const view = buf(64, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'view');
+    const culls = buf(CULLS_LAYOUT.size, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'culls');
+    this.ribbons.load(scene.ribbons, view, pool, dotBase, noise);
     const scan = bufferWithData(
       d,
       new Uint32Array([n, cap, blocks, 0]),
       GPUBufferUsage.UNIFORM,
       'scan',
     );
-    const projected = buf(n * INSTANCE_LAYOUT.size, STORAGE | GPUBufferUsage.COPY_SRC, 'projected');
+    const projected = buf(
+      n1 * INSTANCE_LAYOUT.size,
+      STORAGE | GPUBufferUsage.COPY_SRC,
+      'projected',
+    );
     const classes = buf(n * 4, STORAGE | GPUBufferUsage.COPY_SRC, 'classes');
     const rank = buf(n * 4, STORAGE, 'rank');
     const blockTotals = buf(blocks * 8, STORAGE, 'block totals');
@@ -175,7 +207,7 @@ export class GpuStipple {
       'stipple draw args',
     );
     const out = buf(
-      CLASS_COUNT * cap * INSTANCE_LAYOUT.size,
+      CLASS_COUNT * Math.max(1, cap) * INSTANCE_LAYOUT.size,
       STORAGE | GPUBufferUsage.COPY_SRC,
       'stipple instances',
     );
@@ -193,8 +225,11 @@ export class GpuStipple {
       shape,
       pool,
       dotBase,
+      groupsBuf,
+      noise,
       samples,
       view,
+      culls,
       scan,
       projected,
       classes,
@@ -210,12 +245,24 @@ export class GpuStipple {
           [2, pool],
           [3, dotBase],
           [4, samples],
+          [30, noise],
+        ]),
+        extra: group(P.extra, [
+          [0, galaxy],
+          [2, pool],
+          [3, dotBase],
+          [4, samples],
+          [5, groupsBuf],
         ]),
         project: group(P.project, [
           [0, view],
           [1, samples],
           [2, projected],
           [3, classes],
+          [4, culls],
+          [5, this.ribbons.points],
+          [6, this.ribbons.carve],
+          [30, noise],
         ]),
         local: group(P.local, [
           [0, scan],
@@ -243,7 +290,12 @@ export class GpuStipple {
     const pass = enc.beginComputePass({ label: 'stipple' });
     pass.setPipeline(P.stipple);
     pass.setBindGroup(0, this.model.groups.stipple);
-    pass.dispatchWorkgroups(Math.ceil(n / 64) || 1);
+    pass.dispatchWorkgroups(Math.ceil(G.g.n / 64) || 1);
+    if (nExtra) {
+      pass.setPipeline(P.extra);
+      pass.setBindGroup(0, this.model.groups.extra);
+      pass.dispatchWorkgroups(Math.ceil(nExtra / 64));
+    }
     pass.end();
     d.queue.submit([enc.finish()]);
   }
@@ -259,10 +311,18 @@ export class GpuStipple {
     const m = this.model;
     if (!m || !this.scene) throw new Error('setScene first');
     const d = this.device;
-    d.queue.writeBuffer(m.view, 0, packView(viewDesc(cam, this.scene.galaxy.g.dust, m.n, m.cap)));
+    const { P: params, galaxy } = this.scene;
+    d.queue.writeBuffer(m.view, 0, packView(viewDesc(cam, galaxy.g.dust, m.n, m.cap)));
+    d.queue.writeBuffer(
+      m.culls,
+      0,
+      packStruct(CULLS_LAYOUT, cullsUniform(this.scene.ribbons, cam, params, galaxy.g.key)),
+    );
+    this.ribbons.setView(cam, params, galaxy.g.n_dot_pool);
     const enc = d.createCommandEncoder({ label: 'stipple view' });
     const pass = enc.beginComputePass({ label: 'project + compact' });
     const P = this.pipes;
+    this.ribbons.encodeProject(pass);
     pass.setPipeline(P.project);
     pass.setBindGroup(0, m.groups.project);
     pass.dispatchWorkgroups(Math.ceil(m.n / 64) || 1);
@@ -275,8 +335,14 @@ export class GpuStipple {
     pass.setPipeline(P.scatter);
     pass.setBindGroup(0, m.groups.scatter);
     pass.dispatchWorkgroups(Math.ceil(m.n / 64) || 1);
+    this.ribbons.encodeExpand(pass);
     pass.end();
     d.queue.submit([enc.finish()]);
+  }
+
+  /** The line-work's layers (ribbons, hatching, pieces), drawn before the stipple. */
+  lineLayers(): InkLayer[] {
+    return this.model ? this.ribbons.layers() : [];
   }
 
   /** The drawn classes as indirect sprite layers, in draw order. */
@@ -317,7 +383,17 @@ export class GpuStipple {
     const a = new Uint32Array(await this.read(m.args, CLASS_COUNT * 16));
     const perClass = new Uint32Array(CLASS_COUNT);
     for (let c = 0; c < CLASS_COUNT; c++) perClass[c] = a[c * 4 + 1] ?? 0;
-    return { perClass, counts: markCounts(perClass) };
+    const R = this.scene?.ribbons;
+    return {
+      perClass,
+      counts: {
+        ...markCounts(perClass),
+        curves: R?.nCurves ?? 0,
+        pieces: await this.ribbons.readPieceCount(),
+        ribbonSegments: R?.nSegs ?? 0,
+        hatches: R?.nHatch ?? 0,
+      },
+    };
   }
 
   /** Test only: every model-tier buffer (galaxy uniform, shape, pools, dot sizes, samples). */
@@ -363,8 +439,11 @@ export class GpuStipple {
       m.shape,
       m.pool,
       m.dotBase,
+      m.groupsBuf,
+      m.noise,
       m.samples,
       m.view,
+      m.culls,
       m.scan,
       m.projected,
       m.classes,
@@ -375,6 +454,7 @@ export class GpuStipple {
       m.out,
     ])
       b.destroy();
+    this.ribbons.destroy();
     this.model = null;
   }
 

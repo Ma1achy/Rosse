@@ -10,6 +10,8 @@ import type { Params } from '../core/params';
 import { incE } from '../view/camera';
 import type { Instance } from '../marks/instance';
 import { PLATE, UNIT_SCALE, type Camera } from '../view/camera';
+import { smWarp, wobbleAmplitude } from '../view/warp';
+import type { NoiseField } from '../core/noise';
 import type { DrawingsMeta } from './variation';
 
 /**
@@ -18,7 +20,12 @@ import type { DrawingsMeta } from './variation';
  * preferring the dotted style for stipple-heavy or steep views, scaled by bulge size and flattened
  * by max(bulgeFlat, cos incl), at alpha 0.9.
  */
-export function coreInstances(P: Params, meta: DrawingsMeta, cam: Camera): Instance[] {
+export function coreInstances(
+  P: Params,
+  meta: DrawingsMeta,
+  cam: Camera,
+  field?: NoiseField | null,
+): Instance[] {
   const e = incE(cam.incl);
   if (!(P.bulge > 0.03 && P.bulge < 0.97) || (P.sersicN > 0 && P.bulge >= 0.95) || e >= 80)
     return [];
@@ -41,7 +48,7 @@ export function coreInstances(P: Params, meta: DrawingsMeta, cam: Camera): Insta
   // chain(Rm(pa), Sm(s, sy))
   const c = Math.cos(a);
   const sn = Math.sin(a);
-  return [
-    { x: PLATE / 2, y: PLATE / 2, layer: idx, alpha: 0.9, m: [c * s, sn * s, -sn * sy, c * sy] },
-  ];
+  // a bitmap mark's centre goes through the hand wobble (inst, app23.js:L171)
+  const [x, y] = smWarp(PLATE / 2, PLATE / 2, wobbleAmplitude(P.distort), field);
+  return [{ x, y, layer: idx, alpha: 0.9, m: [c * s, sn * s, -sn * sy, c * sy] }];
 }

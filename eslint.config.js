@@ -9,6 +9,7 @@ export default tseslint.config(
     ignores: [
       'assets/',
       'assets-built/',
+      'tmp-scratch/',
       'dist/',
       'node_modules/',
       'spikes/',

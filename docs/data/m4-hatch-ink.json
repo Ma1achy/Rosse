@@ -1,0 +1,247 @@
+{
+  "about": "Ink the dust hatching adds, engine against v21 (ADR 0019): (hatch − no hatch) of Σα on v21 captures with the stipple, lines, knots and sparkle off, against the CPU engine drawn with v21's choices (ADR 0018). `before` is the first build (capsule coverage, composited per pixel), measured the same way on the ten pen 2.4 cases before ADR 0019 (the engine as of commit 6eb2e8e); `rows` are the final build (v21's quads unioned at its four sample positions). Written by tools/m4-summary.mjs hatch.",
+  "before": {
+    "pen": 2.4,
+    "about": "the first build: capsule coverage composited per pixel (engine as of commit 6eb2e8e)",
+    "ratios": {
+      "grand-design--hatch__s7__home": 1.196,
+      "grand-design--hatch__s4242__home": 1.244,
+      "flocculent--hatch__s7__home": 1.19,
+      "flocculent--hatch__s4242__home": 1.195,
+      "hand-wobble--hatch__s7__home": 1.19,
+      "hand-wobble--hatch__s4242__home": 1.207,
+      "tightly-wound--hatch__s7__home": 1.196,
+      "tightly-wound--hatch__s4242__home": 1.212,
+      "dusty-spiral--hatch__s7__home": 1.167,
+      "dusty-spiral--hatch__s4242__home": 1.205
+    },
+    "mean": 1.2
+  },
+  "summary": {
+    "min": 0.9773,
+    "max": 1.0476,
+    "mean": 1.0073
+  },
+  "rows": [
+    {
+      "case": "dusty-spiral--hatch__s4242__home",
+      "pen": 2.4,
+      "halfWidthPx": 0.456,
+      "ratio": 1.0067,
+      "meanAlphaEngine": 0.6945,
+      "meanAlphaV21": 0.6648,
+      "pixelsEngine": 1135,
+      "pixelsV21": 1173
+    },
+    {
+      "case": "dusty-spiral--hatch__s7__home",
+      "pen": 2.4,
+      "halfWidthPx": 0.456,
+      "ratio": 0.9844,
+      "meanAlphaEngine": 0.7188,
+      "meanAlphaV21": 0.6926,
+      "pixelsEngine": 742,
+      "pixelsV21": 782
+    },
+    {
+      "case": "flocculent--hatch__s4242__home",
+      "pen": 2.4,
+      "halfWidthPx": 0.456,
+      "ratio": 0.9826,
+      "meanAlphaEngine": 0.6728,
+      "meanAlphaV21": 0.6551,
+      "pixelsEngine": 2615,
+      "pixelsV21": 2747
+    },
+    {
+      "case": "flocculent--hatch__s7__home",
+      "pen": 2.4,
+      "halfWidthPx": 0.456,
+      "ratio": 1.0012,
+      "meanAlphaEngine": 0.6969,
+      "meanAlphaV21": 0.6747,
+      "pixelsEngine": 2589,
+      "pixelsV21": 2671
+    },
+    {
+      "case": "grand-design--hatch__s4242__home",
+      "pen": 2.4,
+      "halfWidthPx": 0.456,
+      "ratio": 1.0476,
+      "meanAlphaEngine": 0.6835,
+      "meanAlphaV21": 0.6689,
+      "pixelsEngine": 1178,
+      "pixelsV21": 1159
+    },
+    {
+      "case": "grand-design--hatch__s7__home",
+      "pen": 2.4,
+      "halfWidthPx": 0.456,
+      "ratio": 0.9929,
+      "meanAlphaEngine": 0.7107,
+      "meanAlphaV21": 0.6984,
+      "pixelsEngine": 774,
+      "pixelsV21": 788
+    },
+    {
+      "case": "hand-wobble--hatch__s4242__home",
+      "pen": 2.4,
+      "halfWidthPx": 0.456,
+      "ratio": 1,
+      "meanAlphaEngine": 0.6886,
+      "meanAlphaV21": 0.6596,
+      "pixelsEngine": 1407,
+      "pixelsV21": 1469
+    },
+    {
+      "case": "hand-wobble--hatch__s7__home",
+      "pen": 2.4,
+      "halfWidthPx": 0.456,
+      "ratio": 1.0032,
+      "meanAlphaEngine": 0.7042,
+      "meanAlphaV21": 0.6898,
+      "pixelsEngine": 1836,
+      "pixelsV21": 1864
+    },
+    {
+      "case": "tightly-wound--hatch__s4242__home",
+      "pen": 2.4,
+      "halfWidthPx": 0.456,
+      "ratio": 1.0077,
+      "meanAlphaEngine": 0.6718,
+      "meanAlphaV21": 0.6521,
+      "pixelsEngine": 1557,
+      "pixelsV21": 1594
+    },
+    {
+      "case": "tightly-wound--hatch__s7__home",
+      "pen": 2.4,
+      "halfWidthPx": 0.456,
+      "ratio": 1.0046,
+      "meanAlphaEngine": 0.6923,
+      "meanAlphaV21": 0.6782,
+      "pixelsEngine": 1930,
+      "pixelsV21": 1964
+    },
+    {
+      "case": "flocculent--hatch__s4242__home",
+      "pen": 1.2,
+      "halfWidthPx": 0.228,
+      "ratio": 0.9773,
+      "meanAlphaEngine": 0.5193,
+      "meanAlphaV21": 0.4938,
+      "pixelsEngine": 2056,
+      "pixelsV21": 2203
+    },
+    {
+      "case": "flocculent--hatch__s7__home",
+      "pen": 1.2,
+      "halfWidthPx": 0.228,
+      "ratio": 1.0102,
+      "meanAlphaEngine": 0.5464,
+      "meanAlphaV21": 0.5163,
+      "pixelsEngine": 2030,
+      "pixelsV21": 2122
+    },
+    {
+      "case": "grand-design--hatch__s4242__home",
+      "pen": 1.2,
+      "halfWidthPx": 0.228,
+      "ratio": 1.0358,
+      "meanAlphaEngine": 0.5056,
+      "meanAlphaV21": 0.4898,
+      "pixelsEngine": 902,
+      "pixelsV21": 911
+    },
+    {
+      "case": "grand-design--hatch__s7__home",
+      "pen": 1.2,
+      "halfWidthPx": 0.228,
+      "ratio": 1.0084,
+      "meanAlphaEngine": 0.5261,
+      "meanAlphaV21": 0.5103,
+      "pixelsEngine": 646,
+      "pixelsV21": 682
+    },
+    {
+      "case": "tightly-wound--hatch__s4242__home",
+      "pen": 1.2,
+      "halfWidthPx": 0.228,
+      "ratio": 1.0141,
+      "meanAlphaEngine": 0.5311,
+      "meanAlphaV21": 0.5014,
+      "pixelsEngine": 1178,
+      "pixelsV21": 1237
+    },
+    {
+      "case": "tightly-wound--hatch__s7__home",
+      "pen": 1.2,
+      "halfWidthPx": 0.228,
+      "ratio": 1.0196,
+      "meanAlphaEngine": 0.5295,
+      "meanAlphaV21": 0.511,
+      "pixelsEngine": 1508,
+      "pixelsV21": 1539
+    },
+    {
+      "case": "flocculent--hatch__s4242__home",
+      "pen": 4.8,
+      "halfWidthPx": 0.912,
+      "ratio": 0.9901,
+      "meanAlphaEngine": 0.7816,
+      "meanAlphaV21": 0.771,
+      "pixelsEngine": 3761,
+      "pixelsV21": 3853
+    },
+    {
+      "case": "flocculent--hatch__s7__home",
+      "pen": 4.8,
+      "halfWidthPx": 0.912,
+      "ratio": 1.0037,
+      "meanAlphaEngine": 0.7969,
+      "meanAlphaV21": 0.7882,
+      "pixelsEngine": 3587,
+      "pixelsV21": 3619
+    },
+    {
+      "case": "grand-design--hatch__s4242__home",
+      "pen": 4.8,
+      "halfWidthPx": 0.912,
+      "ratio": 1.0444,
+      "meanAlphaEngine": 0.7807,
+      "meanAlphaV21": 0.7789,
+      "pixelsEngine": 1691,
+      "pixelsV21": 1629
+    },
+    {
+      "case": "grand-design--hatch__s7__home",
+      "pen": 4.8,
+      "halfWidthPx": 0.912,
+      "ratio": 1.0136,
+      "meanAlphaEngine": 0.7991,
+      "meanAlphaV21": 0.7864,
+      "pixelsEngine": 1032,
+      "pixelsV21": 1048
+    },
+    {
+      "case": "tightly-wound--hatch__s4242__home",
+      "pen": 4.8,
+      "halfWidthPx": 0.912,
+      "ratio": 1.0095,
+      "meanAlphaEngine": 0.7788,
+      "meanAlphaV21": 0.7698,
+      "pixelsEngine": 2259,
+      "pixelsV21": 2260
+    },
+    {
+      "case": "tightly-wound--hatch__s7__home",
+      "pen": 4.8,
+      "halfWidthPx": 0.912,
+      "ratio": 1.0037,
+      "meanAlphaEngine": 0.7902,
+      "meanAlphaV21": 0.779,
+      "pixelsEngine": 2726,
+      "pixelsV21": 2757
+    }
+  ]
+}
