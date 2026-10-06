@@ -243,6 +243,139 @@
         "shellsOn": 0,
         "shells": 1
       }
+    },
+    {
+      "preset": "Grand design",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Flocculent",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Tightly wound",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Loose, open arms",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Dusty spiral",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Hand wobble",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Smooth, round",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Cigar-shaped",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Plates slipped",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Stellar populations",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Grand design",
+      "variant": "single",
+      "chalk": true,
+      "seeds": [7],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Plates slipped",
+      "variant": "single",
+      "chalk": true,
+      "seeds": [7],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Stellar populations",
+      "variant": "single",
+      "chalk": true,
+      "seeds": [7],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
     }
   ]
 }
