@@ -5,6 +5,7 @@
  * makes the debris's marks and the tidal grids, then runs each galaxy's own view tier with its tides
  * (./stipple.ts `CpuStipple`), and `mWarp`'s drawings.
  */
+import { cameraOf } from '../view/camera';
 import type { Params } from '../core/params';
 import type { Instance } from '../marks/instance';
 import { CLASS_COUNT, Cls } from '../model/classes';
@@ -49,6 +50,8 @@ export class CpuMerger {
   readonly frames: { chosen: MergerFrame; end: MergerFrame };
   /** the simulated shells, when `shellsOn` */
   readonly shells: CpuShellScene | null;
+  /** the lens's host (M9): a merging pair can lens a galaxy behind it */
+  readonly lensHost: CpuStipple | null;
 
   /** The model tier: the simulation, the framing, the bins and the two galaxies. */
   constructor(
@@ -90,6 +93,7 @@ export class CpuMerger {
           }),
         )
       : null;
+    this.lensHost = this.scene.lensHost ? new CpuStipple(this.scene.lensHost) : null;
     this.galaxies = [0, 1].map(
       (g) =>
         new CpuStipple(this.scene.galaxies[g] as MergerScene['galaxies'][number], {
@@ -152,9 +156,17 @@ export class CpuMerger {
     }
     const sh = this.shells?.view(zoom);
     if (sh) mw.push(...sh.layers);
+    // the lens, over the merged scene
+    const lens = this.lensHost?.view(cameraOf(scene.P, zoom), scene.P.mTime).lens;
+    if (lens) {
+      const LL = lens.layers;
+      mw.push(...LL.line, ...LL.vectors, ...LL.pieces, ...LL.dots, ...LL.knots, ...LL.stars);
+      mw.push(...LL.cores);
+    }
     const perClass = new Uint32Array(CLASS_COUNT);
     for (let c = 0; c < CLASS_COUNT; c++)
       perClass[c] =
+        (lens?.perClass[c] ?? 0) +
         (counts[c] ?? 0) +
         views.reduce((acc, v) => acc + (v.perClass[c] ?? 0), 0) +
         (c === Cls.old ? (sh?.dots ?? 0) : 0);

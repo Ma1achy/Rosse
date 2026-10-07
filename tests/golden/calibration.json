@@ -7,6 +7,46 @@
     "ofConfigurations": 336
   },
   "configurations": [
+    "A sketch, lensed (lens) s101 incl 108",
+    "A sketch, lensed (lens) s101 incl 88",
+    "A sketch, lensed (lens) s11 incl 108",
+    "A sketch, lensed (lens) s11 incl 88",
+    "A sketch, lensed (lens) s13 incl 108",
+    "A sketch, lensed (lens) s13 incl 88",
+    "A sketch, lensed (lens) s211 incl 108",
+    "A sketch, lensed (lens) s211 incl 88",
+    "A sketch, lensed (lens) s23 incl 108",
+    "A sketch, lensed (lens) s23 incl 88",
+    "A sketch, lensed (lens) s29 incl 108",
+    "A sketch, lensed (lens) s29 incl 88",
+    "A sketch, lensed (lens) s3 incl 108",
+    "A sketch, lensed (lens) s3 incl 88",
+    "A sketch, lensed (lens) s4242 incl 108",
+    "A sketch, lensed (lens) s4242 incl 88",
+    "A sketch, lensed (lens) s5 incl 108",
+    "A sketch, lensed (lens) s5 incl 88",
+    "A sketch, lensed (lens) s53 incl 108",
+    "A sketch, lensed (lens) s53 incl 88",
+    "A sketch, lensed (lens) s7 incl 108",
+    "A sketch, lensed (lens) s7 incl 88",
+    "A sketch, lensed (lens) s89 incl 108",
+    "A sketch, lensed (lens) s89 incl 88",
+    "Artefact: cosmic rays (stars) s4242 incl 30",
+    "Artefact: cosmic rays (stars) s4242 incl 50",
+    "Artefact: cosmic rays (stars) s7 incl 30",
+    "Artefact: cosmic rays (stars) s7 incl 50",
+    "Artefact: ghost reflection (stars) s4242 incl 30",
+    "Artefact: ghost reflection (stars) s4242 incl 50",
+    "Artefact: ghost reflection (stars) s7 incl 30",
+    "Artefact: ghost reflection (stars) s7 incl 50",
+    "Artefact: satellite trail (stars) s4242 incl 30",
+    "Artefact: satellite trail (stars) s4242 incl 50",
+    "Artefact: satellite trail (stars) s7 incl 30",
+    "Artefact: satellite trail (stars) s7 incl 50",
+    "Barred spiral (knob-ring-lines) s4242 incl 30",
+    "Barred spiral (knob-ring-lines) s4242 incl 50",
+    "Barred spiral (knob-ring-lines) s7 incl 30",
+    "Barred spiral (knob-ring-lines) s7 incl 50",
     "Barred spiral (lines) s101 incl 30",
     "Barred spiral (lines) s101 incl 50",
     "Barred spiral (lines) s11 incl 30",
@@ -19,6 +59,64 @@
     "Barred spiral (lines) s4242 incl 50",
     "Barred spiral (lines) s7 incl 30",
     "Barred spiral (lines) s7 incl 50",
+    "Barred spiral (ribbons) s4242 incl 30",
+    "Barred spiral (ribbons) s4242 incl 50",
+    "Barred spiral (ribbons) s7 incl 30",
+    "Barred spiral (ribbons) s7 incl 50",
+    "Barred spiral (vectors) s4242 incl 30",
+    "Barred spiral (vectors) s4242 incl 50",
+    "Barred spiral (vectors) s7 incl 30",
+    "Barred spiral (vectors) s7 incl 50",
+    "Barred spiral (zoom 2) s4242 incl 30",
+    "Barred spiral (zoom 2) s7 incl 30",
+    "Barred spiral s4242 incl 30",
+    "Barred spiral s4242 incl 50",
+    "Barred spiral s7 incl 30",
+    "Barred spiral s7 incl 50",
+    "Cigar-shaped (single) s4242 incl 108",
+    "Cigar-shaped (single) s4242 incl 88",
+    "Cigar-shaped (single) s7 incl 108",
+    "Cigar-shaped (single) s7 incl 88",
+    "Cigar-shaped (stipple) s4242 incl 108",
+    "Cigar-shaped (stipple) s4242 incl 88",
+    "Cigar-shaped (stipple) s7 incl 108",
+    "Cigar-shaped (stipple) s7 incl 88",
+    "Cigar-shaped (zoom 2) s4242 incl 88",
+    "Cigar-shaped (zoom 2) s7 incl 88",
+    "Cigar-shaped s4242 incl 108",
+    "Cigar-shaped s4242 incl 88",
+    "Cigar-shaped s7 incl 108",
+    "Cigar-shaped s7 incl 88",
+    "Deep field (sky) s4242 incl 108",
+    "Deep field (sky) s4242 incl 88",
+    "Deep field (sky) s7 incl 108",
+    "Deep field (sky) s7 incl 88",
+    "Disc, no arms (knob-sersic) s4242 incl 60",
+    "Disc, no arms (knob-sersic) s4242 incl 80",
+    "Disc, no arms (knob-sersic) s7 incl 60",
+    "Disc, no arms (knob-sersic) s7 incl 80",
+    "Disc, no arms (knob-tail) s4242 incl 45",
+    "Disc, no arms (knob-tail) s4242 incl 65",
+    "Disc, no arms (knob-tail) s7 incl 45",
+    "Disc, no arms (knob-tail) s7 incl 65",
+    "Disc, no arms (stipple) s11 incl 45",
+    "Disc, no arms (stipple) s11 incl 65",
+    "Disc, no arms (stipple) s3 incl 45",
+    "Disc, no arms (stipple) s3 incl 65",
+    "Disc, no arms (stipple) s4242 incl 45",
+    "Disc, no arms (stipple) s4242 incl 65",
+    "Disc, no arms (stipple) s7 incl 45",
+    "Disc, no arms (stipple) s7 incl 65",
+    "Disc, no arms (vectors) s4242 incl 45",
+    "Disc, no arms (vectors) s4242 incl 65",
+    "Disc, no arms (vectors) s7 incl 45",
+    "Disc, no arms (vectors) s7 incl 65",
+    "Disc, no arms (zoom 2) s4242 incl 45",
+    "Disc, no arms (zoom 2) s7 incl 45",
+    "Disc, no arms s4242 incl 45",
+    "Disc, no arms s4242 incl 65",
+    "Disc, no arms s7 incl 45",
+    "Disc, no arms s7 incl 65",
     "Dusty spiral (lines) s101 incl 35",
     "Dusty spiral (lines) s101 incl 55",
     "Dusty spiral (lines) s11 incl 35",
@@ -31,6 +129,24 @@
     "Dusty spiral (lines) s4242 incl 55",
     "Dusty spiral (lines) s7 incl 35",
     "Dusty spiral (lines) s7 incl 55",
+    "Dusty spiral (ribbons) s4242 incl 35",
+    "Dusty spiral (ribbons) s4242 incl 55",
+    "Dusty spiral (ribbons) s7 incl 35",
+    "Dusty spiral (ribbons) s7 incl 55",
+    "Dusty spiral (single) s4242 incl 35",
+    "Dusty spiral (single) s4242 incl 55",
+    "Dusty spiral (single) s7 incl 35",
+    "Dusty spiral (single) s7 incl 55",
+    "Edge-on with dust (vectors) s4242 incl 108",
+    "Edge-on with dust (vectors) s4242 incl 88",
+    "Edge-on with dust (vectors) s7 incl 108",
+    "Edge-on with dust (vectors) s7 incl 88",
+    "Edge-on with dust (zoom 2) s4242 incl 88",
+    "Edge-on with dust (zoom 2) s7 incl 88",
+    "Edge-on with dust s4242 incl 108",
+    "Edge-on with dust s4242 incl 88",
+    "Edge-on with dust s7 incl 108",
+    "Edge-on with dust s7 incl 88",
     "Flocculent (lines) s101 incl 30",
     "Flocculent (lines) s101 incl 50",
     "Flocculent (lines) s11 incl 30",
@@ -43,334 +159,20 @@
     "Flocculent (lines) s4242 incl 50",
     "Flocculent (lines) s7 incl 30",
     "Flocculent (lines) s7 incl 50",
-    "Grand design (lines) s101 incl 30",
-    "Grand design (lines) s101 incl 50",
-    "Grand design (lines) s11 incl 30",
-    "Grand design (lines) s11 incl 50",
-    "Grand design (lines) s23 incl 30",
-    "Grand design (lines) s23 incl 50",
-    "Grand design (lines) s3 incl 30",
-    "Grand design (lines) s3 incl 50",
-    "Grand design (lines) s4242 incl 30",
-    "Grand design (lines) s4242 incl 50",
-    "Grand design (lines) s7 incl 30",
-    "Grand design (lines) s7 incl 50",
-    "Hand wobble (lines) s101 incl 30",
-    "Hand wobble (lines) s101 incl 50",
-    "Hand wobble (lines) s11 incl 30",
-    "Hand wobble (lines) s11 incl 50",
-    "Hand wobble (lines) s23 incl 30",
-    "Hand wobble (lines) s23 incl 50",
-    "Hand wobble (lines) s3 incl 30",
-    "Hand wobble (lines) s3 incl 50",
-    "Hand wobble (lines) s4242 incl 30",
-    "Hand wobble (lines) s4242 incl 50",
-    "Hand wobble (lines) s7 incl 30",
-    "Hand wobble (lines) s7 incl 50",
-    "Loose, open arms (lines) s101 incl 30",
-    "Loose, open arms (lines) s101 incl 50",
-    "Loose, open arms (lines) s11 incl 30",
-    "Loose, open arms (lines) s11 incl 50",
-    "Loose, open arms (lines) s23 incl 30",
-    "Loose, open arms (lines) s23 incl 50",
-    "Loose, open arms (lines) s3 incl 30",
-    "Loose, open arms (lines) s3 incl 50",
-    "Loose, open arms (lines) s4242 incl 30",
-    "Loose, open arms (lines) s4242 incl 50",
-    "Loose, open arms (lines) s7 incl 30",
-    "Loose, open arms (lines) s7 incl 50",
-    "Tightly wound (lines) s101 incl 30",
-    "Tightly wound (lines) s101 incl 50",
-    "Tightly wound (lines) s11 incl 30",
-    "Tightly wound (lines) s11 incl 50",
-    "Tightly wound (lines) s23 incl 30",
-    "Tightly wound (lines) s23 incl 50",
-    "Tightly wound (lines) s3 incl 30",
-    "Tightly wound (lines) s3 incl 50",
-    "Tightly wound (lines) s4242 incl 30",
-    "Tightly wound (lines) s4242 incl 50",
-    "Tightly wound (lines) s7 incl 30",
-    "Tightly wound (lines) s7 incl 50",
-    "Grand design s7 incl 30",
-    "Grand design (zoom 2) s7 incl 30",
-    "Grand design s7 incl 50",
-    "Grand design s4242 incl 30",
-    "Grand design (zoom 2) s4242 incl 30",
-    "Grand design s4242 incl 50",
-    "Barred spiral s7 incl 30",
-    "Barred spiral (zoom 2) s7 incl 30",
-    "Barred spiral s7 incl 50",
-    "Barred spiral s4242 incl 30",
-    "Barred spiral (zoom 2) s4242 incl 30",
-    "Barred spiral s4242 incl 50",
-    "Flocculent s7 incl 30",
-    "Flocculent (zoom 2) s7 incl 30",
-    "Flocculent s7 incl 50",
-    "Flocculent s4242 incl 30",
-    "Flocculent (zoom 2) s4242 incl 30",
-    "Flocculent s4242 incl 50",
-    "Tightly wound s7 incl 30",
-    "Tightly wound (zoom 2) s7 incl 30",
-    "Tightly wound s7 incl 50",
-    "Tightly wound s4242 incl 30",
-    "Tightly wound (zoom 2) s4242 incl 30",
-    "Tightly wound s4242 incl 50",
-    "Ringed s7 incl 30",
-    "Ringed (zoom 2) s7 incl 30",
-    "Ringed s7 incl 50",
-    "Ringed s4242 incl 30",
-    "Ringed (zoom 2) s4242 incl 30",
-    "Ringed s4242 incl 50",
-    "Disc, no arms s7 incl 45",
-    "Disc, no arms (zoom 2) s7 incl 45",
-    "Disc, no arms s7 incl 65",
-    "Disc, no arms s4242 incl 45",
-    "Disc, no arms (zoom 2) s4242 incl 45",
-    "Disc, no arms s4242 incl 65",
-    "Edge-on with dust s7 incl 88",
-    "Edge-on with dust (zoom 2) s7 incl 88",
-    "Edge-on with dust s7 incl 108",
-    "Edge-on with dust s4242 incl 88",
-    "Edge-on with dust (zoom 2) s4242 incl 88",
-    "Edge-on with dust s4242 incl 108",
-    "Smooth, round s7 incl 10",
-    "Smooth, round (zoom 2) s7 incl 10",
-    "Smooth, round s7 incl 30",
-    "Smooth, round s4242 incl 10",
-    "Smooth, round (zoom 2) s4242 incl 10",
-    "Smooth, round s4242 incl 30",
-    "Cigar-shaped s7 incl 88",
-    "Cigar-shaped (zoom 2) s7 incl 88",
-    "Cigar-shaped s7 incl 108",
-    "Cigar-shaped s4242 incl 88",
-    "Cigar-shaped (zoom 2) s4242 incl 88",
-    "Cigar-shaped s4242 incl 108",
-    "Radio jet s7 incl 88",
-    "Radio jet (zoom 2) s7 incl 88",
-    "Radio jet s7 incl 108",
-    "Radio jet s4242 incl 88",
-    "Radio jet (zoom 2) s4242 incl 88",
-    "Radio jet s4242 incl 108",
-    "Shell galaxy s7 incl 88",
-    "Shell galaxy (zoom 2) s7 incl 88",
-    "Shell galaxy s7 incl 108",
-    "Shell galaxy s4242 incl 88",
-    "Shell galaxy (zoom 2) s4242 incl 88",
-    "Shell galaxy s4242 incl 108",
-    "Barred spiral (ribbons) s4242 incl 30",
-    "Barred spiral (ribbons) s4242 incl 50",
-    "Barred spiral (ribbons) s4242 incl 30",
-    "Barred spiral (ribbons) s7 incl 30",
-    "Barred spiral (ribbons) s7 incl 50",
-    "Barred spiral (ribbons) s7 incl 30",
-    "Barred spiral (vectors) s4242 incl 30",
-    "Barred spiral (vectors) s4242 incl 50",
-    "Barred spiral (vectors) s4242 incl 30",
-    "Barred spiral (vectors) s7 incl 30",
-    "Barred spiral (vectors) s7 incl 50",
-    "Barred spiral (vectors) s7 incl 30",
-    "Cigar-shaped (stipple) s4242 incl 88",
-    "Cigar-shaped (stipple) s4242 incl 108",
-    "Cigar-shaped (stipple) s4242 incl 88",
-    "Cigar-shaped (stipple) s7 incl 88",
-    "Cigar-shaped (stipple) s7 incl 108",
-    "Cigar-shaped (stipple) s7 incl 88",
-    "Disc, no arms (stipple) s11 incl 45",
-    "Disc, no arms (stipple) s11 incl 65",
-    "Disc, no arms (stipple) s3 incl 45",
-    "Disc, no arms (stipple) s3 incl 65",
-    "Disc, no arms (stipple) s4242 incl 45",
-    "Disc, no arms (stipple) s4242 incl 65",
-    "Disc, no arms (stipple) s4242 incl 45",
-    "Disc, no arms (stipple) s7 incl 45",
-    "Disc, no arms (stipple) s7 incl 65",
-    "Disc, no arms (stipple) s7 incl 45",
-    "Disc, no arms (vectors) s4242 incl 45",
-    "Disc, no arms (vectors) s4242 incl 65",
-    "Disc, no arms (vectors) s4242 incl 45",
-    "Disc, no arms (vectors) s7 incl 45",
-    "Disc, no arms (vectors) s7 incl 65",
-    "Disc, no arms (vectors) s7 incl 45",
-    "Dusty spiral (ribbons) s4242 incl 35",
-    "Dusty spiral (ribbons) s4242 incl 55",
-    "Dusty spiral (ribbons) s4242 incl 35",
-    "Dusty spiral (ribbons) s7 incl 35",
-    "Dusty spiral (ribbons) s7 incl 55",
-    "Dusty spiral (ribbons) s7 incl 35",
-    "Edge-on with dust (vectors) s4242 incl 88",
-    "Edge-on with dust (vectors) s4242 incl 108",
-    "Edge-on with dust (vectors) s4242 incl 88",
-    "Edge-on with dust (vectors) s7 incl 88",
-    "Edge-on with dust (vectors) s7 incl 108",
-    "Edge-on with dust (vectors) s7 incl 88",
     "Flocculent (ribbons) s4242 incl 30",
     "Flocculent (ribbons) s4242 incl 50",
-    "Flocculent (ribbons) s4242 incl 30",
     "Flocculent (ribbons) s7 incl 30",
     "Flocculent (ribbons) s7 incl 50",
-    "Flocculent (ribbons) s7 incl 30",
-    "Grand design (ribbons) s4242 incl 30",
-    "Grand design (ribbons) s4242 incl 50",
-    "Grand design (ribbons) s4242 incl 30",
-    "Grand design (ribbons) s7 incl 30",
-    "Grand design (ribbons) s7 incl 50",
-    "Grand design (ribbons) s7 incl 30",
-    "Grand design (stipple-arms) s4242 incl 30",
-    "Grand design (stipple-arms) s4242 incl 50",
-    "Grand design (stipple-arms) s7 incl 30",
-    "Grand design (stipple-arms) s7 incl 50",
-    "Hand-drawn arms (vectors) s4242 incl 30",
-    "Hand-drawn arms (vectors) s4242 incl 50",
-    "Hand-drawn arms (vectors) s4242 incl 30",
-    "Hand-drawn arms (vectors) s7 incl 30",
-    "Hand-drawn arms (vectors) s7 incl 50",
-    "Hand-drawn arms (vectors) s7 incl 30",
-    "Hand wobble (ribbons) s4242 incl 30",
-    "Hand wobble (ribbons) s4242 incl 50",
-    "Hand wobble (ribbons) s4242 incl 30",
-    "Hand wobble (ribbons) s7 incl 30",
-    "Hand wobble (ribbons) s7 incl 50",
-    "Hand wobble (ribbons) s7 incl 30",
-    "Loose, open arms (ribbons) s4242 incl 30",
-    "Loose, open arms (ribbons) s4242 incl 50",
-    "Loose, open arms (ribbons) s4242 incl 30",
-    "Loose, open arms (ribbons) s7 incl 30",
-    "Loose, open arms (ribbons) s7 incl 50",
-    "Loose, open arms (ribbons) s7 incl 30",
-    "Radio jet (stipple) s4242 incl 88",
-    "Radio jet (stipple) s4242 incl 108",
-    "Radio jet (stipple) s7 incl 88",
-    "Radio jet (stipple) s7 incl 108",
-    "Radio jet (vectors) s4242 incl 88",
-    "Radio jet (vectors) s4242 incl 108",
-    "Radio jet (vectors) s4242 incl 88",
-    "Radio jet (vectors) s7 incl 88",
-    "Radio jet (vectors) s7 incl 108",
-    "Radio jet (vectors) s7 incl 88",
-    "Ringed (vectors) s4242 incl 30",
-    "Ringed (vectors) s4242 incl 50",
-    "Ringed (vectors) s4242 incl 30",
-    "Ringed (vectors) s7 incl 30",
-    "Ringed (vectors) s7 incl 50",
-    "Ringed (vectors) s7 incl 30",
-    "Shell galaxy (vectors) s4242 incl 88",
-    "Shell galaxy (vectors) s4242 incl 108",
-    "Shell galaxy (vectors) s4242 incl 88",
-    "Shell galaxy (vectors) s7 incl 88",
-    "Shell galaxy (vectors) s7 incl 108",
-    "Shell galaxy (vectors) s7 incl 88",
-    "Smooth, round (stipple) s11 incl 10",
-    "Smooth, round (stipple) s11 incl 30",
-    "Smooth, round (stipple) s3 incl 10",
-    "Smooth, round (stipple) s3 incl 30",
-    "Smooth, round (stipple) s4242 incl 10",
-    "Smooth, round (stipple) s4242 incl 30",
-    "Smooth, round (stipple) s4242 incl 10",
-    "Smooth, round (stipple) s7 incl 10",
-    "Smooth, round (stipple) s7 incl 30",
-    "Smooth, round (stipple) s7 incl 10",
-    "Stellar streams (vectors) s4242 incl 88",
-    "Stellar streams (vectors) s4242 incl 108",
-    "Stellar streams (vectors) s4242 incl 88",
-    "Stellar streams (vectors) s7 incl 88",
-    "Stellar streams (vectors) s7 incl 108",
-    "Stellar streams (vectors) s7 incl 88",
-    "Tightly wound (ribbons) s4242 incl 30",
-    "Tightly wound (ribbons) s4242 incl 50",
-    "Tightly wound (ribbons) s4242 incl 30",
-    "Tightly wound (ribbons) s7 incl 30",
-    "Tightly wound (ribbons) s7 incl 50",
-    "Tightly wound (ribbons) s7 incl 30",
-    "Artefact: cosmic rays (stars) s4242 incl 30",
-    "Artefact: cosmic rays (stars) s4242 incl 50",
-    "Artefact: cosmic rays (stars) s4242 incl 30",
-    "Artefact: cosmic rays (stars) s7 incl 30",
-    "Artefact: cosmic rays (stars) s7 incl 50",
-    "Artefact: cosmic rays (stars) s7 incl 30",
-    "Artefact: ghost reflection (stars) s4242 incl 30",
-    "Artefact: ghost reflection (stars) s4242 incl 50",
-    "Artefact: ghost reflection (stars) s4242 incl 30",
-    "Artefact: ghost reflection (stars) s7 incl 30",
-    "Artefact: ghost reflection (stars) s7 incl 50",
-    "Artefact: ghost reflection (stars) s7 incl 30",
-    "Artefact: satellite trail (stars) s4242 incl 30",
-    "Artefact: satellite trail (stars) s4242 incl 50",
-    "Artefact: satellite trail (stars) s4242 incl 30",
-    "Artefact: satellite trail (stars) s7 incl 30",
-    "Artefact: satellite trail (stars) s7 incl 50",
-    "Artefact: satellite trail (stars) s7 incl 30",
-    "Deep field (sky) s4242 incl 88",
-    "Deep field (sky) s4242 incl 108",
-    "Deep field (sky) s4242 incl 88",
-    "Deep field (sky) s7 incl 88",
-    "Deep field (sky) s7 incl 108",
-    "Deep field (sky) s7 incl 88",
-    "Layered: barred spiral, satellite trail (layered) s4242 incl 30",
-    "Layered: barred spiral, satellite trail (layered) s4242 incl 50",
-    "Layered: barred spiral, satellite trail (layered) s4242 incl 30",
-    "Layered: barred spiral, satellite trail (layered) s7 incl 30",
-    "Layered: barred spiral, satellite trail (layered) s7 incl 50",
-    "Layered: barred spiral, satellite trail (layered) s7 incl 30",
-    "Layered: edge-on, star on top (layered) s4242 incl 86",
-    "Layered: edge-on, star on top (layered) s4242 incl 106",
-    "Layered: edge-on, star on top (layered) s4242 incl 86",
-    "Layered: edge-on, star on top (layered) s7 incl 86",
-    "Layered: edge-on, star on top (layered) s7 incl 106",
-    "Layered: edge-on, star on top (layered) s7 incl 86",
-    "Layered: ringed galaxy, ghost reflection (layered) s4242 incl 25",
-    "Layered: ringed galaxy, ghost reflection (layered) s4242 incl 45",
-    "Layered: ringed galaxy, ghost reflection (layered) s4242 incl 25",
-    "Layered: ringed galaxy, ghost reflection (layered) s7 incl 25",
-    "Layered: ringed galaxy, ghost reflection (layered) s7 incl 45",
-    "Layered: ringed galaxy, ghost reflection (layered) s7 incl 25",
-    "Layered: spiral beside a bright star (layered) s4242 incl 35",
-    "Layered: spiral beside a bright star (layered) s4242 incl 55",
-    "Layered: spiral beside a bright star (layered) s4242 incl 35",
-    "Layered: spiral beside a bright star (layered) s7 incl 35",
-    "Layered: spiral beside a bright star (layered) s7 incl 55",
-    "Layered: spiral beside a bright star (layered) s7 incl 35",
-    "Star: bright, with spikes (stars) s4242 incl 30",
-    "Star: bright, with spikes (stars) s4242 incl 50",
-    "Star: bright, with spikes (stars) s4242 incl 30",
-    "Star: bright, with spikes (stars) s7 incl 30",
-    "Star: bright, with spikes (stars) s7 incl 50",
-    "Star: bright, with spikes (stars) s7 incl 30",
-    "Star: faint (stars) s4242 incl 30",
-    "Star: faint (stars) s4242 incl 50",
-    "Star: faint (stars) s4242 incl 30",
-    "Star: faint (stars) s7 incl 30",
-    "Star: faint (stars) s7 incl 50",
-    "Star: faint (stars) s7 incl 30",
-    "Barred spiral (knob-ring-lines) s4242 incl 30",
-    "Barred spiral (knob-ring-lines) s4242 incl 50",
-    "Barred spiral (knob-ring-lines) s7 incl 30",
-    "Barred spiral (knob-ring-lines) s7 incl 50",
-    "Cigar-shaped (single) s4242 incl 88",
-    "Cigar-shaped (single) s4242 incl 108",
-    "Cigar-shaped (single) s4242 incl 88",
-    "Cigar-shaped (single) s7 incl 88",
-    "Cigar-shaped (single) s7 incl 108",
-    "Cigar-shaped (single) s7 incl 88",
-    "Disc, no arms (knob-sersic) s4242 incl 60",
-    "Disc, no arms (knob-sersic) s4242 incl 80",
-    "Disc, no arms (knob-sersic) s7 incl 60",
-    "Disc, no arms (knob-sersic) s7 incl 80",
-    "Disc, no arms (knob-tail) s4242 incl 45",
-    "Disc, no arms (knob-tail) s4242 incl 65",
-    "Disc, no arms (knob-tail) s7 incl 45",
-    "Disc, no arms (knob-tail) s7 incl 65",
-    "Dusty spiral (single) s4242 incl 35",
-    "Dusty spiral (single) s4242 incl 55",
-    "Dusty spiral (single) s4242 incl 35",
-    "Dusty spiral (single) s7 incl 35",
-    "Dusty spiral (single) s7 incl 55",
-    "Dusty spiral (single) s7 incl 35",
     "Flocculent (single) s4242 incl 30",
     "Flocculent (single) s4242 incl 50",
-    "Flocculent (single) s4242 incl 30",
     "Flocculent (single) s7 incl 30",
     "Flocculent (single) s7 incl 50",
-    "Flocculent (single) s7 incl 30",
+    "Flocculent (zoom 2) s4242 incl 30",
+    "Flocculent (zoom 2) s7 incl 30",
+    "Flocculent s4242 incl 30",
+    "Flocculent s4242 incl 50",
+    "Flocculent s7 incl 30",
+    "Flocculent s7 incl 50",
     "Grand design (knob-dust) s4242 incl 75",
     "Grand design (knob-dust) s4242 incl 95",
     "Grand design (knob-dust) s7 incl 75",
@@ -387,46 +189,338 @@
     "Grand design (knob-whole) s4242 incl 50",
     "Grand design (knob-whole) s7 incl 30",
     "Grand design (knob-whole) s7 incl 50",
+    "Grand design (lines) s101 incl 30",
+    "Grand design (lines) s101 incl 50",
+    "Grand design (lines) s11 incl 30",
+    "Grand design (lines) s11 incl 50",
+    "Grand design (lines) s23 incl 30",
+    "Grand design (lines) s23 incl 50",
+    "Grand design (lines) s3 incl 30",
+    "Grand design (lines) s3 incl 50",
+    "Grand design (lines) s4242 incl 30",
+    "Grand design (lines) s4242 incl 50",
+    "Grand design (lines) s7 incl 30",
+    "Grand design (lines) s7 incl 50",
+    "Grand design (ribbons) s4242 incl 30",
+    "Grand design (ribbons) s4242 incl 50",
+    "Grand design (ribbons) s7 incl 30",
+    "Grand design (ribbons) s7 incl 50",
     "Grand design (single) s4242 incl 30",
     "Grand design (single) s4242 incl 50",
-    "Grand design (single) s4242 incl 30",
     "Grand design (single) s7 incl 30",
     "Grand design (single) s7 incl 50",
-    "Grand design (single) s7 incl 30",
+    "Grand design (stipple-arms) s4242 incl 30",
+    "Grand design (stipple-arms) s4242 incl 50",
+    "Grand design (stipple-arms) s7 incl 30",
+    "Grand design (stipple-arms) s7 incl 50",
+    "Grand design (zoom 2) s4242 incl 30",
+    "Grand design (zoom 2) s7 incl 30",
+    "Grand design s4242 incl 30",
+    "Grand design s4242 incl 50",
+    "Grand design s7 incl 30",
+    "Grand design s7 incl 50",
+    "Hand wobble (lines) s101 incl 30",
+    "Hand wobble (lines) s101 incl 50",
+    "Hand wobble (lines) s11 incl 30",
+    "Hand wobble (lines) s11 incl 50",
+    "Hand wobble (lines) s23 incl 30",
+    "Hand wobble (lines) s23 incl 50",
+    "Hand wobble (lines) s3 incl 30",
+    "Hand wobble (lines) s3 incl 50",
+    "Hand wobble (lines) s4242 incl 30",
+    "Hand wobble (lines) s4242 incl 50",
+    "Hand wobble (lines) s7 incl 30",
+    "Hand wobble (lines) s7 incl 50",
+    "Hand wobble (ribbons) s4242 incl 30",
+    "Hand wobble (ribbons) s4242 incl 50",
+    "Hand wobble (ribbons) s7 incl 30",
+    "Hand wobble (ribbons) s7 incl 50",
     "Hand wobble (single) s4242 incl 30",
     "Hand wobble (single) s4242 incl 50",
-    "Hand wobble (single) s4242 incl 30",
     "Hand wobble (single) s7 incl 30",
     "Hand wobble (single) s7 incl 50",
-    "Hand wobble (single) s7 incl 30",
+    "Hand-drawn arms (vectors) s4242 incl 30",
+    "Hand-drawn arms (vectors) s4242 incl 50",
+    "Hand-drawn arms (vectors) s7 incl 30",
+    "Hand-drawn arms (vectors) s7 incl 50",
+    "Layered: barred spiral, satellite trail (layered) s4242 incl 30",
+    "Layered: barred spiral, satellite trail (layered) s4242 incl 50",
+    "Layered: barred spiral, satellite trail (layered) s7 incl 30",
+    "Layered: barred spiral, satellite trail (layered) s7 incl 50",
+    "Layered: edge-on, star on top (layered) s4242 incl 106",
+    "Layered: edge-on, star on top (layered) s4242 incl 86",
+    "Layered: edge-on, star on top (layered) s7 incl 106",
+    "Layered: edge-on, star on top (layered) s7 incl 86",
+    "Layered: ringed galaxy, ghost reflection (layered) s4242 incl 25",
+    "Layered: ringed galaxy, ghost reflection (layered) s4242 incl 45",
+    "Layered: ringed galaxy, ghost reflection (layered) s7 incl 25",
+    "Layered: ringed galaxy, ghost reflection (layered) s7 incl 45",
+    "Layered: spiral beside a bright star (layered) s4242 incl 35",
+    "Layered: spiral beside a bright star (layered) s4242 incl 55",
+    "Layered: spiral beside a bright star (layered) s7 incl 35",
+    "Layered: spiral beside a bright star (layered) s7 incl 55",
+    "Lens: Einstein cross (quasar) (lens) s101 incl 108",
+    "Lens: Einstein cross (quasar) (lens) s101 incl 88",
+    "Lens: Einstein cross (quasar) (lens) s11 incl 108",
+    "Lens: Einstein cross (quasar) (lens) s11 incl 88",
+    "Lens: Einstein cross (quasar) (lens) s13 incl 108",
+    "Lens: Einstein cross (quasar) (lens) s13 incl 88",
+    "Lens: Einstein cross (quasar) (lens) s211 incl 108",
+    "Lens: Einstein cross (quasar) (lens) s211 incl 88",
+    "Lens: Einstein cross (quasar) (lens) s23 incl 108",
+    "Lens: Einstein cross (quasar) (lens) s23 incl 88",
+    "Lens: Einstein cross (quasar) (lens) s29 incl 108",
+    "Lens: Einstein cross (quasar) (lens) s29 incl 88",
+    "Lens: Einstein cross (quasar) (lens) s3 incl 108",
+    "Lens: Einstein cross (quasar) (lens) s3 incl 88",
+    "Lens: Einstein cross (quasar) (lens) s4242 incl 108",
+    "Lens: Einstein cross (quasar) (lens) s4242 incl 88",
+    "Lens: Einstein cross (quasar) (lens) s5 incl 108",
+    "Lens: Einstein cross (quasar) (lens) s5 incl 88",
+    "Lens: Einstein cross (quasar) (lens) s53 incl 108",
+    "Lens: Einstein cross (quasar) (lens) s53 incl 88",
+    "Lens: Einstein cross (quasar) (lens) s7 incl 108",
+    "Lens: Einstein cross (quasar) (lens) s7 incl 88",
+    "Lens: Einstein cross (quasar) (lens) s89 incl 108",
+    "Lens: Einstein cross (quasar) (lens) s89 incl 88",
+    "Lens: Einstein ring (lens) s101 incl 108",
+    "Lens: Einstein ring (lens) s101 incl 88",
+    "Lens: Einstein ring (lens) s11 incl 108",
+    "Lens: Einstein ring (lens) s11 incl 88",
+    "Lens: Einstein ring (lens) s13 incl 108",
+    "Lens: Einstein ring (lens) s13 incl 88",
+    "Lens: Einstein ring (lens) s211 incl 108",
+    "Lens: Einstein ring (lens) s211 incl 88",
+    "Lens: Einstein ring (lens) s23 incl 108",
+    "Lens: Einstein ring (lens) s23 incl 88",
+    "Lens: Einstein ring (lens) s29 incl 108",
+    "Lens: Einstein ring (lens) s29 incl 88",
+    "Lens: Einstein ring (lens) s3 incl 108",
+    "Lens: Einstein ring (lens) s3 incl 88",
+    "Lens: Einstein ring (lens) s4242 incl 108",
+    "Lens: Einstein ring (lens) s4242 incl 88",
+    "Lens: Einstein ring (lens) s5 incl 108",
+    "Lens: Einstein ring (lens) s5 incl 88",
+    "Lens: Einstein ring (lens) s53 incl 108",
+    "Lens: Einstein ring (lens) s53 incl 88",
+    "Lens: Einstein ring (lens) s7 incl 108",
+    "Lens: Einstein ring (lens) s7 incl 88",
+    "Lens: Einstein ring (lens) s89 incl 108",
+    "Lens: Einstein ring (lens) s89 incl 88",
+    "Lens: a quad (lens) s101 incl 108",
+    "Lens: a quad (lens) s101 incl 88",
+    "Lens: a quad (lens) s11 incl 108",
+    "Lens: a quad (lens) s11 incl 88",
+    "Lens: a quad (lens) s13 incl 108",
+    "Lens: a quad (lens) s13 incl 88",
+    "Lens: a quad (lens) s211 incl 108",
+    "Lens: a quad (lens) s211 incl 88",
+    "Lens: a quad (lens) s23 incl 108",
+    "Lens: a quad (lens) s23 incl 88",
+    "Lens: a quad (lens) s29 incl 108",
+    "Lens: a quad (lens) s29 incl 88",
+    "Lens: a quad (lens) s3 incl 108",
+    "Lens: a quad (lens) s3 incl 88",
+    "Lens: a quad (lens) s4242 incl 108",
+    "Lens: a quad (lens) s4242 incl 88",
+    "Lens: a quad (lens) s5 incl 108",
+    "Lens: a quad (lens) s5 incl 88",
+    "Lens: a quad (lens) s53 incl 108",
+    "Lens: a quad (lens) s53 incl 88",
+    "Lens: a quad (lens) s7 incl 108",
+    "Lens: a quad (lens) s7 incl 88",
+    "Lens: a quad (lens) s89 incl 108",
+    "Lens: a quad (lens) s89 incl 88",
+    "Lens: double Einstein ring (lens) s101 incl 108",
+    "Lens: double Einstein ring (lens) s101 incl 88",
+    "Lens: double Einstein ring (lens) s11 incl 108",
+    "Lens: double Einstein ring (lens) s11 incl 88",
+    "Lens: double Einstein ring (lens) s13 incl 108",
+    "Lens: double Einstein ring (lens) s13 incl 88",
+    "Lens: double Einstein ring (lens) s211 incl 108",
+    "Lens: double Einstein ring (lens) s211 incl 88",
+    "Lens: double Einstein ring (lens) s23 incl 108",
+    "Lens: double Einstein ring (lens) s23 incl 88",
+    "Lens: double Einstein ring (lens) s29 incl 108",
+    "Lens: double Einstein ring (lens) s29 incl 88",
+    "Lens: double Einstein ring (lens) s3 incl 108",
+    "Lens: double Einstein ring (lens) s3 incl 88",
+    "Lens: double Einstein ring (lens) s4242 incl 108",
+    "Lens: double Einstein ring (lens) s4242 incl 88",
+    "Lens: double Einstein ring (lens) s5 incl 108",
+    "Lens: double Einstein ring (lens) s5 incl 88",
+    "Lens: double Einstein ring (lens) s53 incl 108",
+    "Lens: double Einstein ring (lens) s53 incl 88",
+    "Lens: double Einstein ring (lens) s7 incl 108",
+    "Lens: double Einstein ring (lens) s7 incl 88",
+    "Lens: double Einstein ring (lens) s89 incl 108",
+    "Lens: double Einstein ring (lens) s89 incl 88",
+    "Lens: galaxy cluster (lens) s101 incl 108",
+    "Lens: galaxy cluster (lens) s101 incl 88",
+    "Lens: galaxy cluster (lens) s11 incl 108",
+    "Lens: galaxy cluster (lens) s11 incl 88",
+    "Lens: galaxy cluster (lens) s13 incl 108",
+    "Lens: galaxy cluster (lens) s13 incl 88",
+    "Lens: galaxy cluster (lens) s211 incl 108",
+    "Lens: galaxy cluster (lens) s211 incl 88",
+    "Lens: galaxy cluster (lens) s23 incl 108",
+    "Lens: galaxy cluster (lens) s23 incl 88",
+    "Lens: galaxy cluster (lens) s29 incl 108",
+    "Lens: galaxy cluster (lens) s29 incl 88",
+    "Lens: galaxy cluster (lens) s3 incl 108",
+    "Lens: galaxy cluster (lens) s3 incl 88",
+    "Lens: galaxy cluster (lens) s4242 incl 108",
+    "Lens: galaxy cluster (lens) s4242 incl 88",
+    "Lens: galaxy cluster (lens) s5 incl 108",
+    "Lens: galaxy cluster (lens) s5 incl 88",
+    "Lens: galaxy cluster (lens) s53 incl 108",
+    "Lens: galaxy cluster (lens) s53 incl 88",
+    "Lens: galaxy cluster (lens) s7 incl 108",
+    "Lens: galaxy cluster (lens) s7 incl 88",
+    "Lens: galaxy cluster (lens) s89 incl 108",
+    "Lens: galaxy cluster (lens) s89 incl 88",
+    "Lens: giant arc (lens) s101 incl 108",
+    "Lens: giant arc (lens) s101 incl 88",
+    "Lens: giant arc (lens) s11 incl 108",
+    "Lens: giant arc (lens) s11 incl 88",
+    "Lens: giant arc (lens) s13 incl 108",
+    "Lens: giant arc (lens) s13 incl 88",
+    "Lens: giant arc (lens) s211 incl 108",
+    "Lens: giant arc (lens) s211 incl 88",
+    "Lens: giant arc (lens) s23 incl 108",
+    "Lens: giant arc (lens) s23 incl 88",
+    "Lens: giant arc (lens) s29 incl 108",
+    "Lens: giant arc (lens) s29 incl 88",
+    "Lens: giant arc (lens) s3 incl 108",
+    "Lens: giant arc (lens) s3 incl 88",
+    "Lens: giant arc (lens) s4242 incl 108",
+    "Lens: giant arc (lens) s4242 incl 88",
+    "Lens: giant arc (lens) s5 incl 108",
+    "Lens: giant arc (lens) s5 incl 88",
+    "Lens: giant arc (lens) s53 incl 108",
+    "Lens: giant arc (lens) s53 incl 88",
+    "Lens: giant arc (lens) s7 incl 108",
+    "Lens: giant arc (lens) s7 incl 88",
+    "Lens: giant arc (lens) s89 incl 108",
+    "Lens: giant arc (lens) s89 incl 88",
+    "Loose, open arms (lines) s101 incl 30",
+    "Loose, open arms (lines) s101 incl 50",
+    "Loose, open arms (lines) s11 incl 30",
+    "Loose, open arms (lines) s11 incl 50",
+    "Loose, open arms (lines) s23 incl 30",
+    "Loose, open arms (lines) s23 incl 50",
+    "Loose, open arms (lines) s3 incl 30",
+    "Loose, open arms (lines) s3 incl 50",
+    "Loose, open arms (lines) s4242 incl 30",
+    "Loose, open arms (lines) s4242 incl 50",
+    "Loose, open arms (lines) s7 incl 30",
+    "Loose, open arms (lines) s7 incl 50",
+    "Loose, open arms (ribbons) s4242 incl 30",
+    "Loose, open arms (ribbons) s4242 incl 50",
+    "Loose, open arms (ribbons) s7 incl 30",
+    "Loose, open arms (ribbons) s7 incl 50",
     "Loose, open arms (single) s4242 incl 30",
     "Loose, open arms (single) s4242 incl 50",
-    "Loose, open arms (single) s4242 incl 30",
     "Loose, open arms (single) s7 incl 30",
     "Loose, open arms (single) s7 incl 50",
-    "Loose, open arms (single) s7 incl 30",
+    "Radio jet (stipple) s4242 incl 108",
+    "Radio jet (stipple) s4242 incl 88",
+    "Radio jet (stipple) s7 incl 108",
+    "Radio jet (stipple) s7 incl 88",
+    "Radio jet (vectors) s4242 incl 108",
+    "Radio jet (vectors) s4242 incl 88",
+    "Radio jet (vectors) s7 incl 108",
+    "Radio jet (vectors) s7 incl 88",
+    "Radio jet (zoom 2) s4242 incl 88",
+    "Radio jet (zoom 2) s7 incl 88",
+    "Radio jet s4242 incl 108",
+    "Radio jet s4242 incl 88",
+    "Radio jet s7 incl 108",
+    "Radio jet s7 incl 88",
+    "Ringed (vectors) s4242 incl 30",
+    "Ringed (vectors) s4242 incl 50",
+    "Ringed (vectors) s7 incl 30",
+    "Ringed (vectors) s7 incl 50",
+    "Ringed (zoom 2) s4242 incl 30",
+    "Ringed (zoom 2) s7 incl 30",
+    "Ringed s4242 incl 30",
+    "Ringed s4242 incl 50",
+    "Ringed s7 incl 30",
+    "Ringed s7 incl 50",
+    "Shell galaxy (vectors) s4242 incl 108",
+    "Shell galaxy (vectors) s4242 incl 88",
+    "Shell galaxy (vectors) s7 incl 108",
+    "Shell galaxy (vectors) s7 incl 88",
+    "Shell galaxy (zoom 2) s4242 incl 88",
+    "Shell galaxy (zoom 2) s7 incl 88",
+    "Shell galaxy s4242 incl 108",
+    "Shell galaxy s4242 incl 88",
+    "Shell galaxy s7 incl 108",
+    "Shell galaxy s7 incl 88",
     "Smooth, round (knob-halo) s4242 incl 10",
     "Smooth, round (knob-halo) s4242 incl 30",
     "Smooth, round (knob-halo) s7 incl 10",
     "Smooth, round (knob-halo) s7 incl 30",
     "Smooth, round (single) s4242 incl 10",
     "Smooth, round (single) s4242 incl 30",
-    "Smooth, round (single) s4242 incl 10",
     "Smooth, round (single) s7 incl 10",
     "Smooth, round (single) s7 incl 30",
-    "Smooth, round (single) s7 incl 10",
+    "Smooth, round (stipple) s11 incl 10",
+    "Smooth, round (stipple) s11 incl 30",
+    "Smooth, round (stipple) s3 incl 10",
+    "Smooth, round (stipple) s3 incl 30",
+    "Smooth, round (stipple) s4242 incl 10",
+    "Smooth, round (stipple) s4242 incl 30",
+    "Smooth, round (stipple) s7 incl 10",
+    "Smooth, round (stipple) s7 incl 30",
+    "Smooth, round (zoom 2) s4242 incl 10",
+    "Smooth, round (zoom 2) s7 incl 10",
+    "Smooth, round s4242 incl 10",
+    "Smooth, round s4242 incl 30",
+    "Smooth, round s7 incl 10",
+    "Smooth, round s7 incl 30",
+    "Star: bright, with spikes (stars) s4242 incl 30",
+    "Star: bright, with spikes (stars) s4242 incl 50",
+    "Star: bright, with spikes (stars) s7 incl 30",
+    "Star: bright, with spikes (stars) s7 incl 50",
+    "Star: faint (stars) s4242 incl 30",
+    "Star: faint (stars) s4242 incl 50",
+    "Star: faint (stars) s7 incl 30",
+    "Star: faint (stars) s7 incl 50",
     "Stellar populations (single) s4242 incl 30",
     "Stellar populations (single) s4242 incl 50",
-    "Stellar populations (single) s4242 incl 30",
     "Stellar populations (single) s7 incl 30",
     "Stellar populations (single) s7 incl 50",
-    "Stellar populations (single) s7 incl 30",
+    "Stellar streams (vectors) s4242 incl 108",
+    "Stellar streams (vectors) s4242 incl 88",
+    "Stellar streams (vectors) s7 incl 108",
+    "Stellar streams (vectors) s7 incl 88",
+    "Tightly wound (lines) s101 incl 30",
+    "Tightly wound (lines) s101 incl 50",
+    "Tightly wound (lines) s11 incl 30",
+    "Tightly wound (lines) s11 incl 50",
+    "Tightly wound (lines) s23 incl 30",
+    "Tightly wound (lines) s23 incl 50",
+    "Tightly wound (lines) s3 incl 30",
+    "Tightly wound (lines) s3 incl 50",
+    "Tightly wound (lines) s4242 incl 30",
+    "Tightly wound (lines) s4242 incl 50",
+    "Tightly wound (lines) s7 incl 30",
+    "Tightly wound (lines) s7 incl 50",
+    "Tightly wound (ribbons) s4242 incl 30",
+    "Tightly wound (ribbons) s4242 incl 50",
+    "Tightly wound (ribbons) s7 incl 30",
+    "Tightly wound (ribbons) s7 incl 50",
     "Tightly wound (single) s4242 incl 30",
     "Tightly wound (single) s4242 incl 50",
-    "Tightly wound (single) s4242 incl 30",
     "Tightly wound (single) s7 incl 30",
     "Tightly wound (single) s7 incl 50",
-    "Tightly wound (single) s7 incl 30"
+    "Tightly wound (zoom 2) s4242 incl 30",
+    "Tightly wound (zoom 2) s7 incl 30",
+    "Tightly wound s4242 incl 30",
+    "Tightly wound s4242 incl 50",
+    "Tightly wound s7 incl 30",
+    "Tightly wound s7 incl 50"
   ],
   "families": {
     "spiral": {
@@ -4997,6 +5091,2128 @@
       "v21Reroll": null
     },
     "lens": {
+      "engineRekey": {
+        "ssim": {
+          "n": 252,
+          "min": 0.5026,
+          "p5": 0.5096,
+          "median": 0.5622,
+          "p95": 0.6126,
+          "max": 0.6409
+        },
+        "ssimCoarse": {
+          "n": 252,
+          "min": 0.9333,
+          "p5": 0.9369,
+          "median": 0.9459,
+          "p95": 0.9532,
+          "max": 0.9595
+        },
+        "inkAbs": {
+          "n": 252,
+          "min": 0,
+          "p5": 0.0003,
+          "median": 0.0055,
+          "p95": 0.016,
+          "max": 0.0273
+        },
+        "medianAbs": {
+          "n": 252,
+          "min": 0,
+          "p5": 0,
+          "median": 0.0014,
+          "p95": 0.0125,
+          "max": 0.0228
+        },
+        "p90Abs": {
+          "n": 252,
+          "min": 0,
+          "p5": 0.0008,
+          "median": 0.0105,
+          "p95": 0.0331,
+          "max": 0.0605
+        },
+        "r25Abs": {
+          "n": 252,
+          "min": 0,
+          "p5": 0.0006,
+          "median": 0.0066,
+          "p95": 0.0219,
+          "max": 0.0281
+        },
+        "r50Abs": {
+          "n": 252,
+          "min": 0,
+          "p5": 0.0005,
+          "median": 0.0048,
+          "p95": 0.019,
+          "max": 0.0345
+        },
+        "r90Abs": {
+          "n": 252,
+          "min": 0,
+          "p5": 0.0007,
+          "median": 0.0092,
+          "p95": 0.0346,
+          "max": 0.0539
+        },
+        "outerAbs": {
+          "n": 252,
+          "min": 0,
+          "p5": 0.0004,
+          "median": 0.0032,
+          "p95": 0.008,
+          "max": 0.0116
+        },
+        "qAbs": {
+          "n": 252,
+          "min": 0,
+          "p5": 0.0008,
+          "median": 0.0089,
+          "p95": 0.0239,
+          "max": 0.0439
+        },
+        "qInnerAbs": {
+          "n": 252,
+          "min": 0,
+          "p5": 0.0007,
+          "median": 0.0078,
+          "p95": 0.0216,
+          "max": 0.0329
+        },
+        "paAbs": {
+          "n": 252,
+          "min": 0.0054,
+          "p5": 0.1591,
+          "median": 1.5585,
+          "p95": 7.8354,
+          "max": 64.4411
+        }
+      },
+      "heldOutV21": {
+        "ssim": {
+          "n": 56,
+          "min": 0.5364,
+          "p5": 0.5414,
+          "median": 0.5815,
+          "p95": 0.6169,
+          "max": 0.6441
+        },
+        "ssimCoarse": {
+          "n": 56,
+          "min": 0.9398,
+          "p5": 0.9399,
+          "median": 0.9484,
+          "p95": 0.9574,
+          "max": 0.9607
+        },
+        "inkAbs": {
+          "n": 56,
+          "min": 0.0002,
+          "p5": 0.0008,
+          "median": 0.0055,
+          "p95": 0.016,
+          "max": 0.0206
+        },
+        "medianAbs": {
+          "n": 56,
+          "min": 0,
+          "p5": 0,
+          "median": 0.0001,
+          "p95": 0.0043,
+          "max": 0.0088
+        },
+        "p90Abs": {
+          "n": 56,
+          "min": 0.0001,
+          "p5": 0.0012,
+          "median": 0.0093,
+          "p95": 0.0279,
+          "max": 0.0359
+        },
+        "r25Abs": {
+          "n": 56,
+          "min": 0,
+          "p5": 0.0005,
+          "median": 0.0077,
+          "p95": 0.0179,
+          "max": 0.0528
+        },
+        "r50Abs": {
+          "n": 56,
+          "min": 0.0004,
+          "p5": 0.0011,
+          "median": 0.0098,
+          "p95": 0.0245,
+          "max": 0.0283
+        },
+        "r90Abs": {
+          "n": 56,
+          "min": 0,
+          "p5": 0.0005,
+          "median": 0.0059,
+          "p95": 0.0453,
+          "max": 0.0522
+        },
+        "outerAbs": {
+          "n": 56,
+          "min": 0,
+          "p5": 0.0003,
+          "median": 0.0023,
+          "p95": 0.0093,
+          "max": 0.0118
+        },
+        "qAbs": {
+          "n": 56,
+          "min": 0.0004,
+          "p5": 0.0007,
+          "median": 0.0098,
+          "p95": 0.0287,
+          "max": 0.0363
+        },
+        "qInnerAbs": {
+          "n": 56,
+          "min": 0.0004,
+          "p5": 0.0006,
+          "median": 0.0051,
+          "p95": 0.0204,
+          "max": 0.027
+        },
+        "paAbs": {
+          "n": 56,
+          "min": 0.0013,
+          "p5": 0.0944,
+          "median": 1.1889,
+          "p95": 13.1434,
+          "max": 13.537
+        }
+      },
+      "negativeControls": {
+        "pa +90°": {
+          "applicable": 16,
+          "detected": 16,
+          "missed": [],
+          "ssim": {
+            "n": 16,
+            "min": 0.4543,
+            "p5": 0.4543,
+            "median": 0.4806,
+            "p95": 0.5362,
+            "max": 0.5362
+          },
+          "ssimCoarse": {
+            "n": 16,
+            "min": 0.7547,
+            "p5": 0.7547,
+            "median": 0.839,
+            "p95": 0.9071,
+            "max": 0.9071
+          },
+          "inkAbs": {
+            "n": 16,
+            "min": 0.0008,
+            "p5": 0.0008,
+            "median": 0.0085,
+            "p95": 0.0192,
+            "max": 0.0192
+          },
+          "medianAbs": {
+            "n": 16,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.0043,
+            "p95": 0.0151,
+            "max": 0.0151
+          },
+          "p90Abs": {
+            "n": 16,
+            "min": 0.0021,
+            "p5": 0.0021,
+            "median": 0.0138,
+            "p95": 0.0453,
+            "max": 0.0453
+          },
+          "r25Abs": {
+            "n": 16,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0028,
+            "p95": 0.011,
+            "max": 0.011
+          },
+          "r50Abs": {
+            "n": 16,
+            "min": 0.001,
+            "p5": 0.001,
+            "median": 0.0079,
+            "p95": 0.0186,
+            "max": 0.0186
+          },
+          "r90Abs": {
+            "n": 16,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.0053,
+            "p95": 0.0249,
+            "max": 0.0249
+          },
+          "outerAbs": {
+            "n": 16,
+            "min": 0,
+            "p5": 0,
+            "median": 0.002,
+            "p95": 0.0059,
+            "max": 0.0059
+          },
+          "qAbs": {
+            "n": 16,
+            "min": 0.0011,
+            "p5": 0.0011,
+            "median": 0.0141,
+            "p95": 0.0244,
+            "max": 0.0244
+          },
+          "qInnerAbs": {
+            "n": 16,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0024,
+            "p95": 0.0127,
+            "max": 0.0127
+          },
+          "paAbs": {
+            "n": 16,
+            "min": 81.8626,
+            "p5": 81.8626,
+            "median": 86.3408,
+            "p95": 89.8604,
+            "max": 89.8604
+          },
+          "firstFailures": [
+            {
+              "config": "A sketch, lensed (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["coarse ssim 0.8543", "position angle -89.17°"]
+            },
+            {
+              "config": "Lens: double Einstein ring (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["coarse ssim 0.9071"]
+            },
+            {
+              "config": "Lens: Einstein ring (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["coarse ssim 0.8944", "position angle -84.96°"]
+            },
+            {
+              "config": "Lens: giant arc (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["coarse ssim 0.7719", "position angle -86.34°"]
+            }
+          ]
+        },
+        "bulgeFlat +0.1": {
+          "applicable": 16,
+          "detected": 11,
+          "missed": [
+            "Lens: double Einstein ring (lens) s4242 incl 88",
+            "Lens: Einstein ring (lens) s4242 incl 88",
+            "Lens: double Einstein ring (lens) s7 incl 88",
+            "Lens: Einstein ring (lens) s7 incl 88",
+            "Lens: giant arc (lens) s7 incl 88"
+          ],
+          "ssim": {
+            "n": 16,
+            "min": 0.5017,
+            "p5": 0.5017,
+            "median": 0.5225,
+            "p95": 0.5803,
+            "max": 0.5803
+          },
+          "ssimCoarse": {
+            "n": 16,
+            "min": 0.9265,
+            "p5": 0.9265,
+            "median": 0.9299,
+            "p95": 0.9362,
+            "max": 0.9362
+          },
+          "inkAbs": {
+            "n": 16,
+            "min": 0.0068,
+            "p5": 0.0068,
+            "median": 0.017,
+            "p95": 0.0388,
+            "max": 0.0388
+          },
+          "medianAbs": {
+            "n": 16,
+            "min": 0.0007,
+            "p5": 0.0007,
+            "median": 0.0061,
+            "p95": 0.0144,
+            "max": 0.0144
+          },
+          "p90Abs": {
+            "n": 16,
+            "min": 0.0024,
+            "p5": 0.0024,
+            "median": 0.0131,
+            "p95": 0.0403,
+            "max": 0.0403
+          },
+          "r25Abs": {
+            "n": 16,
+            "min": 0.0083,
+            "p5": 0.0083,
+            "median": 0.0139,
+            "p95": 0.0248,
+            "max": 0.0248
+          },
+          "r50Abs": {
+            "n": 16,
+            "min": 0.0017,
+            "p5": 0.0017,
+            "median": 0.009,
+            "p95": 0.0322,
+            "max": 0.0322
+          },
+          "r90Abs": {
+            "n": 16,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0158,
+            "p95": 0.0432,
+            "max": 0.0432
+          },
+          "outerAbs": {
+            "n": 16,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0046,
+            "p95": 0.0092,
+            "max": 0.0092
+          },
+          "qAbs": {
+            "n": 16,
+            "min": 0.0063,
+            "p5": 0.0063,
+            "median": 0.0387,
+            "p95": 0.0912,
+            "max": 0.0912
+          },
+          "qInnerAbs": {
+            "n": 16,
+            "min": 0.0031,
+            "p5": 0.0031,
+            "median": 0.0284,
+            "p95": 0.043,
+            "max": 0.043
+          },
+          "paAbs": {
+            "n": 16,
+            "min": 0.4013,
+            "p5": 0.4013,
+            "median": 10.6638,
+            "p95": 36.6119,
+            "max": 36.6119
+          },
+          "firstFailures": [
+            {
+              "config": "A sketch, lensed (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["axis ratio 0.0678"]
+            },
+            {
+              "config": "Lens: double Einstein ring (lens) s4242 incl 88",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Lens: Einstein ring (lens) s4242 incl 88",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Lens: giant arc (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["position angle 12.28°"]
+            }
+          ]
+        },
+        "bulgeFlat +0.15": {
+          "applicable": 12,
+          "detected": 10,
+          "missed": [
+            "Lens: Einstein ring (lens) s4242 incl 88",
+            "Lens: Einstein ring (lens) s7 incl 88"
+          ],
+          "ssim": {
+            "n": 12,
+            "min": 0.4936,
+            "p5": 0.4936,
+            "median": 0.5165,
+            "p95": 0.5424,
+            "max": 0.5424
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.9196,
+            "p5": 0.9196,
+            "median": 0.9228,
+            "p95": 0.9283,
+            "max": 0.9283
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.0138,
+            "p5": 0.0138,
+            "median": 0.0264,
+            "p95": 0.0484,
+            "max": 0.0484
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.0042,
+            "p95": 0.0214,
+            "max": 0.0214
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0012,
+            "p5": 0.0012,
+            "median": 0.0115,
+            "p95": 0.0319,
+            "max": 0.0319
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.0142,
+            "p5": 0.0142,
+            "median": 0.0199,
+            "p95": 0.0307,
+            "max": 0.0307
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0033,
+            "p5": 0.0033,
+            "median": 0.0163,
+            "p95": 0.0416,
+            "max": 0.0416
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0012,
+            "p5": 0.0012,
+            "median": 0.0161,
+            "p95": 0.0449,
+            "max": 0.0449
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0008,
+            "p5": 0.0008,
+            "median": 0.0052,
+            "p95": 0.0106,
+            "max": 0.0106
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0038,
+            "p5": 0.0038,
+            "median": 0.0669,
+            "p95": 0.1239,
+            "max": 0.1239
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0073,
+            "p5": 0.0073,
+            "median": 0.0405,
+            "p95": 0.0656,
+            "max": 0.0656
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 1.6307,
+            "p5": 1.6307,
+            "median": 14.276,
+            "p95": 45.2717,
+            "max": 45.2717
+          },
+          "firstFailures": [
+            {
+              "config": "A sketch, lensed (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["axis ratio 0.0873", "inner axis ratio 0.0486", "position angle 12.13°"]
+            },
+            {
+              "config": "Lens: Einstein ring (lens) s4242 incl 88",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Lens: giant arc (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["position angle 16.80°"]
+            },
+            {
+              "config": "A sketch, lensed (lens) s4242 incl 108",
+              "failed": true,
+              "by": ["axis ratio 0.1144", "inner axis ratio 0.0544"]
+            }
+          ]
+        },
+        "bulgeFlat −0.15": {
+          "applicable": 16,
+          "detected": 12,
+          "missed": [
+            "Lens: double Einstein ring (lens) s4242 incl 88",
+            "Lens: Einstein ring (lens) s4242 incl 88",
+            "Lens: giant arc (lens) s4242 incl 88",
+            "Lens: double Einstein ring (lens) s7 incl 88"
+          ],
+          "ssim": {
+            "n": 16,
+            "min": 0.5126,
+            "p5": 0.5126,
+            "median": 0.5341,
+            "p95": 0.5916,
+            "max": 0.5916
+          },
+          "ssimCoarse": {
+            "n": 16,
+            "min": 0.9263,
+            "p5": 0.9263,
+            "median": 0.93,
+            "p95": 0.9397,
+            "max": 0.9397
+          },
+          "inkAbs": {
+            "n": 16,
+            "min": 0.0031,
+            "p5": 0.0031,
+            "median": 0.0217,
+            "p95": 0.0452,
+            "max": 0.0452
+          },
+          "medianAbs": {
+            "n": 16,
+            "min": 0.0017,
+            "p5": 0.0017,
+            "median": 0.0086,
+            "p95": 0.0195,
+            "max": 0.0195
+          },
+          "p90Abs": {
+            "n": 16,
+            "min": 0.0006,
+            "p5": 0.0006,
+            "median": 0.0128,
+            "p95": 0.0372,
+            "max": 0.0372
+          },
+          "r25Abs": {
+            "n": 16,
+            "min": 0.004,
+            "p5": 0.004,
+            "median": 0.0126,
+            "p95": 0.0239,
+            "max": 0.0239
+          },
+          "r50Abs": {
+            "n": 16,
+            "min": 0.0008,
+            "p5": 0.0008,
+            "median": 0.0059,
+            "p95": 0.0335,
+            "max": 0.0335
+          },
+          "r90Abs": {
+            "n": 16,
+            "min": 0.0006,
+            "p5": 0.0006,
+            "median": 0.0168,
+            "p95": 0.0393,
+            "max": 0.0393
+          },
+          "outerAbs": {
+            "n": 16,
+            "min": 0.0004,
+            "p5": 0.0004,
+            "median": 0.0048,
+            "p95": 0.0082,
+            "max": 0.0082
+          },
+          "qAbs": {
+            "n": 16,
+            "min": 0.0206,
+            "p5": 0.0206,
+            "median": 0.067,
+            "p95": 0.0965,
+            "max": 0.0965
+          },
+          "qInnerAbs": {
+            "n": 16,
+            "min": 0.0089,
+            "p5": 0.0089,
+            "median": 0.0637,
+            "p95": 0.0825,
+            "max": 0.0825
+          },
+          "paAbs": {
+            "n": 16,
+            "min": 0.1676,
+            "p5": 0.1676,
+            "median": 3.9812,
+            "p95": 14.532,
+            "max": 14.532
+          },
+          "firstFailures": [
+            {
+              "config": "A sketch, lensed (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["axis ratio -0.0716", "inner axis ratio -0.0637"]
+            },
+            {
+              "config": "Lens: double Einstein ring (lens) s4242 incl 88",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Lens: Einstein ring (lens) s4242 incl 88",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Lens: giant arc (lens) s4242 incl 88",
+              "failed": false,
+              "by": []
+            }
+          ]
+        },
+        "halo off": {
+          "applicable": 16,
+          "detected": 1,
+          "missed": [
+            "A sketch, lensed (lens) s4242 incl 88",
+            "Lens: double Einstein ring (lens) s4242 incl 88",
+            "Lens: Einstein ring (lens) s4242 incl 88",
+            "Lens: giant arc (lens) s4242 incl 88",
+            "A sketch, lensed (lens) s4242 incl 108",
+            "Lens: double Einstein ring (lens) s4242 incl 108",
+            "Lens: Einstein ring (lens) s4242 incl 108",
+            "Lens: giant arc (lens) s4242 incl 108",
+            "A sketch, lensed (lens) s7 incl 88",
+            "Lens: double Einstein ring (lens) s7 incl 88",
+            "Lens: Einstein ring (lens) s7 incl 88",
+            "Lens: giant arc (lens) s7 incl 88",
+            "A sketch, lensed (lens) s7 incl 108",
+            "Lens: double Einstein ring (lens) s7 incl 108",
+            "Lens: Einstein ring (lens) s7 incl 108"
+          ],
+          "ssim": {
+            "n": 16,
+            "min": 0.5065,
+            "p5": 0.5065,
+            "median": 0.5276,
+            "p95": 0.5889,
+            "max": 0.5889
+          },
+          "ssimCoarse": {
+            "n": 16,
+            "min": 0.9353,
+            "p5": 0.9353,
+            "median": 0.9383,
+            "p95": 0.9434,
+            "max": 0.9434
+          },
+          "inkAbs": {
+            "n": 16,
+            "min": 0.006,
+            "p5": 0.006,
+            "median": 0.0105,
+            "p95": 0.017,
+            "max": 0.017
+          },
+          "medianAbs": {
+            "n": 16,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.0024,
+            "p95": 0.017,
+            "max": 0.017
+          },
+          "p90Abs": {
+            "n": 16,
+            "min": 0.0006,
+            "p5": 0.0006,
+            "median": 0.0137,
+            "p95": 0.0434,
+            "max": 0.0434
+          },
+          "r25Abs": {
+            "n": 16,
+            "min": 0.0009,
+            "p5": 0.0009,
+            "median": 0.0033,
+            "p95": 0.0115,
+            "max": 0.0115
+          },
+          "r50Abs": {
+            "n": 16,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.007,
+            "p95": 0.021,
+            "max": 0.021
+          },
+          "r90Abs": {
+            "n": 16,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0076,
+            "p95": 0.0271,
+            "max": 0.0271
+          },
+          "outerAbs": {
+            "n": 16,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.003,
+            "p95": 0.0055,
+            "max": 0.0055
+          },
+          "qAbs": {
+            "n": 16,
+            "min": 0.0005,
+            "p5": 0.0005,
+            "median": 0.015,
+            "p95": 0.0271,
+            "max": 0.0271
+          },
+          "qInnerAbs": {
+            "n": 16,
+            "min": 0.001,
+            "p5": 0.001,
+            "median": 0.0027,
+            "p95": 0.0109,
+            "max": 0.0109
+          },
+          "paAbs": {
+            "n": 16,
+            "min": 0.274,
+            "p5": 0.274,
+            "median": 3.0922,
+            "p95": 9.1638,
+            "max": 9.1638
+          },
+          "firstFailures": [
+            {
+              "config": "A sketch, lensed (lens) s4242 incl 88",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Lens: double Einstein ring (lens) s4242 incl 88",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Lens: Einstein ring (lens) s4242 incl 88",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Lens: giant arc (lens) s4242 incl 88",
+              "failed": false,
+              "by": []
+            }
+          ]
+        },
+        "lensR ×1.12": {
+          "applicable": 16,
+          "detected": 13,
+          "missed": [
+            "A sketch, lensed (lens) s4242 incl 88",
+            "A sketch, lensed (lens) s4242 incl 108",
+            "A sketch, lensed (lens) s7 incl 88"
+          ],
+          "ssim": {
+            "n": 16,
+            "min": 0.4384,
+            "p5": 0.4384,
+            "median": 0.4929,
+            "p95": 0.5182,
+            "max": 0.5182
+          },
+          "ssimCoarse": {
+            "n": 16,
+            "min": 0.8502,
+            "p5": 0.8502,
+            "median": 0.9033,
+            "p95": 0.9289,
+            "max": 0.9289
+          },
+          "inkAbs": {
+            "n": 16,
+            "min": 0.0006,
+            "p5": 0.0006,
+            "median": 0.0175,
+            "p95": 0.0505,
+            "max": 0.0505
+          },
+          "medianAbs": {
+            "n": 16,
+            "min": 0.0006,
+            "p5": 0.0006,
+            "median": 0.006,
+            "p95": 0.0173,
+            "max": 0.0173
+          },
+          "p90Abs": {
+            "n": 16,
+            "min": 0.0021,
+            "p5": 0.0021,
+            "median": 0.016,
+            "p95": 0.0549,
+            "max": 0.0549
+          },
+          "r25Abs": {
+            "n": 16,
+            "min": 0.0015,
+            "p5": 0.0015,
+            "median": 0.007,
+            "p95": 0.0344,
+            "max": 0.0344
+          },
+          "r50Abs": {
+            "n": 16,
+            "min": 0.0021,
+            "p5": 0.0021,
+            "median": 0.0162,
+            "p95": 0.1105,
+            "max": 0.1105
+          },
+          "r90Abs": {
+            "n": 16,
+            "min": 0.0009,
+            "p5": 0.0009,
+            "median": 0.0118,
+            "p95": 0.0834,
+            "max": 0.0834
+          },
+          "outerAbs": {
+            "n": 16,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.0027,
+            "p95": 0.026,
+            "max": 0.026
+          },
+          "qAbs": {
+            "n": 16,
+            "min": 0.0006,
+            "p5": 0.0006,
+            "median": 0.0222,
+            "p95": 0.1043,
+            "max": 0.1043
+          },
+          "qInnerAbs": {
+            "n": 16,
+            "min": 0.0007,
+            "p5": 0.0007,
+            "median": 0.0066,
+            "p95": 0.0667,
+            "max": 0.0667
+          },
+          "paAbs": {
+            "n": 16,
+            "min": 0.2292,
+            "p5": 0.2292,
+            "median": 5.6136,
+            "p95": 17.0555,
+            "max": 17.0555
+          },
+          "firstFailures": [
+            {
+              "config": "A sketch, lensed (lens) s4242 incl 88",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Lens: double Einstein ring (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["coarse ssim 0.8688", "r50 9.15%"]
+            },
+            {
+              "config": "Lens: Einstein ring (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["coarse ssim 0.8731", "r50 10.22%", "inner axis ratio 0.0667"]
+            },
+            {
+              "config": "Lens: giant arc (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["r50 4.92%", "position angle 9.52°"]
+            }
+          ]
+        },
+        "lensShear +0.1": {
+          "applicable": 16,
+          "detected": 14,
+          "missed": ["A sketch, lensed (lens) s4242 incl 88", "A sketch, lensed (lens) s7 incl 88"],
+          "ssim": {
+            "n": 16,
+            "min": 0.4688,
+            "p5": 0.4688,
+            "median": 0.5025,
+            "p95": 0.5221,
+            "max": 0.5221
+          },
+          "ssimCoarse": {
+            "n": 16,
+            "min": 0.8209,
+            "p5": 0.8209,
+            "median": 0.9119,
+            "p95": 0.9319,
+            "max": 0.9319
+          },
+          "inkAbs": {
+            "n": 16,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0275,
+            "p95": 0.0693,
+            "max": 0.0693
+          },
+          "medianAbs": {
+            "n": 16,
+            "min": 0.0009,
+            "p5": 0.0009,
+            "median": 0.0096,
+            "p95": 0.0586,
+            "max": 0.0586
+          },
+          "p90Abs": {
+            "n": 16,
+            "min": 0.0008,
+            "p5": 0.0008,
+            "median": 0.0164,
+            "p95": 0.1097,
+            "max": 0.1097
+          },
+          "r25Abs": {
+            "n": 16,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.0222,
+            "p95": 0.0668,
+            "max": 0.0668
+          },
+          "r50Abs": {
+            "n": 16,
+            "min": 0.0005,
+            "p5": 0.0005,
+            "median": 0.0275,
+            "p95": 0.0847,
+            "max": 0.0847
+          },
+          "r90Abs": {
+            "n": 16,
+            "min": 0.0011,
+            "p5": 0.0011,
+            "median": 0.0372,
+            "p95": 0.2478,
+            "max": 0.2478
+          },
+          "outerAbs": {
+            "n": 16,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.0083,
+            "p95": 0.0665,
+            "max": 0.0665
+          },
+          "qAbs": {
+            "n": 16,
+            "min": 0.0028,
+            "p5": 0.0028,
+            "median": 0.05,
+            "p95": 0.1379,
+            "max": 0.1379
+          },
+          "qInnerAbs": {
+            "n": 16,
+            "min": 0.0007,
+            "p5": 0.0007,
+            "median": 0.0126,
+            "p95": 0.0772,
+            "max": 0.0772
+          },
+          "paAbs": {
+            "n": 16,
+            "min": 0.2292,
+            "p5": 0.2292,
+            "median": 7.1669,
+            "p95": 42.722,
+            "max": 42.722
+          },
+          "firstFailures": [
+            {
+              "config": "A sketch, lensed (lens) s4242 incl 88",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Lens: double Einstein ring (lens) s4242 incl 88",
+              "failed": true,
+              "by": [
+                "ink -6.76%",
+                "coarse ssim 0.8263",
+                "p90 width -10.97%",
+                "axis ratio -0.1122",
+                "inner axis ratio -0.0469"
+              ]
+            },
+            {
+              "config": "Lens: Einstein ring (lens) s4242 incl 88",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.8705",
+                "r50 -3.91%",
+                "axis ratio -0.0530",
+                "inner axis ratio -0.0496"
+              ]
+            },
+            {
+              "config": "Lens: giant arc (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["coarse ssim 0.8987", "axis ratio -0.0477", "inner axis ratio 0.0458"]
+            }
+          ]
+        },
+        "RMAX 4.2": {
+          "applicable": 16,
+          "detected": 13,
+          "missed": [
+            "Lens: double Einstein ring (lens) s4242 incl 88",
+            "Lens: Einstein ring (lens) s4242 incl 88",
+            "Lens: double Einstein ring (lens) s7 incl 88"
+          ],
+          "ssim": {
+            "n": 16,
+            "min": 0.4982,
+            "p5": 0.4982,
+            "median": 0.5148,
+            "p95": 0.5843,
+            "max": 0.5843
+          },
+          "ssimCoarse": {
+            "n": 16,
+            "min": 0.9151,
+            "p5": 0.9151,
+            "median": 0.9239,
+            "p95": 0.9367,
+            "max": 0.9367
+          },
+          "inkAbs": {
+            "n": 16,
+            "min": 0.0021,
+            "p5": 0.0021,
+            "median": 0.0163,
+            "p95": 0.0376,
+            "max": 0.0376
+          },
+          "medianAbs": {
+            "n": 16,
+            "min": 0.0007,
+            "p5": 0.0007,
+            "median": 0.0099,
+            "p95": 0.0207,
+            "max": 0.0207
+          },
+          "p90Abs": {
+            "n": 16,
+            "min": 0.001,
+            "p5": 0.001,
+            "median": 0.0118,
+            "p95": 0.0436,
+            "max": 0.0436
+          },
+          "r25Abs": {
+            "n": 16,
+            "min": 0.0033,
+            "p5": 0.0033,
+            "median": 0.0113,
+            "p95": 0.0229,
+            "max": 0.0229
+          },
+          "r50Abs": {
+            "n": 16,
+            "min": 0.0008,
+            "p5": 0.0008,
+            "median": 0.016,
+            "p95": 0.05,
+            "max": 0.05
+          },
+          "r90Abs": {
+            "n": 16,
+            "min": 0.0198,
+            "p5": 0.0198,
+            "median": 0.0638,
+            "p95": 0.1404,
+            "max": 0.1404
+          },
+          "outerAbs": {
+            "n": 16,
+            "min": 0.0068,
+            "p5": 0.0068,
+            "median": 0.0212,
+            "p95": 0.0278,
+            "max": 0.0278
+          },
+          "qAbs": {
+            "n": 16,
+            "min": 0.0017,
+            "p5": 0.0017,
+            "median": 0.0132,
+            "p95": 0.027,
+            "max": 0.027
+          },
+          "qInnerAbs": {
+            "n": 16,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.0023,
+            "p95": 0.013,
+            "max": 0.013
+          },
+          "paAbs": {
+            "n": 16,
+            "min": 0.3917,
+            "p5": 0.3917,
+            "median": 3.294,
+            "p95": 7.1962,
+            "max": 7.1962
+          },
+          "firstFailures": [
+            {
+              "config": "A sketch, lensed (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["r90 -7.71%", "outer ink -2.29%"]
+            },
+            {
+              "config": "Lens: double Einstein ring (lens) s4242 incl 88",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Lens: Einstein ring (lens) s4242 incl 88",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Lens: giant arc (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["r90 -8.18%", "outer ink -2.25%"]
+            }
+          ]
+        },
+        "dot size ×1.3": {
+          "applicable": 16,
+          "detected": 16,
+          "missed": [],
+          "ssim": {
+            "n": 16,
+            "min": 0.3982,
+            "p5": 0.3982,
+            "median": 0.4207,
+            "p95": 0.4812,
+            "max": 0.4812
+          },
+          "ssimCoarse": {
+            "n": 16,
+            "min": 0.8384,
+            "p5": 0.8384,
+            "median": 0.8473,
+            "p95": 0.8592,
+            "max": 0.8592
+          },
+          "inkAbs": {
+            "n": 16,
+            "min": 0.2502,
+            "p5": 0.2502,
+            "median": 0.4098,
+            "p95": 0.4474,
+            "max": 0.4474
+          },
+          "medianAbs": {
+            "n": 16,
+            "min": 0.1036,
+            "p5": 0.1036,
+            "median": 0.2587,
+            "p95": 0.297,
+            "max": 0.297
+          },
+          "p90Abs": {
+            "n": 16,
+            "min": 0.1612,
+            "p5": 0.1612,
+            "median": 0.2717,
+            "p95": 0.3104,
+            "max": 0.3104
+          },
+          "r25Abs": {
+            "n": 16,
+            "min": 0.006,
+            "p5": 0.006,
+            "median": 0.1412,
+            "p95": 0.1713,
+            "max": 0.1713
+          },
+          "r50Abs": {
+            "n": 16,
+            "min": 0.0079,
+            "p5": 0.0079,
+            "median": 0.0777,
+            "p95": 0.1222,
+            "max": 0.1222
+          },
+          "r90Abs": {
+            "n": 16,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.056,
+            "p95": 0.1614,
+            "max": 0.1614
+          },
+          "outerAbs": {
+            "n": 16,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.0154,
+            "p95": 0.0366,
+            "max": 0.0366
+          },
+          "qAbs": {
+            "n": 16,
+            "min": 0.008,
+            "p5": 0.008,
+            "median": 0.0229,
+            "p95": 0.0542,
+            "max": 0.0542
+          },
+          "qInnerAbs": {
+            "n": 16,
+            "min": 0.0008,
+            "p5": 0.0008,
+            "median": 0.0116,
+            "p95": 0.0491,
+            "max": 0.0491
+          },
+          "paAbs": {
+            "n": 16,
+            "min": 0.029,
+            "p5": 0.029,
+            "median": 1.4975,
+            "p95": 12.0089,
+            "max": 12.0089
+          },
+          "firstFailures": [
+            {
+              "config": "A sketch, lensed (lens) s4242 incl 88",
+              "failed": true,
+              "by": [
+                "ink 41.15%",
+                "coarse ssim 0.8490",
+                "median width 22.53%",
+                "p90 width 28.00%",
+                "r25 15.66%",
+                "r50 11.07%",
+                "outer ink 1.54%"
+              ]
+            },
+            {
+              "config": "Lens: double Einstein ring (lens) s4242 incl 88",
+              "failed": true,
+              "by": [
+                "ink 25.02%",
+                "coarse ssim 0.8592",
+                "median width 19.88%",
+                "p90 width 16.12%",
+                "r90 16.14%",
+                "outer ink 3.66%"
+              ]
+            },
+            {
+              "config": "Lens: Einstein ring (lens) s4242 incl 88",
+              "failed": true,
+              "by": [
+                "ink 29.73%",
+                "coarse ssim 0.8525",
+                "median width 25.74%",
+                "p90 width 21.60%",
+                "r25 6.61%",
+                "r90 12.42%",
+                "outer ink 3.01%"
+              ]
+            },
+            {
+              "config": "Lens: giant arc (lens) s4242 incl 88",
+              "failed": true,
+              "by": [
+                "ink 34.43%",
+                "coarse ssim 0.8503",
+                "median width 27.68%",
+                "p90 width 25.53%",
+                "r25 10.54%",
+                "r50 5.45%",
+                "r90 9.41%",
+                "outer ink 2.49%",
+                "inner axis ratio 0.0491"
+              ]
+            }
+          ]
+        },
+        "lensSize ×1.4": {
+          "applicable": 12,
+          "detected": 10,
+          "missed": [
+            "Lens: giant arc (lens) s4242 incl 88",
+            "Lens: double Einstein ring (lens) s4242 incl 108"
+          ],
+          "ssim": {
+            "n": 12,
+            "min": 0.5013,
+            "p5": 0.5013,
+            "median": 0.5156,
+            "p95": 0.5804,
+            "max": 0.5804
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.9297,
+            "p5": 0.9297,
+            "median": 0.934,
+            "p95": 0.9379,
+            "max": 0.9379
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.017,
+            "p5": 0.017,
+            "median": 0.0477,
+            "p95": 0.0822,
+            "max": 0.0822
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0.0008,
+            "p5": 0.0008,
+            "median": 0.0075,
+            "p95": 0.0252,
+            "max": 0.0252
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.02,
+            "p95": 0.0672,
+            "max": 0.0672
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.0197,
+            "p5": 0.0197,
+            "median": 0.031,
+            "p95": 0.0622,
+            "max": 0.0622
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0005,
+            "p5": 0.0005,
+            "median": 0.0147,
+            "p95": 0.0558,
+            "max": 0.0558
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0052,
+            "p5": 0.0052,
+            "median": 0.0153,
+            "p95": 0.0611,
+            "max": 0.0611
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.001,
+            "p5": 0.001,
+            "median": 0.0062,
+            "p95": 0.0184,
+            "max": 0.0184
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0004,
+            "p5": 0.0004,
+            "median": 0.0138,
+            "p95": 0.0408,
+            "max": 0.0408
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0007,
+            "p5": 0.0007,
+            "median": 0.0066,
+            "p95": 0.0233,
+            "max": 0.0233
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 0.4222,
+            "p5": 0.4222,
+            "median": 4.2529,
+            "p95": 12.6928,
+            "max": 12.6928
+          },
+          "firstFailures": [
+            {
+              "config": "Lens: double Einstein ring (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["ink 5.50%"]
+            },
+            {
+              "config": "Lens: Einstein ring (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["ink 5.63%", "r25 5.99%"]
+            },
+            {
+              "config": "Lens: giant arc (lens) s4242 incl 88",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Lens: double Einstein ring (lens) s4242 incl 108",
+              "failed": false,
+              "by": []
+            }
+          ]
+        },
+        "lensStars ×0.5": {
+          "applicable": 12,
+          "detected": 3,
+          "missed": [
+            "Lens: Einstein ring (lens) s4242 incl 88",
+            "Lens: giant arc (lens) s4242 incl 88",
+            "Lens: double Einstein ring (lens) s4242 incl 108",
+            "Lens: Einstein ring (lens) s4242 incl 108",
+            "Lens: giant arc (lens) s4242 incl 108",
+            "Lens: Einstein ring (lens) s7 incl 88",
+            "Lens: giant arc (lens) s7 incl 88",
+            "Lens: double Einstein ring (lens) s7 incl 108",
+            "Lens: Einstein ring (lens) s7 incl 108"
+          ],
+          "ssim": {
+            "n": 12,
+            "min": 0.5042,
+            "p5": 0.5042,
+            "median": 0.5183,
+            "p95": 0.5773,
+            "max": 0.5773
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.9334,
+            "p5": 0.9334,
+            "median": 0.9343,
+            "p95": 0.939,
+            "max": 0.939
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.0058,
+            "p5": 0.0058,
+            "median": 0.0181,
+            "p95": 0.0775,
+            "max": 0.0775
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.005,
+            "p95": 0.0279,
+            "max": 0.0279
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0055,
+            "p5": 0.0055,
+            "median": 0.0191,
+            "p95": 0.0692,
+            "max": 0.0692
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0076,
+            "p95": 0.0745,
+            "max": 0.0745
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0009,
+            "p5": 0.0009,
+            "median": 0.0109,
+            "p95": 0.028,
+            "max": 0.028
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0037,
+            "p5": 0.0037,
+            "median": 0.0287,
+            "p95": 0.0652,
+            "max": 0.0652
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0021,
+            "p5": 0.0021,
+            "median": 0.0072,
+            "p95": 0.0147,
+            "max": 0.0147
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0019,
+            "p5": 0.0019,
+            "median": 0.0123,
+            "p95": 0.0328,
+            "max": 0.0328
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0007,
+            "p5": 0.0007,
+            "median": 0.0047,
+            "p95": 0.0192,
+            "max": 0.0192
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 0.4319,
+            "p5": 0.4319,
+            "median": 2.4278,
+            "p95": 5.8527,
+            "max": 5.8527
+          },
+          "firstFailures": [
+            {
+              "config": "Lens: double Einstein ring (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["ink -7.75%", "r25 -6.41%"]
+            },
+            {
+              "config": "Lens: Einstein ring (lens) s4242 incl 88",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Lens: giant arc (lens) s4242 incl 88",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Lens: double Einstein ring (lens) s4242 incl 108",
+              "failed": false,
+              "by": []
+            }
+          ]
+        },
+        "lensSrc +0.25": {
+          "applicable": 12,
+          "detected": 11,
+          "missed": ["Lens: giant arc (lens) s4242 incl 108"],
+          "ssim": {
+            "n": 12,
+            "min": 0.4709,
+            "p5": 0.4709,
+            "median": 0.4982,
+            "p95": 0.5215,
+            "max": 0.5215
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.7987,
+            "p5": 0.7987,
+            "median": 0.8748,
+            "p95": 0.9208,
+            "max": 0.9208
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.0005,
+            "p5": 0.0005,
+            "median": 0.02,
+            "p95": 0.1676,
+            "max": 0.1676
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0.0012,
+            "p5": 0.0012,
+            "median": 0.0072,
+            "p95": 0.042,
+            "max": 0.042
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0061,
+            "p5": 0.0061,
+            "median": 0.02,
+            "p95": 0.1892,
+            "max": 0.1892
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.001,
+            "p5": 0.001,
+            "median": 0.0118,
+            "p95": 0.1377,
+            "max": 0.1377
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0208,
+            "p95": 0.176,
+            "max": 0.176
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0101,
+            "p5": 0.0101,
+            "median": 0.0453,
+            "p95": 0.0992,
+            "max": 0.0992
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0019,
+            "p5": 0.0019,
+            "median": 0.0131,
+            "p95": 0.0238,
+            "max": 0.0238
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0205,
+            "p5": 0.0205,
+            "median": 0.0629,
+            "p95": 0.1684,
+            "max": 0.1684
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0007,
+            "p5": 0.0007,
+            "median": 0.0066,
+            "p95": 0.0433,
+            "max": 0.0433
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 0.576,
+            "p5": 0.576,
+            "median": 7.3158,
+            "p95": 46.8147,
+            "max": 46.8147
+          },
+          "firstFailures": [
+            {
+              "config": "Lens: double Einstein ring (lens) s4242 incl 88",
+              "failed": true,
+              "by": [
+                "ink -13.54%",
+                "coarse ssim 0.8412",
+                "p90 width -18.54%",
+                "r25 -12.24%",
+                "r50 14.11%",
+                "r90 9.81%",
+                "outer ink 2.08%",
+                "axis ratio -0.0629"
+              ]
+            },
+            {
+              "config": "Lens: Einstein ring (lens) s4242 incl 88",
+              "failed": true,
+              "by": [
+                "ink -16.76%",
+                "coarse ssim 0.8093",
+                "p90 width -18.92%",
+                "r25 -12.54%",
+                "r50 -12.24%",
+                "r90 9.92%",
+                "outer ink 2.38%",
+                "axis ratio -0.1362"
+              ]
+            },
+            {
+              "config": "Lens: giant arc (lens) s4242 incl 88",
+              "failed": true,
+              "by": ["ink -7.86%", "coarse ssim 0.8748", "r25 -7.01%"]
+            },
+            {
+              "config": "Lens: double Einstein ring (lens) s4242 incl 108",
+              "failed": true,
+              "by": ["axis ratio 0.1020", "position angle -15.78°"]
+            }
+          ]
+        },
+        "pa +30°": {
+          "applicable": 1,
+          "detected": 1,
+          "missed": [],
+          "ssim": {
+            "n": 1,
+            "min": 0.4857,
+            "p5": 0.4857,
+            "median": 0.4857,
+            "p95": 0.4857,
+            "max": 0.4857
+          },
+          "ssimCoarse": {
+            "n": 1,
+            "min": 0.8623,
+            "p5": 0.8623,
+            "median": 0.8623,
+            "p95": 0.8623,
+            "max": 0.8623
+          },
+          "inkAbs": {
+            "n": 1,
+            "min": 0.0219,
+            "p5": 0.0219,
+            "median": 0.0219,
+            "p95": 0.0219,
+            "max": 0.0219
+          },
+          "medianAbs": {
+            "n": 1,
+            "min": 0.0023,
+            "p5": 0.0023,
+            "median": 0.0023,
+            "p95": 0.0023,
+            "max": 0.0023
+          },
+          "p90Abs": {
+            "n": 1,
+            "min": 0.0258,
+            "p5": 0.0258,
+            "median": 0.0258,
+            "p95": 0.0258,
+            "max": 0.0258
+          },
+          "r25Abs": {
+            "n": 1,
+            "min": 0.029,
+            "p5": 0.029,
+            "median": 0.029,
+            "p95": 0.029,
+            "max": 0.029
+          },
+          "r50Abs": {
+            "n": 1,
+            "min": 0.0316,
+            "p5": 0.0316,
+            "median": 0.0316,
+            "p95": 0.0316,
+            "max": 0.0316
+          },
+          "r90Abs": {
+            "n": 1,
+            "min": 0.1752,
+            "p5": 0.1752,
+            "median": 0.1752,
+            "p95": 0.1752,
+            "max": 0.1752
+          },
+          "outerAbs": {
+            "n": 1,
+            "min": 0.0426,
+            "p5": 0.0426,
+            "median": 0.0426,
+            "p95": 0.0426,
+            "max": 0.0426
+          },
+          "qAbs": {
+            "n": 1,
+            "min": 0.0206,
+            "p5": 0.0206,
+            "median": 0.0206,
+            "p95": 0.0206,
+            "max": 0.0206
+          },
+          "qInnerAbs": {
+            "n": 1,
+            "min": 0.0006,
+            "p5": 0.0006,
+            "median": 0.0006,
+            "p95": 0.0006,
+            "max": 0.0006
+          },
+          "paAbs": {
+            "n": 1,
+            "min": 36.2578,
+            "p5": 36.2578,
+            "median": 36.2578,
+            "p95": 36.2578,
+            "max": 36.2578
+          },
+          "firstFailures": [
+            {
+              "config": "Lens: giant arc (lens) s7 incl 108",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.8623",
+                "r90 -17.52%",
+                "outer ink -4.26%",
+                "position angle 36.26°"
+              ]
+            }
+          ]
+        },
+        "pa −30°": {
+          "applicable": 1,
+          "detected": 1,
+          "missed": [],
+          "ssim": {
+            "n": 1,
+            "min": 0.4918,
+            "p5": 0.4918,
+            "median": 0.4918,
+            "p95": 0.4918,
+            "max": 0.4918
+          },
+          "ssimCoarse": {
+            "n": 1,
+            "min": 0.8787,
+            "p5": 0.8787,
+            "median": 0.8787,
+            "p95": 0.8787,
+            "max": 0.8787
+          },
+          "inkAbs": {
+            "n": 1,
+            "min": 0.0088,
+            "p5": 0.0088,
+            "median": 0.0088,
+            "p95": 0.0088,
+            "max": 0.0088
+          },
+          "medianAbs": {
+            "n": 1,
+            "min": 0.0018,
+            "p5": 0.0018,
+            "median": 0.0018,
+            "p95": 0.0018,
+            "max": 0.0018
+          },
+          "p90Abs": {
+            "n": 1,
+            "min": 0.0142,
+            "p5": 0.0142,
+            "median": 0.0142,
+            "p95": 0.0142,
+            "max": 0.0142
+          },
+          "r25Abs": {
+            "n": 1,
+            "min": 0.0056,
+            "p5": 0.0056,
+            "median": 0.0056,
+            "p95": 0.0056,
+            "max": 0.0056
+          },
+          "r50Abs": {
+            "n": 1,
+            "min": 0.0036,
+            "p5": 0.0036,
+            "median": 0.0036,
+            "p95": 0.0036,
+            "max": 0.0036
+          },
+          "r90Abs": {
+            "n": 1,
+            "min": 0.0579,
+            "p5": 0.0579,
+            "median": 0.0579,
+            "p95": 0.0579,
+            "max": 0.0579
+          },
+          "outerAbs": {
+            "n": 1,
+            "min": 0.0134,
+            "p5": 0.0134,
+            "median": 0.0134,
+            "p95": 0.0134,
+            "max": 0.0134
+          },
+          "qAbs": {
+            "n": 1,
+            "min": 0.0201,
+            "p5": 0.0201,
+            "median": 0.0201,
+            "p95": 0.0201,
+            "max": 0.0201
+          },
+          "qInnerAbs": {
+            "n": 1,
+            "min": 0.0005,
+            "p5": 0.0005,
+            "median": 0.0005,
+            "p95": 0.0005,
+            "max": 0.0005
+          },
+          "paAbs": {
+            "n": 1,
+            "min": 23.8059,
+            "p5": 23.8059,
+            "median": 23.8059,
+            "p95": 23.8059,
+            "max": 23.8059
+          },
+          "firstFailures": [
+            {
+              "config": "Lens: giant arc (lens) s7 incl 108",
+              "failed": true,
+              "by": ["coarse ssim 0.8787", "position angle -23.81°"]
+            }
+          ]
+        },
+        "orbit 35°": {
+          "applicable": 1,
+          "detected": 1,
+          "missed": [],
+          "ssim": {
+            "n": 1,
+            "min": 0.5076,
+            "p5": 0.5076,
+            "median": 0.5076,
+            "p95": 0.5076,
+            "max": 0.5076
+          },
+          "ssimCoarse": {
+            "n": 1,
+            "min": 0.9092,
+            "p5": 0.9092,
+            "median": 0.9092,
+            "p95": 0.9092,
+            "max": 0.9092
+          },
+          "inkAbs": {
+            "n": 1,
+            "min": 0.0519,
+            "p5": 0.0519,
+            "median": 0.0519,
+            "p95": 0.0519,
+            "max": 0.0519
+          },
+          "medianAbs": {
+            "n": 1,
+            "min": 0.0007,
+            "p5": 0.0007,
+            "median": 0.0007,
+            "p95": 0.0007,
+            "max": 0.0007
+          },
+          "p90Abs": {
+            "n": 1,
+            "min": 0.0063,
+            "p5": 0.0063,
+            "median": 0.0063,
+            "p95": 0.0063,
+            "max": 0.0063
+          },
+          "r25Abs": {
+            "n": 1,
+            "min": 0.0504,
+            "p5": 0.0504,
+            "median": 0.0504,
+            "p95": 0.0504,
+            "max": 0.0504
+          },
+          "r50Abs": {
+            "n": 1,
+            "min": 0.064,
+            "p5": 0.064,
+            "median": 0.064,
+            "p95": 0.064,
+            "max": 0.064
+          },
+          "r90Abs": {
+            "n": 1,
+            "min": 0.2651,
+            "p5": 0.2651,
+            "median": 0.2651,
+            "p95": 0.2651,
+            "max": 0.2651
+          },
+          "outerAbs": {
+            "n": 1,
+            "min": 0.0718,
+            "p5": 0.0718,
+            "median": 0.0718,
+            "p95": 0.0718,
+            "max": 0.0718
+          },
+          "qAbs": {
+            "n": 1,
+            "min": 0.0266,
+            "p5": 0.0266,
+            "median": 0.0266,
+            "p95": 0.0266,
+            "max": 0.0266
+          },
+          "qInnerAbs": {
+            "n": 1,
+            "min": 0.0014,
+            "p5": 0.0014,
+            "median": 0.0014,
+            "p95": 0.0014,
+            "max": 0.0014
+          },
+          "paAbs": {
+            "n": 1,
+            "min": 4.9645,
+            "p5": 4.9645,
+            "median": 4.9645,
+            "p95": 4.9645,
+            "max": 4.9645
+          },
+          "firstFailures": [
+            {
+              "config": "Lens: giant arc (lens) s7 incl 108",
+              "failed": true,
+              "by": [
+                "ink -5.19%",
+                "coarse ssim 0.9092",
+                "r50 -6.40%",
+                "r90 -26.51%",
+                "outer ink -7.18%"
+              ]
+            }
+          ]
+        }
+      },
       "v21Reroll": null
     },
     "star": {
@@ -17760,6 +19976,13 @@
         }
       },
       "v21Reroll": null
+    }
+  },
+  "controlsByFamily": {
+    "lens": {
+      "controlsEvery": 2,
+      "configurations": 16,
+      "ofConfigurations": 168
     }
   }
 }

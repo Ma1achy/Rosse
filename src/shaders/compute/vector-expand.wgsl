@@ -164,11 +164,12 @@ fn place(I: VInst, p: vec2<f32>) -> vec2<f32> {
   return vec2<f32>((I.t.x + I.m.x * p.x) + I.m.z * p.y, (I.t.y + I.m.y * p.x) + I.m.w * p.y);
 }
 
-// The post hook: c + S (q - c).
+// The post hook: c + t + S (q - c); t is zero except for a lensed image, which is carried to its
+// own place (w.zw).
 fn post(I: VInst, q: vec2<f32>) -> vec2<f32> {
   let dx = q.x - I.w.x;
   let dy = q.y - I.w.y;
-  return vec2<f32>((I.w.x + I.w2.x * dx) + I.w2.z * dy, (I.w.y + I.w2.y * dx) + I.w2.w * dy);
+  return vec2<f32>(((I.w.x + I.w.z) + I.w2.x * dx) + I.w2.z * dy, ((I.w.y + I.w.w) + I.w2.y * dx) + I.w2.w * dy);
 }
 
 // expandVector's tf (app23.js:L1194-1198): the warp, the matrix, the wobble.
@@ -263,6 +264,9 @@ fn expand_caps(@builtin(global_invocation_id) id: vec3<u32>) {
       }
     }
   }
+  if (I.pad0 != 0u) {
+    key = DROP;
+  }
   caps_raw[i] = Capsule(a, b, (vu.pen_line / 2.0) * I.ps, 1.0, 0.0, 0.0);
   keys[i] = key;
 }
@@ -274,7 +278,11 @@ fn expand_dots(@builtin(global_invocation_id) id: vec3<u32>) {
     return;
   }
   let I = inst[inst_of(i, 1u)];
-  if (I.drawing == INACTIVE || i - I.dot_first >= table[I.drawing * DRAWING_WORDS + 3u]) {
+  if (
+    I.pad0 != 0u ||
+    I.drawing == INACTIVE ||
+    i - I.dot_first >= table[I.drawing * DRAWING_WORDS + 3u]
+  ) {
     dots_out[i] = Instance(vec2<f32>(0.0), 0u, 0.0, vec4<f32>(0.0));
     return;
   }
@@ -294,7 +302,11 @@ fn expand_blobs(@builtin(global_invocation_id) id: vec3<u32>) {
     return;
   }
   let I = inst[inst_of(i, 2u)];
-  if (I.drawing == INACTIVE || i - I.blob_first >= table[I.drawing * DRAWING_WORDS + 5u]) {
+  if (
+    I.pad0 != 0u ||
+    I.drawing == INACTIVE ||
+    i - I.blob_first >= table[I.drawing * DRAWING_WORDS + 5u]
+  ) {
     blobs_out[i] = Instance(vec2<f32>(0.0), 0u, 0.0, vec4<f32>(0.0));
     return;
   }

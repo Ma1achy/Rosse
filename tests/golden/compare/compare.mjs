@@ -45,7 +45,7 @@
  *     --reuse-shards  only aggregate the last calibration's measurements (test-results/
  *                     calibration-shard-*.json, made with at least K keys) for this K
  *     --only-family f  calibrate the families named f (and f@zoom) alone and merge them into the
- *                     two files, leaving every other family as it is (M6: `slip`)
+ *                     two files, leaving every other family as it is (M6: `slip`; M9: `lens`)
  *   --jobs n          parallel processes for the re-draws and the calibration (default 4)
  *   --reuse-redraws   with the comparison, the last run's re-draws as they are (a run stopped after
  *                     them); only while the engine and the cases are unchanged
@@ -729,7 +729,9 @@ async function calibrate(G, node) {
       const label = G.configLabel(c);
       // the controls on every n-th of each shard's own configurations, so the shards stay
       // balanced; the line-work alone has its own breaks instead (docs/milestones/m4/README.md)
-      const wantControls = c.family !== 'lines' && Math.floor(i / n) % controlsEvery === 0;
+      // (a held-out v21 capture is there for v21's spread, not for the controls)
+      const wantControls =
+        !c.heldOut && c.family !== 'lines' && Math.floor(i / n) % controlsEvery === 0;
       const needPairs = !done.has(label);
       const needControls = wantControls && !controlsDone.has(label);
       if (!needPairs && !needControls) continue;
@@ -816,6 +818,15 @@ async function calibrate(G, node) {
   console.log(`  ${v21.used} v21 pairs whose stipple re-rolled`);
 
   const ADR = { ink: 0.05, median: 0.1, p90: 0.1, counts: 0.03, countsSmall: 0.1, poisson: 3 };
+  /** the lens family's count gate, in standard deviations of two Poisson draws (ADR 0053) */
+  const LENS_POISSON = 4.5;
+  /**
+   * the lens family's least inner axis-ratio band: 1.1 × the largest |Δq| of the inner aperture
+   * over the 84 v21 captures of the family (the 56 held out, 0.027, and the 28 acceptance cases,
+   * 0.0395), ADR 0054 (accepted). ADR 0018 sets the band no lower than 1.1 × the largest value of
+   * the held-out sample, and the acceptance captures are 28 more such samples.
+   */
+  const LENS_QINNER = 0.044;
   const KEYS = /** @type {const} */ ([
     ['ssim', (/** @type {any} */ c) => c.ssim],
     ['ssimCoarse', (/** @type {any} */ c) => c.ssimCoarse],
@@ -846,18 +857,23 @@ async function calibrate(G, node) {
   const parity = {};
   /** @type {Record<string, any>} */
   const numbers = {};
+  const ofFamily = (/** @type {string} */ f) =>
+    !onlyFamily || f === onlyFamily || f === `${onlyFamily}@zoom`;
   const families = onlyFamilies
     ? [...onlyFamilies]
     : onlyFamily
       ? []
       : ['spiral', 'smooth', 'merger', 'lens', 'star', 'artefact'];
-  for (const f of Object.keys(eng.pairs)) if (!families.includes(f)) families.push(f);
+  for (const f of Object.keys(eng.pairs))
+    if (ofFamily(f) && !families.includes(f)) families.push(f);
   for (const family of families) {
     const list = eng.pairs[family] ?? [];
     const base = {
       counts: ADR.counts,
       countsSmall: ADR.countsSmall,
-      poisson: ADR.poisson,
+      // the lensed knots and drawn stars of a source are clustered (its arms' knots, the images
+      // of one knot) and so more variable than Poisson draws: ADR 0053 (proposed)
+      poisson: family === 'lens' ? LENS_POISSON : ADR.poisson,
       // the drawn stars of a disc galaxy (about 1,000–1,100 of ~11,000 proposals) are a binomial
       // draw too: ±3% there is under one standard deviation of the difference of two draws
       poissonBelow: 2000,
@@ -948,6 +964,8 @@ async function calibrate(G, node) {
       ...(Object.keys(countsBy).length ? { countsBy } : {}),
       ...(held.length ? { heldOut: held.length } : {}),
     };
+    if (family === 'lens')
+      parity[family].qInner = Math.max(parity[family].qInner ?? 0, LENS_QINNER);
     // per-preset axis-ratio tolerances: near-round galaxies are noisier in q than flat ones, so
     // a family-wide value would be too wide for the flat ones (ADR 0015)
     /** @type {Record<string, any>} */
@@ -1148,12 +1166,15 @@ async function calibrate(G, node) {
 }
 
 /**
- * The presets of a calibration family that --only-family adds held-out configurations for.
+ * The presets of a calibration family that --only-family adds held-out configurations for (those
+ * whose held-out configurations are not captured).
  *
  * @param {string} family
  */
 function onlyFamilyPresets(family) {
   if (family === 'slip') return ['Plates slipped'];
+  // the lens presets' held-out configurations are captured (`calibration` cases of the manifest)
+  if (family === 'lens') return [];
   throw new Error(`no held-out presets for family ${family}`);
 }
 

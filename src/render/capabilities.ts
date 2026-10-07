@@ -5,7 +5,7 @@
  *
  * - `merger`: the merger simulation, its tides, debris and shells (M8), wired in src/main.ts;
  * - `stars`: stars, artefacts, overlays and the sky (M7), wired in src/main.ts (the overlays' home orientation is `wanted.home`);
- * - `lens`: the lens (M9): off until M9's engine path is merged.
+ * - `lens`: the lens (M9), wired in src/main.ts through `wanted.home`.
  *
  * M7 and M9 switch their flag on in the pull request that wires their drawing into the page.
  */
@@ -18,5 +18,5 @@ export interface Capabilities {
 export const CAPABILITIES: Readonly<Capabilities> = {
   stars: true,
   merger: true,
-  lens: false,
+  lens: true,
 };

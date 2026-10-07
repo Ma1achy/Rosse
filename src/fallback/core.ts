@@ -12,7 +12,7 @@ import type { MarkCounts } from '../model/scene';
 import type { DrawingsMeta } from '../model/variation';
 import { inkKey, inkLook } from '../render/ink-look';
 import type { InkLayer } from '../render/layers';
-import { pageModelKey } from '../render/page-key';
+import { lensOpts, pageModelKey } from '../render/page-key';
 import type { Plates } from '../render/plates';
 import { SURFACES, type SurfaceName } from '../render/surface';
 import { CpuRenderer } from './index';
@@ -80,7 +80,10 @@ export class CpuEngineCore {
     if (P.merger) {
       const key = pageModelKey(P);
       if (this.merger?.key !== key) {
-        this.merger = { key, m: new CpuMerger({ ...P }, this.meta) };
+        this.merger = {
+          key,
+          m: new CpuMerger({ ...P }, this.meta, P.lensOn ? { lens: lensOpts(P, home) } : {}),
+        };
         this.pageRuns.model++;
       }
       const m = this.merger.m;
@@ -93,7 +96,7 @@ export class CpuEngineCore {
       this.counts = v.counts;
       this.mode = 'merger';
     } else {
-      const { view, work } = this.stipple.frame(P, zoom, { home });
+      const { view, work } = this.stipple.frame(P, zoom, { home, ...lensOpts(P, home) });
       let shellsView: { layers: InkLayer[]; dots: number } | null = null;
       if (P.shellsOn && this.stipple.stipple) {
         const key = pageModelKey(P);

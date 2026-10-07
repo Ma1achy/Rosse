@@ -23,8 +23,8 @@
  *
  * URL parameters: `preset`, `seed`, `variant=stipple` (the M2 golden overrides: no lines, knots,
  * envelope, drawn stars, deep field or foreground stars), `variant=ribbons` (the M4 overrides),
- * `variant=vectors` (the M5 overrides), `az`, `incl`, `pa`, `zoom`, `backend=cpu|webgpu`,
- * `present=copy`, `cpuworker=off` (the CPU engine on the main thread, for profiling).
+ * `variant=vectors` (the M5 overrides), `variant=lens` (the M9 overrides), `az`, `incl`, `pa`, `zoom`,
+ * `backend=cpu|webgpu`, `present=copy`, `cpuworker=off` (the CPU engine on the main thread, for profiling).
  */
 import type { Params } from './core/params';
 import { presetParams } from './core/presets';
@@ -34,7 +34,7 @@ import { GpuMerger } from './render/merger';
 import { GpuShells } from './render/shells';
 import { CAPABILITIES, type Capabilities } from './render/capabilities';
 import type { InkLayer } from './render/layers';
-import { pageModelKey } from './render/page-key';
+import { lensOpts, pageModelKey } from './render/page-key';
 import { Gpu, awaitLoss, detectBackend, type Backend } from './gpu/device';
 import { readTexture } from './gpu/readback';
 import { BuiltAssets, type AtlasData, type AtlasName, type ImageData8 } from './marks/atlas';
@@ -124,6 +124,12 @@ function vectorsOnly(preset: string): Partial<Params> {
     ...(preset === 'Shell galaxy' ? { shellsOn: 0, shells: 1 } : {}),
   };
 }
+
+/**
+ * The M9 golden overrides (tests/golden/extra-cases.json, variant `lens`): no drawn stars among
+ * the stipple, deep field or foreground stars (M7), which the lens presets would otherwise show.
+ */
+const LENS_ONLY: Partial<Params> = { starMix: 0, field: 0, fgstars: 0 };
 
 interface Scene {
   atlases: AtlasData[];
@@ -393,7 +399,7 @@ async function gpuEngine(
           builtKey = null;
           busy(true);
           try {
-            await m.build({ ...P }, scene.meta);
+            await m.build({ ...P }, scene.meta, P.lensOn ? { lens: lensOpts(P, home) } : {});
           } finally {
             busy(false);
           }
@@ -411,7 +417,7 @@ async function gpuEngine(
         readCounts = async () => (await m.readCounts()).counts;
         mode = 'merger';
       } else {
-        const work = st.frame(P, zoom, scene.meta, { home });
+        const work = st.frame(P, zoom, scene.meta, { home, ...lensOpts(P, home) });
         let sh: GpuShells | null = null;
         if (P.shellsOn && st.current) {
           sh = shellsPass ??= GpuShells.create(r.device);
@@ -607,7 +613,9 @@ async function start(): Promise<void> {
         ? ribbonsOnly(name)
         : variant === 'vectors'
           ? vectorsOnly(name)
-          : {};
+          : variant === 'lens'
+            ? LENS_ONLY
+            : {};
   const makeParams = (name: string, sd: number) => presetParams(name, sd, variantOverrides(name));
 
   /** the surface the toggle asks for; the plate catches up with it in show() */
@@ -807,8 +815,8 @@ async function start(): Promise<void> {
       preset: startPreset,
       ...(urlState.from !== undefined ? { from: urlState.from } : {}),
       zoom,
-      // the camera the page starts at is the overlays' home (M7 reads it; the engines of M11 do not
-      // draw overlays yet)
+      // the camera the page starts at is the home of the overlays (M7) and of a lens's sources (M9,
+      // ADR 0050)
       home: orientationOf(cameraOf(start)),
     };
   })();

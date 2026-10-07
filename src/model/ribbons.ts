@@ -250,6 +250,8 @@ export interface RibbonDesc {
   penLine: number;
   sheetW: number;
   sheetH: number;
+  /** pieces of the strokes sheet, per row (the lens sizes its branch slots from them, M9) */
+  strokePieces: number[];
   /** the scene's noise field (the wobble of ribbons, pieces and hatches) */
   noise: NoiseField;
 }
@@ -386,6 +388,7 @@ export function describeRibbons(
     penLine,
     sheetW,
     sheetH,
+    strokePieces: pcs.count,
     noise,
   };
 }

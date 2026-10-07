@@ -29,6 +29,7 @@ import { GpuTide } from './tide';
 import { GpuVectors } from './vectors';
 import { GpuStarSet } from './star-set';
 import { GpuSky } from './sky';
+import { GpuLens } from './lens';
 import { hatchRows, vectorView } from '../model/vectors';
 import { coreInstances } from '../model/parts';
 import {
@@ -122,6 +123,9 @@ interface ModelBuffers {
 
 export class GpuStipple {
   private model: ModelBuffers | null = null;
+  /** the lens (M9), made when a lensed scene is first loaded; its sources are sampled by `scratch` */
+  private lens: GpuLens | null = null;
+  private scratch: GpuStipple | null = null;
   private scene: GalaxyScene | null = null;
   /** what `frame` last built (ADR 0010) */
   readonly tiers = new TierState();
@@ -220,7 +224,7 @@ export class GpuStipple {
           this.meta = meta;
         },
         view: () => {
-          this.runView(cameraOf(P, zoom));
+          this.runView(cameraOf(P, zoom), P.mTime);
         },
       },
     );
@@ -494,16 +498,28 @@ export class GpuStipple {
     }
     pass.end();
     d.queue.submit([enc.finish()]);
+    if (scene.lens) {
+      this.lens ??= GpuLens.create(d, {
+        run: (src, cam) => {
+          const sc = (this.scratch ??= GpuStipple.create(d));
+          sc.setScene(src);
+          sc.setView(cam);
+          const sm = sc.need();
+          return { n: sm.n, projected: sm.projected, classes: sm.classes };
+        },
+      });
+      this.lens.load(scene, scene.meta, { pool, dotBase, noise });
+    } else this.lens?.destroy();
   }
 
   /** View tier: projection, culls and compaction for a camera. */
-  setView(cam: Camera): void {
+  setView(cam: Camera, mTime?: number): void {
     // a view `frame` did not choose: its record of the last view no longer holds
     this.tiers.invalidate();
-    this.runView(cam);
+    this.runView(cam, mTime);
   }
 
-  private runView(cam: Camera): void {
+  private runView(cam: Camera, mTime?: number): void {
     const m = this.model;
     if (!m || !this.scene) throw new Error('setScene first');
     const d = this.device;
@@ -560,6 +576,8 @@ export class GpuStipple {
       ),
     );
     this.camera = cam;
+    // the quasar's flare follows the moment of the timeline, a view input (mTime)
+    if (this.scene.lens && this.lens?.loaded) this.lens.setView(cam, mTime ?? params.mTime);
     const enc = d.createCommandEncoder({ label: 'stipple view' });
     const ts = this.profiler?.span('view: project, scan, expand');
     const pass = enc.beginComputePass({
@@ -625,6 +643,7 @@ export class GpuStipple {
     this.vectors.encode(pass);
     this.stars.encode(pass);
     this.sky.encode(pass);
+    if (this.scene.lens && this.lens?.loaded) this.lens.encode(pass);
     pass.end();
     d.queue.submit([enc.finish()]);
   }
@@ -693,6 +712,7 @@ export class GpuStipple {
     const cores = this.tide
       ? []
       : coreInstances(P, meta, this.camera, galaxy.noise, vectors.parts.picks.nuclear);
+    const LL = this.scene.lens && this.lens?.loaded ? this.lens.layers() : null;
     const tided: InkLayer[] =
       this.tide && this.core?.count
         ? [
@@ -732,15 +752,23 @@ export class GpuStipple {
       ...this.sky.background(),
       ...line.filter((l) => !pieces.includes(l) && l !== hatch),
       ...merged,
+      ...(LL?.line ?? []),
       ...placed.filter((l) => l !== parts),
       ...this.stars.layers(),
+      ...(LL?.vectors ?? []),
       ...pieces,
+      ...(LL?.pieces ?? []),
       ...stipple.slice(0, 3),
+      ...(LL?.dots ?? []),
       ...this.vectors.streamLayers(),
-      ...stipple.slice(3),
+      ...stipple.slice(3, 4),
+      ...(LL?.knots ?? []),
+      ...stipple.slice(4),
+      ...(LL?.stars ?? []),
       ...(cores.length
         ? [{ kind: 'sprites', atlas: 'cores', gain: 1, pop: 'old', instances: cores } as InkLayer]
         : []),
+      ...(LL?.cores ?? []),
       ...this.sky.foreground(),
       ...tided,
     ];
@@ -785,16 +813,37 @@ export class GpuStipple {
     return copy;
   }
 
-  async readCounts(): Promise<{ perClass: Uint32Array; counts: MarkCounts }> {
+  /**
+   * The lens's layers alone, in the stipple's order (a merger carries a host's lens over its own
+   * marks, app23.js:L1724).
+   */
+  lensLayers(): InkLayer[] {
+    const LL = this.scene?.lens && this.lens?.loaded ? this.lens.layers() : null;
+    return LL
+      ? [...LL.line, ...LL.vectors, ...LL.pieces, ...LL.dots, ...LL.knots, ...LL.stars, ...LL.cores]
+      : [];
+  }
+
+  /** The lens's instances per class (a read-back); empty without a lens. */
+  async lensCounts(): Promise<number[]> {
+    return this.scene?.lens && this.lens?.loaded ? this.lens.readCounts() : [];
+  }
+
+  /** `withLens: false` counts the galaxy's own marks alone (the stipple kernels' tests). */
+  async readCounts(withLens = true): Promise<{ perClass: Uint32Array; counts: MarkCounts }> {
     const m = this.need();
     const a = new Uint32Array(await this.read(m.args, CLASS_COUNT * 16));
     const perClass = new Uint32Array(CLASS_COUNT);
     for (let c = 0; c < CLASS_COUNT; c++) perClass[c] = a[c * 4 + 1] ?? 0;
     const R = this.scene?.ribbons;
+    // the lens's marks join the galaxy's, as v21 appends them to the same rows (M9)
+    const lensCounts =
+      withLens && this.scene?.lens && this.lens?.loaded ? await this.lens.readCounts() : [];
+    const total = Uint32Array.from(perClass, (n, c) => n + (lensCounts[c] ?? 0));
     return {
-      perClass,
+      perClass: total,
       counts: {
-        ...markCounts(perClass),
+        ...markCounts(total),
         curves: R?.nCurves ?? 0,
         pieces: await this.ribbons.readPieceCount(),
         ribbonSegments: R?.nSegs ?? 0,
@@ -879,6 +928,17 @@ export class GpuStipple {
     return { out: await this.read(m.out, CLASS_COUNT * m.cap * INSTANCE_LAYOUT.size), cap: m.cap };
   }
 
+  /** The lens of the scene, when it has one (tests). */
+  get lensTier(): GpuLens | null {
+    return this.lens;
+  }
+
+  /** Samples, projected instances and classes of the last view: what the lens gathers its marks from. */
+  get sampleBuffers(): { n: number; projected: GPUBuffer; classes: GPUBuffer } {
+    const m = this.need();
+    return { n: m.n, projected: m.projected, classes: m.classes };
+  }
+
   private need(): ModelBuffers {
     if (!this.model) throw new Error('setScene first');
     return this.model;
@@ -934,5 +994,7 @@ export class GpuStipple {
     this.stars.destroy();
     this.sky.destroy();
     this.res.destroy();
+    this.lens?.destroy();
+    this.scratch?.destroy();
   }
 }

@@ -176,6 +176,13 @@ export function expandSegment(
   const reps = stU[so + 3] ?? 1;
   const j = i - (cu[o + 7] ?? 0);
   const wob = rib.wobble;
+  const oo = i * RIBBON_SEG_WORDS;
+  // a curve with fewer points than its slots (the lensed branches of M9): nothing past its end
+  if (j + 1 >= n) {
+    outF.fill(0, oo, oo + RIBBON_SEG_WORDS);
+    outU[oo + 10] = cu[o + 2] ?? 0;
+    return;
+  }
   const ends: number[] = [];
   const us: number[] = [];
   for (const e of [j, j + 1]) {
@@ -197,7 +204,6 @@ export function expandSegment(
     ends.push(...p0, ...p1);
     us.push(f(fr * reps));
   }
-  const oo = i * RIBBON_SEG_WORDS;
   for (let k = 0; k < 8; k++) outF[oo + k] = ends[k] ?? 0;
   outF[oo + 8] = us[0] ?? 0;
   outF[oo + 9] = us[1] ?? 0;

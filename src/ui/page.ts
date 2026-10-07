@@ -295,7 +295,10 @@ export function mountPage(opts: PageOptions): Page {
     setText(tlEls.read, `t = ${st.P.mTime.toFixed(2)} · ${phase(st.P.mTime, quasar)}`);
     if (document.activeElement !== tlEls.end) tlEls.end.value = tl.end.toFixed(2);
     setText(tlEls.speedValue, `${String(tl.speed)}×`);
-    tlEls.play.setAttribute('aria-label', tl.playing ? 'Pause' : 'Play the merger');
+    tlEls.play.setAttribute(
+      'aria-label',
+      tl.playing ? 'Pause' : quasar ? 'Play the flare' : 'Play the merger',
+    );
     tlEls.play.dataset.playing = String(tl.playing);
     const caption = document.getElementById('platecapt');
     if (caption)

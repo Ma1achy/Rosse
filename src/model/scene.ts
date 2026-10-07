@@ -24,6 +24,7 @@ import { describeStars, starSlotCapacity, type StarPicks, type StarsDesc } from 
 import { describeSky, type SkyCatalogue, type SkyDesc } from './sky';
 import { cameraOf, orientationOf, type Orientation } from '../view/camera';
 import { describeRibbons, type RibbonDesc } from './ribbons';
+import { describeLens, type LensOptions, type LensScene } from '../sim/lens';
 import { makeVariation, type DrawingsMeta, type Variation } from './variation';
 import type { MergerSceneOptions } from './merger';
 import type { ShellSceneOptions } from './shells';
@@ -51,6 +52,8 @@ export interface GalaxyScene {
    * here it is a parameter, by default the camera of the parameters the scene is built from.
    */
   home: Orientation;
+  /** the lensed scene (M9): the sources behind the lens, their curves and drawn parts */
+  lens?: LensScene;
 }
 
 export interface SceneOptions {
@@ -113,6 +116,11 @@ export interface SceneOptions {
   rmax?: number;
   /** Calibration only (negative controls): every dot's quad scaled by this. */
   dotScale?: number;
+  /**
+   * The lens (M9): the orientation the sources are fixed at (`home`, saved with the drawing, ADR
+   * 0050) and, for the golden runner, v21's own discrete choices (`picks`, ADR 0051).
+   */
+  lens?: LensOptions;
   /**
    * A merging galaxy (M8): which of the two (0 or 1). Its vector drawings are carried by that
    * galaxy's tides (`WarpKind.tide`); the bitmap marks and ribbons are carried after the kernels
@@ -215,6 +223,14 @@ export function buildScene(P0: Params, meta: DrawingsMeta, opts: SceneOptions = 
         : 0,
     ...strides,
   };
+  // a merger's lens is M8's; a lensed star or artefact has none (the lens needs a galaxy)
+  const lens =
+    P.lensOn && !P.merger && P.subject === 'galaxy'
+      ? describeLens(P, meta, buildScene, {
+          ...opts.lens,
+          ...(opts.placementKey === undefined ? {} : { placementKey: opts.placementKey }),
+        })
+      : undefined;
   return {
     P,
     variation,
@@ -227,6 +243,7 @@ export function buildScene(P0: Params, meta: DrawingsMeta, opts: SceneOptions = 
     sky,
     starSlots: stars ? starSlotCapacity(stars, P, home) : 0,
     home,
+    ...(lens ? { lens } : {}),
   };
 }
 

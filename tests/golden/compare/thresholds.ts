@@ -81,6 +81,9 @@ export function impossibleClasses(
     starMix: number;
     subject?: string;
     ring?: number;
+    /** a lens (M9): its source galaxies have knots and sparkle stars of their own */
+    lensOn?: number;
+    lensSource?: string;
     merger?: number;
     ovStar?: number;
     ovArtefact?: string;
@@ -91,11 +94,21 @@ export function impossibleClasses(
   const star = P.subject === 'star' || P.subject === 'artefact';
   const overlay = (P.ovStar ?? 0) > 0.02 || (!!P.ovArtefact && P.ovArtefact !== 'none');
   const ring = (P.ring ?? 0) > 0.1 && !P.merger;
-  if (!(P.knots > 0) && !star && !overlay && !ring && !groupKnots) out.add('knots');
-  if (!(P.sparkle > 0) || star) out.add('stars');
+  const lensed = P.lensOn === 1;
+  if (!(P.knots > 0) && !star && !overlay && !ring && !groupKnots && !lensed) out.add('knots');
+  if ((!(P.sparkle > 0) && !lensed) || star) out.add('stars');
   // a merger's galaxies keep the drawn stars of their clumps, and a knot in a tidal tail has a
-  // bright one whatever `starMix` says (mergerSprites, app23.js:L522–524)
-  if (!(P.starMix > 0.01) && !star && !overlay && !ring && !P.merger) out.add('rstars');
+  // bright one whatever `starMix` says (mergerSprites, app23.js:L522–524); a quasar's images are
+  // each a drawn star
+  if (
+    !(P.starMix > 0.01) &&
+    !star &&
+    !overlay &&
+    !ring &&
+    !P.merger &&
+    !(lensed && P.lensSource === 'quasar')
+  )
+    out.add('rstars');
   return out;
 }
 

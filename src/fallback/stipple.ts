@@ -44,6 +44,7 @@ import { runVectors, vectorInputs, type VectorOut } from './kernels/vector';
 import { warpCaps, warpInstances, warpRibbons, type TideData } from './kernels/tide';
 import { hatchRows, vectorView, type VectorView } from '../model/vectors';
 import { usedDrawings } from '../model/used';
+import { CpuLens, type CpuLensView } from './lens';
 
 export interface CpuStippleView {
   layers: InkLayer[];
@@ -69,6 +70,8 @@ export interface CpuStippleView {
   skyDrawings: VectorOut | null;
   /** the sky's layers alone: the background, then the foreground stars */
   skyLayers: InkLayer[];
+  /** the lens's view tier (M9), when the scene is lensed */
+  lens?: CpuLensView;
 }
 
 /** Instances from a buffer of INSTANCE_WORDS words each. */
@@ -190,6 +193,8 @@ export interface CpuTide {
 export class CpuStipple {
   readonly samples: ReturnType<typeof runStipple>;
   readonly lines: RibbonModel;
+  /** the lens (M9): its sources are galaxies of their own, sampled and projected like this one */
+  readonly lens: CpuLens | null;
 
   constructor(
     readonly scene: GalaxyScene,
@@ -198,9 +203,16 @@ export class CpuStipple {
   ) {
     this.samples = runStipple(scene.galaxy);
     this.lines = ribbonModel(scene.ribbons, scene.galaxy.pool, scene.galaxy.dotBase);
+    this.lens = scene.lens
+      ? new CpuLens(scene, scene.meta, (s, cam) => {
+          const src = new CpuStipple(s);
+          const v = src.view(cam);
+          return { n: src.samples.n, classes: v.classes, projected: v.projected };
+        })
+      : null;
   }
 
-  view(cam: Camera): CpuStippleView {
+  view(cam: Camera, mTime?: number): CpuStippleView {
     const n = this.samples.n;
     const { P, galaxy, ribbons: R } = this.scene;
     // the marks of a star or an artefact follow the stipple's samples (M7)
@@ -356,6 +368,8 @@ export class CpuStipple {
       instances: list(l.cls),
     }));
     const streams = VD.parts.streams.length ? streamLayers(vo) : [];
+    const lens = this.lens?.view(cam, mTime);
+    const LL = lens?.layers;
     // the hatching's and the placed drawings' pen-line quads are one layer, one union per
     // sample, as on the GPU (ADR 0019)
     const placed = vectorLayers(vo, VD.nDots, VD.nBlobs);
@@ -372,12 +386,19 @@ export class CpuStipple {
       ...bgLayers,
       ...line.filter((l) => !pieces.includes(l) && l !== hatch),
       ...merged,
+      ...(LL?.line ?? []),
       ...placed.filter((l) => l !== parts),
       ...vectorLayers(so, liveStars * spec.strideDots, liveStars * spec.strideBlobs),
+      ...(LL?.vectors ?? []),
       ...pieces,
+      ...(LL?.pieces ?? []),
       ...stipple.slice(0, 3),
+      ...(LL?.dots ?? []),
       ...streams,
-      ...stipple.slice(3),
+      ...stipple.slice(3, 4),
+      ...(LL?.knots ?? []),
+      ...stipple.slice(4),
+      ...(LL?.stars ?? []),
     ];
     const cores = coreInstances(P, meta, cam, galaxy.noise, VD.parts.picks.nuclear);
     if (T)
@@ -388,6 +409,7 @@ export class CpuStipple {
       }
     if (cores.length)
       layers.push({ kind: 'sprites', atlas: 'cores', gain: 1, pop: 'old', instances: cores });
+    layers.push(...(LL?.cores ?? []));
     layers.push(...fgLayers);
     const tiles = (l: InkLayer[], atlas: string) =>
       l.flatMap((x) =>
@@ -431,10 +453,13 @@ export class CpuStipple {
         ...VD.parts.picks.streams.map((s) => s.tile),
       ],
     });
+    const lc = lens?.perClass ?? [];
+    const withLens = Array.from(counts, (n, c) => n + (lc[c] ?? 0));
     return {
       layers,
+      ...(lens ? { lens } : {}),
       counts: {
-        ...markCounts(counts),
+        ...markCounts(withLens),
         curves: R.nCurves,
         pieces: rv.nPieces,
         ribbonSegments: R.nSegs,
@@ -489,7 +514,7 @@ export class CpuStippleTiers {
         },
         view: () => {
           if (!this.stipple) throw new Error('no model tier');
-          this.view = this.stipple.view(cameraOf(P, zoom));
+          this.view = this.stipple.view(cameraOf(P, zoom), P.mTime);
         },
       },
     );

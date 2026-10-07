@@ -9,7 +9,10 @@ import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import type { Params } from '../../../src/core/params';
 import { presetFamily, presetParams } from '../../../src/core/presets';
-import type { MarkCounts, SceneOptions } from '../../../src/model/scene';
+import { lensHomeOf } from '../../../src/core/home';
+import { buildScene, type MarkCounts, type SceneOptions } from '../../../src/model/scene';
+import { SRC_SCALE, describeLens, type LensOptions } from '../../../src/sim/lens';
+import { UNIT_SCALE } from '../../../src/view/camera';
 import type { Variation } from '../../../src/model/variation';
 import { CpuGolden } from './engine-cpu';
 import { v21CurvePicks, v21DustPicks, v21RingKnots } from './v21-curves';
@@ -49,6 +52,7 @@ import { v21Companions, v21Sky } from './v21-sky';
 import { wantsStars } from '../../../src/model/stars';
 import { skyCounts } from '../../../src/model/sky';
 import { cameraOf, orientationOf } from '../../../src/view/camera';
+import { v21LensPlan } from './v21-lens';
 
 export { compareMeasures, countAllowance, evaluate, impossibleClasses, measure };
 export type { Comparison, Evaluation, Grey, ImageMeasures, Thresholds };
@@ -149,7 +153,7 @@ export class GoldenNode {
    * re-draws nothing else. From M5 (ADR 0021) also v21's part picks at this zoom.
    */
   referenceOptions(P: Params, zoom = 1, preset?: string): SceneOptions {
-    if (P.merger) return this.mergerOptions(P);
+    if (P.merger) return this.mergerOptions(P, zoom, preset);
     const variation = this.v21Variation(P);
     const meta = this.cpu.meta;
     const kinds = meta.strokes?.kind ?? [];
@@ -179,6 +183,47 @@ export class GoldenNode {
       dustPicks: v21DustPicks(this.root, P, variation, kinds, meta.penlines?.n ?? 0),
       ringKnotPicks: v21RingKnots(this.root, P, variation),
       home,
+      ...(P.lensOn && !P.merger && preset ? { lens: this.lensOptions(P, preset) } : {}),
+    };
+  }
+
+  /**
+   * The lens, drawn with v21's own choices (ADR 0050, 0051): the cluster's layout, each source's
+   * options and its own variation, strokes, noise and part picks, replayed from v21's streams
+   * (./v21-lens.ts), and the orientation the preset's camera gives (v21 places the sources there
+   * on the first view of a fresh page, which is how the captures were made; the orbit camera is
+   * reached from it).
+   */
+  lensOptions(P: Params, preset: string): LensOptions {
+    const home = lensHomeOf(presetParams(preset, P.seed));
+    const meta = this.cpu.meta;
+    const plan = v21LensPlan(P, this.root, meta.vectors?.whole?.type ?? []);
+    // describe once with v21's choices to learn each source's parameters, then give each the
+    // pens v21 drew it with
+    const first = describeLens(P, meta, buildScene, { home, picks: plan.picks });
+    const sources = first.sources.map((s, i) => ({
+      ...(plan.picks.sources?.[i] ?? {}),
+      ...(s.Ps ? { scene: this.sceneOptionsOf(s.Ps) } : {}),
+    }));
+    return { home, picks: { ...plan.picks, sources } };
+  }
+
+  /** v21's own variation, strokes, noise and part picks for a source galaxy (at its scale of 70). */
+  sceneOptionsOf(Ps: Params): SceneOptions {
+    const variation = this.v21Variation(Ps);
+    return {
+      variation,
+      curvePicks: this.v21CurvePicks(Ps, variation),
+      noise: this.v21Noise(Ps.seed),
+      partPicks: v21PartPicks(Ps, variation, this.cpu.meta, SRC_SCALE / UNIT_SCALE),
+      dustPicks: v21DustPicks(
+        this.root,
+        Ps,
+        variation,
+        this.cpu.meta.strokes?.kind ?? [],
+        this.cpu.meta.penlines?.n ?? 0,
+      ),
+      ringKnotPicks: v21RingKnots(this.root, Ps, variation),
     };
   }
 
@@ -188,7 +233,7 @@ export class GoldenNode {
    * variation, stroke choices, noise and part picks (replayed for the galaxy's own parameters); and
    * `mWarp`'s two whole drawings. The test stars' own draws are the engine's.
    */
-  mergerOptions(P: Params): SceneOptions {
+  mergerOptions(P: Params, zoom = 1, preset?: string): SceneOptions {
     const picks = v21MergerPicks(this.root, P);
     const meta = this.cpu.meta;
     const galaxy = [0, 1].map((g) => {
@@ -216,6 +261,10 @@ export class GoldenNode {
         variation: this.v21Variation(P),
         galaxy,
         ...(mwarp ? { mwarp } : {}),
+        // a merging pair can lens a galaxy behind it: the lens host's v21 draws (M9)
+        ...(P.lensOn && preset
+          ? { lens: this.referenceOptions({ ...P, merger: 0 }, zoom, preset) }
+          : {}),
       },
     };
   }
@@ -703,6 +752,32 @@ export const NEGATIVE_CONTROLS: {
       name: 'halo off',
       applies: (P) => !P.merger && P.halo > 0,
       params: (P) => ({ ...P, halo: 0 }),
+    },
+    // the lens (M9): a change of what is lensed, which the lensed ink must show
+    {
+      name: 'lensR ×1.12',
+      applies: (P) => P.lensOn === 1,
+      params: (P) => ({ ...P, lensR: Math.min(2.2, P.lensR * 1.12) }),
+    },
+    {
+      name: 'lensSize ×1.4',
+      applies: (P) => P.lensOn === 1 && P.lensSource !== 'drawing',
+      params: (P) => ({ ...P, lensSize: Math.min(0.6, P.lensSize * 1.4) }),
+    },
+    {
+      name: 'lensStars ×0.5',
+      applies: (P) => P.lensOn === 1 && P.lensSource !== 'drawing',
+      params: (P) => ({ ...P, lensStars: Math.max(500, P.lensStars * 0.5) }),
+    },
+    {
+      name: 'lensShear +0.1',
+      applies: (P) => P.lensOn === 1,
+      params: (P) => ({ ...P, lensShear: Math.min(0.3, P.lensShear + 0.1) }),
+    },
+    {
+      name: 'lensSrc +0.25',
+      applies: (P) => P.lensOn === 1 && P.lensSource !== 'drawing' && !P.lensCluster,
+      params: (P) => ({ ...P, lensSrc: Math.min(0.8, P.lensSrc + 0.25) }),
     },
     { name: 'RMAX 4.2', applies: (P) => !P.merger, scene: { rmax: 4.2 } },
     {

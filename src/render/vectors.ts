@@ -124,7 +124,10 @@ export class GpuVectors {
     return this.model?.D ?? null;
   }
 
-  /** The instance table (VINST_LAYOUT): written by the CPU, or by a rows pass for a dynamic set. */
+  /**
+   * The instance table (VINST_LAYOUT): written by the CPU, by a rows pass for a dynamic set (M7), or
+   * for the lensed drawings' images by compute/lens-query.wgsl (M9).
+   */
   get instances(): GPUBuffer {
     return this.need().buffers[1] as GPUBuffer;
   }

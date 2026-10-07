@@ -27,7 +27,7 @@ Status: **done**, **waits for M7 / M9** (built from the schema; appears when the
 
 | v21 control | status |
 | --- | --- |
-| Presets, grouped (galaxies, mergers, lenses, stars and artefacts, scenes, creative) | done, with this engine's thumbnails (28 now); the lens, star and artefact presets wait for M9 and M7 |
+| Presets, grouped (galaxies, mergers, lenses, stars and artefacts, scenes, creative) | done, with this engine's thumbnails (28 now); the lens presets are in (M9, 8 more thumbnails); the star and artefact presets wait for M7 |
 | Surprise me (the post-it pile) | done (star and artefact additions wait for M7); `?variant=` overrides apply |
 | New stars, seed | done (the seed box takes 1 to 9999) |
 | Recipe cards: What it is, Bulge, Disc, Spiral arms, Bar, Ring, Dust, Stars and knots | done; "What it is" (galaxy, star, artefact) waits for M7 |
@@ -36,7 +36,7 @@ Status: **done**, **waits for M7 / M9** (built from the schema; appears when the
 | Companions and oddities | done (foreground stars wait for M7) |
 | The deep field | bubbles, streams, hand wobble done; the deep field itself waits for M7 |
 | Pen, Stars and dust (hatching), The drawings, Print (plates) | done (drawn stars wait for M7) |
-| Lensing, the quasar flare | wait for M9 |
+| Lensing, the quasar flare | done (M9: `capabilities.lens` on; the quasar's flare runs on the timeline through `mTime`, a view-tier input) |
 | Shells (simulated) | done (drawn by the page since M11) |
 | The merger: moment, ratio, approach, time since closest approach, tilts, friction, arms, sizes, orbit tilt, speed, stars simulated, galaxy types, merger on, tearing | done |
 | Timeline: play, scrub, end (0.2 to 30), loop, speed | done |
