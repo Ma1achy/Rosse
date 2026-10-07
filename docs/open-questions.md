@@ -152,4 +152,6 @@ npx prettier --write tests/golden/thresholds.json tests/golden/calibration.json
 
 If a case then fails, or a negative control that was caught is missed, the thresholds or the ADR are revisited.
 
+Also re-check then, from M7 (ADRs 0035 and 0036, proposed): the calibration factor 2 and the dots' count tolerance, and the three cases compared with the mean of v21's draws (`cigar-shaped--stipple` s4242 orbit, `ringed--vectors` s7 zoom, `layered-barred-spiral-satellite-trail--layered` s7 zoom; `tests/golden/v21-redraws.json`). If they pass against v21's single capture on real hardware, remove them from that list; if more cases fail by v21's single draw, add them with `npm run capture:reference -- --redraws tests/golden/v21-redraws.json`.
+
 **Recommendation:** do it with M10's real-hardware pass (it is on that row's acceptance in docs/roadmap.md), or earlier if convenient.

@@ -23,10 +23,10 @@ The merge of M5's branch had turned the golden job red (75 of 212 passing; 209 o
 
 See ADR 0035 for the numbers, the calibration factor (2, the owner's decision, with the results at 1.5, 2.5 and 3) and what the owner may prefer instead. `Edge-on with dust` keeps M5's thresholds exactly; its three cases await the owner's decision (M5 README).
 
-## Golden job: red on three cases
+## The three cases at factor 2
 
-At factor 2 (209 of 212 pass, both engines, the 12 drawn-star gates pass), the job fails on exactly: `cigar-shaped--stipple` seed 4242 orbit (position angle 5.37° against ±5.01°), `ringed--vectors` seed 7 zoom (inner axis ratio 0.0386 against ±0.0340) and `layered-barred-spiral-satellite-trail--layered` seed 7 zoom (r50 3.19% against ±2.50%). None is widened, skipped or pinned; the owner will decide.
+At factor 2 three cases failed by v21's single draw (`cigar-shaped--stipple` s4242 orbit, position angle 5.37° against ±5.01°; `ringed--vectors` s7 zoom, inner axis ratio 0.0386 against ±0.0340; `layered-barred-spiral-satellite-trail--layered` s7 zoom, r50 3.19% against ±2.50%). The owner's decision (ADR 0036, proposed): v21 is drawn again for them (8 draws of its stipple, `tests/golden/v21-redraws.json`) and they are compared with the mean. They pass with their own bands (1.06°, 0.0112, 1.52%). The last full golden run, with M6 and M8 merged: 387 of 388 required cases pass; the one failure is M6's `barred-spiral--knob-ring-lines` seed 7 home, axis ratio 0.0270 against ±0.0270 (not widened here).
 
 ## Decisions awaiting the owner
 
-ADRs 0034 and 0035 (proposed); the three `Edge-on with dust` cases of M5; those three cases; the sign-off of ADR 0035 (factor 2 chosen).
+ADRs 0034 and 0035 (proposed); the three `Edge-on with dust` cases of M5; the sign-off of ADRs 0035 (factor 2 chosen) and 0036.
