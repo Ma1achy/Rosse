@@ -63,6 +63,10 @@
     "presets": {
       "file": "docs/img/figures/presets.jpg",
       "bytes": 1305147
+    },
+    "anatomy": {
+      "file": "docs/img/figures/anatomy.jpg",
+      "bytes": 389178
     }
   },
   "gifs": {
@@ -79,6 +83,15 @@
       "frames": 146,
       "fps": 18,
       "encoded": "384 px, 24 colours"
+    },
+    "anatomy": {
+      "file": "docs/img/gifs/anatomy.gif",
+      "bytes": 1285337,
+      "mp4": "docs/img/gifs/anatomy.mp4",
+      "mp4Bytes": 1129639,
+      "frames": 140,
+      "fps": 15,
+      "encoded": "336 px, 16 colours, every 2nd frame"
     }
   },
   "gz2": {

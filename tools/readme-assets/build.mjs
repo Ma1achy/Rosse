@@ -33,7 +33,6 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { join, relative } from 'node:path';
-import { PNG } from 'pngjs';
 import { viewAt } from './camera.mjs';
 import { strip, sheet, pair, WIDTH } from './figures.mjs';
 import {
