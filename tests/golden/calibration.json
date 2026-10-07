@@ -6369,6 +6369,2934 @@
       "v21Reroll": null
     },
     "merger": {
+      "engineRekey": {
+        "ssim": {
+          "n": 144,
+          "min": 0.3279,
+          "p5": 0.3504,
+          "median": 0.4324,
+          "p95": 0.5168,
+          "max": 0.6365
+        },
+        "ssimCoarse": {
+          "n": 144,
+          "min": 0.7914,
+          "p5": 0.8167,
+          "median": 0.8747,
+          "p95": 0.953,
+          "max": 0.9682
+        },
+        "inkAbs": {
+          "n": 144,
+          "min": 0,
+          "p5": 0.0008,
+          "median": 0.0099,
+          "p95": 0.0294,
+          "max": 0.0554
+        },
+        "medianAbs": {
+          "n": 144,
+          "min": 0,
+          "p5": 0.0005,
+          "median": 0.0056,
+          "p95": 0.0243,
+          "max": 0.0432
+        },
+        "p90Abs": {
+          "n": 144,
+          "min": 0.0001,
+          "p5": 0.0018,
+          "median": 0.0171,
+          "p95": 0.0457,
+          "max": 0.0624
+        },
+        "r25Abs": {
+          "n": 144,
+          "min": 0.0002,
+          "p5": 0.0013,
+          "median": 0.0124,
+          "p95": 0.04,
+          "max": 0.0703
+        },
+        "r50Abs": {
+          "n": 144,
+          "min": 0.0001,
+          "p5": 0.0009,
+          "median": 0.0119,
+          "p95": 0.033,
+          "max": 0.0701
+        },
+        "r90Abs": {
+          "n": 144,
+          "min": 0.0002,
+          "p5": 0.0007,
+          "median": 0.0085,
+          "p95": 0.0453,
+          "max": 0.0748
+        },
+        "outerAbs": {
+          "n": 144,
+          "min": 0,
+          "p5": 0.0005,
+          "median": 0.0047,
+          "p95": 0.0175,
+          "max": 0.0313
+        },
+        "qAbs": {
+          "n": 144,
+          "min": 0.0001,
+          "p5": 0.0014,
+          "median": 0.0112,
+          "p95": 0.0382,
+          "max": 0.0638
+        },
+        "qInnerAbs": {
+          "n": 144,
+          "min": 0.0001,
+          "p5": 0.0008,
+          "median": 0.0116,
+          "p95": 0.0388,
+          "max": 0.0604
+        },
+        "paAbs": {
+          "n": 144,
+          "min": 0.011,
+          "p5": 0.0957,
+          "median": 1.1778,
+          "p95": 4.7516,
+          "max": 10.4251
+        }
+      },
+      "negativeControls": {
+        "pa +30°": {
+          "applicable": 45,
+          "detected": 45,
+          "missed": [],
+          "ssim": {
+            "n": 45,
+            "min": 0.1053,
+            "p5": 0.1091,
+            "median": 0.1959,
+            "p95": 0.4517,
+            "max": 0.4642
+          },
+          "ssimCoarse": {
+            "n": 45,
+            "min": 0.2511,
+            "p5": 0.2908,
+            "median": 0.3855,
+            "p95": 0.7704,
+            "max": 0.804
+          },
+          "inkAbs": {
+            "n": 45,
+            "min": 0.0007,
+            "p5": 0.001,
+            "median": 0.0097,
+            "p95": 0.0269,
+            "max": 0.038
+          },
+          "medianAbs": {
+            "n": 45,
+            "min": 0.0001,
+            "p5": 0.0003,
+            "median": 0.0067,
+            "p95": 0.0207,
+            "max": 0.027
+          },
+          "p90Abs": {
+            "n": 45,
+            "min": 0.0005,
+            "p5": 0.0027,
+            "median": 0.0175,
+            "p95": 0.0461,
+            "max": 0.0479
+          },
+          "r25Abs": {
+            "n": 45,
+            "min": 0.0004,
+            "p5": 0.0034,
+            "median": 0.0167,
+            "p95": 0.0555,
+            "max": 0.0642
+          },
+          "r50Abs": {
+            "n": 45,
+            "min": 0,
+            "p5": 0.0018,
+            "median": 0.0153,
+            "p95": 0.034,
+            "max": 0.0622
+          },
+          "r90Abs": {
+            "n": 45,
+            "min": 0.0005,
+            "p5": 0.0014,
+            "median": 0.0093,
+            "p95": 0.051,
+            "max": 0.0555
+          },
+          "outerAbs": {
+            "n": 45,
+            "min": 0.0004,
+            "p5": 0.0006,
+            "median": 0.0056,
+            "p95": 0.0183,
+            "max": 0.0361
+          },
+          "qAbs": {
+            "n": 45,
+            "min": 0.0006,
+            "p5": 0.0024,
+            "median": 0.0115,
+            "p95": 0.0256,
+            "max": 0.0375
+          },
+          "qInnerAbs": {
+            "n": 45,
+            "min": 0.0001,
+            "p5": 0.0014,
+            "median": 0.0122,
+            "p95": 0.0331,
+            "max": 0.0505
+          },
+          "paAbs": {
+            "n": 45,
+            "min": 25.2808,
+            "p5": 26.3321,
+            "median": 29.9236,
+            "p95": 32.8892,
+            "max": 37.2695
+          },
+          "firstFailures": [
+            {
+              "config": "Layered: lensed merger (mergers) s4242 incl 30",
+              "failed": true,
+              "by": ["coarse ssim 0.5101", "position angle 29.53°"]
+            },
+            {
+              "config": "Layered: lensed merger (mergers) s7 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.5954", "position angle 32.22°"]
+            },
+            {
+              "config": "Merger: dry (two ellipticals) (mergers) s7 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.7704", "position angle 32.89°"]
+            },
+            {
+              "config": "Merger: minor, a stream (mergers) s4242 incl 25",
+              "failed": true,
+              "by": ["coarse ssim 0.3397", "position angle 30.06°"]
+            }
+          ]
+        },
+        "pa −30°": {
+          "applicable": 45,
+          "detected": 45,
+          "missed": [],
+          "ssim": {
+            "n": 45,
+            "min": 0.1004,
+            "p5": 0.113,
+            "median": 0.1962,
+            "p95": 0.4538,
+            "max": 0.4666
+          },
+          "ssimCoarse": {
+            "n": 45,
+            "min": 0.2579,
+            "p5": 0.274,
+            "median": 0.3806,
+            "p95": 0.7846,
+            "max": 0.8186
+          },
+          "inkAbs": {
+            "n": 45,
+            "min": 0,
+            "p5": 0.001,
+            "median": 0.0078,
+            "p95": 0.026,
+            "max": 0.0386
+          },
+          "medianAbs": {
+            "n": 45,
+            "min": 0.0003,
+            "p5": 0.0006,
+            "median": 0.0051,
+            "p95": 0.0185,
+            "max": 0.0231
+          },
+          "p90Abs": {
+            "n": 45,
+            "min": 0.0001,
+            "p5": 0.0041,
+            "median": 0.0195,
+            "p95": 0.0412,
+            "max": 0.0466
+          },
+          "r25Abs": {
+            "n": 45,
+            "min": 0.001,
+            "p5": 0.0028,
+            "median": 0.0145,
+            "p95": 0.0543,
+            "max": 0.0609
+          },
+          "r50Abs": {
+            "n": 45,
+            "min": 0.0005,
+            "p5": 0.0017,
+            "median": 0.0125,
+            "p95": 0.0343,
+            "max": 0.0787
+          },
+          "r90Abs": {
+            "n": 45,
+            "min": 0.0004,
+            "p5": 0.0015,
+            "median": 0.0125,
+            "p95": 0.0412,
+            "max": 0.051
+          },
+          "outerAbs": {
+            "n": 45,
+            "min": 0.0001,
+            "p5": 0.0007,
+            "median": 0.0068,
+            "p95": 0.0161,
+            "max": 0.0357
+          },
+          "qAbs": {
+            "n": 45,
+            "min": 0.0014,
+            "p5": 0.0023,
+            "median": 0.0109,
+            "p95": 0.0262,
+            "max": 0.0379
+          },
+          "qInnerAbs": {
+            "n": 45,
+            "min": 0,
+            "p5": 0.0012,
+            "median": 0.012,
+            "p95": 0.0331,
+            "max": 0.0492
+          },
+          "paAbs": {
+            "n": 45,
+            "min": 22.6894,
+            "p5": 27.0704,
+            "median": 30.0204,
+            "p95": 33.6985,
+            "max": 34.7219
+          },
+          "firstFailures": [
+            {
+              "config": "Layered: lensed merger (mergers) s4242 incl 30",
+              "failed": true,
+              "by": ["coarse ssim 0.4887", "position angle -30.46°"]
+            },
+            {
+              "config": "Layered: lensed merger (mergers) s7 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.5698", "position angle -27.75°"]
+            },
+            {
+              "config": "Merger: dry (two ellipticals) (mergers) s7 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.7846", "position angle -27.07°"]
+            },
+            {
+              "config": "Merger: minor, a stream (mergers) s4242 incl 25",
+              "failed": true,
+              "by": ["coarse ssim 0.3336", "position angle -29.92°"]
+            }
+          ]
+        },
+        "stage +0.7": {
+          "applicable": 48,
+          "detected": 46,
+          "missed": [
+            "Merger: coalescing (mergers) s4242 incl 40",
+            "Merger: coalescing (mergers) s4242 incl 60"
+          ],
+          "ssim": {
+            "n": 48,
+            "min": 0.1533,
+            "p5": 0.1932,
+            "median": 0.2598,
+            "p95": 0.4949,
+            "max": 0.513
+          },
+          "ssimCoarse": {
+            "n": 48,
+            "min": 0.3305,
+            "p5": 0.3916,
+            "median": 0.6442,
+            "p95": 0.8609,
+            "max": 0.8952
+          },
+          "inkAbs": {
+            "n": 48,
+            "min": 0.0001,
+            "p5": 0.0022,
+            "median": 0.03,
+            "p95": 0.0792,
+            "max": 0.1004
+          },
+          "medianAbs": {
+            "n": 48,
+            "min": 0.0002,
+            "p5": 0.0007,
+            "median": 0.0101,
+            "p95": 0.0417,
+            "max": 0.0522
+          },
+          "p90Abs": {
+            "n": 48,
+            "min": 0.0009,
+            "p5": 0.0025,
+            "median": 0.0233,
+            "p95": 0.0634,
+            "max": 0.0826
+          },
+          "r25Abs": {
+            "n": 48,
+            "min": 0.0028,
+            "p5": 0.0079,
+            "median": 0.0893,
+            "p95": 0.2445,
+            "max": 0.2766
+          },
+          "r50Abs": {
+            "n": 48,
+            "min": 0.0013,
+            "p5": 0.005,
+            "median": 0.0693,
+            "p95": 0.1623,
+            "max": 0.1923
+          },
+          "r90Abs": {
+            "n": 48,
+            "min": 0.0014,
+            "p5": 0.0023,
+            "median": 0.0433,
+            "p95": 0.0983,
+            "max": 0.1318
+          },
+          "outerAbs": {
+            "n": 48,
+            "min": 0.0003,
+            "p5": 0.001,
+            "median": 0.0201,
+            "p95": 0.0619,
+            "max": 0.0712
+          },
+          "qAbs": {
+            "n": 48,
+            "min": 0.0001,
+            "p5": 0.0067,
+            "median": 0.0323,
+            "p95": 0.1187,
+            "max": 0.1501
+          },
+          "qInnerAbs": {
+            "n": 48,
+            "min": 0.0012,
+            "p5": 0.0041,
+            "median": 0.0257,
+            "p95": 0.0775,
+            "max": 0.1045
+          },
+          "paAbs": {
+            "n": 48,
+            "min": 0.5586,
+            "p5": 0.6065,
+            "median": 16.6347,
+            "p95": 41.4086,
+            "max": 57.0383
+          },
+          "firstFailures": [
+            {
+              "config": "Layered: lensed merger (mergers) s4242 incl 30",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.6340",
+                "r25 6.32%",
+                "r90 7.40%",
+                "outer ink 3.99%",
+                "position angle 16.63°"
+              ]
+            },
+            {
+              "config": "Layered: lensed merger (mergers) s7 incl 50",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.6741",
+                "r25 17.63%",
+                "r50 13.25%",
+                "r90 7.65%",
+                "outer ink 3.90%",
+                "axis ratio -0.0698",
+                "position angle 28.73°"
+              ]
+            },
+            {
+              "config": "Merger: dry (two ellipticals) (mergers) s4242 incl 30",
+              "failed": true,
+              "by": ["ink -7.92%", "r90 -8.17%", "axis ratio -0.1187"]
+            },
+            {
+              "config": "Merger: dry (two ellipticals) (mergers) s7 incl 50",
+              "failed": true,
+              "by": ["axis ratio -0.0595"]
+            }
+          ]
+        },
+        "stage −0.7": {
+          "applicable": 48,
+          "detected": 48,
+          "missed": [],
+          "ssim": {
+            "n": 48,
+            "min": 0.1181,
+            "p5": 0.1495,
+            "median": 0.2398,
+            "p95": 0.4836,
+            "max": 0.4962
+          },
+          "ssimCoarse": {
+            "n": 48,
+            "min": 0.2513,
+            "p5": 0.2688,
+            "median": 0.5864,
+            "p95": 0.8537,
+            "max": 0.8791
+          },
+          "inkAbs": {
+            "n": 48,
+            "min": 0.0006,
+            "p5": 0.0009,
+            "median": 0.0324,
+            "p95": 0.0967,
+            "max": 0.1074
+          },
+          "medianAbs": {
+            "n": 48,
+            "min": 0,
+            "p5": 0.0006,
+            "median": 0.0079,
+            "p95": 0.0514,
+            "max": 0.0611
+          },
+          "p90Abs": {
+            "n": 48,
+            "min": 0.0007,
+            "p5": 0.0019,
+            "median": 0.0251,
+            "p95": 0.0765,
+            "max": 0.0817
+          },
+          "r25Abs": {
+            "n": 48,
+            "min": 0.0026,
+            "p5": 0.015,
+            "median": 0.0852,
+            "p95": 0.2023,
+            "max": 0.3529
+          },
+          "r50Abs": {
+            "n": 48,
+            "min": 0.0034,
+            "p5": 0.0094,
+            "median": 0.0682,
+            "p95": 0.1718,
+            "max": 0.2082
+          },
+          "r90Abs": {
+            "n": 48,
+            "min": 0.0007,
+            "p5": 0.0092,
+            "median": 0.0492,
+            "p95": 0.1017,
+            "max": 0.1266
+          },
+          "outerAbs": {
+            "n": 48,
+            "min": 0.001,
+            "p5": 0.0037,
+            "median": 0.0169,
+            "p95": 0.0778,
+            "max": 0.0891
+          },
+          "qAbs": {
+            "n": 48,
+            "min": 0.0007,
+            "p5": 0.0077,
+            "median": 0.0488,
+            "p95": 0.18,
+            "max": 0.2242
+          },
+          "qInnerAbs": {
+            "n": 48,
+            "min": 0.0033,
+            "p5": 0.004,
+            "median": 0.0373,
+            "p95": 0.119,
+            "max": 0.1648
+          },
+          "paAbs": {
+            "n": 48,
+            "min": 0.2308,
+            "p5": 1.8873,
+            "median": 22.9625,
+            "p95": 42.2728,
+            "max": 81.7052
+          },
+          "firstFailures": [
+            {
+              "config": "Layered: lensed merger (mergers) s4242 incl 30",
+              "failed": true,
+              "by": ["coarse ssim 0.5773", "r25 -6.41%", "position angle -24.39°"]
+            },
+            {
+              "config": "Layered: lensed merger (mergers) s7 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.6144", "position angle -36.31°"]
+            },
+            {
+              "config": "Merger: dry (two ellipticals) (mergers) s4242 incl 30",
+              "failed": true,
+              "by": ["r25 -17.67%", "r50 -14.48%"]
+            },
+            {
+              "config": "Merger: dry (two ellipticals) (mergers) s7 incl 50",
+              "failed": true,
+              "by": ["r25 -11.78%", "r50 -12.03%"]
+            }
+          ]
+        },
+        "mass ratio ∓0.3": {
+          "applicable": 44,
+          "detected": 40,
+          "missed": [
+            "Merger: dry (two ellipticals) (mergers) s7 incl 50",
+            "Merger: the Mice (mergers-t05) s4242 incl 55",
+            "Merger: the Mice (mergers) s4242 incl 35",
+            "Merger: dry (two ellipticals) (mergers) s7 incl 30"
+          ],
+          "ssim": {
+            "n": 44,
+            "min": 0.2099,
+            "p5": 0.2221,
+            "median": 0.3036,
+            "p95": 0.4975,
+            "max": 0.5057
+          },
+          "ssimCoarse": {
+            "n": 44,
+            "min": 0.4873,
+            "p5": 0.5534,
+            "median": 0.6904,
+            "p95": 0.8706,
+            "max": 0.8914
+          },
+          "inkAbs": {
+            "n": 44,
+            "min": 0.0002,
+            "p5": 0.0013,
+            "median": 0.0413,
+            "p95": 0.1229,
+            "max": 0.1606
+          },
+          "medianAbs": {
+            "n": 44,
+            "min": 0,
+            "p5": 0.0007,
+            "median": 0.012,
+            "p95": 0.0526,
+            "max": 0.0612
+          },
+          "p90Abs": {
+            "n": 44,
+            "min": 0.0032,
+            "p5": 0.0068,
+            "median": 0.0304,
+            "p95": 0.0973,
+            "max": 0.1046
+          },
+          "r25Abs": {
+            "n": 44,
+            "min": 0.001,
+            "p5": 0.0046,
+            "median": 0.0411,
+            "p95": 0.1448,
+            "max": 0.1737
+          },
+          "r50Abs": {
+            "n": 44,
+            "min": 0.0025,
+            "p5": 0.0055,
+            "median": 0.0279,
+            "p95": 0.0966,
+            "max": 0.1505
+          },
+          "r90Abs": {
+            "n": 44,
+            "min": 0.0005,
+            "p5": 0.006,
+            "median": 0.0582,
+            "p95": 0.1771,
+            "max": 0.2018
+          },
+          "outerAbs": {
+            "n": 44,
+            "min": 0.0004,
+            "p5": 0.002,
+            "median": 0.024,
+            "p95": 0.0632,
+            "max": 0.0871
+          },
+          "qAbs": {
+            "n": 44,
+            "min": 0.0014,
+            "p5": 0.0032,
+            "median": 0.036,
+            "p95": 0.2454,
+            "max": 0.3021
+          },
+          "qInnerAbs": {
+            "n": 44,
+            "min": 0.0001,
+            "p5": 0.0022,
+            "median": 0.0209,
+            "p95": 0.0849,
+            "max": 0.1322
+          },
+          "paAbs": {
+            "n": 44,
+            "min": 0.0351,
+            "p5": 0.1892,
+            "median": 2.2066,
+            "p95": 46.6113,
+            "max": 88.9
+          },
+          "firstFailures": [
+            {
+              "config": "Layered: lensed merger (mergers) s4242 incl 30",
+              "failed": true,
+              "by": ["coarse ssim 0.7658", "r90 -11.03%", "outer ink -4.98%"]
+            },
+            {
+              "config": "Layered: lensed merger (mergers) s7 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.7855"]
+            },
+            {
+              "config": "Merger: dry (two ellipticals) (mergers) s4242 incl 30",
+              "failed": true,
+              "by": ["ink -6.96%", "r25 -6.63%", "r50 -5.75%", "r90 -7.32%"]
+            },
+            {
+              "config": "Merger: dry (two ellipticals) (mergers) s7 incl 50",
+              "failed": false,
+              "by": []
+            }
+          ]
+        },
+        "closest approach +0.8": {
+          "applicable": 48,
+          "detected": 48,
+          "missed": [],
+          "ssim": {
+            "n": 48,
+            "min": 0.1032,
+            "p5": 0.1129,
+            "median": 0.2117,
+            "p95": 0.4729,
+            "max": 0.4898
+          },
+          "ssimCoarse": {
+            "n": 48,
+            "min": 0.1852,
+            "p5": 0.1992,
+            "median": 0.4504,
+            "p95": 0.7845,
+            "max": 0.827
+          },
+          "inkAbs": {
+            "n": 48,
+            "min": 0.0246,
+            "p5": 0.0452,
+            "median": 0.1791,
+            "p95": 0.287,
+            "max": 0.3124
+          },
+          "medianAbs": {
+            "n": 48,
+            "min": 0,
+            "p5": 0.0005,
+            "median": 0.0193,
+            "p95": 0.0551,
+            "max": 0.1194
+          },
+          "p90Abs": {
+            "n": 48,
+            "min": 0.0028,
+            "p5": 0.0039,
+            "median": 0.0315,
+            "p95": 0.2008,
+            "max": 0.3399
+          },
+          "r25Abs": {
+            "n": 48,
+            "min": 0.0066,
+            "p5": 0.0112,
+            "median": 0.1676,
+            "p95": 0.4646,
+            "max": 0.6156
+          },
+          "r50Abs": {
+            "n": 48,
+            "min": 0.0023,
+            "p5": 0.0082,
+            "median": 0.075,
+            "p95": 0.2864,
+            "max": 0.3536
+          },
+          "r90Abs": {
+            "n": 48,
+            "min": 0.0002,
+            "p5": 0.0037,
+            "median": 0.0661,
+            "p95": 0.1663,
+            "max": 0.1855
+          },
+          "outerAbs": {
+            "n": 48,
+            "min": 0.0004,
+            "p5": 0.0021,
+            "median": 0.0299,
+            "p95": 0.0521,
+            "max": 0.1058
+          },
+          "qAbs": {
+            "n": 48,
+            "min": 0.0024,
+            "p5": 0.0158,
+            "median": 0.1727,
+            "p95": 0.3933,
+            "max": 0.4698
+          },
+          "qInnerAbs": {
+            "n": 48,
+            "min": 0.0043,
+            "p5": 0.0073,
+            "median": 0.0959,
+            "p95": 0.2327,
+            "max": 0.2542
+          },
+          "paAbs": {
+            "n": 48,
+            "min": 0.0255,
+            "p5": 0.2827,
+            "median": 13.7096,
+            "p95": 81.1354,
+            "max": 84.5922
+          },
+          "firstFailures": [
+            {
+              "config": "Layered: lensed merger (mergers) s4242 incl 30",
+              "failed": true,
+              "by": [
+                "ink -10.96%",
+                "coarse ssim 0.4606",
+                "r25 15.94%",
+                "r50 7.60%",
+                "position angle -45.26°"
+              ]
+            },
+            {
+              "config": "Layered: lensed merger (mergers) s7 incl 50",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.5466",
+                "r25 19.15%",
+                "r50 13.17%",
+                "axis ratio -0.1851",
+                "inner axis ratio -0.0356",
+                "position angle -60.73°"
+              ]
+            },
+            {
+              "config": "Merger: dry (two ellipticals) (mergers) s4242 incl 30",
+              "failed": true,
+              "by": [
+                "ink -9.14%",
+                "coarse ssim 0.7845",
+                "r25 -20.08%",
+                "r50 -11.53%",
+                "r90 11.84%",
+                "outer ink 3.34%",
+                "position angle 68.98°"
+              ]
+            },
+            {
+              "config": "Merger: dry (two ellipticals) (mergers) s7 incl 50",
+              "failed": true,
+              "by": [
+                "ink -6.78%",
+                "r25 -21.74%",
+                "r50 -19.56%",
+                "r90 16.82%",
+                "outer ink 4.35%",
+                "axis ratio 0.1605",
+                "position angle -12.32°"
+              ]
+            }
+          ]
+        },
+        "timeline 0.5": {
+          "applicable": 40,
+          "detected": 40,
+          "missed": [],
+          "ssim": {
+            "n": 40,
+            "min": 0.1064,
+            "p5": 0.125,
+            "median": 0.1902,
+            "p95": 0.432,
+            "max": 0.4552
+          },
+          "ssimCoarse": {
+            "n": 40,
+            "min": 0.2385,
+            "p5": 0.2587,
+            "median": 0.3377,
+            "p95": 0.6889,
+            "max": 0.746
+          },
+          "inkAbs": {
+            "n": 40,
+            "min": 0.0835,
+            "p5": 0.1292,
+            "median": 0.2538,
+            "p95": 0.4161,
+            "max": 0.4292
+          },
+          "medianAbs": {
+            "n": 40,
+            "min": 0.0193,
+            "p5": 0.0226,
+            "median": 0.092,
+            "p95": 0.1969,
+            "max": 0.2082
+          },
+          "p90Abs": {
+            "n": 40,
+            "min": 0.0787,
+            "p5": 0.1284,
+            "median": 0.2593,
+            "p95": 0.5878,
+            "max": 0.8971
+          },
+          "r25Abs": {
+            "n": 40,
+            "min": 0.0004,
+            "p5": 0.0154,
+            "median": 0.2101,
+            "p95": 0.5425,
+            "max": 0.5912
+          },
+          "r50Abs": {
+            "n": 40,
+            "min": 0.012,
+            "p5": 0.0262,
+            "median": 0.2556,
+            "p95": 0.4673,
+            "max": 0.5093
+          },
+          "r90Abs": {
+            "n": 40,
+            "min": 0.2151,
+            "p5": 0.2371,
+            "median": 0.3455,
+            "p95": 0.5529,
+            "max": 0.6094
+          },
+          "outerAbs": {
+            "n": 40,
+            "min": 0.0652,
+            "p5": 0.0691,
+            "median": 0.0995,
+            "p95": 0.1,
+            "max": 0.1
+          },
+          "qAbs": {
+            "n": 40,
+            "min": 0.0074,
+            "p5": 0.0084,
+            "median": 0.0907,
+            "p95": 0.348,
+            "max": 0.3928
+          },
+          "qInnerAbs": {
+            "n": 40,
+            "min": 0.0035,
+            "p5": 0.004,
+            "median": 0.0748,
+            "p95": 0.3908,
+            "max": 0.4179
+          },
+          "paAbs": {
+            "n": 40,
+            "min": 0.7217,
+            "p5": 1.2939,
+            "median": 34.5225,
+            "p95": 76.7962,
+            "max": 82.0828
+          },
+          "firstFailures": [
+            {
+              "config": "Layered: lensed merger (mergers) s4242 incl 30",
+              "failed": true,
+              "by": [
+                "ink -22.85%",
+                "coarse ssim 0.5128",
+                "p90 width 23.65%",
+                "r50 -6.39%",
+                "r90 -31.48%",
+                "outer ink -9.26%",
+                "inner axis ratio 0.0397",
+                "position angle 21.73°"
+              ]
+            },
+            {
+              "config": "Layered: lensed merger (mergers) s7 incl 50",
+              "failed": true,
+              "by": [
+                "ink -12.92%",
+                "coarse ssim 0.5589",
+                "p90 width 14.27%",
+                "r90 -30.62%",
+                "outer ink -8.81%",
+                "axis ratio -0.1602",
+                "inner axis ratio 0.0475",
+                "position angle 30.34°"
+              ]
+            },
+            {
+              "config": "Merger: dry (two ellipticals) (mergers) s4242 incl 30",
+              "failed": true,
+              "by": [
+                "ink -28.18%",
+                "coarse ssim 0.6666",
+                "p90 width 28.26%",
+                "r25 -46.74%",
+                "r50 -40.98%",
+                "r90 -38.60%",
+                "outer ink -7.38%",
+                "inner axis ratio 0.1023",
+                "position angle -46.53°"
+              ]
+            },
+            {
+              "config": "Merger: dry (two ellipticals) (mergers) s7 incl 50",
+              "failed": true,
+              "by": [
+                "ink -21.29%",
+                "coarse ssim 0.7460",
+                "p90 width 14.23%",
+                "r25 -38.03%",
+                "r50 -36.85%",
+                "r90 -28.52%",
+                "outer ink -6.52%",
+                "position angle -6.32°"
+              ]
+            }
+          ]
+        },
+        "pa +90°": {
+          "applicable": 48,
+          "detected": 48,
+          "missed": [],
+          "ssim": {
+            "n": 48,
+            "min": 0.0547,
+            "p5": 0.0679,
+            "median": 0.1718,
+            "p95": 0.4362,
+            "max": 0.4615
+          },
+          "ssimCoarse": {
+            "n": 48,
+            "min": 0.1269,
+            "p5": 0.1287,
+            "median": 0.2685,
+            "p95": 0.6907,
+            "max": 0.7348
+          },
+          "inkAbs": {
+            "n": 48,
+            "min": 0,
+            "p5": 0.0001,
+            "median": 0.008,
+            "p95": 0.0281,
+            "max": 0.0559
+          },
+          "medianAbs": {
+            "n": 48,
+            "min": 0,
+            "p5": 0.0008,
+            "median": 0.0063,
+            "p95": 0.0203,
+            "max": 0.024
+          },
+          "p90Abs": {
+            "n": 48,
+            "min": 0.001,
+            "p5": 0.0026,
+            "median": 0.0158,
+            "p95": 0.0415,
+            "max": 0.0498
+          },
+          "r25Abs": {
+            "n": 48,
+            "min": 0.0007,
+            "p5": 0.0022,
+            "median": 0.0148,
+            "p95": 0.0548,
+            "max": 0.0688
+          },
+          "r50Abs": {
+            "n": 48,
+            "min": 0.0001,
+            "p5": 0.0022,
+            "median": 0.0121,
+            "p95": 0.0462,
+            "max": 0.0715
+          },
+          "r90Abs": {
+            "n": 48,
+            "min": 0.0001,
+            "p5": 0.0006,
+            "median": 0.0085,
+            "p95": 0.048,
+            "max": 0.075
+          },
+          "outerAbs": {
+            "n": 48,
+            "min": 0.0001,
+            "p5": 0.0002,
+            "median": 0.0052,
+            "p95": 0.019,
+            "max": 0.0317
+          },
+          "qAbs": {
+            "n": 48,
+            "min": 0.0004,
+            "p5": 0.0028,
+            "median": 0.0112,
+            "p95": 0.0364,
+            "max": 0.0601
+          },
+          "qInnerAbs": {
+            "n": 48,
+            "min": 0.0002,
+            "p5": 0.0015,
+            "median": 0.0122,
+            "p95": 0.0388,
+            "max": 0.0609
+          },
+          "paAbs": {
+            "n": 48,
+            "min": 82.6772,
+            "p5": 85.2501,
+            "median": 88.758,
+            "p95": 89.9499,
+            "max": 89.9866
+          },
+          "firstFailures": [
+            {
+              "config": "Layered: lensed merger (mergers) s4242 incl 30",
+              "failed": true,
+              "by": ["coarse ssim 0.3129", "position angle 89.55°"]
+            },
+            {
+              "config": "Layered: lensed merger (mergers) s7 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.4115", "position angle -87.75°"]
+            },
+            {
+              "config": "Merger: dry (two ellipticals) (mergers) s4242 incl 30",
+              "failed": true,
+              "by": [
+                "ink -5.59%",
+                "coarse ssim 0.7348",
+                "r25 -6.88%",
+                "r90 -7.50%",
+                "axis ratio -0.0601",
+                "inner axis ratio -0.0609",
+                "position angle 86.88°"
+              ]
+            },
+            {
+              "config": "Merger: dry (two ellipticals) (mergers) s7 incl 50",
+              "failed": true,
+              "by": ["coarse ssim 0.6901", "position angle -87.12°"]
+            }
+          ]
+        },
+        "dot size ×1.3": {
+          "applicable": 48,
+          "detected": 48,
+          "missed": [],
+          "ssim": {
+            "n": 48,
+            "min": 0.2846,
+            "p5": 0.2961,
+            "median": 0.3877,
+            "p95": 0.4492,
+            "max": 0.5939
+          },
+          "ssimCoarse": {
+            "n": 48,
+            "min": 0.7498,
+            "p5": 0.7666,
+            "median": 0.8333,
+            "p95": 0.8919,
+            "max": 0.9242
+          },
+          "inkAbs": {
+            "n": 48,
+            "min": 0.232,
+            "p5": 0.247,
+            "median": 0.3011,
+            "p95": 0.3702,
+            "max": 0.3886
+          },
+          "medianAbs": {
+            "n": 48,
+            "min": 0.1173,
+            "p5": 0.1469,
+            "median": 0.1916,
+            "p95": 0.2339,
+            "max": 0.2481
+          },
+          "p90Abs": {
+            "n": 48,
+            "min": 0.1701,
+            "p5": 0.1765,
+            "median": 0.2395,
+            "p95": 0.3116,
+            "max": 0.3304
+          },
+          "r25Abs": {
+            "n": 48,
+            "min": 0.0008,
+            "p5": 0.0011,
+            "median": 0.0269,
+            "p95": 0.119,
+            "max": 0.1231
+          },
+          "r50Abs": {
+            "n": 48,
+            "min": 0.0006,
+            "p5": 0.009,
+            "median": 0.0243,
+            "p95": 0.07,
+            "max": 0.0993
+          },
+          "r90Abs": {
+            "n": 48,
+            "min": 0.0002,
+            "p5": 0.0021,
+            "median": 0.0125,
+            "p95": 0.0524,
+            "max": 0.0685
+          },
+          "outerAbs": {
+            "n": 48,
+            "min": 0.0003,
+            "p5": 0.0007,
+            "median": 0.0074,
+            "p95": 0.0199,
+            "max": 0.0301
+          },
+          "qAbs": {
+            "n": 48,
+            "min": 0.0005,
+            "p5": 0.0014,
+            "median": 0.0125,
+            "p95": 0.0338,
+            "max": 0.0485
+          },
+          "qInnerAbs": {
+            "n": 48,
+            "min": 0.0033,
+            "p5": 0.0064,
+            "median": 0.0342,
+            "p95": 0.0662,
+            "max": 0.0834
+          },
+          "paAbs": {
+            "n": 48,
+            "min": 0.0061,
+            "p5": 0.0249,
+            "median": 1.3495,
+            "p95": 5.9039,
+            "max": 20.4984
+          },
+          "firstFailures": [
+            {
+              "config": "Layered: lensed merger (mergers) s4242 incl 30",
+              "failed": true,
+              "by": [
+                "ink 32.03%",
+                "median width 20.85%",
+                "p90 width 28.06%",
+                "inner axis ratio 0.0360"
+              ]
+            },
+            {
+              "config": "Layered: lensed merger (mergers) s7 incl 50",
+              "failed": true,
+              "by": ["ink 36.27%", "median width 17.88%", "p90 width 23.45%", "r50 6.98%"]
+            },
+            {
+              "config": "Merger: dry (two ellipticals) (mergers) s4242 incl 30",
+              "failed": true,
+              "by": ["ink 33.18%", "median width 19.89%", "p90 width 33.04%", "r25 -6.75%"]
+            },
+            {
+              "config": "Merger: dry (two ellipticals) (mergers) s7 incl 50",
+              "failed": true,
+              "by": ["ink 38.86%", "median width 21.20%", "p90 width 25.35%", "r90 6.85%"]
+            }
+          ]
+        },
+        "orbit 35°": {
+          "applicable": 45,
+          "detected": 45,
+          "missed": [],
+          "ssim": {
+            "n": 45,
+            "min": 0.0575,
+            "p5": 0.0956,
+            "median": 0.2047,
+            "p95": 0.4506,
+            "max": 0.4766
+          },
+          "ssimCoarse": {
+            "n": 45,
+            "min": 0.1215,
+            "p5": 0.2336,
+            "median": 0.3648,
+            "p95": 0.7768,
+            "max": 0.8196
+          },
+          "inkAbs": {
+            "n": 45,
+            "min": 0.002,
+            "p5": 0.0153,
+            "median": 0.0839,
+            "p95": 0.2773,
+            "max": 0.3064
+          },
+          "medianAbs": {
+            "n": 45,
+            "min": 0,
+            "p5": 0.0004,
+            "median": 0.0141,
+            "p95": 0.0627,
+            "max": 0.0848
+          },
+          "p90Abs": {
+            "n": 45,
+            "min": 0.0081,
+            "p5": 0.0093,
+            "median": 0.0611,
+            "p95": 0.1666,
+            "max": 0.3946
+          },
+          "r25Abs": {
+            "n": 45,
+            "min": 0.0015,
+            "p5": 0.0163,
+            "median": 0.1283,
+            "p95": 0.4415,
+            "max": 0.4534
+          },
+          "r50Abs": {
+            "n": 45,
+            "min": 0.0079,
+            "p5": 0.0214,
+            "median": 0.1021,
+            "p95": 0.3038,
+            "max": 0.3475
+          },
+          "r90Abs": {
+            "n": 45,
+            "min": 0.0018,
+            "p5": 0.0279,
+            "median": 0.1436,
+            "p95": 0.2711,
+            "max": 0.3463
+          },
+          "outerAbs": {
+            "n": 45,
+            "min": 0.0009,
+            "p5": 0.0113,
+            "median": 0.0601,
+            "p95": 0.153,
+            "max": 0.2099
+          },
+          "qAbs": {
+            "n": 45,
+            "min": 0.0037,
+            "p5": 0.0052,
+            "median": 0.1192,
+            "p95": 0.3175,
+            "max": 0.3454
+          },
+          "qInnerAbs": {
+            "n": 45,
+            "min": 0.0005,
+            "p5": 0.0095,
+            "median": 0.0778,
+            "p95": 0.1759,
+            "max": 0.4159
+          },
+          "paAbs": {
+            "n": 45,
+            "min": 14.695,
+            "p5": 15.9168,
+            "median": 36.3683,
+            "p95": 80.7551,
+            "max": 86.5496
+          },
+          "firstFailures": [
+            {
+              "config": "Layered: lensed merger (mergers) s4242 incl 30",
+              "failed": true,
+              "by": [
+                "ink -7.65%",
+                "coarse ssim 0.5219",
+                "r25 -24.14%",
+                "r50 -16.79%",
+                "r90 -19.09%",
+                "outer ink -6.49%",
+                "axis ratio 0.1830",
+                "inner axis ratio 0.1011",
+                "position angle 30.97°"
+              ]
+            },
+            {
+              "config": "Layered: lensed merger (mergers) s7 incl 50",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.5204",
+                "r50 7.80%",
+                "r90 -12.08%",
+                "outer ink -7.42%",
+                "axis ratio -0.0445",
+                "position angle 55.38°"
+              ]
+            },
+            {
+              "config": "Merger: dry (two ellipticals) (mergers) s7 incl 50",
+              "failed": true,
+              "by": [
+                "r25 15.50%",
+                "r50 10.21%",
+                "r90 11.58%",
+                "outer ink 4.23%",
+                "axis ratio -0.1052",
+                "position angle 19.44°"
+              ]
+            },
+            {
+              "config": "Merger: minor, a stream (mergers) s4242 incl 25",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.2778",
+                "r25 -14.70%",
+                "r50 -9.18%",
+                "r90 -13.22%",
+                "outer ink -7.50%",
+                "position angle 38.17°"
+              ]
+            }
+          ]
+        }
+      },
+      "v21Reroll": null
+    },
+    "merger@zoom": {
+      "engineRekey": {
+        "ssim": {
+          "n": 72,
+          "min": 0.3269,
+          "p5": 0.3422,
+          "median": 0.3881,
+          "p95": 0.444,
+          "max": 0.4492
+        },
+        "ssimCoarse": {
+          "n": 72,
+          "min": 0.7876,
+          "p5": 0.7987,
+          "median": 0.8338,
+          "p95": 0.875,
+          "max": 0.8805
+        },
+        "inkAbs": {
+          "n": 72,
+          "min": 0.0002,
+          "p5": 0.001,
+          "median": 0.0137,
+          "p95": 0.0397,
+          "max": 0.058
+        },
+        "medianAbs": {
+          "n": 72,
+          "min": 0,
+          "p5": 0,
+          "median": 0.0016,
+          "p95": 0.0168,
+          "max": 0.0273
+        },
+        "p90Abs": {
+          "n": 72,
+          "min": 0.0007,
+          "p5": 0.002,
+          "median": 0.0143,
+          "p95": 0.0335,
+          "max": 0.047
+        },
+        "r25Abs": {
+          "n": 72,
+          "min": 0.0005,
+          "p5": 0.0017,
+          "median": 0.0121,
+          "p95": 0.0638,
+          "max": 0.083
+        },
+        "r50Abs": {
+          "n": 72,
+          "min": 0,
+          "p5": 0.0009,
+          "median": 0.0092,
+          "p95": 0.0363,
+          "max": 0.0518
+        },
+        "r90Abs": {
+          "n": 72,
+          "min": 0,
+          "p5": 0.0008,
+          "median": 0.0079,
+          "p95": 0.0311,
+          "max": 0.0599
+        },
+        "outerAbs": {
+          "n": 72,
+          "min": 0,
+          "p5": 0.0004,
+          "median": 0.0045,
+          "p95": 0.0149,
+          "max": 0.0247
+        },
+        "qAbs": {
+          "n": 72,
+          "min": 0.0002,
+          "p5": 0.0005,
+          "median": 0.0066,
+          "p95": 0.048,
+          "max": 0.0652
+        },
+        "qInnerAbs": {
+          "n": 72,
+          "min": 0.0004,
+          "p5": 0.0012,
+          "median": 0.0114,
+          "p95": 0.0599,
+          "max": 0.0874
+        },
+        "paAbs": {
+          "n": 72,
+          "min": 0.0545,
+          "p5": 0.1249,
+          "median": 0.6692,
+          "p95": 3.6497,
+          "max": 5.4143
+        }
+      },
+      "negativeControls": {
+        "pa +30°": {
+          "applicable": 24,
+          "detected": 24,
+          "missed": [],
+          "ssim": {
+            "n": 24,
+            "min": 0.1431,
+            "p5": 0.1432,
+            "median": 0.246,
+            "p95": 0.3685,
+            "max": 0.3951
+          },
+          "ssimCoarse": {
+            "n": 24,
+            "min": 0.3087,
+            "p5": 0.3224,
+            "median": 0.4321,
+            "p95": 0.6794,
+            "max": 0.691
+          },
+          "inkAbs": {
+            "n": 24,
+            "min": 0.0011,
+            "p5": 0.0013,
+            "median": 0.0148,
+            "p95": 0.0776,
+            "max": 0.0987
+          },
+          "medianAbs": {
+            "n": 24,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0015,
+            "p95": 0.0161,
+            "max": 0.0163
+          },
+          "p90Abs": {
+            "n": 24,
+            "min": 0.0001,
+            "p5": 0.0033,
+            "median": 0.0136,
+            "p95": 0.0359,
+            "max": 0.0362
+          },
+          "r25Abs": {
+            "n": 24,
+            "min": 0.0015,
+            "p5": 0.0053,
+            "median": 0.0141,
+            "p95": 0.0943,
+            "max": 0.1009
+          },
+          "r50Abs": {
+            "n": 24,
+            "min": 0.0001,
+            "p5": 0.0007,
+            "median": 0.0144,
+            "p95": 0.0486,
+            "max": 0.0659
+          },
+          "r90Abs": {
+            "n": 24,
+            "min": 0.0091,
+            "p5": 0.0104,
+            "median": 0.0302,
+            "p95": 0.1058,
+            "max": 0.1437
+          },
+          "outerAbs": {
+            "n": 24,
+            "min": 0.0034,
+            "p5": 0.0061,
+            "median": 0.0144,
+            "p95": 0.0747,
+            "max": 0.0797
+          },
+          "qAbs": {
+            "n": 24,
+            "min": 0.0001,
+            "p5": 0.0006,
+            "median": 0.0062,
+            "p95": 0.0454,
+            "max": 0.0479
+          },
+          "qInnerAbs": {
+            "n": 24,
+            "min": 0.0001,
+            "p5": 0.0015,
+            "median": 0.0112,
+            "p95": 0.0642,
+            "max": 0.0878
+          },
+          "paAbs": {
+            "n": 24,
+            "min": 28.7308,
+            "p5": 28.7709,
+            "median": 29.7128,
+            "p95": 33.6193,
+            "max": 34.6519
+          },
+          "firstFailures": [
+            {
+              "config": "Merger: coalescing (mergers) s4242 incl 40 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.6194", "position angle 34.65°"]
+            },
+            {
+              "config": "Merger: long tails (mergers) s4242 incl 55 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.4090", "r90 8.28%", "outer ink 3.23%", "position angle 28.77°"]
+            },
+            {
+              "config": "Merger: polar collision (mergers) s4242 incl 30 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.3497", "position angle 28.88°"]
+            },
+            {
+              "config": "Merger: the Mice (mergers) s4242 incl 35 zoom 2",
+              "failed": true,
+              "by": [
+                "ink -6.01%",
+                "coarse ssim 0.3889",
+                "r50 -6.59%",
+                "r90 -10.58%",
+                "outer ink -7.97%",
+                "position angle 29.54°"
+              ]
+            }
+          ]
+        },
+        "pa −30°": {
+          "applicable": 24,
+          "detected": 24,
+          "missed": [],
+          "ssim": {
+            "n": 24,
+            "min": 0.1462,
+            "p5": 0.1655,
+            "median": 0.2508,
+            "p95": 0.3716,
+            "max": 0.3975
+          },
+          "ssimCoarse": {
+            "n": 24,
+            "min": 0.3194,
+            "p5": 0.32,
+            "median": 0.4405,
+            "p95": 0.6927,
+            "max": 0.7014
+          },
+          "inkAbs": {
+            "n": 24,
+            "min": 0.0024,
+            "p5": 0.0041,
+            "median": 0.0231,
+            "p95": 0.0689,
+            "max": 0.0744
+          },
+          "medianAbs": {
+            "n": 24,
+            "min": 0,
+            "p5": 0,
+            "median": 0.002,
+            "p95": 0.0163,
+            "max": 0.0207
+          },
+          "p90Abs": {
+            "n": 24,
+            "min": 0.002,
+            "p5": 0.0032,
+            "median": 0.0103,
+            "p95": 0.0401,
+            "max": 0.0419
+          },
+          "r25Abs": {
+            "n": 24,
+            "min": 0.0013,
+            "p5": 0.0018,
+            "median": 0.0163,
+            "p95": 0.0766,
+            "max": 0.126
+          },
+          "r50Abs": {
+            "n": 24,
+            "min": 0.0002,
+            "p5": 0.0016,
+            "median": 0.0122,
+            "p95": 0.0479,
+            "max": 0.0484
+          },
+          "r90Abs": {
+            "n": 24,
+            "min": 0.0024,
+            "p5": 0.0078,
+            "median": 0.0312,
+            "p95": 0.1101,
+            "max": 0.114
+          },
+          "outerAbs": {
+            "n": 24,
+            "min": 0.0017,
+            "p5": 0.003,
+            "median": 0.0169,
+            "p95": 0.0556,
+            "max": 0.0654
+          },
+          "qAbs": {
+            "n": 24,
+            "min": 0,
+            "p5": 0.0001,
+            "median": 0.0063,
+            "p95": 0.0459,
+            "max": 0.0479
+          },
+          "qInnerAbs": {
+            "n": 24,
+            "min": 0.0011,
+            "p5": 0.0015,
+            "median": 0.0112,
+            "p95": 0.0643,
+            "max": 0.0877
+          },
+          "paAbs": {
+            "n": 24,
+            "min": 25.3775,
+            "p5": 26.3615,
+            "median": 30.2475,
+            "p95": 31.2472,
+            "max": 31.2514
+          },
+          "firstFailures": [
+            {
+              "config": "Merger: coalescing (mergers) s4242 incl 40 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.6303", "position angle -25.38°"]
+            },
+            {
+              "config": "Merger: long tails (mergers) s4242 incl 55 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.4408", "position angle -31.25°"]
+            },
+            {
+              "config": "Merger: polar collision (mergers) s4242 incl 30 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.3758", "position angle -31.13°"]
+            },
+            {
+              "config": "Merger: the Mice (mergers) s4242 incl 35 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.3591", "position angle -30.89°"]
+            }
+          ]
+        },
+        "stage +0.7": {
+          "applicable": 24,
+          "detected": 23,
+          "missed": ["Merger: coalescing (mergers) s7 incl 40 zoom 2"],
+          "ssim": {
+            "n": 24,
+            "min": 0.194,
+            "p5": 0.1985,
+            "median": 0.2793,
+            "p95": 0.3926,
+            "max": 0.426
+          },
+          "ssimCoarse": {
+            "n": 24,
+            "min": 0.4077,
+            "p5": 0.4227,
+            "median": 0.6068,
+            "p95": 0.7847,
+            "max": 0.8113
+          },
+          "inkAbs": {
+            "n": 24,
+            "min": 0.0077,
+            "p5": 0.0084,
+            "median": 0.0304,
+            "p95": 0.1215,
+            "max": 0.1387
+          },
+          "medianAbs": {
+            "n": 24,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0031,
+            "p95": 0.017,
+            "max": 0.0219
+          },
+          "p90Abs": {
+            "n": 24,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.0103,
+            "p95": 0.0445,
+            "max": 0.0595
+          },
+          "r25Abs": {
+            "n": 24,
+            "min": 0.0032,
+            "p5": 0.0061,
+            "median": 0.065,
+            "p95": 0.1805,
+            "max": 0.1983
+          },
+          "r50Abs": {
+            "n": 24,
+            "min": 0.0106,
+            "p5": 0.0148,
+            "median": 0.0733,
+            "p95": 0.1391,
+            "max": 0.1404
+          },
+          "r90Abs": {
+            "n": 24,
+            "min": 0.0021,
+            "p5": 0.0031,
+            "median": 0.0277,
+            "p95": 0.1015,
+            "max": 0.1163
+          },
+          "outerAbs": {
+            "n": 24,
+            "min": 0.0013,
+            "p5": 0.0022,
+            "median": 0.0151,
+            "p95": 0.0659,
+            "max": 0.0757
+          },
+          "qAbs": {
+            "n": 24,
+            "min": 0.0002,
+            "p5": 0.0026,
+            "median": 0.0407,
+            "p95": 0.0867,
+            "max": 0.0976
+          },
+          "qInnerAbs": {
+            "n": 24,
+            "min": 0.0007,
+            "p5": 0.0067,
+            "median": 0.0455,
+            "p95": 0.1229,
+            "max": 0.14
+          },
+          "paAbs": {
+            "n": 24,
+            "min": 3.2996,
+            "p5": 5.4515,
+            "median": 15.0891,
+            "p95": 26.5088,
+            "max": 27.0879
+          },
+          "firstFailures": [
+            {
+              "config": "Merger: coalescing (mergers) s4242 incl 40 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.7692", "position angle 8.58°"]
+            },
+            {
+              "config": "Merger: long tails (mergers) s4242 incl 55 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.6068", "axis ratio -0.0747", "position angle 14.62°"]
+            },
+            {
+              "config": "Merger: polar collision (mergers) s4242 incl 30 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.4867", "r25 -18.05%", "r50 -13.91%", "position angle -23.79°"]
+            },
+            {
+              "config": "Merger: the Mice (mergers) s4242 incl 35 zoom 2",
+              "failed": true,
+              "by": [
+                "ink -13.87%",
+                "coarse ssim 0.4077",
+                "r90 -11.63%",
+                "outer ink -7.57%",
+                "position angle 27.09°"
+              ]
+            }
+          ]
+        },
+        "stage −0.7": {
+          "applicable": 24,
+          "detected": 24,
+          "missed": [],
+          "ssim": {
+            "n": 24,
+            "min": 0.1623,
+            "p5": 0.174,
+            "median": 0.2548,
+            "p95": 0.3846,
+            "max": 0.4062
+          },
+          "ssimCoarse": {
+            "n": 24,
+            "min": 0.2875,
+            "p5": 0.3208,
+            "median": 0.5523,
+            "p95": 0.7514,
+            "max": 0.7517
+          },
+          "inkAbs": {
+            "n": 24,
+            "min": 0.0002,
+            "p5": 0.0023,
+            "median": 0.0541,
+            "p95": 0.1387,
+            "max": 0.1537
+          },
+          "medianAbs": {
+            "n": 24,
+            "min": 0.0002,
+            "p5": 0.0003,
+            "median": 0.0026,
+            "p95": 0.0179,
+            "max": 0.0261
+          },
+          "p90Abs": {
+            "n": 24,
+            "min": 0.001,
+            "p5": 0.002,
+            "median": 0.0156,
+            "p95": 0.0481,
+            "max": 0.0623
+          },
+          "r25Abs": {
+            "n": 24,
+            "min": 0.0026,
+            "p5": 0.008,
+            "median": 0.0628,
+            "p95": 0.2502,
+            "max": 0.3884
+          },
+          "r50Abs": {
+            "n": 24,
+            "min": 0.0089,
+            "p5": 0.0097,
+            "median": 0.0649,
+            "p95": 0.2185,
+            "max": 0.2603
+          },
+          "r90Abs": {
+            "n": 24,
+            "min": 0.0004,
+            "p5": 0.0022,
+            "median": 0.0491,
+            "p95": 0.1208,
+            "max": 0.1244
+          },
+          "outerAbs": {
+            "n": 24,
+            "min": 0.0011,
+            "p5": 0.0011,
+            "median": 0.0284,
+            "p95": 0.0658,
+            "max": 0.0663
+          },
+          "qAbs": {
+            "n": 24,
+            "min": 0.007,
+            "p5": 0.0074,
+            "median": 0.0379,
+            "p95": 0.1505,
+            "max": 0.1767
+          },
+          "qInnerAbs": {
+            "n": 24,
+            "min": 0.0039,
+            "p5": 0.0042,
+            "median": 0.0316,
+            "p95": 0.0707,
+            "max": 0.0725
+          },
+          "paAbs": {
+            "n": 24,
+            "min": 0.1829,
+            "p5": 4.4403,
+            "median": 22.2016,
+            "p95": 42.7141,
+            "max": 44.541
+          },
+          "firstFailures": [
+            {
+              "config": "Merger: coalescing (mergers) s4242 incl 40 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.7345"]
+            },
+            {
+              "config": "Merger: long tails (mergers) s4242 incl 55 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.5697", "position angle -23.67°"]
+            },
+            {
+              "config": "Merger: polar collision (mergers) s4242 incl 30 zoom 2",
+              "failed": true,
+              "by": [
+                "ink 7.71%",
+                "coarse ssim 0.4278",
+                "r25 25.02%",
+                "r50 21.17%",
+                "r90 7.95%",
+                "outer ink 3.83%",
+                "axis ratio -0.0847",
+                "position angle 22.17°"
+              ]
+            },
+            {
+              "config": "Merger: the Mice (mergers) s4242 incl 35 zoom 2",
+              "failed": true,
+              "by": [
+                "ink 8.52%",
+                "coarse ssim 0.2875",
+                "r50 -6.89%",
+                "r90 -9.62%",
+                "outer ink -5.66%",
+                "inner axis ratio 0.0725",
+                "position angle -44.54°"
+              ]
+            }
+          ]
+        },
+        "mass ratio ∓0.3": {
+          "applicable": 22,
+          "detected": 21,
+          "missed": ["Merger: dry (two ellipticals) (mergers) s7 incl 30 zoom 2"],
+          "ssim": {
+            "n": 22,
+            "min": 0.1887,
+            "p5": 0.2185,
+            "median": 0.3227,
+            "p95": 0.4158,
+            "max": 0.4379
+          },
+          "ssimCoarse": {
+            "n": 22,
+            "min": 0.5641,
+            "p5": 0.5824,
+            "median": 0.7297,
+            "p95": 0.8304,
+            "max": 0.8446
+          },
+          "inkAbs": {
+            "n": 22,
+            "min": 0.007,
+            "p5": 0.0115,
+            "median": 0.0328,
+            "p95": 0.1216,
+            "max": 0.1278
+          },
+          "medianAbs": {
+            "n": 22,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0021,
+            "p95": 0.0165,
+            "max": 0.0226
+          },
+          "p90Abs": {
+            "n": 22,
+            "min": 0.0011,
+            "p5": 0.004,
+            "median": 0.0165,
+            "p95": 0.074,
+            "max": 0.0838
+          },
+          "r25Abs": {
+            "n": 22,
+            "min": 0.0034,
+            "p5": 0.0109,
+            "median": 0.0269,
+            "p95": 0.1925,
+            "max": 0.2315
+          },
+          "r50Abs": {
+            "n": 22,
+            "min": 0.0002,
+            "p5": 0.0006,
+            "median": 0.0234,
+            "p95": 0.2134,
+            "max": 0.3595
+          },
+          "r90Abs": {
+            "n": 22,
+            "min": 0.0061,
+            "p5": 0.0063,
+            "median": 0.0294,
+            "p95": 0.0878,
+            "max": 0.1093
+          },
+          "outerAbs": {
+            "n": 22,
+            "min": 0.0034,
+            "p5": 0.0036,
+            "median": 0.0165,
+            "p95": 0.038,
+            "max": 0.0401
+          },
+          "qAbs": {
+            "n": 22,
+            "min": 0.0027,
+            "p5": 0.0048,
+            "median": 0.0248,
+            "p95": 0.052,
+            "max": 0.0874
+          },
+          "qInnerAbs": {
+            "n": 22,
+            "min": 0.0035,
+            "p5": 0.0061,
+            "median": 0.0213,
+            "p95": 0.0832,
+            "max": 0.1103
+          },
+          "paAbs": {
+            "n": 22,
+            "min": 0.2593,
+            "p5": 0.496,
+            "median": 2.3066,
+            "p95": 63.4739,
+            "max": 82.6306
+          },
+          "firstFailures": [
+            {
+              "config": "Merger: coalescing (mergers) s4242 incl 40 zoom 2",
+              "failed": true,
+              "by": [
+                "ink 12.16%",
+                "coarse ssim 0.5824",
+                "r25 19.25%",
+                "r50 21.34%",
+                "position angle 82.63°"
+              ]
+            },
+            {
+              "config": "Merger: long tails (mergers) s4242 incl 55 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.7483", "position angle -4.32°"]
+            },
+            {
+              "config": "Merger: polar collision (mergers) s4242 incl 30 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.6044", "r90 -8.66%", "outer ink -3.80%", "position angle 6.08°"]
+            },
+            {
+              "config": "Merger: the Mice (mergers) s4242 incl 35 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.7297", "position angle -2.83°"]
+            }
+          ]
+        },
+        "closest approach +0.8": {
+          "applicable": 24,
+          "detected": 24,
+          "missed": [],
+          "ssim": {
+            "n": 24,
+            "min": 0.1474,
+            "p5": 0.1489,
+            "median": 0.2328,
+            "p95": 0.3611,
+            "max": 0.4011
+          },
+          "ssimCoarse": {
+            "n": 24,
+            "min": 0.2385,
+            "p5": 0.2769,
+            "median": 0.4006,
+            "p95": 0.6393,
+            "max": 0.6813
+          },
+          "inkAbs": {
+            "n": 24,
+            "min": 0.0007,
+            "p5": 0.0163,
+            "median": 0.0729,
+            "p95": 0.1794,
+            "max": 0.2507
+          },
+          "medianAbs": {
+            "n": 24,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.0054,
+            "p95": 0.0288,
+            "max": 0.0362
+          },
+          "p90Abs": {
+            "n": 24,
+            "min": 0.0014,
+            "p5": 0.0021,
+            "median": 0.0538,
+            "p95": 0.08,
+            "max": 0.0967
+          },
+          "r25Abs": {
+            "n": 24,
+            "min": 0.0349,
+            "p5": 0.1089,
+            "median": 0.2976,
+            "p95": 1.0474,
+            "max": 1.2108
+          },
+          "r50Abs": {
+            "n": 24,
+            "min": 0.0142,
+            "p5": 0.0397,
+            "median": 0.2051,
+            "p95": 0.491,
+            "max": 0.6788
+          },
+          "r90Abs": {
+            "n": 24,
+            "min": 0.0052,
+            "p5": 0.007,
+            "median": 0.0499,
+            "p95": 0.2024,
+            "max": 0.2793
+          },
+          "outerAbs": {
+            "n": 24,
+            "min": 0.0015,
+            "p5": 0.0044,
+            "median": 0.027,
+            "p95": 0.1596,
+            "max": 0.2789
+          },
+          "qAbs": {
+            "n": 24,
+            "min": 0.0052,
+            "p5": 0.0067,
+            "median": 0.1399,
+            "p95": 0.2985,
+            "max": 0.3247
+          },
+          "qInnerAbs": {
+            "n": 24,
+            "min": 0.0029,
+            "p5": 0.0057,
+            "median": 0.0466,
+            "p95": 0.1671,
+            "max": 0.2123
+          },
+          "paAbs": {
+            "n": 24,
+            "min": 3.8618,
+            "p5": 4.8949,
+            "median": 25.6652,
+            "p95": 84.6929,
+            "max": 85.5165
+          },
+          "firstFailures": [
+            {
+              "config": "Merger: coalescing (mergers) s4242 incl 40 zoom 2",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.4160",
+                "r25 104.74%",
+                "r50 49.10%",
+                "r90 4.99%",
+                "outer ink 2.56%",
+                "axis ratio -0.1399",
+                "inner axis ratio -0.2123",
+                "position angle 60.90°"
+              ]
+            },
+            {
+              "config": "Merger: long tails (mergers) s4242 incl 55 zoom 2",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.2385",
+                "r25 43.16%",
+                "r50 43.14%",
+                "r90 27.93%",
+                "outer ink 27.89%",
+                "axis ratio -0.2567",
+                "position angle -82.57°"
+              ]
+            },
+            {
+              "config": "Merger: polar collision (mergers) s4242 incl 30 zoom 2",
+              "failed": true,
+              "by": [
+                "ink -14.33%",
+                "coarse ssim 0.3846",
+                "r25 64.07%",
+                "r50 46.02%",
+                "r90 6.21%",
+                "outer ink 3.86%",
+                "axis ratio -0.2985",
+                "position angle 19.92°"
+              ]
+            },
+            {
+              "config": "Merger: the Mice (mergers) s4242 incl 35 zoom 2",
+              "failed": true,
+              "by": [
+                "ink -6.63%",
+                "coarse ssim 0.4135",
+                "r25 30.84%",
+                "r50 16.66%",
+                "r90 -7.98%",
+                "outer ink -3.95%",
+                "axis ratio -0.1339",
+                "position angle -19.55°"
+              ]
+            }
+          ]
+        },
+        "timeline 0.5": {
+          "applicable": 20,
+          "detected": 20,
+          "missed": [],
+          "ssim": {
+            "n": 20,
+            "min": 0.1744,
+            "p5": 0.1744,
+            "median": 0.2298,
+            "p95": 0.352,
+            "max": 0.365
+          },
+          "ssimCoarse": {
+            "n": 20,
+            "min": 0.3073,
+            "p5": 0.3073,
+            "median": 0.466,
+            "p95": 0.5649,
+            "max": 0.5926
+          },
+          "inkAbs": {
+            "n": 20,
+            "min": 0.0029,
+            "p5": 0.0029,
+            "median": 0.0864,
+            "p95": 0.1638,
+            "max": 0.1824
+          },
+          "medianAbs": {
+            "n": 20,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0283,
+            "p95": 0.1023,
+            "max": 0.128
+          },
+          "p90Abs": {
+            "n": 20,
+            "min": 0.0343,
+            "p5": 0.0343,
+            "median": 0.1088,
+            "p95": 0.1715,
+            "max": 0.2322
+          },
+          "r25Abs": {
+            "n": 20,
+            "min": 0.0218,
+            "p5": 0.0218,
+            "median": 0.2182,
+            "p95": 0.6176,
+            "max": 0.6561
+          },
+          "r50Abs": {
+            "n": 20,
+            "min": 0.0017,
+            "p5": 0.0017,
+            "median": 0.1357,
+            "p95": 0.4978,
+            "max": 0.5141
+          },
+          "r90Abs": {
+            "n": 20,
+            "min": 0.0076,
+            "p5": 0.0076,
+            "median": 0.1493,
+            "p95": 0.3356,
+            "max": 0.3568
+          },
+          "outerAbs": {
+            "n": 20,
+            "min": 0.0063,
+            "p5": 0.0063,
+            "median": 0.0782,
+            "p95": 0.0998,
+            "max": 0.1
+          },
+          "qAbs": {
+            "n": 20,
+            "min": 0.0036,
+            "p5": 0.0036,
+            "median": 0.0536,
+            "p95": 0.1956,
+            "max": 0.2395
+          },
+          "qInnerAbs": {
+            "n": 20,
+            "min": 0.0093,
+            "p5": 0.0093,
+            "median": 0.1053,
+            "p95": 0.4639,
+            "max": 0.4717
+          },
+          "paAbs": {
+            "n": 20,
+            "min": 3.3567,
+            "p5": 3.3567,
+            "median": 13.1109,
+            "p95": 42.8416,
+            "max": 52.519
+          },
+          "firstFailures": [
+            {
+              "config": "Merger: coalescing (mergers) s4242 incl 40 zoom 2",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.4711",
+                "p90 width 15.45%",
+                "r90 -23.86%",
+                "outer ink -8.52%",
+                "axis ratio 0.0874",
+                "position angle 52.52°"
+              ]
+            },
+            {
+              "config": "Merger: long tails (mergers) s4242 incl 55 zoom 2",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.5063",
+                "r25 -13.04%",
+                "r50 -12.44%",
+                "r90 -16.83%",
+                "outer ink -8.73%",
+                "position angle -4.80°"
+              ]
+            },
+            {
+              "config": "Merger: polar collision (mergers) s4242 incl 30 zoom 2",
+              "failed": true,
+              "by": [
+                "ink -7.42%",
+                "coarse ssim 0.3311",
+                "median width 12.80%",
+                "p90 width 23.22%",
+                "r25 -37.72%",
+                "r50 -29.94%",
+                "r90 -35.68%",
+                "outer ink -9.98%",
+                "axis ratio 0.1304",
+                "inner axis ratio 0.1799",
+                "position angle -36.61°"
+              ]
+            },
+            {
+              "config": "Merger: the Mice (mergers) s4242 incl 35 zoom 2",
+              "failed": true,
+              "by": [
+                "ink 11.70%",
+                "coarse ssim 0.3899",
+                "r25 23.77%",
+                "r50 9.44%",
+                "r90 -10.59%",
+                "outer ink -7.18%",
+                "axis ratio 0.0476",
+                "inner axis ratio 0.1745",
+                "position angle 25.86°"
+              ]
+            }
+          ]
+        },
+        "pa +90°": {
+          "applicable": 24,
+          "detected": 24,
+          "missed": [],
+          "ssim": {
+            "n": 24,
+            "min": 0.1008,
+            "p5": 0.112,
+            "median": 0.1859,
+            "p95": 0.3482,
+            "max": 0.383
+          },
+          "ssimCoarse": {
+            "n": 24,
+            "min": 0.1597,
+            "p5": 0.1597,
+            "median": 0.2932,
+            "p95": 0.6186,
+            "max": 0.6455
+          },
+          "inkAbs": {
+            "n": 24,
+            "min": 0.0009,
+            "p5": 0.0018,
+            "median": 0.0135,
+            "p95": 0.0286,
+            "max": 0.0537
+          },
+          "medianAbs": {
+            "n": 24,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0016,
+            "p95": 0.0166,
+            "max": 0.0167
+          },
+          "p90Abs": {
+            "n": 24,
+            "min": 0.0024,
+            "p5": 0.0028,
+            "median": 0.0107,
+            "p95": 0.0354,
+            "max": 0.0356
+          },
+          "r25Abs": {
+            "n": 24,
+            "min": 0.0006,
+            "p5": 0.0024,
+            "median": 0.016,
+            "p95": 0.0676,
+            "max": 0.0845
+          },
+          "r50Abs": {
+            "n": 24,
+            "min": 0.0026,
+            "p5": 0.0047,
+            "median": 0.0099,
+            "p95": 0.04,
+            "max": 0.0472
+          },
+          "r90Abs": {
+            "n": 24,
+            "min": 0.0011,
+            "p5": 0.0012,
+            "median": 0.0119,
+            "p95": 0.0325,
+            "max": 0.0602
+          },
+          "outerAbs": {
+            "n": 24,
+            "min": 0.0005,
+            "p5": 0.0007,
+            "median": 0.0058,
+            "p95": 0.015,
+            "max": 0.0246
+          },
+          "qAbs": {
+            "n": 24,
+            "min": 0.0002,
+            "p5": 0.0004,
+            "median": 0.0061,
+            "p95": 0.046,
+            "max": 0.0477
+          },
+          "qInnerAbs": {
+            "n": 24,
+            "min": 0.0002,
+            "p5": 0.001,
+            "median": 0.0111,
+            "p95": 0.0645,
+            "max": 0.0868
+          },
+          "paAbs": {
+            "n": 24,
+            "min": 85.4685,
+            "p5": 86.4018,
+            "median": 89.2665,
+            "p95": 89.8724,
+            "max": 89.8747
+          },
+          "firstFailures": [
+            {
+              "config": "Merger: coalescing (mergers) s4242 incl 40 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.5050", "position angle -85.47°"]
+            },
+            {
+              "config": "Merger: long tails (mergers) s4242 incl 55 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.3199", "position angle 88.75°"]
+            },
+            {
+              "config": "Merger: polar collision (mergers) s4242 incl 30 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.2825", "position angle 88.91°"]
+            },
+            {
+              "config": "Merger: the Mice (mergers) s4242 incl 35 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.1980", "position angle 89.03°"]
+            }
+          ]
+        },
+        "dot size ×1.3": {
+          "applicable": 24,
+          "detected": 24,
+          "missed": [],
+          "ssim": {
+            "n": 24,
+            "min": 0.279,
+            "p5": 0.2959,
+            "median": 0.3233,
+            "p95": 0.3591,
+            "max": 0.3689
+          },
+          "ssimCoarse": {
+            "n": 24,
+            "min": 0.7522,
+            "p5": 0.7542,
+            "median": 0.7817,
+            "p95": 0.8045,
+            "max": 0.8162
+          },
+          "inkAbs": {
+            "n": 24,
+            "min": 0.2809,
+            "p5": 0.3024,
+            "median": 0.3513,
+            "p95": 0.4607,
+            "max": 0.4877
+          },
+          "medianAbs": {
+            "n": 24,
+            "min": 0.0676,
+            "p5": 0.0957,
+            "median": 0.1739,
+            "p95": 0.2224,
+            "max": 0.2298
+          },
+          "p90Abs": {
+            "n": 24,
+            "min": 0.1823,
+            "p5": 0.184,
+            "median": 0.2209,
+            "p95": 0.2551,
+            "max": 0.2575
+          },
+          "r25Abs": {
+            "n": 24,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.0324,
+            "p95": 0.0969,
+            "max": 0.1028
+          },
+          "r50Abs": {
+            "n": 24,
+            "min": 0.0003,
+            "p5": 0.0012,
+            "median": 0.0113,
+            "p95": 0.0514,
+            "max": 0.1084
+          },
+          "r90Abs": {
+            "n": 24,
+            "min": 0.0002,
+            "p5": 0.0015,
+            "median": 0.0106,
+            "p95": 0.0394,
+            "max": 0.0484
+          },
+          "outerAbs": {
+            "n": 24,
+            "min": 0.0002,
+            "p5": 0.0008,
+            "median": 0.0067,
+            "p95": 0.0201,
+            "max": 0.0239
+          },
+          "qAbs": {
+            "n": 24,
+            "min": 0.001,
+            "p5": 0.004,
+            "median": 0.0169,
+            "p95": 0.0442,
+            "max": 0.0579
+          },
+          "qInnerAbs": {
+            "n": 24,
+            "min": 0.0054,
+            "p5": 0.0068,
+            "median": 0.0251,
+            "p95": 0.0527,
+            "max": 0.0872
+          },
+          "paAbs": {
+            "n": 24,
+            "min": 0.0446,
+            "p5": 0.0742,
+            "median": 0.9946,
+            "p95": 3.4939,
+            "max": 4.4529
+          },
+          "firstFailures": [
+            {
+              "config": "Merger: coalescing (mergers) s4242 incl 40 zoom 2",
+              "failed": true,
+              "by": ["ink 35.13%", "coarse ssim 0.7522", "median width 16.26%", "p90 width 24.60%"]
+            },
+            {
+              "config": "Merger: long tails (mergers) s4242 incl 55 zoom 2",
+              "failed": true,
+              "by": ["ink 33.04%", "median width 19.35%", "p90 width 19.84%"]
+            },
+            {
+              "config": "Merger: polar collision (mergers) s4242 incl 30 zoom 2",
+              "failed": true,
+              "by": ["ink 35.75%", "coarse ssim 0.7542", "median width 21.12%", "p90 width 25.07%"]
+            },
+            {
+              "config": "Merger: the Mice (mergers) s4242 incl 35 zoom 2",
+              "failed": true,
+              "by": ["ink 39.69%", "median width 17.61%", "p90 width 24.19%"]
+            }
+          ]
+        },
+        "orbit 35°": {
+          "applicable": 24,
+          "detected": 24,
+          "missed": [],
+          "ssim": {
+            "n": 24,
+            "min": 0.111,
+            "p5": 0.126,
+            "median": 0.2292,
+            "p95": 0.3535,
+            "max": 0.3749
+          },
+          "ssimCoarse": {
+            "n": 24,
+            "min": 0.1661,
+            "p5": 0.2629,
+            "median": 0.3816,
+            "p95": 0.6562,
+            "max": 0.6947
+          },
+          "inkAbs": {
+            "n": 24,
+            "min": 0.0012,
+            "p5": 0.0076,
+            "median": 0.0617,
+            "p95": 0.1814,
+            "max": 0.1853
+          },
+          "medianAbs": {
+            "n": 24,
+            "min": 0,
+            "p5": 0.0001,
+            "median": 0.0031,
+            "p95": 0.0299,
+            "max": 0.0693
+          },
+          "p90Abs": {
+            "n": 24,
+            "min": 0.0002,
+            "p5": 0.0012,
+            "median": 0.0204,
+            "p95": 0.0712,
+            "max": 0.1174
+          },
+          "r25Abs": {
+            "n": 24,
+            "min": 0.0148,
+            "p5": 0.017,
+            "median": 0.1353,
+            "p95": 0.2603,
+            "max": 0.3158
+          },
+          "r50Abs": {
+            "n": 24,
+            "min": 0.0028,
+            "p5": 0.0084,
+            "median": 0.0748,
+            "p95": 0.2345,
+            "max": 0.2356
+          },
+          "r90Abs": {
+            "n": 24,
+            "min": 0.009,
+            "p5": 0.014,
+            "median": 0.057,
+            "p95": 0.119,
+            "max": 0.1774
+          },
+          "outerAbs": {
+            "n": 24,
+            "min": 0.0049,
+            "p5": 0.0062,
+            "median": 0.025,
+            "p95": 0.0727,
+            "max": 0.0998
+          },
+          "qAbs": {
+            "n": 24,
+            "min": 0.0208,
+            "p5": 0.0266,
+            "median": 0.1039,
+            "p95": 0.2372,
+            "max": 0.2455
+          },
+          "qInnerAbs": {
+            "n": 24,
+            "min": 0.001,
+            "p5": 0.0024,
+            "median": 0.0399,
+            "p95": 0.1358,
+            "max": 0.1538
+          },
+          "paAbs": {
+            "n": 24,
+            "min": 14.3941,
+            "p5": 16.846,
+            "median": 41.8896,
+            "p95": 71.4227,
+            "max": 72.3354
+          },
+          "firstFailures": [
+            {
+              "config": "Merger: coalescing (mergers) s4242 incl 40 zoom 2",
+              "failed": true,
+              "by": ["coarse ssim 0.6562", "r90 9.15%", "outer ink 4.81%", "position angle 20.37°"]
+            },
+            {
+              "config": "Merger: long tails (mergers) s4242 incl 55 zoom 2",
+              "failed": true,
+              "by": [
+                "ink -18.53%",
+                "coarse ssim 0.2629",
+                "r25 -24.23%",
+                "r90 9.85%",
+                "outer ink 5.64%",
+                "axis ratio -0.0952",
+                "inner axis ratio -0.1240",
+                "position angle 71.42°"
+              ]
+            },
+            {
+              "config": "Merger: polar collision (mergers) s4242 incl 30 zoom 2",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.4111",
+                "r25 -12.15%",
+                "r90 -8.40%",
+                "outer ink -3.81%",
+                "axis ratio -0.1039",
+                "position angle -19.06°"
+              ]
+            },
+            {
+              "config": "Merger: the Mice (mergers) s4242 incl 35 zoom 2",
+              "failed": true,
+              "by": [
+                "ink 7.91%",
+                "coarse ssim 0.4402",
+                "r25 -26.00%",
+                "r50 -15.77%",
+                "r90 -11.90%",
+                "outer ink -7.27%",
+                "axis ratio 0.1883",
+                "inner axis ratio 0.1335",
+                "position angle 16.85°"
+              ]
+            }
+          ]
+        }
+      },
       "v21Reroll": null
     }
   },

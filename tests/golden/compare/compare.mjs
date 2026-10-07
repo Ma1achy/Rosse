@@ -752,12 +752,19 @@ async function calibrate(G, node) {
       const mine = list.filter((c) => c.preset === preset);
       if (mine.length < 8) continue;
       const ps = stats(mine);
+      // the coarse SSIM too, where the preset's own re-draws agree with each other less than the
+      // family's do (a merger's chaotic remnant, ADR 0044): the same rule on its own sample, and
+      // only ever below the family's
+      const ssimOwn = floor2(ps.ssimCoarse.p5 - 0.02);
       byPreset[preset] = {
         q: spread(ps, 'qAbs', 0.005),
         qInner: spread(ps, 'qInnerAbs', 0.005),
         // the preset's own noise floor of the ellipticity (a smooth Sérsic profile is far quieter
         // than a galaxy with a sparse halo); the family's paA
         paEps0: Math.max(0.01, positionAngle(mine).paEps0),
+        ...(family.startsWith('merger') && ssimOwn < (t['ssimCoarse'] ?? 0)
+          ? { ssimCoarse: ssimOwn }
+          : {}),
       };
     }
     parity[family].byPreset = byPreset;
