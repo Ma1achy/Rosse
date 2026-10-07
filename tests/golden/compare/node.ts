@@ -8,7 +8,8 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import type { Params } from '../../../src/core/params';
-import { presetFamily, presetParams } from '../../../src/core/presets';
+import { presetFamily, presetParams as presetParamsOf } from '../../../src/core/presets';
+import { fromReal, type RealGalaxy } from '../../../src/extras/from-votes';
 import { lensHomeOf } from '../../../src/core/home';
 import { buildScene, type MarkCounts, type SceneOptions } from '../../../src/model/scene';
 import { SRC_SCALE, describeLens, type LensOptions } from '../../../src/sim/lens';
@@ -120,6 +121,27 @@ export function alphaHash(a: Grey): string {
   const bytes = new Uint8Array(a.data.length);
   for (let i = 0; i < bytes.length; i++) bytes[i] = Math.round((a.data[i] ?? 0) * 255);
   return createHash('sha256').update(bytes).digest('hex');
+}
+
+let realData: RealGalaxy[] | null = null;
+
+/**
+ * The parameters a case's name stands for, at a seed: a preset's, or, for the real galaxies of M12
+ * (`Real galaxy 12`, ADR 0060: no preset, v21's `fromReal` over the data file), what `fromReal`
+ * gives, as v21's `showReal` draws it. It is the case's home: the camera the capture started at.
+ */
+export function presetParams(name: string, seed: number, extra: Partial<Params> = {}): Params {
+  const m = /^Real galaxy (\d+)$/.exec(name);
+  if (!m) return presetParamsOf(name, seed, extra);
+  realData ??= JSON.parse(
+    readFileSync(
+      join(import.meta.dirname, '../../../assets/data/rosse/real-galaxies/real-galaxies.json'),
+      'utf8',
+    ),
+  ) as RealGalaxy[];
+  const g = realData[Number(m[1])];
+  if (!g) throw new Error(`unknown real galaxy ${JSON.stringify(name)}`);
+  return { ...fromReal(g).p, seed, ...extra };
 }
 
 export class GoldenNode {
