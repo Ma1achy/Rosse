@@ -691,6 +691,7 @@ async function calibrate(G, node) {
         '--controls-every',
         String(controlsEvery),
         ...(flag('--resume') ? ['--resume'] : []),
+        ...(onlyFamilies ? ['--families', onlyFamilies.join(',')] : []),
       ],
       jobs,
     );
