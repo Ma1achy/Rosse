@@ -423,6 +423,91 @@
           "paEps0": 0.034
         }
       }
+    },
+    "real": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.89,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.032,
+      "r50": 0.037,
+      "r90": 0.05,
+      "outer": 0.014,
+      "q": 0.032,
+      "qInner": 0.032,
+      "paA": 0.901,
+      "paEps0": 0.032,
+      "byPreset": {
+        "Real galaxy 0": {
+          "q": 0.038,
+          "qInner": 0.028,
+          "paEps0": 0.039
+        },
+        "Real galaxy 10": {
+          "q": 0.025,
+          "qInner": 0.025,
+          "paEps0": 0.032
+        },
+        "Real galaxy 15": {
+          "q": 0.019,
+          "qInner": 0.03,
+          "paEps0": 0.022,
+          "r25": 0.044
+        },
+        "Real galaxy 19": {
+          "q": 0.04,
+          "qInner": 0.032,
+          "paEps0": 0.045,
+          "paA": 1.024
+        },
+        "Real galaxy 26": {
+          "q": 0.042,
+          "qInner": 0.036,
+          "paEps0": 0.048,
+          "r25": 0.057,
+          "r90": 0.057
+        },
+        "Real galaxy 3": {
+          "q": 0.027,
+          "qInner": 0.046,
+          "paEps0": 0.032,
+          "r25": 0.037,
+          "r50": 0.063,
+          "r90": 0.086,
+          "paA": 1.232
+        },
+        "Real galaxy 6": {
+          "q": 0.042,
+          "qInner": 0.047,
+          "paEps0": 0.05,
+          "r25": 0.035,
+          "r50": 0.039,
+          "paA": 1.007
+        },
+        "Real galaxy 12": {
+          "q": 0.024,
+          "qInner": 0.03,
+          "paEps0": 0.028,
+          "r90": 0.054,
+          "paA": 0.918
+        },
+        "Real galaxy 23": {
+          "q": 0.025,
+          "qInner": 0.029,
+          "paEps0": 0.03,
+          "r25": 0.039,
+          "r90": 0.062
+        },
+        "Real galaxy 37": {
+          "q": 0.02,
+          "qInner": 0.031,
+          "paEps0": 0.025
+        }
+      }
     }
   }
 }

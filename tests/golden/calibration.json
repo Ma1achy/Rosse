@@ -280,7 +280,47 @@
     "Tightly wound (ribbons) s4242 incl 30",
     "Tightly wound (ribbons) s7 incl 30",
     "Tightly wound (ribbons) s7 incl 50",
-    "Tightly wound (ribbons) s7 incl 30"
+    "Tightly wound (ribbons) s7 incl 30",
+    "Real galaxy 0 (real) s2009 incl 108",
+    "Real galaxy 0 (real) s2009 incl 88",
+    "Real galaxy 0 s3 incl 108",
+    "Real galaxy 0 s3 incl 88",
+    "Real galaxy 10 (real) s7941 incl 63",
+    "Real galaxy 10 (real) s7941 incl 83",
+    "Real galaxy 10 s3 incl 63",
+    "Real galaxy 10 s3 incl 83",
+    "Real galaxy 12 (real) s6057 incl 29",
+    "Real galaxy 12 (real) s6057 incl 49",
+    "Real galaxy 12 s3 incl 29",
+    "Real galaxy 12 s3 incl 49",
+    "Real galaxy 15 (real) s9946 incl 56",
+    "Real galaxy 15 (real) s9946 incl 76",
+    "Real galaxy 15 s3 incl 56",
+    "Real galaxy 15 s3 incl 76",
+    "Real galaxy 19 (real) s1884 incl 45",
+    "Real galaxy 19 (real) s1884 incl 65",
+    "Real galaxy 19 s3 incl 45",
+    "Real galaxy 19 s3 incl 65",
+    "Real galaxy 23 (real) s8748 incl 73",
+    "Real galaxy 23 (real) s8748 incl 93",
+    "Real galaxy 23 s3 incl 73",
+    "Real galaxy 23 s3 incl 93",
+    "Real galaxy 26 (real) s7121 incl 37",
+    "Real galaxy 26 (real) s7121 incl 57",
+    "Real galaxy 26 s3 incl 37",
+    "Real galaxy 26 s3 incl 57",
+    "Real galaxy 3 (real) s4288 incl 108",
+    "Real galaxy 3 (real) s4288 incl 88",
+    "Real galaxy 3 s3 incl 108",
+    "Real galaxy 3 s3 incl 88",
+    "Real galaxy 37 (real) s3937 incl 54",
+    "Real galaxy 37 (real) s3937 incl 74",
+    "Real galaxy 37 s3 incl 54",
+    "Real galaxy 37 s3 incl 74",
+    "Real galaxy 6 (real) s586 incl 104",
+    "Real galaxy 6 (real) s586 incl 84",
+    "Real galaxy 6 s3 incl 104",
+    "Real galaxy 6 s3 incl 84"
   ],
   "families": {
     "spiral": {
@@ -6358,6 +6398,1303 @@
         }
       },
       "negativeControls": {},
+      "v21Reroll": null
+    },
+    "real": {
+      "engineRekey": {
+        "ssim": {
+          "n": 120,
+          "min": 0.3897,
+          "p5": 0.4305,
+          "median": 0.5908,
+          "p95": 0.6951,
+          "max": 0.7293
+        },
+        "ssimCoarse": {
+          "n": 120,
+          "min": 0.9002,
+          "p5": 0.9192,
+          "median": 0.9516,
+          "p95": 0.9683,
+          "max": 0.9723
+        },
+        "inkAbs": {
+          "n": 120,
+          "min": 0.0002,
+          "p5": 0.0007,
+          "median": 0.0057,
+          "p95": 0.0179,
+          "max": 0.0252
+        },
+        "medianAbs": {
+          "n": 120,
+          "min": 0,
+          "p5": 0,
+          "median": 0.0045,
+          "p95": 0.0201,
+          "max": 0.0284
+        },
+        "p90Abs": {
+          "n": 120,
+          "min": 0.0002,
+          "p5": 0.0006,
+          "median": 0.0114,
+          "p95": 0.0442,
+          "max": 0.0891
+        },
+        "r25Abs": {
+          "n": 120,
+          "min": 0.0001,
+          "p5": 0.0005,
+          "median": 0.006,
+          "p95": 0.0208,
+          "max": 0.0374
+        },
+        "r50Abs": {
+          "n": 120,
+          "min": 0.0002,
+          "p5": 0.0014,
+          "median": 0.0084,
+          "p95": 0.024,
+          "max": 0.0419
+        },
+        "r90Abs": {
+          "n": 120,
+          "min": 0.0002,
+          "p5": 0.0012,
+          "median": 0.0094,
+          "p95": 0.0327,
+          "max": 0.0573
+        },
+        "outerAbs": {
+          "n": 120,
+          "min": 0,
+          "p5": 0.0003,
+          "median": 0.0028,
+          "p95": 0.0092,
+          "max": 0.0143
+        },
+        "qAbs": {
+          "n": 120,
+          "min": 0.0001,
+          "p5": 0.0005,
+          "median": 0.006,
+          "p95": 0.0209,
+          "max": 0.028
+        },
+        "qInnerAbs": {
+          "n": 120,
+          "min": 0.0001,
+          "p5": 0.0006,
+          "median": 0.0076,
+          "p95": 0.021,
+          "max": 0.0311
+        },
+        "paAbs": {
+          "n": 120,
+          "min": 0.0042,
+          "p5": 0.0237,
+          "median": 0.494,
+          "p95": 13.8194,
+          "max": 77.945
+        }
+      },
+      "negativeControls": {
+        "pa +90°": {
+          "applicable": 15,
+          "detected": 12,
+          "missed": [
+            "Real galaxy 0 s3 incl 88",
+            "Real galaxy 0 s3 incl 108",
+            "Real galaxy 0 (real) s2009 incl 88"
+          ],
+          "ssim": {
+            "n": 15,
+            "min": 0.2803,
+            "p5": 0.2803,
+            "median": 0.4223,
+            "p95": 0.4901,
+            "max": 0.4901
+          },
+          "ssimCoarse": {
+            "n": 15,
+            "min": 0.4452,
+            "p5": 0.4452,
+            "median": 0.5858,
+            "p95": 0.9271,
+            "max": 0.9271
+          },
+          "inkAbs": {
+            "n": 15,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.0053,
+            "p95": 0.0291,
+            "max": 0.0291
+          },
+          "medianAbs": {
+            "n": 15,
+            "min": 0.001,
+            "p5": 0.001,
+            "median": 0.0033,
+            "p95": 0.0251,
+            "max": 0.0251
+          },
+          "p90Abs": {
+            "n": 15,
+            "min": 0.0005,
+            "p5": 0.0005,
+            "median": 0.0139,
+            "p95": 0.0626,
+            "max": 0.0626
+          },
+          "r25Abs": {
+            "n": 15,
+            "min": 0.0022,
+            "p5": 0.0022,
+            "median": 0.0058,
+            "p95": 0.0219,
+            "max": 0.0219
+          },
+          "r50Abs": {
+            "n": 15,
+            "min": 0.0019,
+            "p5": 0.0019,
+            "median": 0.007,
+            "p95": 0.0245,
+            "max": 0.0245
+          },
+          "r90Abs": {
+            "n": 15,
+            "min": 0.0005,
+            "p5": 0.0005,
+            "median": 0.0106,
+            "p95": 0.0239,
+            "max": 0.0239
+          },
+          "outerAbs": {
+            "n": 15,
+            "min": 0.0004,
+            "p5": 0.0004,
+            "median": 0.0031,
+            "p95": 0.0076,
+            "max": 0.0076
+          },
+          "qAbs": {
+            "n": 15,
+            "min": 0.0011,
+            "p5": 0.0011,
+            "median": 0.0054,
+            "p95": 0.0167,
+            "max": 0.0167
+          },
+          "qInnerAbs": {
+            "n": 15,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.0091,
+            "p95": 0.0192,
+            "max": 0.0192
+          },
+          "paAbs": {
+            "n": 15,
+            "min": 79.2008,
+            "p5": 79.2008,
+            "median": 89.5196,
+            "p95": 89.9686,
+            "max": 89.9686
+          },
+          "firstFailures": [
+            {
+              "config": "Real galaxy 0 s3 incl 88",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Real galaxy 19 s3 incl 65",
+              "failed": true,
+              "by": ["coarse ssim 0.5706", "position angle -88.97°"]
+            },
+            {
+              "config": "Real galaxy 6 s3 incl 84",
+              "failed": true,
+              "by": ["coarse ssim 0.6161", "position angle 89.52°"]
+            },
+            {
+              "config": "Real galaxy 15 (real) s9946 incl 76",
+              "failed": true,
+              "by": ["coarse ssim 0.6139", "position angle -89.71°"]
+            }
+          ]
+        },
+        "bulgeFlat −0.15": {
+          "applicable": 3,
+          "detected": 3,
+          "missed": [],
+          "ssim": {
+            "n": 3,
+            "min": 0.4335,
+            "p5": 0.4335,
+            "median": 0.4335,
+            "p95": 0.434,
+            "max": 0.434
+          },
+          "ssimCoarse": {
+            "n": 3,
+            "min": 0.9167,
+            "p5": 0.9167,
+            "median": 0.9173,
+            "p95": 0.9187,
+            "max": 0.9187
+          },
+          "inkAbs": {
+            "n": 3,
+            "min": 0.0291,
+            "p5": 0.0291,
+            "median": 0.0297,
+            "p95": 0.0362,
+            "max": 0.0362
+          },
+          "medianAbs": {
+            "n": 3,
+            "min": 0.0013,
+            "p5": 0.0013,
+            "median": 0.0027,
+            "p95": 0.0052,
+            "max": 0.0052
+          },
+          "p90Abs": {
+            "n": 3,
+            "min": 0.0014,
+            "p5": 0.0014,
+            "median": 0.0035,
+            "p95": 0.0064,
+            "max": 0.0064
+          },
+          "r25Abs": {
+            "n": 3,
+            "min": 0.0174,
+            "p5": 0.0174,
+            "median": 0.0176,
+            "p95": 0.0245,
+            "max": 0.0245
+          },
+          "r50Abs": {
+            "n": 3,
+            "min": 0.0215,
+            "p5": 0.0215,
+            "median": 0.023,
+            "p95": 0.0315,
+            "max": 0.0315
+          },
+          "r90Abs": {
+            "n": 3,
+            "min": 0.0286,
+            "p5": 0.0286,
+            "median": 0.0414,
+            "p95": 0.0417,
+            "max": 0.0417
+          },
+          "outerAbs": {
+            "n": 3,
+            "min": 0.0089,
+            "p5": 0.0089,
+            "median": 0.0119,
+            "p95": 0.0121,
+            "max": 0.0121
+          },
+          "qAbs": {
+            "n": 3,
+            "min": 0.0902,
+            "p5": 0.0902,
+            "median": 0.1006,
+            "p95": 0.1007,
+            "max": 0.1007
+          },
+          "qInnerAbs": {
+            "n": 3,
+            "min": 0.0387,
+            "p5": 0.0387,
+            "median": 0.0465,
+            "p95": 0.0498,
+            "max": 0.0498
+          },
+          "paAbs": {
+            "n": 3,
+            "min": 4.2409,
+            "p5": 4.2409,
+            "median": 4.6458,
+            "p95": 6.3073,
+            "max": 6.3073
+          },
+          "firstFailures": [
+            {
+              "config": "Real galaxy 0 s3 incl 88",
+              "failed": true,
+              "by": ["axis ratio -0.1007", "inner axis ratio -0.0465"]
+            },
+            {
+              "config": "Real galaxy 0 s3 incl 108",
+              "failed": true,
+              "by": ["axis ratio -0.1006", "inner axis ratio -0.0498"]
+            },
+            {
+              "config": "Real galaxy 0 (real) s2009 incl 88",
+              "failed": true,
+              "by": ["axis ratio -0.0902", "inner axis ratio -0.0387"]
+            }
+          ]
+        },
+        "halo off": {
+          "applicable": 15,
+          "detected": 5,
+          "missed": [
+            "Real galaxy 0 s3 incl 88",
+            "Real galaxy 19 s3 incl 65",
+            "Real galaxy 15 (real) s9946 incl 76",
+            "Real galaxy 37 (real) s3937 incl 54",
+            "Real galaxy 0 s3 incl 108",
+            "Real galaxy 6 s3 incl 104",
+            "Real galaxy 19 (real) s1884 incl 45",
+            "Real galaxy 10 s3 incl 63",
+            "Real galaxy 0 (real) s2009 incl 88",
+            "Real galaxy 19 (real) s1884 incl 65"
+          ],
+          "ssim": {
+            "n": 15,
+            "min": 0.3991,
+            "p5": 0.3991,
+            "median": 0.6012,
+            "p95": 0.7352,
+            "max": 0.7352
+          },
+          "ssimCoarse": {
+            "n": 15,
+            "min": 0.9112,
+            "p5": 0.9112,
+            "median": 0.9517,
+            "p95": 0.9625,
+            "max": 0.9625
+          },
+          "inkAbs": {
+            "n": 15,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0066,
+            "p95": 0.0387,
+            "max": 0.0387
+          },
+          "medianAbs": {
+            "n": 15,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0077,
+            "p95": 0.0228,
+            "max": 0.0228
+          },
+          "p90Abs": {
+            "n": 15,
+            "min": 0.0025,
+            "p5": 0.0025,
+            "median": 0.0119,
+            "p95": 0.0925,
+            "max": 0.0925
+          },
+          "r25Abs": {
+            "n": 15,
+            "min": 0.0017,
+            "p5": 0.0017,
+            "median": 0.009,
+            "p95": 0.0266,
+            "max": 0.0266
+          },
+          "r50Abs": {
+            "n": 15,
+            "min": 0.0006,
+            "p5": 0.0006,
+            "median": 0.0096,
+            "p95": 0.0317,
+            "max": 0.0317
+          },
+          "r90Abs": {
+            "n": 15,
+            "min": 0.0014,
+            "p5": 0.0014,
+            "median": 0.0124,
+            "p95": 0.0369,
+            "max": 0.0369
+          },
+          "outerAbs": {
+            "n": 15,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.0033,
+            "p95": 0.0118,
+            "max": 0.0118
+          },
+          "qAbs": {
+            "n": 15,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.0173,
+            "p95": 0.0447,
+            "max": 0.0447
+          },
+          "qInnerAbs": {
+            "n": 15,
+            "min": 0.0017,
+            "p5": 0.0017,
+            "median": 0.0133,
+            "p95": 0.0588,
+            "max": 0.0588
+          },
+          "paAbs": {
+            "n": 15,
+            "min": 0.0583,
+            "p5": 0.0583,
+            "median": 0.5756,
+            "p95": 9.6152,
+            "max": 9.6152
+          },
+          "firstFailures": [
+            {
+              "config": "Real galaxy 0 s3 incl 88",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Real galaxy 19 s3 incl 65",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Real galaxy 6 s3 incl 84",
+              "failed": true,
+              "by": ["inner axis ratio -0.0549"]
+            },
+            {
+              "config": "Real galaxy 15 (real) s9946 incl 76",
+              "failed": false,
+              "by": []
+            }
+          ]
+        },
+        "RMAX 4.2": {
+          "applicable": 15,
+          "detected": 14,
+          "missed": ["Real galaxy 15 (real) s9946 incl 76"],
+          "ssim": {
+            "n": 15,
+            "min": 0.3982,
+            "p5": 0.3982,
+            "median": 0.5994,
+            "p95": 0.7192,
+            "max": 0.7192
+          },
+          "ssimCoarse": {
+            "n": 15,
+            "min": 0.8661,
+            "p5": 0.8661,
+            "median": 0.9094,
+            "p95": 0.9572,
+            "max": 0.9572
+          },
+          "inkAbs": {
+            "n": 15,
+            "min": 0.0067,
+            "p5": 0.0067,
+            "median": 0.0206,
+            "p95": 0.0461,
+            "max": 0.0461
+          },
+          "medianAbs": {
+            "n": 15,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0102,
+            "p95": 0.0573,
+            "max": 0.0573
+          },
+          "p90Abs": {
+            "n": 15,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0196,
+            "p95": 0.0858,
+            "max": 0.0858
+          },
+          "r25Abs": {
+            "n": 15,
+            "min": 0.0031,
+            "p5": 0.0031,
+            "median": 0.0214,
+            "p95": 0.0591,
+            "max": 0.0591
+          },
+          "r50Abs": {
+            "n": 15,
+            "min": 0.0047,
+            "p5": 0.0047,
+            "median": 0.0226,
+            "p95": 0.0887,
+            "max": 0.0887
+          },
+          "r90Abs": {
+            "n": 15,
+            "min": 0.0293,
+            "p5": 0.0293,
+            "median": 0.0879,
+            "p95": 0.1227,
+            "max": 0.1227
+          },
+          "outerAbs": {
+            "n": 15,
+            "min": 0.0083,
+            "p5": 0.0083,
+            "median": 0.0274,
+            "p95": 0.0412,
+            "max": 0.0412
+          },
+          "qAbs": {
+            "n": 15,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.005,
+            "p95": 0.0449,
+            "max": 0.0449
+          },
+          "qInnerAbs": {
+            "n": 15,
+            "min": 0.0005,
+            "p5": 0.0005,
+            "median": 0.0095,
+            "p95": 0.041,
+            "max": 0.041
+          },
+          "paAbs": {
+            "n": 15,
+            "min": 0.039,
+            "p5": 0.039,
+            "median": 0.5051,
+            "p95": 11.2527,
+            "max": 11.2527
+          },
+          "firstFailures": [
+            {
+              "config": "Real galaxy 0 s3 incl 88",
+              "failed": true,
+              "by": ["r90 -6.81%", "outer ink -2.09%"]
+            },
+            {
+              "config": "Real galaxy 19 s3 incl 65",
+              "failed": true,
+              "by": ["r90 -8.78%", "outer ink -2.43%"]
+            },
+            {
+              "config": "Real galaxy 6 s3 incl 84",
+              "failed": true,
+              "by": ["r25 -4.33%", "r50 -5.54%", "r90 -9.16%", "outer ink -2.74%"]
+            },
+            {
+              "config": "Real galaxy 15 (real) s9946 incl 76",
+              "failed": false,
+              "by": []
+            }
+          ]
+        },
+        "dot size ×1.3": {
+          "applicable": 15,
+          "detected": 15,
+          "missed": [],
+          "ssim": {
+            "n": 15,
+            "min": 0.313,
+            "p5": 0.313,
+            "median": 0.4951,
+            "p95": 0.6408,
+            "max": 0.6408
+          },
+          "ssimCoarse": {
+            "n": 15,
+            "min": 0.8175,
+            "p5": 0.8175,
+            "median": 0.8828,
+            "p95": 0.9334,
+            "max": 0.9334
+          },
+          "inkAbs": {
+            "n": 15,
+            "min": 0.2563,
+            "p5": 0.2563,
+            "median": 0.397,
+            "p95": 0.4568,
+            "max": 0.4568
+          },
+          "medianAbs": {
+            "n": 15,
+            "min": 0.2105,
+            "p5": 0.2105,
+            "median": 0.3041,
+            "p95": 0.3462,
+            "max": 0.3462
+          },
+          "p90Abs": {
+            "n": 15,
+            "min": 0.1524,
+            "p5": 0.1524,
+            "median": 0.3287,
+            "p95": 0.464,
+            "max": 0.464
+          },
+          "r25Abs": {
+            "n": 15,
+            "min": 0.0816,
+            "p5": 0.0816,
+            "median": 0.1118,
+            "p95": 0.1631,
+            "max": 0.1631
+          },
+          "r50Abs": {
+            "n": 15,
+            "min": 0.055,
+            "p5": 0.055,
+            "median": 0.0819,
+            "p95": 0.1226,
+            "max": 0.1226
+          },
+          "r90Abs": {
+            "n": 15,
+            "min": 0.0203,
+            "p5": 0.0203,
+            "median": 0.0568,
+            "p95": 0.1,
+            "max": 0.1
+          },
+          "outerAbs": {
+            "n": 15,
+            "min": 0.0075,
+            "p5": 0.0075,
+            "median": 0.0186,
+            "p95": 0.0293,
+            "max": 0.0293
+          },
+          "qAbs": {
+            "n": 15,
+            "min": 0.0022,
+            "p5": 0.0022,
+            "median": 0.0102,
+            "p95": 0.0401,
+            "max": 0.0401
+          },
+          "qInnerAbs": {
+            "n": 15,
+            "min": 0.0048,
+            "p5": 0.0048,
+            "median": 0.0279,
+            "p95": 0.0471,
+            "max": 0.0471
+          },
+          "paAbs": {
+            "n": 15,
+            "min": 0.0141,
+            "p5": 0.0141,
+            "median": 0.4988,
+            "p95": 10.3996,
+            "max": 10.3996
+          },
+          "firstFailures": [
+            {
+              "config": "Real galaxy 0 s3 incl 88",
+              "failed": true,
+              "by": [
+                "ink 42.78%",
+                "coarse ssim 0.8277",
+                "median width 34.27%",
+                "p90 width 30.41%",
+                "r25 16.31%",
+                "r50 12.26%"
+              ]
+            },
+            {
+              "config": "Real galaxy 19 s3 incl 65",
+              "failed": true,
+              "by": [
+                "ink 37.57%",
+                "median width 25.19%",
+                "p90 width 33.75%",
+                "r25 10.94%",
+                "r50 8.92%",
+                "r90 9.25%",
+                "outer ink 2.41%"
+              ]
+            },
+            {
+              "config": "Real galaxy 6 s3 incl 84",
+              "failed": true,
+              "by": [
+                "ink 40.54%",
+                "median width 30.56%",
+                "p90 width 24.79%",
+                "r25 14.38%",
+                "r50 7.64%",
+                "r90 7.06%",
+                "outer ink 2.44%"
+              ]
+            },
+            {
+              "config": "Real galaxy 15 (real) s9946 incl 76",
+              "failed": true,
+              "by": [
+                "ink 27.89%",
+                "median width 24.08%",
+                "p90 width 30.65%",
+                "r25 10.25%",
+                "r50 6.97%",
+                "r90 10.00%",
+                "outer ink 2.93%",
+                "axis ratio 0.0401",
+                "inner axis ratio 0.0322"
+              ]
+            }
+          ]
+        },
+        "pa +30°": {
+          "applicable": 12,
+          "detected": 12,
+          "missed": [],
+          "ssim": {
+            "n": 12,
+            "min": 0.3211,
+            "p5": 0.3211,
+            "median": 0.4382,
+            "p95": 0.5345,
+            "max": 0.5345
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.5774,
+            "p5": 0.5774,
+            "median": 0.6633,
+            "p95": 0.7741,
+            "max": 0.7741
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.0018,
+            "p5": 0.0018,
+            "median": 0.0037,
+            "p95": 0.0274,
+            "max": 0.0274
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.0022,
+            "p95": 0.0275,
+            "max": 0.0275
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0041,
+            "p5": 0.0041,
+            "median": 0.0105,
+            "p95": 0.0358,
+            "max": 0.0358
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.0027,
+            "p5": 0.0027,
+            "median": 0.006,
+            "p95": 0.0244,
+            "max": 0.0244
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0032,
+            "p5": 0.0032,
+            "median": 0.0096,
+            "p95": 0.0256,
+            "max": 0.0256
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0012,
+            "p5": 0.0012,
+            "median": 0.007,
+            "p95": 0.0313,
+            "max": 0.0313
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0018,
+            "p95": 0.0095,
+            "max": 0.0095
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0008,
+            "p5": 0.0008,
+            "median": 0.0057,
+            "p95": 0.0165,
+            "max": 0.0165
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0094,
+            "p95": 0.02,
+            "max": 0.02
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 29.517,
+            "p5": 29.517,
+            "median": 30.2098,
+            "p95": 33.621,
+            "max": 33.621
+          },
+          "firstFailures": [
+            {
+              "config": "Real galaxy 19 s3 incl 65",
+              "failed": true,
+              "by": ["coarse ssim 0.6717", "position angle 31.00°"]
+            },
+            {
+              "config": "Real galaxy 6 s3 incl 84",
+              "failed": true,
+              "by": ["coarse ssim 0.6678", "position angle 29.52°"]
+            },
+            {
+              "config": "Real galaxy 15 (real) s9946 incl 76",
+              "failed": true,
+              "by": ["coarse ssim 0.7153", "position angle 30.28°"]
+            },
+            {
+              "config": "Real galaxy 37 (real) s3937 incl 54",
+              "failed": true,
+              "by": ["coarse ssim 0.5774", "position angle 30.24°"]
+            }
+          ]
+        },
+        "pa −30°": {
+          "applicable": 12,
+          "detected": 12,
+          "missed": [],
+          "ssim": {
+            "n": 12,
+            "min": 0.3258,
+            "p5": 0.3258,
+            "median": 0.4387,
+            "p95": 0.5225,
+            "max": 0.5225
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.5688,
+            "p5": 0.5688,
+            "median": 0.6465,
+            "p95": 0.7635,
+            "max": 0.7635
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.0006,
+            "p5": 0.0006,
+            "median": 0.0068,
+            "p95": 0.0417,
+            "max": 0.0417
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0027,
+            "p95": 0.0261,
+            "max": 0.0261
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.0066,
+            "p95": 0.065,
+            "max": 0.065
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.001,
+            "p5": 0.001,
+            "median": 0.0077,
+            "p95": 0.0397,
+            "max": 0.0397
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0052,
+            "p5": 0.0052,
+            "median": 0.0123,
+            "p95": 0.0348,
+            "max": 0.0348
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.007,
+            "p5": 0.007,
+            "median": 0.0108,
+            "p95": 0.077,
+            "max": 0.077
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0016,
+            "p5": 0.0016,
+            "median": 0.0038,
+            "p95": 0.0229,
+            "max": 0.0229
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0006,
+            "p5": 0.0006,
+            "median": 0.005,
+            "p95": 0.0164,
+            "max": 0.0164
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.0075,
+            "p95": 0.0184,
+            "max": 0.0184
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 26.4688,
+            "p5": 26.4688,
+            "median": 29.7777,
+            "p95": 30.4754,
+            "max": 30.4754
+          },
+          "firstFailures": [
+            {
+              "config": "Real galaxy 19 s3 incl 65",
+              "failed": true,
+              "by": ["coarse ssim 0.6725", "position angle -29.01°"]
+            },
+            {
+              "config": "Real galaxy 6 s3 incl 84",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.6465",
+                "r25 3.97%",
+                "r90 7.70%",
+                "outer ink 2.29%",
+                "position angle -30.48°"
+              ]
+            },
+            {
+              "config": "Real galaxy 15 (real) s9946 incl 76",
+              "failed": true,
+              "by": ["coarse ssim 0.6957", "position angle -29.78°"]
+            },
+            {
+              "config": "Real galaxy 37 (real) s3937 incl 54",
+              "failed": true,
+              "by": ["coarse ssim 0.5688", "position angle -29.73°"]
+            }
+          ]
+        },
+        "thick ×3": {
+          "applicable": 12,
+          "detected": 11,
+          "missed": ["Real galaxy 19 (real) s1884 incl 45"],
+          "ssim": {
+            "n": 12,
+            "min": 0.392,
+            "p5": 0.392,
+            "median": 0.5784,
+            "p95": 0.6613,
+            "max": 0.6613
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.8509,
+            "p5": 0.8509,
+            "median": 0.9299,
+            "p95": 0.9602,
+            "max": 0.9602
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.0158,
+            "p5": 0.0158,
+            "median": 0.073,
+            "p95": 0.4999,
+            "max": 0.4999
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0.0006,
+            "p5": 0.0006,
+            "median": 0.0074,
+            "p95": 0.0695,
+            "max": 0.0695
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0013,
+            "p5": 0.0013,
+            "median": 0.0199,
+            "p95": 0.1065,
+            "max": 0.1065
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0303,
+            "p95": 0.1243,
+            "max": 0.1243
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0063,
+            "p5": 0.0063,
+            "median": 0.0184,
+            "p95": 0.0517,
+            "max": 0.0517
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0015,
+            "p5": 0.0015,
+            "median": 0.0104,
+            "p95": 0.1064,
+            "max": 0.1064
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0008,
+            "p5": 0.0008,
+            "median": 0.0027,
+            "p95": 0.0341,
+            "max": 0.0341
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0017,
+            "p5": 0.0017,
+            "median": 0.0427,
+            "p95": 0.0883,
+            "max": 0.0883
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0027,
+            "p5": 0.0027,
+            "median": 0.0289,
+            "p95": 0.1825,
+            "max": 0.1825
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 0.019,
+            "p5": 0.019,
+            "median": 0.3536,
+            "p95": 3.605,
+            "max": 3.605
+          },
+          "firstFailures": [
+            {
+              "config": "Real galaxy 19 s3 incl 65",
+              "failed": true,
+              "by": ["r25 3.26%", "axis ratio 0.0473"]
+            },
+            {
+              "config": "Real galaxy 6 s3 incl 84",
+              "failed": true,
+              "by": ["ink 11.93%"]
+            },
+            {
+              "config": "Real galaxy 15 (real) s9946 incl 76",
+              "failed": true,
+              "by": [
+                "ink 9.97%",
+                "r25 7.93%",
+                "r50 5.17%",
+                "axis ratio 0.0723",
+                "inner axis ratio 0.0484"
+              ]
+            },
+            {
+              "config": "Real galaxy 37 (real) s3937 incl 54",
+              "failed": true,
+              "by": ["axis ratio 0.0427"]
+            }
+          ]
+        },
+        "orbit 35°": {
+          "applicable": 12,
+          "detected": 12,
+          "missed": [],
+          "ssim": {
+            "n": 12,
+            "min": 0.3192,
+            "p5": 0.3192,
+            "median": 0.4634,
+            "p95": 0.6067,
+            "max": 0.6067
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.6323,
+            "p5": 0.6323,
+            "median": 0.7442,
+            "p95": 0.915,
+            "max": 0.915
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.0242,
+            "p5": 0.0242,
+            "median": 0.2992,
+            "p95": 0.6315,
+            "max": 0.6315
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0.0098,
+            "p5": 0.0098,
+            "median": 0.0263,
+            "p95": 0.0979,
+            "max": 0.0979
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0021,
+            "p5": 0.0021,
+            "median": 0.1045,
+            "p95": 0.2212,
+            "max": 0.2212
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.0265,
+            "p5": 0.0265,
+            "median": 0.1151,
+            "p95": 0.23,
+            "max": 0.23
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0011,
+            "p5": 0.0011,
+            "median": 0.0304,
+            "p95": 0.1708,
+            "max": 0.1708
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0059,
+            "p5": 0.0059,
+            "median": 0.077,
+            "p95": 0.1497,
+            "max": 0.1497
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0014,
+            "p5": 0.0014,
+            "median": 0.0219,
+            "p95": 0.0487,
+            "max": 0.0487
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0062,
+            "p5": 0.0062,
+            "median": 0.1451,
+            "p95": 0.2914,
+            "max": 0.2914
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.2591,
+            "p95": 0.3808,
+            "max": 0.3808
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 0.1658,
+            "p5": 0.1658,
+            "median": 2.0679,
+            "p95": 4.8487,
+            "max": 4.8487
+          },
+          "firstFailures": [
+            {
+              "config": "Real galaxy 19 s3 incl 65",
+              "failed": true,
+              "by": [
+                "ink -28.16%",
+                "coarse ssim 0.7874",
+                "p90 width 15.07%",
+                "r25 -12.73%",
+                "r90 14.08%",
+                "outer ink 3.70%",
+                "axis ratio -0.1451",
+                "inner axis ratio -0.3808",
+                "position angle 3.62°"
+              ]
+            },
+            {
+              "config": "Real galaxy 6 s3 incl 84",
+              "failed": true,
+              "by": [
+                "ink 36.61%",
+                "coarse ssim 0.8552",
+                "r25 10.40%",
+                "axis ratio 0.0667",
+                "inner axis ratio 0.0749"
+              ]
+            },
+            {
+              "config": "Real galaxy 15 (real) s9946 incl 76",
+              "failed": true,
+              "by": [
+                "p90 width -10.45%",
+                "r25 6.93%",
+                "r50 4.57%",
+                "r90 7.70%",
+                "outer ink 3.54%",
+                "position angle 2.41°"
+              ]
+            },
+            {
+              "config": "Real galaxy 37 (real) s3937 incl 54",
+              "failed": true,
+              "by": [
+                "ink -19.83%",
+                "coarse ssim 0.6323",
+                "p90 width 22.12%",
+                "r25 -20.58%",
+                "r50 -15.94%",
+                "axis ratio -0.2513",
+                "inner axis ratio -0.3392",
+                "position angle 3.13°"
+              ]
+            }
+          ]
+        }
+      },
       "v21Reroll": null
     }
   }
