@@ -127,9 +127,9 @@ The thresholds were recalibrated with the M5 cases among the configurations (`np
 | stellar-streams s7 orbit | 1.1% | 0.953 | 1.1% | 0.5% | 2.2% | 7000/7000 | 0/0 | 0/0 | 0/0 | pass |
 | stellar-streams s7 zoom | 0.4% | 0.941 | 0.8% | 1.2% | 0.9% | 7000/7000 | 0/0 | 0/0 | 0/0 | pass |
 
-**45 of the 48 M5 cases pass, and 149 of the 152 required cases in all** (each against the mean of 6 draws, ADR 0018; the CPU engine gives the same numbers). The M2, M3 and M4 cases pass at the thresholds recalibrated with the M5 set among the configurations; the engine hashes are rewritten for M4's final pen lines (test e).
+**45 of the 48 M5 cases passed at the first calibration, and 149 of the 152 required cases in all; after the widening of ADR 0026 all 48 and all 152 pass** (each against the mean of 6 draws, ADR 0018; the CPU engine gives the same numbers). The M2, M3 and M4 cases pass at the thresholds recalibrated with the M5 set among the configurations; the engine hashes are rewritten for M4's final pen lines (test e).
 
-The three failures are all `Edge-on with dust`, each one moment measure just past its band, every other measure of the case passing:
+The three failures at the first calibration were all `Edge-on with dust`, each one moment measure just past its band, every other measure of the case passing:
 
 | case | measure | v21 against the mean of 6 draws | band |
 | --- | --- | --- | --- |
@@ -141,7 +141,7 @@ Where they come from:
 
 - **Not from the vector marks or from the merge.** For `Edge-on with dust` s7 orbit the mean axis-ratio difference is −0.0308 with the parts drawn, with every vector part removed, and with M4's final engine alone (a checkout of the M4 branch, which draws no parts): identical to four places. Nor do the dust hatching (`dustScribble` 0 gives −0.0312) or the knots (−0.0306). The halo matters (`halo` 0 gives −0.044), and so do the dust lanes (`dust` 0 gives −0.045): the measure is the edge-on stipple's, carved by the dust.
 - **They sit in the re-draw spread, past the band's margin.** The engine's own re-draws of `Edge-on with dust` reach 0.021 in axis ratio, 3.8% in r25 and 1.15° in position angle, a flat galaxy's scatter, and the family's bands (1.5 × the 95th percentile over every spiral) are narrower than that for r25 (3.0%, against 4.8% for this preset's own 1.5 × p95). The preset's own axis-ratio band is 0.030, from its 24 pairs (8 configurations, the three stand-ins of each sharing one set of draws), and v21's single draw lands at 0.0308. Across the six cameras and seeds the signed axis-ratio differences are −0.011, −0.031, −0.002, +0.021, +0.018 and +0.017: no bias, a scatter.
-- **Not loosened.** The bands are the calibration's. Per-preset tolerances for the radii and the position angle, and a per-preset axis-ratio rule that does not rest on so few configurations, would make these cases pass; that changes how the thresholds are calibrated, so it is left to the owner (see the report of this change).
+- **Widened, by the owner's decision of 2026-10-07 (ADR 0026, proposed).** For the radii, the position angle and the axis ratio, a preset's band is now the larger of what applied and 1.5 × its own largest re-draw spread (widen-only; no other threshold moves). The three cases pass at the recalibrated thresholds (152 of 152). The negative controls' detections, re-run from the same shards, went from 253 to 249 of 399 (four controls each lose one configuration; ADR 0026 lists them).
 
 ### CPU engine against WebGPU (L1)
 
@@ -202,3 +202,7 @@ Where they come from:
 | `npm run build` | builds (247.0 kB, 75.2 kB gzipped) |
 | `npm run test:gpu` | 9 of 9 pass (vector kernels, pen ink, line-work bit-exact, stipple parity, tiers, surface, orbit) |
 | `npm run golden` | 149 of 152 required cases pass (45 of 48 M5 cases; the three failures above); strict CPU = WebGPU on all 152; 12 of 12 drawn-star gates |
+
+## For the owner
+
+After this widening, re-run the golden calibration on a real GPU (your MacBook) and commit the result: `npm run golden -- --calibrate`, then `npm run golden`, then `npx prettier --write tests/golden/thresholds.json tests/golden/calibration.json`. See docs/open-questions.md Q14 and the M10 row of docs/roadmap.md.

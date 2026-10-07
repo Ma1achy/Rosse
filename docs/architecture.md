@@ -35,6 +35,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0023](adr/0023-m6-acceptance-overrides.md) | _Proposed:_ the overrides of the M6 acceptance captures (`starMix`, `field`, `fgstars`, as before; the Chalkboard captures; the `knob-*` probes). |
 | [0024](adr/0024-plates-are-present-tier-passes.md) | Plates (`slip`, `colour`) are present-tier passes over layers that carry their population; switching them builds uniforms only. |
 | [0025](adr/0025-the-slipped-plates-are-their-own-golden-family.md) | _Proposed:_ the slipped plates are their own golden family (`slip`), calibrated alone. |
+| [0026](adr/0026-per-preset-bands-widen-only.md) | _Proposed:_ per-preset bands for the radii, the position angle and the axis ratio: the larger of the current band and 1.5 × the preset's largest re-draw spread (the owner's decision of 2026-10-07). |
 
 ## Modules
 

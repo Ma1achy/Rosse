@@ -39,49 +39,68 @@
       "paEps0": 0.038,
       "byPreset": {
         "Grand design": {
-          "q": 0.036,
+          "q": 0.048,
           "qInner": 0.039,
-          "paEps0": 0.044
+          "paEps0": 0.044,
+          "r50": 0.035,
+          "r90": 0.075,
+          "paA": 0.944
         },
         "Barred spiral": {
-          "q": 0.034,
+          "q": 0.036,
           "qInner": 0.027,
-          "paEps0": 0.037
+          "paEps0": 0.037,
+          "r25": 0.037
         },
         "Flocculent": {
-          "q": 0.039,
+          "q": 0.049,
           "qInner": 0.031,
-          "paEps0": 0.049
+          "paEps0": 0.049,
+          "r25": 0.033,
+          "r50": 0.031,
+          "paA": 0.953
         },
         "Tightly wound": {
-          "q": 0.02,
+          "q": 0.027,
           "qInner": 0.041,
           "paEps0": 0.022
         },
         "Ringed": {
-          "q": 0.029,
+          "q": 0.035,
           "qInner": 0.026,
-          "paEps0": 0.035
+          "paEps0": 0.035,
+          "r25": 0.043,
+          "r90": 0.056
         },
         "Disc, no arms": {
-          "q": 0.021,
+          "q": 0.029,
           "qInner": 0.04,
-          "paEps0": 0.025
+          "paEps0": 0.025,
+          "r25": 0.034,
+          "r50": 0.036,
+          "paA": 1.232
         },
         "Dusty spiral": {
           "q": 0.044,
           "qInner": 0.047,
-          "paEps0": 0.052
+          "paEps0": 0.052,
+          "r25": 0.034,
+          "r90": 0.055
         },
         "Loose, open arms": {
           "q": 0.024,
           "qInner": 0.027,
-          "paEps0": 0.03
+          "paEps0": 0.03,
+          "paA": 1.186
         },
         "Edge-on with dust": {
-          "q": 0.03,
+          "q": 0.032,
           "qInner": 0.042,
-          "paEps0": 0.038
+          "paEps0": 0.038,
+          "r25": 0.057,
+          "r50": 0.069,
+          "r90": 0.1,
+          "paA": 0.911
         },
         "Hand-drawn arms": {
           "q": 0.028,
@@ -91,7 +110,9 @@
         "Hand wobble": {
           "q": 0.023,
           "qInner": 0.044,
-          "paEps0": 0.027
+          "paEps0": 0.027,
+          "r90": 0.055,
+          "paA": 0.882
         }
       }
     },
@@ -114,29 +135,40 @@
       "paEps0": 0.049,
       "byPreset": {
         "Cigar-shaped": {
-          "q": 0.046,
+          "q": 0.049,
           "qInner": 0.034,
-          "paEps0": 0.06
+          "paEps0": 0.06,
+          "r25": 0.031,
+          "r50": 0.058,
+          "r90": 0.094,
+          "paA": 1.303
         },
         "Radio jet": {
-          "q": 0.038,
+          "q": 0.039,
           "qInner": 0.035,
-          "paEps0": 0.042
+          "paEps0": 0.042,
+          "r25": 0.035
         },
         "Smooth, round": {
-          "q": 0.047,
+          "q": 0.049,
           "qInner": 0.026,
-          "paEps0": 0.049
+          "paEps0": 0.049,
+          "r50": 0.068,
+          "r90": 0.085,
+          "paA": 1.244
         },
         "Shell galaxy": {
-          "q": 0.042,
+          "q": 0.048,
           "qInner": 0.037,
-          "paEps0": 0.046
+          "paEps0": 0.046,
+          "paA": 1.223
         },
         "Stellar streams": {
           "q": 0.042,
           "qInner": 0.045,
-          "paEps0": 0.046
+          "paEps0": 0.046,
+          "r25": 0.03,
+          "r50": 0.048
         }
       }
     },
@@ -237,32 +269,40 @@
         "Grand design": {
           "q": 0.037,
           "qInner": 0.034,
-          "paEps0": 0.041
+          "paEps0": 0.041,
+          "r25": 0.059,
+          "paA": 0.939
         },
         "Flocculent": {
           "q": 0.057,
           "qInner": 0.027,
-          "paEps0": 0.06
+          "paEps0": 0.06,
+          "r25": 0.05
         },
         "Ringed": {
           "q": 0.033,
           "qInner": 0.03,
-          "paEps0": 0.036
+          "paEps0": 0.036,
+          "r25": 0.082,
+          "r90": 0.045
         },
         "Barred spiral": {
           "q": 0.055,
           "qInner": 0.027,
-          "paEps0": 0.056
+          "paEps0": 0.056,
+          "r90": 0.037
         },
         "Disc, no arms": {
           "q": 0.04,
           "qInner": 0.045,
-          "paEps0": 0.045
+          "paEps0": 0.045,
+          "r50": 0.066
         },
         "Edge-on with dust": {
           "q": 0.03,
           "qInner": 0.04,
-          "paEps0": 0.033
+          "paEps0": 0.033,
+          "r50": 0.054
         },
         "Tightly wound": {
           "q": 0.034,
@@ -297,12 +337,15 @@
         "Cigar-shaped": {
           "q": 0.038,
           "qInner": 0.039,
-          "paEps0": 0.049
+          "paEps0": 0.049,
+          "r90": 0.069,
+          "paA": 1.006
         },
         "Shell galaxy": {
           "q": 0.035,
           "qInner": 0.038,
-          "paEps0": 0.038
+          "paEps0": 0.038,
+          "r25": 0.043
         },
         "Radio jet": {
           "q": 0.023,
