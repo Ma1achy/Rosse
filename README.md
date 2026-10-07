@@ -174,7 +174,7 @@ A galaxy is a pile of kinds of mark, laid in a fixed order. Here is one galaxy, 
 
 ### Lenses
 
-A lens is a galaxy (or a cluster) in front of a source: the source's drawing is bent into rings, arcs and images. The source can be a galaxy, a quasar or one of the owner's hand drawings.
+A lens is a galaxy (or a cluster) in front of a source: the source's drawing is bent into rings, arcs and images. The source can be a galaxy, a quasar or one of the owner's hand drawings (Fig. 36.6).
 
 <img src="docs/img/figures/lenses.jpg" alt="Fig. 15: six lens presets: an Einstein ring, a double ring, a quasar cross, a quad, a cluster with arcs and a giant arc" width="100%">
 
@@ -186,7 +186,7 @@ A lens is a galaxy (or a cluster) in front of a source: the source's drawing is 
 <td width="50%"><img src="docs/img/gifs/lens-quasar.gif" alt="Fig. 18: the four images of a lensed quasar circling the cross as the source circles"><br><sub><b>18</b> &nbsp;EINSTEIN CROSS<br>a quasar: four images follow the source round</sub></td>
 </tr>
 <tr>
-<td colspan="2" align="center"><img src="docs/img/gifs/lens-sketch.gif" alt="Fig. 19: a hand drawing, stretched into arcs as it slides behind a lens" width="50%"><br><sub><b>19</b> &nbsp;A SKETCH, LENSED<br>a hand drawing as the source</sub></td>
+<td colspan="2" align="center"><img src="docs/img/gifs/lens-double.gif" alt="Fig. 19: a double Einstein ring: two rings that part and close again as one source drifts, with the camera pushing in" width="50%"><br><sub><b>19</b> &nbsp;DOUBLE EINSTEIN RING<br>two sources behind one lens</sub></td>
 </tr>
 </table>
 

@@ -576,16 +576,16 @@ async function frameOf(/** @type {any} */ g, /** @type {number} */ i, /** @type 
 }
 
 function encode(/** @type {any} */ g, /** @type {string} */ dir, /** @type {string} */ out) {
-  const budget = (g.budgetMB ?? 1.8) * 1024 * 1024 * 0.97;
+  const budget = (g.budgetMB ?? 2.5) * 1024 * 1024 * 0.97;
   // attempts, from the best to the leanest: [size, colours, frame step, dither]
   const attempts = [
     [g.size, g.colours, 1, 'bayer:bayer_scale=5'],
-    [g.size, Math.min(g.colours, 32), 1, 'bayer:bayer_scale=5'],
-    [Math.round(g.size * 0.9), Math.min(g.colours, 32), 1, 'bayer:bayer_scale=5'],
-    [Math.round(g.size * 0.9), 24, 1, 'bayer:bayer_scale=4'],
-    [Math.round(g.size * 0.8), 24, 1, 'bayer:bayer_scale=4'],
-    [Math.round(g.size * 0.8), 16, 2, 'bayer:bayer_scale=4'],
-    [Math.round(g.size * 0.64), 16, 2, 'bayer:bayer_scale=3'],
+    [g.size, Math.min(g.colours, 24), 1, 'bayer:bayer_scale=5'],
+    [Math.round(g.size * 0.9), 24, 1, 'bayer:bayer_scale=5'],
+    [Math.round(g.size * 0.85), 16, 1, 'bayer:bayer_scale=4'],
+    [Math.round(g.size * 0.75), 16, 1, 'bayer:bayer_scale=4'],
+    [Math.round(g.size * 0.68), 16, 1, 'bayer:bayer_scale=3'],
+    [Math.round(g.size * 0.6), 12, 1, 'bayer:bayer_scale=3'],
   ];
   let used = '';
   for (const [size, colours, step, dither] of attempts) {
@@ -642,30 +642,31 @@ async function gifs(/** @type {(g: any) => boolean} */ pick) {
     if (redo) k = readdirSync(dir).length;
     const out = join(OUT.gifs, `${g.id}.gif`);
     const used = encode(g, dir, out);
-    // a full-size MP4 beside the GIF (the GIF is the README's fallback, the MP4 is the film)
-    const mp4 = join(OUT.gifs, `${g.id}.mp4`);
-    sh('ffmpeg', [
-      '-y',
-      '-loglevel',
-      'error',
-      '-framerate',
-      String(g.fps),
-      '-i',
-      join(dir, 'f%04d.png'),
-      '-vf',
-      'scale=trunc(iw/2)*2:trunc(ih/2)*2',
-      '-c:v',
-      'libx264',
-      '-crf',
-      '28',
-      '-preset',
-      'slow',
-      '-pix_fmt',
-      'yuv420p',
-      '-movflags',
-      '+faststart',
-      mp4,
-    ]);
+    // `--mp4`: a full-size H.264 MP4 beside the GIF (not committed by default: it is as big again)
+    const mp4 = args.includes('--mp4') ? join(OUT.gifs, `${g.id}.mp4`) : null;
+    if (mp4)
+      sh('ffmpeg', [
+        '-y',
+        '-loglevel',
+        'error',
+        '-framerate',
+        String(g.fps),
+        '-i',
+        join(dir, 'f%04d.png'),
+        '-vf',
+        'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+        '-c:v',
+        'libx264',
+        '-crf',
+        '28',
+        '-preset',
+        'slow',
+        '-pix_fmt',
+        'yuv420p',
+        '-movflags',
+        '+faststart',
+        mp4,
+      ]);
     if (!args.includes('--keep')) rmSync(dir, { recursive: true, force: true });
     console.log(
       `wrote ${rel(out)} (${String(kb(out))} KB; ${String(k)} frames, ${used}; ${String(Math.round((Date.now() - t0) / 1000))} s)`,
@@ -673,8 +674,7 @@ async function gifs(/** @type {(g: any) => boolean} */ pick) {
     manifest.gifs[g.id] = {
       file: rel(out),
       bytes: statSync(out).size,
-      mp4: rel(mp4),
-      mp4Bytes: statSync(mp4).size,
+      ...(mp4 ? { mp4: rel(mp4), mp4Bytes: statSync(mp4).size } : {}),
       frames: k,
       fps: g.fps,
       encoded: used,

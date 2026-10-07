@@ -72,26 +72,122 @@
   "gifs": {
     "spiral-orbit": {
       "file": "docs/img/gifs/spiral-orbit.gif",
-      "bytes": 1550189,
-      "frames": 90,
-      "fps": 18,
-      "encoded": "384 px, 16 colours, every 2nd frame"
+      "bytes": 2491482,
+      "frames": 75,
+      "fps": 15,
+      "encoded": "378 px, 24 colours"
     },
     "merger-mice": {
       "file": "docs/img/gifs/merger-mice.gif",
-      "bytes": 3037181,
-      "frames": 146,
-      "fps": 18,
-      "encoded": "384 px, 24 colours"
+      "bytes": 2144001,
+      "frames": 110,
+      "fps": 15,
+      "encoded": "378 px, 24 colours"
     },
     "anatomy": {
       "file": "docs/img/gifs/anatomy.gif",
-      "bytes": 1285337,
-      "mp4": "docs/img/gifs/anatomy.mp4",
-      "mp4Bytes": 1129639,
+      "bytes": 2529597,
       "frames": 140,
       "fps": 15,
-      "encoded": "336 px, 16 colours, every 2nd frame"
+      "encoded": "357 px, 16 colours"
+    },
+    "edge-on-orbit": {
+      "file": "docs/img/gifs/edge-on-orbit.gif",
+      "bytes": 2300535,
+      "frames": 75,
+      "fps": 15,
+      "encoded": "315 px, 16 colours"
+    },
+    "pen-dive": {
+      "file": "docs/img/gifs/pen-dive.gif",
+      "bytes": 2505109,
+      "frames": 90,
+      "fps": 15,
+      "encoded": "286 px, 16 colours"
+    },
+    "merger-tails": {
+      "file": "docs/img/gifs/merger-tails.gif",
+      "bytes": 1696204,
+      "frames": 110,
+      "fps": 15,
+      "encoded": "420 px, 32 colours"
+    },
+    "merger-polar": {
+      "file": "docs/img/gifs/merger-polar.gif",
+      "bytes": 1629736,
+      "frames": 110,
+      "fps": 15,
+      "encoded": "420 px, 32 colours"
+    },
+    "merger-torn": {
+      "file": "docs/img/gifs/merger-torn.gif",
+      "bytes": 2173641,
+      "frames": 110,
+      "fps": 15,
+      "encoded": "378 px, 24 colours"
+    },
+    "lens-ring": {
+      "file": "docs/img/gifs/lens-ring.gif",
+      "bytes": 2215043,
+      "frames": 90,
+      "fps": 15,
+      "encoded": "286 px, 16 colours"
+    },
+    "lens-quasar": {
+      "file": "docs/img/gifs/lens-quasar.gif",
+      "bytes": 2156606,
+      "frames": 90,
+      "fps": 15,
+      "encoded": "315 px, 16 colours"
+    },
+    "lens-sketch": {
+      "file": "docs/img/gifs/lens-sketch.gif",
+      "bytes": 245354,
+      "frames": 90,
+      "fps": 15,
+      "encoded": "420 px, 32 colours"
+    },
+    "morph": {
+      "file": "docs/img/gifs/morph.gif",
+      "bytes": 2524787,
+      "frames": 90,
+      "fps": 15,
+      "encoded": "357 px, 16 colours"
+    },
+    "shells": {
+      "file": "docs/img/gifs/shells.gif",
+      "bytes": 2294092,
+      "frames": 104,
+      "fps": 15,
+      "encoded": "378 px, 24 colours"
+    },
+    "deep-field": {
+      "file": "docs/img/gifs/deep-field.gif",
+      "bytes": 2518682,
+      "frames": 90,
+      "fps": 15,
+      "encoded": "315 px, 16 colours"
+    },
+    "star-dive": {
+      "file": "docs/img/gifs/star-dive.gif",
+      "bytes": 2324496,
+      "frames": 90,
+      "fps": 15,
+      "encoded": "286 px, 16 colours"
+    },
+    "surfaces": {
+      "file": "docs/img/gifs/surfaces.gif",
+      "bytes": 343746,
+      "frames": 50,
+      "fps": 20,
+      "encoded": "420 px, 64 colours"
+    },
+    "breathe": {
+      "file": "docs/img/gifs/breathe.gif",
+      "bytes": 1229162,
+      "frames": 90,
+      "fps": 15,
+      "encoded": "420 px, 96 colours"
     }
   },
   "gz2": {
