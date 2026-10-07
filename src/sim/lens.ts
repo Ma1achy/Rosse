@@ -236,6 +236,10 @@ export interface SourceOpts {
 /**
  * The parameters of a source galaxy: the main ones with what `buildSourceGalaxy` overrides
  * (app23.js:L632–634). Nothing else about it is special: it is described and drawn as any galaxy.
+ *
+ * v21 parity: a source inherits everything not listed, such as `streams`, `bubbles`, `starMix`,
+ * `dustLines`, `patchy`, `dust`, `thick` and `stroke` from the lens preset (reference notes 20.20,
+ * open question Q13). The shipped lens presets mostly leave these at zero, so the effect is mostly latent.
  */
 export function sourceParams(P: Params, seed: number, o: SourceOpts): Params {
   return {

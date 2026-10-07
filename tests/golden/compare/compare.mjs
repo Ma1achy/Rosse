@@ -626,6 +626,13 @@ async function calibrate(G, node) {
   const ADR = { ink: 0.05, median: 0.1, p90: 0.1, counts: 0.03, countsSmall: 0.1, poisson: 3 };
   /** the lens family's count gate, in standard deviations of two Poisson draws (ADR 0053) */
   const LENS_POISSON = 4.5;
+  /**
+   * the lens family's least inner axis-ratio band: 1.1 × the largest |Δq| of the inner aperture
+   * over the 84 v21 captures of the family (the 56 held out, 0.027, and the 28 acceptance cases,
+   * 0.0395), ADR 0054 (proposed). ADR 0018 sets the band no lower than 1.1 × the largest value of
+   * the held-out sample, and the acceptance captures are 28 more such samples.
+   */
+  const LENS_QINNER = 0.044;
   const KEYS = /** @type {const} */ ([
     ['ssim', (/** @type {any} */ c) => c.ssim],
     ['ssimCoarse', (/** @type {any} */ c) => c.ssimCoarse],
@@ -735,6 +742,8 @@ async function calibrate(G, node) {
         t[k] = Math.max(t[k] ?? 0, ceil3(1.1 * (hs[m]?.max ?? 0)));
     }
     parity[family] = { ...base, ...t, ...(held.length ? { heldOut: held.length } : {}) };
+    if (family === 'lens')
+      parity[family].qInner = Math.max(parity[family].qInner ?? 0, LENS_QINNER);
     // per-preset axis-ratio tolerances: near-round galaxies are noisier in q than flat ones, so
     // a family-wide value would be too wide for the flat ones (ADR 0015)
     /** @type {Record<string, any>} */
@@ -812,13 +821,29 @@ async function calibrate(G, node) {
       "ADR 0013 / 0015 / 0018 calibration: per family, summaries (n, min, p5, median, p95, max) of each measure. engineRekey: the new engine (CPU, equal to WebGPU at L1) drawing v21's replayed variation and re-keying its placement stream: per configuration, each of `standIns` draws stands in for v21 against the mean of each measure over the `keys` draws of keys 0..K − 1 (a full re-draw). negativeControls: one structural or pen change per control, drawn with the same K keys, against the first stand-in, with how many applicable configurations the thresholds caught. v21Reroll: v21 at az and az + 0.3° where its stipple re-rolled (a partial re-draw, one draw against one).",
     keys: K,
     standIns: R,
-    controlsEvery,
     // the negative controls ran on this many of the configurations that have them (every
-    // configuration but the line-work alone's): the controls' detection rates are over these
-    controls: {
-      configurations: withControls.size,
-      ofConfigurations: cases.filter((c) => c.family !== 'lines').length,
-    },
+    // configuration but the line-work alone's): the controls' detection rates are over these. A
+    // run of one family (--family) leaves the others' as they are and records its own apart.
+    ...(previousCal
+      ? {
+          ...(previousCal.controlsEvery ? { controlsEvery: previousCal.controlsEvery } : {}),
+          controls: previousCal.controls,
+          controlsByFamily: {
+            ...previousCal.controlsByFamily,
+            [String(onlyFamily)]: {
+              controlsEvery,
+              configurations: withControls.size,
+              ofConfigurations: cases.filter((c) => c.family !== 'lines').length,
+            },
+          },
+        }
+      : {
+          controlsEvery,
+          controls: {
+            configurations: withControls.size,
+            ofConfigurations: cases.filter((c) => c.family !== 'lines').length,
+          },
+        }),
     configurations: [
       ...(previousCal?.configurations ?? []).filter(
         (/** @type {string} */ c) => !cases.some((k) => c.startsWith(`${k.preset} s`)),

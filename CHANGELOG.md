@@ -13,6 +13,7 @@ All notable changes to this project are documented here. The format follows [Kee
   - Explicit source orientation (open question Q3, option b): a saved parameter set, `LensHome {incl, az, w}` (`core/home`). The orbit never re-rolls it. This is a deliberate divergence from v21 (ADR 0050).
   - Goldens: 28 v21 captures (six `Lens: …` presets and `A sketch, lensed`, seeds 7 and 4242, home then orbit, a fresh page each), drawn with v21's own lens picks (`compare/v21-lens.ts`, ADR 0051). The engine's own picks are tested against v21's over many seeds; image positions, J and μ are compared against v21's solver. Overrides for the deep field, drawn stars and foreground stars are in ADR 0052.
   - Tests: `npm run test:gpu` has the lens kernels against their twins, slot by slot. The page takes `?variant=lens`.
+  - The `lens` family is calibrated (ADR 0053, proposed: count gate 4.5σ) and its inner axis-ratio band is 0.044 (ADR 0054, proposed). `--calibrate --family f` measures one family and leaves the others' thresholds and numbers as they are. `Layered: lensed merger` joins when M8 merges.
 
 - M5, vector marks:
   - `marks/vector`: the whole vector library (12 sheets, 429 drawings, 23,431 segments, 6,038 dots, 328 blobs) packed once into shared tables with a per-drawing range table and a densified-piece prefix (packer 4 copies every sheet with its metadata).
