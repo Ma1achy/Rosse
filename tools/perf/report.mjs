@@ -164,7 +164,7 @@ if (worker) {
   );
   for (const [k, r] of Object.entries(worker.rows))
     lines.push(
-      `| ${k} | ${String(/** @type {any} */ (r).framesDrawn)} | ${String(/** @type {any} */ (r).maxFrameGapMs)} | ${String(/** @type {any} */ (r).longTasks)} | ${String(/** @type {any} */ (r).longTaskMs)} | ${String(/** @type {any} */ (r).driveMs)} |`,
+      `| ${k} | ${String(/** @type {any} */ (r).framesDrawn)} | ${String(/** @type {any} */ (r).maxFrameGapMs)} | ${String(/** @type {any} */ (r).longTasks)} | ${String(/** @type {any} */ (r).longTaskMs)} | ${String(/** @type {any} */ (r).driveMs ?? '-')} |`,
     );
   lines.push('');
 }

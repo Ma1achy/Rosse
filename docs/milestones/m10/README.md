@@ -33,6 +33,15 @@ SwiftShader is a software rasteriser running on those same CPU cores. Its "GPU" 
   | in the worker | 15 | 27 ms | 0 | 0 ms |
   | on the main thread | 60 | 211 ms | 60 | 7,551 ms |
 
+  M11's page draws mergers and shell galaxies, and the CPU engine integrated them on the main thread. That is in the worker too (`CpuEngineCore` holds the merger and the shells; the page still says "Simulating the merger…" while it builds). Loading the page on `Merger: the Mice` on the CPU engine, the longest task the main thread saw:
+
+  | CPU engine, `Merger: the Mice` first frame | longest task | animation frames in the same time |
+  | --- | --- | --- |
+  | in the worker | 104 ms (page start-up) | 217 |
+  | on the main thread (`?cpuworker=off`) | 2,497 ms | 60 |
+
+  The CPU engine's `layers()` (M12's SVG export) is empty on the page while the layers live in the worker; the export asks `CpuBackend.layers()`, which is asynchronous.
+
   The worker draws fewer frames because the page coalesces moves while it is busy, and the drag took 2.0 s to feed instead of 9.8 s: the page stayed responsive. The cost of a frame is the same code either way.
 - **CPU engine speed, output unchanged.** The composite keeps the surface under the ink between frames (it does not depend on the ink) and copies the rounded surface where there is no ink; the bilinear tap allocates nothing. Both were checked byte for byte against the code they replaced (`tests/unit/raster-background.test.ts` keeps the cache honest). Composite: about 160 ms to 10 ms at 800 px.
 - **The L1 harness** (`npm run l1`): a WebGPU adapter against the CPU engine at the strict thresholds, L0 on that adapter, and the hashes against the engine's SwiftShader goldens, one entry per adapter in [l1-report.json](l1-report.json) and [l1-report.md](l1-report.md). Run it with `ROSSE_WEBGPU_ADAPTER=hardware` on a machine with a GPU and commit the changed report.

@@ -64,9 +64,11 @@ Plate 800 CSS px at DPR 1; medians.
 
 ### The CPU engine in a worker, on the page
 
-CPU engine on the page: worker against main thread (headless Chromium); Grand design; load after 3.62 3.52 6.95.
+CPU engine on the page: worker against main thread (headless Chromium); Grand design; load after 9.92 10.25 11.1.
 
-| where it ran | frames drawn | longest gap between animation frames ms | long tasks (>= 50 ms) | their total ms | time to feed the drag ms |
-| ------------ | ------------ | --------------------------------------- | --------------------- | -------------- | ------------------------ |
-| worker       | 15           | 27                                      | 0                     | 0              | 2021                     |
-| main thread  | 60           | 211                                     | 60                    | 7551           | 9752                     |
+| where it ran              | frames drawn | longest gap between animation frames ms | long tasks (>= 50 ms) | their total ms | time to feed the drag ms |
+| ------------------------- | ------------ | --------------------------------------- | --------------------- | -------------- | ------------------------ |
+| drag: worker              | 14           | 25                                      | 0                     | 0              | 2085                     |
+| drag: main thread         | 60           | 248                                     | 60                    | 6868           | 9023                     |
+| merger build: worker      | 1            | 104                                     | 1                     | 104            | -                        |
+| merger build: main thread | 1            | 2504                                    | 1                     | 2497           | -                        |

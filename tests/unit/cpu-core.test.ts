@@ -52,4 +52,18 @@ describe('CpuEngineCore (what the worker runs)', () => {
     core.resize({ plateCss: 100, dpr: 1 });
     expect(core.present('paper', 'ink').width).toBe(100);
   });
+
+  it('builds a merger once and scrubs it as a view change', () => {
+    const P = presetParams('Merger: the Mice', 7);
+    const core = new CpuEngineCore(atlases, paper, meta, size);
+    const first = core.draw(P, 1);
+    expect(first.tiers.model).toBe(1);
+    expect(first.counts.dots).toBeGreaterThan(0);
+    const scrub = core.draw({ ...P, mTime: 0.4, az: (P.az + 10) % 360 }, 1);
+    expect(scrub.tiers.model).toBe(1);
+    expect(scrub.tiers.view).toBe(first.tiers.view + 1);
+    expect(core.inkLayers.length).toBeGreaterThan(0);
+    // a model parameter rebuilds it
+    expect(core.draw({ ...P, seed: 8 }, 1).tiers.model).toBe(2);
+  }, 120000);
 });

@@ -3,27 +3,43 @@
   "label": "CPU engine on the page: worker against main thread (headless Chromium)",
   "date": "2026-10-07",
   "preset": "Grand design",
-  "loadAfter": [3.62, 3.52, 6.95],
+  "loadAfter": [9.92, 10.25, 11.1],
   "rows": {
-    "worker": {
+    "drag: worker": {
       "where": "worker",
       "moves": 60,
-      "driveMs": 2021,
-      "framesDrawn": 15,
-      "maxFrameGapMs": 27,
+      "driveMs": 2085,
+      "framesDrawn": 14,
+      "maxFrameGapMs": 25,
       "longTasks": 0,
       "longTaskMs": 0,
-      "animationFrames": 218
+      "animationFrames": 219
     },
-    "main thread": {
+    "drag: main thread": {
       "where": "main thread",
       "moves": 60,
-      "driveMs": 9752,
+      "driveMs": 9023,
       "framesDrawn": 60,
-      "maxFrameGapMs": 211,
+      "maxFrameGapMs": 248,
       "longTasks": 60,
-      "longTaskMs": 7551,
-      "animationFrames": 299
+      "longTaskMs": 6868,
+      "animationFrames": 310
+    },
+    "merger build: worker": {
+      "where": "worker",
+      "framesDrawn": 1,
+      "maxFrameGapMs": 104,
+      "longTasks": 1,
+      "longTaskMs": 104,
+      "animationFrames": 217
+    },
+    "merger build: main thread": {
+      "where": "main thread",
+      "framesDrawn": 1,
+      "maxFrameGapMs": 2504,
+      "longTasks": 1,
+      "longTaskMs": 2497,
+      "animationFrames": 60
     }
   }
 }
