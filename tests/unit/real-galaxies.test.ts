@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { REAL_GALAXIES, printRotation, realCards } from '../../src/extras/real/real-galaxies';
 
@@ -33,6 +35,26 @@ describe('the 42 real galaxies', () => {
       const r = printRotation(i);
       expect(Math.abs(r)).toBeLessThanOrEqual(1.5);
       expect(r).toBe(Number(r.toFixed(2)));
+    }
+  });
+
+  it("has v21's own parameters in the golden captures (what fromVotes gives, plus the case's overrides)", () => {
+    const dir = join(import.meta.dirname, '../golden/reference');
+    const manifest = JSON.parse(readFileSync(join(dir, 'manifest.json'), 'utf8')) as {
+      captures: { name: string; variant?: string; real?: number; overrides?: object }[];
+    };
+    const real = manifest.captures.filter((c) => c.variant === 'real');
+    expect(real).toHaveLength(20);
+    for (const c of real) {
+      const rec = JSON.parse(readFileSync(join(dir, `${c.name}.json`), 'utf8')) as {
+        params: Record<string, unknown>;
+      };
+      const card = cards[c.real as number];
+      // the orbit capture has its camera moved from home
+      const home = c.name.endsWith('__home');
+      const want = { ...card?.params, ...c.overrides };
+      if (home) expect(rec.params, c.name).toEqual(want);
+      else expect({ ...rec.params, az: 0, incl: 0 }, c.name).toEqual({ ...want, az: 0, incl: 0 });
     }
   });
 });
