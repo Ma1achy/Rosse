@@ -1046,3 +1046,9 @@ input[type='range']:disabled {
 .cat-results {
   grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
 }
+
+.num::placeholder,
+.cat-text::placeholder {
+  color: var(--ink2);
+  opacity: 1;
+}

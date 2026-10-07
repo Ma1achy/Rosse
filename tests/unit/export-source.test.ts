@@ -26,7 +26,11 @@ describe('the page-level SVG export (ExportSource) on the CPU engine', () => {
       device: () => null,
       // the worker's layers come back by message: a promise
       layers: () =>
-        new Promise<typeof core.inkLayers>((ok) => setTimeout(() => ok(core.inkLayers), 5)),
+        new Promise<typeof core.inkLayers>((ok) =>
+          setTimeout(() => {
+            ok(core.inkLayers);
+          }, 5),
+        ),
       exportInfo: () => Promise.resolve(infoOfData(core.exportInfo())),
     };
     const got = await exportSvgOf(source);

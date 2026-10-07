@@ -4,8 +4,20 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Fixed
+
+- The golden harness crashed on the real galaxies (`unknown preset "Real galaxy 0"`): a case's home is now `fromReal`'s parameters for `Real galaxy N` (`tests/unit/golden-real.test.ts`).
+- A camera move built new ink batches again on M7's scenes (`tests/gpu/reuse.ts` failed): the dynamic vector and deep-field sprite layers bind their capacity, not the view's live count (ADR 0070).
+- `capture:reference --redraws` drew the default galaxy for a real galaxy's re-draws.
+
 ### Added
 
+- The integration of M7, M9, M12 and the README redesign with M10 and M11 (pull request #15):
+  - M12 wired into M11's page: Export SVG (both engines, one layer per pen; the sky's marks in `background`; a merger's and shells' frames too) and Export GIF (the merger's timeline and a lensed quasar's flare, at 320, 480 or 640 px, ink frames drawn at the GIF's size inside the frame queue, the page's moment and size put back), the real-galaxy prints with the photograph beside the drawing and the credit, the Galaxy Zoo 2 catalogue (types, random, find by object id or position, a search by colour and redshift; fetched when opened, in a worker), and `?from=real:<n>` and `?from=gz2:<DR7 object id>` links.
+  - `ExportSource` gains `exportInfo()` (seed, pens' metadata, capsule roles) and `exclusive()` (a job in the frame queue, with `ink(P, size)` for the GIF); the CPU worker answers `exportInfo` and `ink`, and its `layers()` come back by message. `LayerBase.svgLayer` is set by the sky; a layer that names its SVG layer is exported whole there.
+  - `tools/gpu-test/extras-smoke.mjs` (in `npm run test:gpu` and `npm run test:ui`): the SVG's layers and counts, the GIF's frame count, size and loop, the real galaxies and the catalogue drawing galaxies, and the link round trip, on both engines.
+  - ADR 0061 (proposed): the 20 real v21 captures made again without the star and sky overrides; the `real` family's dots tolerance calibrated again (12.2%, ADR 0035's procedure); `Real galaxy 6` (home) and `barred-spiral--knob-ring-lines` (s7 home) compared with the mean of v21's 8 draws (ADR 0036); `capture:reference --redraws` carries a real galaxy's index.
+  - `engine-hashes.json` made again in full (440 cases); the real cases changed with their captures, and the cases that differ from main's file are the 128 whose M7 captures lost their overrides (ADR 0031) and the four `lines` cases, whose ring-knot stars are drawn now.
 - M7, stars and artefacts:
   - Drawn stars (`sstars`) through the vector-expand path as a dynamic set (`model/dynvec`), with the RSP breathing-room filter as a pure view filter (`compute/breathe.wgsl`); ring-knot and clump stars.
   - `starSprites` on the GPU with its CPU twin (`model/stars`, `compute/star-marks.wgsl`, `fallback/kernels/star-marks.ts`): heart knots, power-law glare, spikes, faint rings with lattice noise, the bleed column, the drawn star at the core, fainter nearby stars, trails, ghost reflections and cosmic rays, on counter-RNG named streams, compacted deterministically.

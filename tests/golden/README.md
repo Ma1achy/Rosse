@@ -85,8 +85,14 @@ npm run capture:reference -- --redraws tests/golden/v21-redraws.json  # v21 draw
 
 - **v21's other draws** (ADR 0036, proposed). v21's capture is one draw of its stipple. For the cases listed in `v21-redraws.json` (`{ draws, cases: [capture names] }`), `npm run capture:reference -- --redraws tests/golden/v21-redraws.json` captures draws 1 to `draws` − 1 of the stipple, moving the one stream `generate()` draws the marks from (the page is served with `mulberry32(P.seed * 9973 + 1 + k · 1000003)`; everything else is the capture's own). The files are `<name>__v21d<k>.ink.png` (with `.plate.jpg` and `.json`), recorded under `v21Draws` in the manifest and checked with the captures. The runner compares such a case with the mean of its comparisons with each of v21's draws (and v21's counts are the mean of theirs), falling back to the one capture otherwise.
 
+- **Five cases** are compared this way (ADR 0036 and 0061): `cigar-shaped--stipple` s4242 orbit, `ringed--vectors` s7 zoom, `layered-barred-spiral-satellite-trail--layered` s7 zoom, `real-galaxy-6--real__s586__home` and `barred-spiral--knob-ring-lines` s7 home.
+
 **Reports.** A failing case writes `diff/<name>.html`: both renders, both density maps, the signed density difference, and both stroke-width histograms. `diff/` is git-ignored and uploaded by CI as an artifact. Attach the report to your pull request.
 
 ## Lens goldens (M9)
 
 `variant=lens` captures the six `Lens: …` presets and `A sketch, lensed` at seeds 7 and 4242, home then orbit, each on a fresh page (v21 fixes its lensed sources at the view where it first placed them, so the order matters). The runner draws them with v21's lens picks (`compare/v21-lens.ts`, ADR 0051), and the thresholds of the `lens` family come from `npm run golden -- --calibrate --only-family lens` (ADR 0015's procedure; the other families are left as they are). The overrides are in ADR 0052, the inner axis-ratio band in ADR 0054. `Layered: lensed merger` (lens on, the same overrides) is in the set since M8 merged; it is a `merger` family case. Results: `docs/milestones/m9/README.md`.
+
+## Real galaxies (M12) and the integration
+
+`variant=real` captures ten of the 42 real galaxies (indices 0, 3, 6, 10, 12, 15, 19, 23, 26, 37) as v21 draws them from their votes (`__GEN.real(i)`), home and orbit, with **no overrides** (the sky is on since M7; ADR 0061). A case's home is `fromReal`'s parameters (`presetParams('Real galaxy N', seed)` in `compare/node.ts`; `tests/unit/golden-real.test.ts`). Their family `real` is ADR 0060's, its dots' tolerance ADR 0061's. `npm run golden` judges 440 required cases; `engine-hashes.json` holds all 440 (`--update-engine` after a full run).

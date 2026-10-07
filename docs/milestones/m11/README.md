@@ -46,8 +46,8 @@ Status: **done**, **waits for M7 / M9** (built from the schema; appears when the
 | "Drawn on the CPU" note | done (`#note`, red pencil, announced as a status) |
 | Plate caption, "drag to orbit" hint, double-click reset | done |
 | Recipe rail, hand-lettered tabs, post-it pile, taped print | done (see Objects) |
-| Export SVG, Export GIF | M12 |
-| Any Galaxy Zoo 2 galaxy (random by type, find) and real galaxies with photos | M12 |
+| Export SVG, Export GIF | done (M12, wired by the integration: `src/ui/exports.ts`) |
+| Any Galaxy Zoo 2 galaxy (random by type, find) and real galaxies with photos | done (M12, wired by the integration: `src/ui/galaxies.ts`) |
 | Line strokes, whole drawing, halo or disc drawing, outline arcs | changed: v21's off/on buttons, and any value above 0 reads as on (a preset's 0.9 shows "on"); links and presets keep the exact value |
 
 ### Not buildable yet
