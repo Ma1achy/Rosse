@@ -75,6 +75,7 @@ export function impossibleClasses(
     /** a lens (M9): its source galaxies have knots and sparkle stars of their own */
     lensOn?: number;
     lensSource?: string;
+    merger?: number;
   },
   groupKnots = false,
 ): Set<string> {
@@ -82,8 +83,10 @@ export function impossibleClasses(
   const lensed = P.lensOn === 1;
   if (!(P.knots > 0) && !groupKnots && !lensed) out.add('knots');
   if (!(P.sparkle > 0) && !lensed) out.add('stars');
-  // a quasar's images are each a drawn star
-  if (!(P.starMix > 0.01) && !(lensed && P.lensSource === 'quasar')) out.add('rstars');
+  // a merger's galaxies keep the drawn stars of their clumps, and a knot in a tidal tail has a
+  // bright one whatever `starMix` says (mergerSprites, app23.js:L522–524); a quasar's images are
+  // each a drawn star
+  if (!(P.starMix > 0.01) && !P.merger && !(lensed && P.lensSource === 'quasar')) out.add('rstars');
   return out;
 }
 

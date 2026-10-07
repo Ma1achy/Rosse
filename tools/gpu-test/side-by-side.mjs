@@ -1,14 +1,15 @@
 // @ts-check
 /**
- * `node tools/gpu-test/side-by-side.mjs [out dir] [--set m2|m3|m4|m5|m9]`: the new engine (WebGPU on
+ * `node tools/gpu-test/side-by-side.mjs [out dir] [--set m2|m3|m4|m5|m8|m9]`: the new engine (WebGPU on
  * SwiftShader, the page with `?present=copy`) beside v21's capture of the same case
  * (tests/golden/reference/<name>.plate.jpg), as small JPEGs for the milestone notes. The page is
  * given the capture's camera (az, incl, pa) and zoom. Default: the m2 set, in docs/milestones/m2.
  * The m4 set is drawn as the golden runner draws it (tests/golden/render.html), with v21's
  * variation, stroke choices and noise, so the two show the same galaxy; its ink is shown over the
- * plate's field colour. The m5 set is drawn the same way, with v21's part picks too, and the m9
- * set with v21's lens picks (the sources' options, pens and drawings) and the preset's camera as
- * the lens home.
+ * plate's field colour. The m5 set is drawn the same way, with v21's part picks too, and the m8 set
+ * (mergers and the simulated shells) with v21's galaxy-level draws as well, and the m9 set
+ * with v21's lens picks (the sources' options, pens and drawings) and the preset's camera as the
+ * lens home.
  */
 import { mkdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -132,8 +133,19 @@ const SETS = {
       'lens',
     ],
   ],
+  m8: [
+    ['the-mice-s7', 'merger-the-mice--mergers__s7__home', 'Merger: the Mice', 7, 'mergers'],
+    [
+      'sketches-torn-apart-s4242-zoom',
+      'sketches-torn-apart--mergers__s4242__zoom',
+      'Sketches, torn apart',
+      4242,
+      'mergers',
+    ],
+    ['shell-galaxy-s7', 'shell-galaxy--shells__s7__home', 'Shell galaxy', 7, 'mergers'],
+  ],
 };
-const CASES = SETS[/** @type {'m2' | 'm3' | 'm4' | 'm5' | 'm6' | 'm6all' | 'm9'} */ (set)];
+const CASES = SETS[/** @type {'m2' | 'm3' | 'm4' | 'm5' | 'm6' | 'm6all' | 'm8' | 'm9'} */ (set)];
 if (!CASES) throw new Error(`unknown set ${set}`);
 
 prepareAssets();
@@ -183,7 +195,12 @@ try {
       );
       ours = Buffer.from(png, 'base64');
       label = "new engine (WebGPU), with v21's variation, strokes, noise and part picks";
-    } else if (variant === 'ribbons' || variant === 'vectors' || variant === 'lens') {
+    } else if (
+      variant === 'ribbons' ||
+      variant === 'vectors' ||
+      variant === 'lens' ||
+      variant === 'mergers'
+    ) {
       // M4, M5: the golden runner's draw, with v21's variation, stroke choices, noise and part
       // picks (as the comparison draws), the ink alpha shown over the plate's field colour
       const opts = node.referenceOptions(rec.params, rec.zoom ?? 1, rec.preset);
@@ -223,9 +240,11 @@ try {
       label =
         variant === 'lens'
           ? "new engine (WebGPU), with v21's variation, strokes, noise, part and lens picks"
-          : variant === 'vectors'
-            ? "new engine (WebGPU), with v21's variation, strokes, noise and part picks"
-            : "new engine (WebGPU), with v21's variation, strokes and noise";
+          : variant === 'mergers'
+            ? "new engine (WebGPU), with v21's galaxy-level draws, variations, strokes, noise and part picks"
+            : variant === 'vectors'
+              ? "new engine (WebGPU), with v21's variation, strokes, noise and part picks"
+              : "new engine (WebGPU), with v21's variation, strokes and noise";
     } else {
       const q = new URLSearchParams({
         preset: String(preset),

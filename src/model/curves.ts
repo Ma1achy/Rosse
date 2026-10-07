@@ -71,7 +71,7 @@ export interface Curve {
    */
   edgeAlpha: boolean;
   /** what it is (tests, statistics) */
-  role: 'arm' | 'arm-piece' | 'spur' | 'ring' | 'bar' | 'edge-on' | 'outline' | 'tail';
+  role: 'arm' | 'arm-piece' | 'spur' | 'ring' | 'bar' | 'edge-on' | 'outline' | 'tail' | 'shell';
 }
 
 /**

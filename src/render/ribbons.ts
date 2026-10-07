@@ -23,6 +23,7 @@ import {
 import type { Params } from '../core/params';
 import type { Camera } from '../view/camera';
 import type { InkLayer } from './layers';
+import type { GpuTide } from './tide';
 
 const STORAGE = GPUBufferUsage.STORAGE;
 const ENTRIES = [
@@ -206,6 +207,60 @@ export class GpuRibbons {
     this.dispatch(pass, 'hatch_caps', R.nCaps);
     this.dispatch(pass, 'hatch_dots', R.nHDots);
     this.dispatch(pass, 'hatch_blobs', R.nHBlobs);
+  }
+
+  /**
+   * A merging galaxy's tides (M8), applied in place to what `encodeExpand` made: the ribbon
+   * segments (torn where stretched), the pieces, and the hatching's capsules, dots and blobs.
+   */
+  encodeTide(
+    pass: GPUComputePassEncoder,
+    apply: GpuTide,
+    tide: GPUBuffer,
+    g: number,
+    r2: number,
+  ): void {
+    const m = this.need();
+    const R = m.R;
+    const b = m.buffers;
+    const job = { g, r2 };
+    apply.encode(pass, tide, {
+      ...job,
+      key: 'segs',
+      entry: 'warp_ribbons',
+      buffer: b[8] as GPUBuffer,
+      n: R.nSegs,
+    });
+    apply.encode(pass, tide, {
+      ...job,
+      key: 'pieces',
+      entry: 'warp_instances',
+      buffer: b[9] as GPUBuffer,
+      n: R.pieceCap,
+      args: b[10] as GPUBuffer,
+      argsIndex: 0,
+    });
+    apply.encode(pass, tide, {
+      ...job,
+      key: 'caps',
+      entry: 'warp_caps',
+      buffer: b[16] as GPUBuffer,
+      n: R.nCaps,
+    });
+    apply.encode(pass, tide, {
+      ...job,
+      key: 'hdots',
+      entry: 'warp_instances',
+      buffer: b[17] as GPUBuffer,
+      n: R.nHDots,
+    });
+    apply.encode(pass, tide, {
+      ...job,
+      key: 'hblobs',
+      entry: 'warp_instances',
+      buffer: b[18] as GPUBuffer,
+      n: R.nHBlobs,
+    });
   }
 
   private dispatch(pass: GPUComputePassEncoder, e: Entry, n: number): void {

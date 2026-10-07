@@ -172,25 +172,6 @@
         }
       }
     },
-    "merger": {
-      "counts": 0.03,
-      "countsSmall": 0.1,
-      "poisson": 3,
-      "poissonBelow": 2000,
-      "ink": 0.05,
-      "ssimCoarse": 0.85,
-      "median": 0.1,
-      "p90": 0.1,
-      "r25": 0.1,
-      "r50": 0.1,
-      "r90": 0.1,
-      "outer": 0.03,
-      "q": 0.05,
-      "qInner": 0.05,
-      "paA": 2,
-      "paEps0": 0.05,
-      "provisional": true
-    },
     "lens": {
       "counts": 0.03,
       "countsSmall": 0.1,
@@ -374,6 +355,142 @@
       "paEps0": 0.052,
       "heldOut": 56,
       "byPreset": {}
+    },
+    "shells": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.92,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.033,
+      "r50": 0.029,
+      "r90": 0.015,
+      "outer": 0.01,
+      "q": 0.03,
+      "qInner": 0.03,
+      "paA": 0.776,
+      "paEps0": 0.038,
+      "heldOut": 8,
+      "byPreset": {}
+    },
+    "shells@zoom": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.89,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.025,
+      "r50": 0.037,
+      "r90": 0.019,
+      "outer": 0.014,
+      "q": 0.024,
+      "qInner": 0.034,
+      "paA": 0.867,
+      "paEps0": 0.03,
+      "heldOut": 4,
+      "byPreset": {}
+    },
+    "merger": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.79,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.078,
+      "r50": 0.078,
+      "r90": 0.083,
+      "outer": 0.035,
+      "q": 0.058,
+      "qInner": 0.059,
+      "paA": 2.114,
+      "paEps0": 0.072,
+      "byPreset": {
+        "Layered: lensed merger": {
+          "q": 0.041,
+          "qInner": 0.031,
+          "paEps0": 0.052
+        },
+        "Merger: dry (two ellipticals)": {
+          "q": 0.096,
+          "qInner": 0.091,
+          "paEps0": 0.118
+        },
+        "Merger: minor, a stream": {
+          "q": 0.025,
+          "qInner": 0.046,
+          "paEps0": 0.032
+        },
+        "Merger: spiral meets elliptical": {
+          "q": 0.058,
+          "qInner": 0.058,
+          "paEps0": 0.071
+        },
+        "Merger: the Mice": {
+          "q": 0.056,
+          "qInner": 0.039,
+          "paEps0": 0.072
+        },
+        "Merger: three-armed pair": {
+          "q": 0.053,
+          "qInner": 0.055,
+          "paEps0": 0.068
+        },
+        "Merger: coalescing": {
+          "q": 0.044,
+          "qInner": 0.088,
+          "paEps0": 0.055,
+          "ssimCoarse": 0.77
+        },
+        "Merger: long tails": {
+          "q": 0.085,
+          "qInner": 0.067,
+          "paEps0": 0.11
+        },
+        "Merger: polar collision": {
+          "q": 0.067,
+          "qInner": 0.055,
+          "paEps0": 0.087
+        },
+        "Sketches, torn apart": {
+          "q": 0.033,
+          "qInner": 0.045,
+          "paEps0": 0.042
+        }
+      }
+    },
+    "merger@zoom": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.06,
+      "ssimCoarse": 0.77,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.096,
+      "r50": 0.057,
+      "r90": 0.066,
+      "outer": 0.028,
+      "q": 0.073,
+      "qInner": 0.09,
+      "paA": 1.684,
+      "paEps0": 0.093,
+      "byPreset": {
+        "Merger: the Mice": {
+          "q": 0.042,
+          "qInner": 0.041,
+          "paEps0": 0.054
+        }
+      }
     },
     "slip": {
       "counts": 0.03,
