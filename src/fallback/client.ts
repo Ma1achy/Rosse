@@ -10,6 +10,7 @@ import type { Plates } from '../render/plates';
 import type { SurfaceName } from '../render/surface';
 import type { DrawingsMeta } from '../model/variation';
 import { CpuEngineCore, type CpuDrawn, type CpuFrame, type CpuSize } from './core';
+import { infoOfData, type ExportInfo } from '../extras/export/engine';
 import type { CpuReply, CpuRequest } from './protocol';
 import { cameraOf, orientationOf, type Orientation } from '../view/camera';
 
@@ -20,6 +21,10 @@ export interface CpuBackend {
   present(surface: SurfaceName, plates: Plates): Promise<CpuFrame>;
   /** The ink layers of the last draw, copied from the worker (the SVG export, M12). */
   layers(): Promise<readonly InkLayer[]>;
+  /** What an SVG export needs besides the layers (the seed, pens' metadata, capsule roles). */
+  exportInfo(): Promise<ExportInfo>;
+  /** The key ink alone as RGBA8 at the size drawn (a GIF's frame), after a `draw`. */
+  inkFrame(): Promise<CpuFrame>;
   destroy(): void;
 }
 
@@ -43,6 +48,12 @@ export class LocalCpu implements CpuBackend {
   }
   layers() {
     return Promise.resolve(this.core.inkLayers);
+  }
+  exportInfo() {
+    return Promise.resolve(infoOfData(this.core.exportInfo()));
+  }
+  inkFrame() {
+    return Promise.resolve(this.core.inkFrame());
   }
   destroy(): void {
     // nothing is held outside the object
@@ -106,6 +117,16 @@ export class WorkerCpu implements CpuBackend {
     const r = await this.request({ op: 'layers' });
     if (r.op !== 'layers') throw new Error('unexpected reply');
     return r.layers;
+  }
+  async exportInfo() {
+    const r = await this.request({ op: 'exportInfo' });
+    if (r.op !== 'exportInfo') throw new Error('unexpected reply');
+    return infoOfData(r.info);
+  }
+  async inkFrame() {
+    const r = await this.request({ op: 'ink' });
+    if (r.op !== 'ink') throw new Error('unexpected reply');
+    return { pixels: r.pixels, width: r.width, height: r.height };
   }
   destroy(): void {
     this.worker.terminate();

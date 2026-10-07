@@ -77,6 +77,9 @@ interface Model {
   bound: number;
 }
 
+/** The SVG export's layer of everything the sky draws (src/extras/export/svg.ts). */
+const toBackground = (l: InkLayer): InkLayer => ({ ...l, svgLayer: 'background' });
+
 export class GpuSky {
   private model: Model | null = null;
 
@@ -184,12 +187,17 @@ export class GpuSky {
       bufferWithData(
         d,
         new Uint32Array([4, nDotSlots, 0, 0]),
-        GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_DST,
+        GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC,
         'sky dot args',
       ),
     );
     const fgArgs = keep(
-      bufferWithData(d, new Uint32Array([4, S.nFg, 0, 0]), GPUBufferUsage.INDIRECT, 'fg args'),
+      bufferWithData(
+        d,
+        new Uint32Array([4, S.nFg, 0, 0]),
+        GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC,
+        'fg args',
+      ),
     );
     if (S.spec.rows && S.spec.strideCaps)
       this.vectors.load(dynDesc(lib, P, S.spec), pool, dotBase, noise);
@@ -367,7 +375,7 @@ export class GpuSky {
     if (!m || !m.S.nBg) return [];
     const S = m.S;
     const ib = INSTANCE_LAYOUT.size;
-    return [
+    const layers: InkLayer[] = [
       {
         kind: 'gpu-sprites',
         atlas: 'dots',
@@ -383,6 +391,7 @@ export class GpuSky {
       },
       ...(S.spec.rows && S.spec.strideCaps ? this.vectors.layers() : []),
     ];
+    return layers.map(toBackground);
   }
 
   /** The foreground stars (the `star` ink, drawn last). */
@@ -392,6 +401,7 @@ export class GpuSky {
     return [
       {
         kind: 'gpu-sprites',
+        svgLayer: 'background',
         atlas: 'fgstars',
         gain: 1,
         source: {

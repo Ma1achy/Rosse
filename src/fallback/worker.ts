@@ -27,6 +27,12 @@ async function handle(m: CpuRequest): Promise<{ reply: CpuReply; transfer?: Tran
       return { reply: { id: m.id, ok: true, op: 'resize' } };
     case 'layers':
       return { reply: { id: m.id, ok: true, op: 'layers', layers: need().inkLayers } };
+    case 'exportInfo':
+      return { reply: { id: m.id, ok: true, op: 'exportInfo', info: need().exportInfo() } };
+    case 'ink': {
+      const f = need().inkFrame();
+      return { reply: { id: m.id, ok: true, op: 'ink', ...f }, transfer: [f.pixels.buffer] };
+    }
     case 'present': {
       const f = need().present(m.surface, m.plates);
       return {

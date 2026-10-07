@@ -76,15 +76,15 @@ You need Node 22 or later and a browser with WebGPU for the GPU engine (any othe
 
 ```sh
 npm ci
-npm run dev        # Vite dev server: the plate, with a preset menu, a seed, Paper/Chalkboard and plates
+npm run dev        # Vite dev server: the page (plate, controls, presets, timeline, exports)
 ```
 
-The page is the engine's testbed (the full page is [M11](docs/roadmap.md), in progress). Drag to orbit and tilt, shift-drag or Q/E to roll, wheel to zoom. The URL takes `?preset=`, `?seed=`, `?az=`, `?incl=`, `?pa=`, `?zoom=` and `?backend=cpu|webgpu`; for example `/?preset=Barred%20spiral&seed=11&backend=cpu`.
+The page has the plate on Paper or the Chalkboard, v21's controls as a recipe of cards, preset cards drawn by this engine, the merger's timeline, the 42 real galaxies with their photographs, the Galaxy Zoo 2 catalogue, and PNG, SVG (for pen plotters, one layer per pen) and GIF (the merger's timeline, a quasar's flare) export. Drag to orbit and tilt, shift-drag or Q/E to roll, wheel to zoom. A link holds the drawing: `?preset=` (or `?from=real:<n>`, `?from=gz2:<DR7 object id>`), `?seed=`, `?az=`, `?incl=`, `?pa=`, `?zoom=`, `?surface=paper|chalk`, any parameter by its name, and `?backend=cpu|webgpu`; for example `/?preset=Barred%20spiral&seed=11&backend=cpu`.
 
 | command | what it does |
 | --- | --- |
 | `npm test` | unit tests (vitest) |
-| `npm run test:gpu` | browser tests on WebGPU (SwiftShader): RNG vectors, CPU = GPU kernels and raster |
+| `npm run test:gpu` | browser tests on WebGPU (SwiftShader): RNG vectors, CPU = GPU kernels and raster, the page's UI and extras smoke tests |
 | `npm run golden` | the golden check against v21 (see below; slow) |
 | `npm run lint`, `typecheck`, `validate:wgsl`, `build` | the other CI checks |
 | `npm run readme:assets` | re-draws every picture on this page ([`tools/readme-assets`](tools/readme-assets/README.md); needs `ffmpeg` and ImageMagick) |
@@ -123,7 +123,7 @@ parameters ──► schema: which tier is dirty?
 
 ## Status
 
-Each milestone is one reviewable pull request. The engine draws single galaxies and mergers; the sky, lensing, the full page and the extras are still open.
+Each milestone is one reviewable pull request. The engine draws single galaxies, mergers, stars, artefacts and the sky, and lensing; the page and the extras are built on it. M0 to M12 are all built; M7, M9 and M12 are in the integration pull request (#15) and reach `main` with it.
 
 | # | milestone | state |
 | --- | --- | --- |
@@ -134,14 +134,16 @@ Each milestone is one reviewable pull request. The engine draws single galaxies 
 | M4 | Stroke ribbons and arms; dust lanes | merged |
 | M5 | Vector marks: bars, rings, whole drawings, jets, streams | merged |
 | M6 | The single-galaxy preset set; plates; Chalkboard | merged |
-| M7 | Stars and artefacts; the sky | in progress (open pull request) |
+| M7 | Stars and artefacts; the sky | built (pull request #15) |
 | M8 | Mergers and shell galaxies | merged |
-| M9 | Lensing | in progress (open pull request) |
-| M10 | Performance pass on real hardware | in progress (open pull request #13) |
-| M11 | The page and its UI | in progress (open pull request #12) |
-| M12 | The extras: Galaxy Zoo 2 catalogue, real galaxies, SVG and GIF export | in progress (open pull request #11) |
+| M9 | Lensing | built (pull request #15) |
+| M10 | Performance pass: pooling, kept batches, the CPU engine in a worker, the profiling and L1 harnesses | merged; real-hardware numbers open |
+| M11 | The page and its UI | merged |
+| M12 | The extras: Galaxy Zoo 2 catalogue, real galaxies, SVG and GIF export | built (pull request #15), wired into the page |
 
-Not yet proven: all parity numbers are measured on SwiftShader; real GPUs are measured in M10. Details per milestone are in [docs/roadmap.md](docs/roadmap.md) and [docs/milestones/](docs/milestones/).
+Still open: everything that needs a real GPU (the budget table of [docs/architecture.md](docs/architecture.md), the L1 report on a second adapter, and recalibrating the golden thresholds, [Q14](docs/open-questions.md)); measurements on a phone; the licence ([Q1](docs/open-questions.md)) and the SDSS acknowledgement wording the page must show; and the owner's sign-off of the proposed ADRs (0035, 0036, 0061 among them).
+
+Not yet proven: all parity numbers are measured on SwiftShader, a software adapter. Details per milestone are in [docs/roadmap.md](docs/roadmap.md) and [docs/milestones/](docs/milestones/).
 
 <br>
 
@@ -170,7 +172,7 @@ Not yet proven: all parity numbers are measured on SwiftShader; real GPUs are me
 ## Credits and licences
 
 - **The drawings** are the owner's own pen drawings (dots, strokes, knots, stars, whole galaxies), scanned and cut out.
-- **Galaxy Zoo 2** classifications (Willett et al. 2013) are licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) and must be credited. The catalogue sits in the asset pack and is used from M12.
-- **SDSS** imagery for real galaxies carries the Sloan Digital Sky Survey's acknowledgement and is used from M12.
+- **Galaxy Zoo 2** classifications (Willett et al. 2013) are licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) and must be credited. The catalogue sits in the asset pack and is browsed on the page; each galaxy's card carries the credit.
+- **SDSS** imagery for the real galaxies carries the Sloan Digital Sky Survey's acknowledgement (the page points to SDSS's own wording; the exact text is the owner's to confirm).
 - **Fonts.** The banner is set in Heros (the files are TeX Gyre Heros, a Helvetica-like face) and IBM Plex Mono (SIL OFL 1.1, text in `assets/fonts/ibm-plex-mono/`). The handwriting fonts (Threshold Grain, Mark, Patina, Signs) are made from the owner's handwriting. Each keeps its own terms; they are listed in `assets/fonts/fonts.json`.
 - **The project's licence is undecided.** Until the owner chooses one ([docs/open-questions.md](docs/open-questions.md), Q1), all rights are reserved; see [`LICENSE`](LICENSE). Third-party material in `assets/` remains under its own terms.

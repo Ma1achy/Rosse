@@ -57,6 +57,13 @@ export type ChangeKind = 'params' | 'preset' | 'camera' | 'surface';
 
 export interface PageOptions {
   initial: PageState;
+  /**
+   * The parameters of the galaxy `initial.from` names, before the link's own edits: what a link
+   * for it is written against (a preset's link is written against the preset).
+   */
+  fromBase?: Params;
+  /** its print (a photograph) and name, for the taped print under the cards */
+  fromLook?: { thumb?: string; label: string };
   /** a preset's parameters at a seed, with the page's overrides (the golden variants) */
   makeParams(preset: string, seed: number): Params;
   /** the golden variants' overrides for a preset, laid over Surprise me's result (`?variant=`) */
@@ -76,7 +83,21 @@ export interface PageOptions {
 export interface ExportSpec {
   id: string;
   label: string;
+  /** whether the button is offered for this state (the GIF: a merger or a lensed quasar only) */
+  available?(state: PageState): boolean;
   run(source: ExportSource, page: Page): Promise<void>;
+}
+
+/** A galaxy that is not a preset (M12's catalogue and real galaxies), ready to draw. */
+export interface GalaxyChoice {
+  /** as the link writes it: `gz2:<objid>` or `real:<n>` */
+  from: string;
+  /** what Rosse draws for it (`fromVotes`, `fromReal`) */
+  P: Params;
+  /** the name under its print */
+  label: string;
+  /** its photograph, where it has one */
+  thumb?: string;
 }
 
 export interface TimelineInfo {
@@ -95,7 +116,11 @@ export interface Page {
   /** the timeline's end, speed and loop (the GIF plays what the viewer set) */
   timeline(): TimelineInfo;
   /** a button in the actions row, for an export the engine can feed (M12) */
-  addExport(spec: ExportSpec): void;
+  addExport(spec: ExportSpec): HTMLButtonElement;
+  /** draws a galaxy that is not a preset (M12): the page takes `from` and its parameters */
+  setGalaxy(g: GalaxyChoice): void;
+  /** a section at the end of the Choose tab (M12's catalogue and real galaxies) */
+  addChoose(section: HTMLElement): void;
 }
 
 function byId<T extends HTMLElement>(id: string, type: new () => T): T {
@@ -118,7 +143,20 @@ export function mountPage(opts: PageOptions): Page {
   const say = (text: string) => {
     setText(status, text);
   };
-  const baseOf = (s: PageState) => opts.makeParams(s.preset ?? 'Grand design', s.P.seed);
+  /** the galaxy that is not a preset: its own parameters (links are written against them), its print */
+  let fromBase: Params | null = opts.initial.from !== undefined ? (opts.fromBase ?? null) : null;
+  let fromLook: { thumb?: string; label: string } | null = opts.fromLook ?? null;
+  const baseOf = (s: PageState) =>
+    s.from !== undefined && fromBase
+      ? { ...fromBase, seed: s.P.seed }
+      : opts.makeParams(s.preset ?? 'Grand design', s.P.seed);
+  /** a preset or Surprise me draws a preset: the galaxy that is not one is let go */
+  const toPreset = (s: PageState, preset: string, P: Params): PageState => {
+    fromBase = null;
+    fromLook = null;
+    return { preset, P, zoom: s.zoom, surface: s.surface };
+  };
+  const exportSpecs: { spec: ExportSpec; button: HTMLButtonElement }[] = [];
 
   // ---- the address bar
   let urlTimer: ReturnType<typeof setTimeout> | undefined;
@@ -240,7 +278,7 @@ export function mountPage(opts: PageOptions): Page {
       b.append(th, t, d);
       b.addEventListener('click', () => {
         // a preset keeps the seed and the zoom and brings its own view
-        commit('preset', { ...st, preset: name, P: opts.makeParams(name, st.P.seed) });
+        commit('preset', toPreset(st, name, opts.makeParams(name, st.P.seed)));
       });
       list.append(b);
       cards.set(name, b);
@@ -273,15 +311,18 @@ export function mountPage(opts: PageOptions): Page {
     document.querySelectorAll<HTMLButtonElement>('button[data-surface]').forEach((b) => {
       b.setAttribute('aria-pressed', String(b.dataset.surface === st.surface));
     });
-    const src = st.preset ? opts.thumb?.(st.preset, st.surface) : undefined;
+    const src = st.preset ? opts.thumb?.(st.preset, st.surface) : fromLook?.thumb;
     printEl.hidden = !src;
     if (src && printImg.getAttribute('src') !== src) printImg.src = src;
     setText(
       printCap,
       st.preset
         ? `${cardTitle(st.preset)}, seed ${String(st.P.seed)}`
-        : `Seed ${String(st.P.seed)}`,
+        : fromLook
+          ? fromLook.label
+          : `Seed ${String(st.P.seed)}`,
     );
+    for (const { spec, button } of exportSpecs) button.hidden = spec.available?.(st) === false;
     const quasar = features.lens && st.P.lensOn > 0 && st.P.lensSource === 'quasar';
     const animated = (features.merger && st.P.merger > 0) || quasar;
     tlEls.root.hidden = !animated;
@@ -337,7 +378,7 @@ export function mountPage(opts: PageOptions): Page {
     b.classList.add('pull');
     const r = surprise(Math.random, availablePresets(features), features);
     const extra = opts.variantOverrides?.(r.preset) ?? {};
-    commit('preset', { ...st, preset: r.preset, P: { ...r.P, ...extra } });
+    commit('preset', toPreset(st, r.preset, { ...r.P, ...extra }));
   });
 
   // ---- exports and the link
@@ -440,6 +481,14 @@ export function mountPage(opts: PageOptions): Page {
     },
     say,
     timeline: () => ({ end: tl.end, speed: tl.speed, loop: tl.loop, playing: tl.playing }),
+    setGalaxy(g) {
+      fromBase = { ...g.P };
+      fromLook = { label: g.label, ...(g.thumb ? { thumb: g.thumb } : {}) };
+      commit('preset', { ...st, preset: null, from: g.from, P: { ...g.P } });
+    },
+    addChoose(section) {
+      choose.append(section);
+    },
     addExport(spec) {
       const b = document.createElement('button');
       b.type = 'button';
@@ -457,7 +506,11 @@ export function mountPage(opts: PageOptions): Page {
             b.disabled = false;
           });
       });
-      byId('export-png', HTMLButtonElement).after(b);
+      // after the buttons already added, so they stand in the order they were added
+      (exportSpecs.at(-1)?.button ?? byId('export-png', HTMLButtonElement)).after(b);
+      exportSpecs.push({ spec, button: b });
+      b.hidden = spec.available?.(st) === false;
+      return b;
     },
   };
   return page;

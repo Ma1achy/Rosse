@@ -9,6 +9,8 @@ import type { Params } from '../core/params';
 import type { AtlasData, ImageData8 } from '../marks/atlas';
 import { buildShellScene } from '../model/shells';
 import type { MarkCounts } from '../model/scene';
+import { cpuExportInfoData, plainExportInfo, type ExportInfoData } from '../extras/export/engine';
+import { cpuInkFrame } from '../extras/export/gif-frames';
 import type { DrawingsMeta } from '../model/variation';
 import { inkKey, inkLook } from '../render/ink-look';
 import type { InkLayer } from '../render/layers';
@@ -18,7 +20,7 @@ import { SURFACES, type SurfaceName } from '../render/surface';
 import { CpuRenderer } from './index';
 import { CpuMerger } from './merger';
 import { CpuShellScene } from './shells';
-import { CpuStippleTiers } from './stipple';
+import { CpuStippleTiers, type CpuStippleView } from './stipple';
 import { cameraOf, orientationOf, type Orientation } from '../view/camera';
 
 export interface CpuSize {
@@ -42,6 +44,9 @@ export class CpuEngineCore {
   private readonly stipple: CpuStippleTiers;
   private counts: MarkCounts | null = null;
   private layers: readonly InkLayer[] = [];
+  /** the seed and the single galaxy's last view, for an SVG export's metadata and capsule roles */
+  private seed = 0;
+  private lastView: CpuStippleView | null = null;
   /** the key of the look the ink buffer holds; null when it is stale */
   private inked: string | null = null;
   /** the merger (or the shells) built for these parameters, and what they were keyed on */
@@ -77,6 +82,7 @@ export class CpuEngineCore {
   /** The tiers these parameters and zoom need (the view only for a camera move), not yet inked. */
   draw(P: Params, zoom: number, home: Orientation = orientationOf(cameraOf(P))): CpuDrawn {
     const r = this.renderer;
+    this.seed = P.seed;
     if (P.merger) {
       const key = pageModelKey(P);
       if (this.merger?.key !== key) {
@@ -94,6 +100,7 @@ export class CpuEngineCore {
       r.setLayers(v.layers);
       this.layers = v.layers;
       this.counts = v.counts;
+      this.lastView = null;
       this.mode = 'merger';
     } else {
       const { view, work } = this.stipple.frame(P, zoom, { home, ...lensOpts(P, home) });
@@ -120,6 +127,7 @@ export class CpuEngineCore {
         ? { ...view.counts, dots: view.counts.dots + shellsView.dots }
         : view.counts;
       this.mode = shellsView ? 'shells' : 'stipple';
+      this.lastView = shellsView ? null : view;
     }
     this.inked = null;
     return {
@@ -134,6 +142,36 @@ export class CpuEngineCore {
   resize(size: CpuSize): void {
     this.renderer.resize(size);
     this.inked = null;
+  }
+
+  /**
+   * What an SVG export needs beside the layers (src/extras/export/engine.ts): the seed, the pens'
+   * metadata and, for a single galaxy, the capsule roles of its placed drawings.
+   */
+  exportInfo(): ExportInfoData {
+    const s = this.stipple.stipple;
+    if (this.lastView && s) return cpuExportInfoData(s, this.lastView);
+    const p = plainExportInfo(this.seed, this.meta);
+    return {
+      seed: p.seed,
+      dotSize: p.dotSize,
+      ...(p.strokes ? { strokes: p.strokes } : {}),
+      hatchCaps: 0,
+    };
+  }
+
+  /**
+   * The key ink alone, premultiplied RGBA8 at the size drawn: a GIF's frame (the page sets the
+   * size, draws, then asks). The page's own ink buffer is stale afterwards.
+   */
+  inkFrame(): CpuFrame {
+    this.renderer.drawInk();
+    this.inked = null;
+    return {
+      pixels: cpuInkFrame(this.renderer.ink) as Uint8ClampedArray<ArrayBuffer>,
+      width: this.renderer.width,
+      height: this.renderer.height,
+    };
   }
 
   /** Inks if the plates or the palette changed, and composites onto the surface. */

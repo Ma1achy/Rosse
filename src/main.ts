@@ -47,9 +47,13 @@ import type { Plates } from './render/plates';
 import { GpuStipple } from './render/stipple';
 import { SURFACES, type SurfaceName } from './render/surface';
 import { attachOrbit, type OrbitState } from './ui/orbit';
-import type { Pixels } from './ui/export';
+import type { ExportSource, Pixels } from './ui/export';
+import { gpuExportInfo, plainExportInfo, type ExportInfo } from './extras/export/engine';
+import { gpuInkFrame } from './extras/export/gif-frames';
 import { iconSvg } from './ui/icons';
 import { mountPage } from './ui/page';
+import { addExtraExports } from './ui/exports';
+import { mountGalaxyPanels, resolveGalaxy } from './ui/galaxies';
 import { thumbUrl } from './ui/thumbs';
 import { initialSurface } from './ui/theme';
 import { parseUrlState } from './ui/urlstate';
@@ -175,8 +179,25 @@ interface Engine {
    * Reads back on demand (never on the frame path); the page asks for it in the frame queue.
    */
   snapshot(surface: SurfaceName, plates: Plates): Promise<Pixels>;
-  /** The ink layers of the last draw (an export may read their buffers back on demand). */
-  layers(): readonly InkLayer[];
+  /**
+   * The ink layers of the last draw (an export may read their buffers back on demand). The CPU
+   * engine's are in its worker, so they come back by message.
+   */
+  layers(): readonly InkLayer[] | Promise<readonly InkLayer[]>;
+  /** What an SVG export needs besides the layers: seed, pens' metadata, capsule roles. */
+  exportInfo(): Promise<ExportInfo>;
+  /**
+   * The key ink of a drawing alone, premultiplied RGBA8 at `size` × `size` pixels (a GIF's frame):
+   * resizes the engine, draws, reads the ink back. Only inside `ExportSource.exclusive`, which
+   * puts the plate's size back and has the page draw again.
+   */
+  inkFrame(
+    P: Params,
+    zoom: number,
+    home: Orientation,
+    size: number,
+    busy: (on: boolean) => void,
+  ): Promise<Uint8ClampedArray>;
   /** The GPU device drawing now, or null on the CPU engine. */
   device(): GPUDevice | null;
   /** A new plate size or DPR: re-inks at that size, keeping the drawings loaded. */
@@ -248,7 +269,7 @@ async function cpuEngine(scene: Scene, size: FrameSize): Promise<Engine> {
   /** the key of the merger or shells the backend holds; null for a single galaxy */
   let builtKey: string | null = null;
   document.documentElement.dataset.cpuWhere = backend.where;
-  return {
+  const engine: Engine = {
     backend: 'cpu',
     capabilities: CAPABILITIES,
     size: () => current,
@@ -291,14 +312,25 @@ async function cpuEngine(scene: Scene, size: FrameSize): Promise<Engine> {
       pending = backend.resize(s);
       pending.catch(() => undefined);
     },
-    // the layers live in the worker: M12's SVG export asks `CpuBackend.layers()` (asynchronous)
-    layers: () => [],
+    // the layers live in the worker: the SVG export asks `CpuBackend.layers()` (asynchronous)
+    layers: () => backend.layers(),
+    exportInfo: () => backend.exportInfo(),
+    async inkFrame(P, zoom, home, size, busy) {
+      await pending;
+      if (current.plateCss !== size || current.dpr !== 1) {
+        current = { plateCss: size, dpr: 1 };
+        await backend.resize(current);
+      }
+      await engine.draw(P, zoom, home, busy);
+      return (await backend.inkFrame()).pixels;
+    },
     device: () => null,
     recovering: () => Promise.resolve(false),
     destroy: () => {
       backend.destroy();
     },
   };
+  return engine;
 }
 
 /**
@@ -336,6 +368,8 @@ async function gpuEngine(
     /** what the ink layers are now: the stipple's, the stipple's with shells, or the merger's */
     let mode: 'stipple' | 'shells' | 'merger' = 'stipple';
     let layers: readonly InkLayer[] = [];
+    /** the seed of the last drawing, for an export's title */
+    let drawnSeed = 0;
     let readCounts: () => Promise<MarkCounts> = () => Promise.resolve(markCounts([]));
     let out: GPUTexture | null = null;
     /** the key of the look the ink target holds; null when it is stale */
@@ -391,6 +425,7 @@ async function gpuEngine(
       const st = stipple;
       if (!st) throw new Error('no stipple passes');
       stale = false;
+      drawnSeed = P.seed;
       const lost = () => new Error('the device was lost during the build');
       if (P.merger) {
         const m = (merger ??= GpuMerger.create(r.device));
@@ -481,6 +516,24 @@ async function gpuEngine(
       // a read-back of the indirect draw arguments: never awaited by the frame queue
       counts: () => readCounts(),
       layers: () => layers,
+      exportInfo() {
+        // a single galaxy's capsules have roles (its placed drawings against the hatching); a
+        // merger's or the shells' frames do not
+        return mode === 'stipple' && stipple?.current
+          ? gpuExportInfo(stipple)
+          : Promise.resolve(plainExportInfo(drawnSeed, scene.meta));
+      },
+      async inkFrame(P, zoom, home, size, busy) {
+        const r = current();
+        await inkScene(P, zoom, home, busy);
+        if (r.size.plateCss !== size || r.size.dpr !== 1) {
+          // the visible canvas keeps its size: the page's own resize puts the target back
+          r.resize({ plateCss: size, dpr: 1 });
+        }
+        r.drawInk();
+        inked = null;
+        return gpuInkFrame(r.device, r.ink);
+      },
       device: () => renderer?.device ?? null,
       async present(surface, plates) {
         const r = current();
@@ -577,6 +630,12 @@ async function start(): Promise<void> {
   const variant = params.get('variant');
   const note = document.getElementById('note');
   const stats = document.getElementById('stats');
+
+  // a galaxy that is not a preset (`?from=real:<n>` or `gz2:<id>`, M12), if the link names one
+  // that exists; otherwise the link's preset, and the page says so. Resolved before anything can
+  // ask for a frame (the catalogue's worker is waited for here, for a catalogue galaxy).
+  const fromLink = params.get('from')?.trim();
+  const galaxy = fromLink ? await resolveGalaxy(fromLink).catch(() => null) : null;
 
   const assets = await BuiltAssets.load(import.meta.env.BASE_URL);
   const [atlases, paper, sheets] = await Promise.all([
@@ -801,19 +860,20 @@ async function start(): Promise<void> {
   const capabilities = engine.capabilities;
   const urlState = parseUrlState(params, capabilities);
   surface = initialSurface(urlState.surface);
-  const startPreset = urlState.from === undefined ? (urlState.preset ?? 'Grand design') : null;
+  const startPreset = galaxy ? null : (urlState.preset ?? 'Grand design');
+  const missingGalaxy = urlState.from !== undefined && !galaxy;
   wanted = (() => {
-    const P = {
-      ...makeParams(startPreset ?? 'Grand design', urlState.seed ?? 7),
-      ...urlState.overrides,
-    };
+    const base = galaxy
+      ? { ...galaxy.P, seed: urlState.seed ?? galaxy.P.seed }
+      : makeParams(startPreset ?? 'Grand design', urlState.seed ?? 7);
+    const P = { ...base, ...urlState.overrides };
     const { az = P.az, incl = P.incl, pa = P.pa, zoom = 1 } = urlState.view;
     // zoom is the page's (v21's ZOOM: not a parameter, a view input)
     const start = { ...P, az, incl, pa };
     return {
       P: start,
       preset: startPreset,
-      ...(urlState.from !== undefined ? { from: urlState.from } : {}),
+      ...(galaxy ? { from: galaxy.from } : {}),
       zoom,
       // the camera the page starts at is the home of the overlays (M7) and of a lens's sources (M9,
       // ADR 0050)
@@ -821,31 +881,80 @@ async function start(): Promise<void> {
     };
   })();
 
+  /** what the exports read from the engine, in the frame queue (src/ui/export.ts) */
+  const exportSource: ExportSource = {
+    backend: () => (engine ? engine.backend : 'cpu'),
+    layers: () => engine?.layers() ?? [],
+    device: () => engine?.device() ?? null,
+    exportInfo() {
+      if (!engine) return Promise.reject(new Error('nothing is drawn yet'));
+      return engine.exportInfo();
+    },
+    exclusive(job) {
+      // holds the frame queue: no frame draws until the job ends, then the plate is put back
+      return new Promise((resolve, reject) => {
+        queue = queue
+          .then(async () => {
+            const e = engine;
+            if (!e) throw new Error('nothing is drawn yet');
+            const before = e.size();
+            const used = { ink: false };
+            try {
+              resolve(
+                await job({
+                  ink: (P, size) => {
+                    used.ink = true;
+                    return e.inkFrame(P, wanted.zoom, wanted.home, size, busy);
+                  },
+                }),
+              );
+            } finally {
+              if (used.ink) {
+                if (e === engine && !sameSize(e.size(), before)) e.resize(before);
+                // the engine holds the job's last frame: draw the page's own again
+                drawn = null;
+                schedule();
+              }
+            }
+          })
+          .catch(reject);
+      });
+    },
+    snapshot() {
+      // after any frame waiting, in the queue: the pixels of what is shown
+      return new Promise((resolve, reject) => {
+        queue = queue
+          .then(async () => {
+            if (!engine) throw new Error('nothing is drawn yet');
+            resolve(await engine.snapshot(surface, wanted.P.plates as Plates));
+          })
+          .catch(reject);
+      });
+    },
+  };
+
   // The page (src/ui/page.ts): the controls, the preset cards, the seed, the surface, the timeline
   // and the buttons. It owns what the viewer edits and reports each change here; this file draws.
   const page = mountPage({
-    initial: { P: wanted.P, preset: wanted.preset, zoom: wanted.zoom, surface },
+    initial: {
+      P: wanted.P,
+      preset: wanted.preset,
+      ...(wanted.from !== undefined ? { from: wanted.from } : {}),
+      zoom: wanted.zoom,
+      surface,
+    },
+    ...(galaxy
+      ? {
+          fromBase: galaxy.P,
+          fromLook: { label: galaxy.label, ...(galaxy.thumb ? { thumb: galaxy.thumb } : {}) },
+        }
+      : {}),
     makeParams,
     variantOverrides,
     features: capabilities,
     icon: (spec) => iconSvg(vectors, spec),
     thumb: thumbUrl,
-    source: {
-      backend: () => (engine ? engine.backend : 'cpu'),
-      layers: () => engine?.layers() ?? [],
-      device: () => engine?.device() ?? null,
-      snapshot() {
-        // after any frame waiting, in the queue: the pixels of what is shown
-        return new Promise((resolve, reject) => {
-          queue = queue
-            .then(async () => {
-              if (!engine) throw new Error('nothing is drawn yet');
-              resolve(await engine.snapshot(surface, wanted.P.plates as Plates));
-            })
-            .catch(reject);
-        });
-      },
-    },
+    source: exportSource,
     onChange(s, kind) {
       if (kind === 'surface') {
         // the toggle works from the start: a click before the first frame sets the surface it shows
@@ -867,6 +976,11 @@ async function start(): Promise<void> {
       else schedule();
     },
   });
+  addExtraExports(page);
+  const panels = mountGalaxyPanels(page, exportSource);
+  if (galaxy) panels.show(galaxy.from);
+  if (missingGalaxy)
+    page.say('That link names a galaxy that could not be found; here is a preset.');
   bindOrbit();
   schedule();
   await queue;

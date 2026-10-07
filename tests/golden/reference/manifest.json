@@ -20121,6 +20121,120 @@
     "file": "tests/golden/v21-redraws.json",
     "draws": 8,
     "cases": {
+      "barred-spiral--knob-ring-lines__s7__home": [
+        {
+          "draw": 1,
+          "name": "barred-spiral--knob-ring-lines__s7__home__v21d1",
+          "inkPixelSha256": "c47006afaaf6f0c683bd981a33b89c210d9d90a00462c0ecf914b9f625379903",
+          "stats": {
+            "rstars": 15,
+            "dots": 9680,
+            "knots": 183,
+            "stars": 9,
+            "curves": 1,
+            "used": 59,
+            "ms": 54
+          },
+          "captured": "2026-10-07T20:54:10.466Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 2,
+          "name": "barred-spiral--knob-ring-lines__s7__home__v21d2",
+          "inkPixelSha256": "ce285b8b549c247a884886491681a7bce253930c8b375e83d26aa0ed36a5c5e1",
+          "stats": {
+            "rstars": 15,
+            "dots": 9690,
+            "knots": 193,
+            "stars": 12,
+            "curves": 1,
+            "used": 65,
+            "ms": 59
+          },
+          "captured": "2026-10-07T20:54:09.741Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 3,
+          "name": "barred-spiral--knob-ring-lines__s7__home__v21d3",
+          "inkPixelSha256": "2629d0cb201aa14b72b10e0b99d43fb3408f4d5123089dbce42fc8d9a608d501",
+          "stats": {
+            "rstars": 15,
+            "dots": 9696,
+            "knots": 180,
+            "stars": 10,
+            "curves": 1,
+            "used": 63,
+            "ms": 124
+          },
+          "captured": "2026-10-07T20:54:10.039Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 4,
+          "name": "barred-spiral--knob-ring-lines__s7__home__v21d4",
+          "inkPixelSha256": "e5247f7026c00214cd51adba49ec9ea88c5758028e23d1c46c20040d1601525a",
+          "stats": {
+            "rstars": 15,
+            "dots": 9707,
+            "knots": 192,
+            "stars": 9,
+            "curves": 1,
+            "used": 67,
+            "ms": 60
+          },
+          "captured": "2026-10-07T20:54:09.802Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 5,
+          "name": "barred-spiral--knob-ring-lines__s7__home__v21d5",
+          "inkPixelSha256": "575b413aa8a573792afff8969ed62c39b8e83c841eb359a241fe50308e5d9f9f",
+          "stats": {
+            "rstars": 15,
+            "dots": 9715,
+            "knots": 170,
+            "stars": 14,
+            "curves": 1,
+            "used": 65,
+            "ms": 1125
+          },
+          "captured": "2026-10-07T20:54:23.992Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 6,
+          "name": "barred-spiral--knob-ring-lines__s7__home__v21d6",
+          "inkPixelSha256": "c982de0e92e15a73572464dfe1e225ab4f03292221de57c401124ae24255f358",
+          "stats": {
+            "rstars": 15,
+            "dots": 9678,
+            "knots": 196,
+            "stars": 13,
+            "curves": 1,
+            "used": 67,
+            "ms": 48
+          },
+          "captured": "2026-10-07T20:54:19.459Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 7,
+          "name": "barred-spiral--knob-ring-lines__s7__home__v21d7",
+          "inkPixelSha256": "c513943dc8c77b06e01f293aa6fa4e7c993813920995bacedce9de6b01cec55f",
+          "stats": {
+            "rstars": 15,
+            "dots": 9703,
+            "knots": 176,
+            "stars": 10,
+            "curves": 1,
+            "used": 64,
+            "ms": 1153
+          },
+          "captured": "2026-10-07T20:54:23.460Z",
+          "pageErrors": 0
+        }
+      ],
       "cigar-shaped--stipple__s4242__orbit": [
         {
           "draw": 1,
