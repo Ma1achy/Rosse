@@ -27,7 +27,7 @@
  * `present=copy`.
  */
 import type { Params } from './core/params';
-import { PRESET_NAMES, presetParams } from './core/presets';
+import { presetParams } from './core/presets';
 import { CpuRenderer } from './fallback';
 import { CpuStippleTiers } from './fallback/stipple';
 import { Gpu, awaitLoss, detectBackend, type Backend } from './gpu/device';
@@ -42,7 +42,10 @@ import type { InkLook, Plates } from './render/plates';
 import { GpuStipple } from './render/stipple';
 import { SURFACES, type SurfaceName } from './render/surface';
 import { attachOrbit, type OrbitState } from './ui/orbit';
-import { parseUrlView } from './ui/url';
+import type { Pixels } from './ui/export';
+import { mountPage } from './ui/page';
+import { initialSurface } from './ui/theme';
+import { parseUrlState } from './ui/urlstate';
 import { PLATE } from './view/camera';
 
 declare global {
@@ -142,6 +145,11 @@ interface Engine {
    * be shown.
    */
   present(surface: SurfaceName, plates: Plates): Promise<void>;
+  /**
+   * The plate as pixels, composited for this surface and plates at the size drawn: the PNG export.
+   * Reads back on demand (never on the frame path); the page asks for it in the frame queue.
+   */
+  snapshot(surface: SurfaceName, plates: Plates): Promise<Pixels>;
   /** A new plate size or DPR: re-inks at that size, keeping the drawings loaded. */
   resize(size: FrameSize): void;
   /**
@@ -228,6 +236,14 @@ function cpuEngine(scene: Scene, size: FrameSize): Engine {
       const out = r.present(SURFACES[surface]);
       ctx.putImageData(new ImageData(out, r.width, r.height), 0, 0);
       return Promise.resolve();
+    },
+    snapshot(surface, plates) {
+      ink(inkLook(plates, surface));
+      return Promise.resolve({
+        px: r.present(SURFACES[surface]),
+        width: r.width,
+        height: r.height,
+      });
     },
     resize(s) {
       r.resize(s);
@@ -358,6 +374,28 @@ async function gpuEngine(
         // a frame is on screen: the recovery budget counts losses in a row
         gpu.markHealthy();
       },
+      async snapshot(surface, plates) {
+        const r = current();
+        const look = inkLook(plates, surface);
+        if (inkKey(look) !== inked) {
+          r.drawInk(look);
+          inked = inkKey(look);
+        }
+        // composite into a texture of its own and read it back: nothing depends on the canvas
+        // keeping what it showed
+        const tex = r.device.createTexture({
+          size: [r.width, r.height],
+          format: 'rgba8unorm',
+          usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
+        });
+        try {
+          r.present(tex.createView(), 'rgba8unorm', SURFACES[surface]);
+          const px = new Uint8ClampedArray((await readTexture(r.device, tex, 4)).buffer);
+          return { px, width: r.width, height: r.height };
+        } finally {
+          tex.destroy();
+        }
+      },
       resize(s) {
         // keep the atlases and pipelines: a new ink target, batches and composite uniforms
         const r = current();
@@ -394,15 +432,11 @@ async function start(): Promise<void> {
   const variant = params.get('variant');
   const note = document.getElementById('note');
   const stats = document.getElementById('stats');
-  const select = document.getElementById('preset');
-  const seedInput = document.getElementById('seed');
-  if (!(select instanceof HTMLSelectElement) || !(seedInput instanceof HTMLInputElement))
-    throw new Error('#preset or #seed is missing');
-  let preset = params.get('preset') ?? 'Grand design';
-  if (!PRESET_NAMES.includes(preset)) preset = 'Grand design';
-  let seed = Math.min(9999, Math.max(1, Math.round(Number(params.get('seed') ?? 7)) || 7));
-  for (const name of PRESET_NAMES) select.add(new Option(name, name, false, name === preset));
-  seedInput.value = String(seed);
+  // the state in the link (src/ui/urlstate.ts): the preset, the seed, any parameter, the camera
+  // and the surface
+  const urlState = parseUrlState(params);
+  const preset = urlState.preset ?? 'Grand design';
+  const seed = urlState.seed ?? 7;
 
   const assets = await BuiltAssets.load(import.meta.env.BASE_URL);
   const [atlases, paper, sheets] = await Promise.all([
@@ -431,31 +465,29 @@ async function start(): Promise<void> {
       vectors,
     ),
   };
-  const params0 = () =>
+  const makeParams = (name: string, sd: number) =>
     presetParams(
-      preset,
-      seed,
+      name,
+      sd,
       variant === 'stipple'
         ? STIPPLE_ONLY
         : variant === 'ribbons'
-          ? ribbonsOnly(preset)
+          ? ribbonsOnly(name)
           : variant === 'vectors'
-            ? vectorsOnly(preset)
+            ? vectorsOnly(name)
             : {},
     );
-  /** the camera from the URL, if given (src/ui/url.ts) */
-  const urlView = parseUrlView(params);
 
   /** the surface the toggle asks for; the plate catches up with it in show() */
-  let surface: SurfaceName = 'paper';
+  let surface: SurfaceName = initialSurface(urlState.surface);
   /** the size the plate should be drawn at; applied in show(), before presenting */
   let wantedSize = plateSize(plateCanvas());
   let frames = 0;
   let engine: Engine | undefined;
   /** the parameters and zoom wanted, and the engine and parameters last drawn */
   let wanted = (() => {
-    const P = params0();
-    const { az = P.az, incl = P.incl, pa = P.pa, zoom = 1 } = urlView;
+    const P = { ...makeParams(preset, seed), ...urlState.overrides };
+    const { az = P.az, incl = P.incl, pa = P.pa, zoom = 1 } = urlState.view;
     // zoom is the page's (v21's ZOOM: not a parameter, a view input)
     return { P: { ...P, az, incl, pa }, preset, zoom };
   })();
@@ -566,64 +598,50 @@ async function start(): Promise<void> {
     requestAnimationFrame(schedule);
   }
 
+  // The page (src/ui/page.ts): the controls, the preset cards, the seed, the surface, the timeline
+  // and the buttons. It owns what the viewer edits and reports each change here; this file draws.
+  const page = mountPage({
+    initial: { P: wanted.P, preset, zoom: wanted.zoom, surface },
+    makeParams,
+    onChange(s, kind) {
+      if (kind === 'surface') {
+        // the toggle works from the start: a click before the first frame sets the surface it shows
+        surface = s.surface;
+        schedule();
+        return;
+      }
+      wanted = { P: s.P, preset: s.preset, zoom: s.zoom };
+      // a camera move waits for the next animation frame, as the orbit always did
+      if (kind === 'camera') requestFrame();
+      else schedule();
+    },
+    snapshot() {
+      // after any frame waiting, in the queue: the pixels of what is shown
+      return new Promise((resolve, reject) => {
+        queue = queue
+          .then(async () => {
+            if (!engine) throw new Error('nothing is drawn yet');
+            resolve(await engine.snapshot(surface, wanted.P.plates as Plates));
+          })
+          .catch(reject);
+      });
+    },
+  });
+
   // orbit, roll and zoom (v21's controls); re-attached when a new engine replaces the canvas
   let detachOrbit: (() => void) | null = null;
   const bindOrbit = () => {
     detachOrbit?.();
     detachOrbit = attachOrbit(plateCanvas(), {
       get: () => {
-        const P = wanted.P;
-        return { az: P.az || 0, incl: P.incl, pa: P.pa, zoom: wanted.zoom };
+        const { P, zoom } = page.state();
+        return { az: P.az || 0, incl: P.incl, pa: P.pa, zoom };
       },
       set: (c) => {
-        wanted = { ...wanted, P: { ...wanted.P, az: c.az, incl: c.incl, pa: c.pa }, zoom: c.zoom };
-        requestFrame();
+        page.setCamera(c);
       },
     });
   };
-
-  // the toggle works from the start: a click before the first frame sets the surface it shows
-  document.querySelectorAll<HTMLButtonElement>('button[data-surface]').forEach((b) => {
-    b.addEventListener('click', () => {
-      surface = b.dataset.surface === 'chalk' ? 'chalk' : 'paper';
-      document.querySelectorAll('button[data-surface]').forEach((o) => {
-        o.setAttribute('aria-pressed', String(o === b));
-      });
-      schedule();
-    });
-  });
-
-  // plates are a present-tier input (ADR 0010): the choice re-inks and re-composites, and runs no
-  // compute pass; it is kept when the preset changes (the presets that set plates set it)
-  const platesSelect = document.getElementById('plates');
-  const syncPlates = () => {
-    if (platesSelect instanceof HTMLSelectElement) platesSelect.value = wanted.P.plates;
-  };
-  syncPlates();
-  platesSelect?.addEventListener('change', () => {
-    if (!(platesSelect instanceof HTMLSelectElement)) return;
-    const plates =
-      platesSelect.value === 'slip' || platesSelect.value === 'colour' ? platesSelect.value : 'ink';
-    wanted = { ...wanted, P: { ...wanted.P, plates } };
-    // the frame runs no tier for it (dirtyTier says `present`) and re-inks
-    schedule();
-  });
-
-  select.addEventListener('change', () => {
-    preset = select.value;
-    wanted = { P: params0(), preset, zoom: wanted.zoom };
-    syncPlates();
-    schedule();
-  });
-  seedInput.addEventListener('change', () => {
-    seed = Math.min(9999, Math.max(1, Math.round(Number(seedInput.value)) || 1));
-    seedInput.value = String(seed);
-    // a new seed keeps the camera
-    const { az, incl, pa } = wanted.P;
-    wanted = { P: { ...params0(), az, incl, pa }, preset, zoom: wanted.zoom };
-    syncPlates();
-    schedule();
-  });
 
   // redraw when the plate's CSS width or the device pixel ratio changes, as v21 does; resizes
   // are coalesced with camera moves (requestFrame) and applied in the frame queue

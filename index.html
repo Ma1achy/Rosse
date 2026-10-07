@@ -1,124 +1,131 @@
 <!doctype html>
-<html lang="en-GB">
+<html lang="en-GB" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
     <title>Rosse</title>
-    <style>
-      :root {
-        --paper: #efe9dc;
-        --ink: #1d1b19;
-        --ink2: #6f6a5f;
-      }
-      body {
-        margin: 0;
-        padding: 24px 16px;
-        background: var(--paper);
-        color: var(--ink);
-        font:
-          14px/1.4 system-ui,
-          sans-serif;
-      }
-      main {
-        max-width: 800px;
-        margin: 0 auto;
-      }
-      .plate {
-        display: block;
-        width: 800px;
-        height: 800px;
-        max-width: 100%;
-        height: auto;
-        aspect-ratio: 1;
-      }
-      .bar {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        align-items: center;
-        margin: 10px 0 0;
-      }
-      .bar button {
-        font: inherit;
-        padding: 4px 12px;
-        border: 1px solid var(--ink);
-        background: transparent;
-        color: var(--ink);
-        border-radius: 3px;
-        cursor: pointer;
-      }
-      .bar button[aria-pressed='true'] {
-        background: var(--ink);
-        color: var(--paper);
-      }
-      .bar select,
-      .bar input {
-        font: inherit;
-        padding: 3px 6px;
-        border: 1px solid var(--ink);
-        background: transparent;
-        color: var(--ink);
-        border-radius: 3px;
-      }
-      .bar label {
-        display: inline-flex;
-        gap: 4px;
-        align-items: center;
-        min-width: 0;
-        max-width: 100%;
-      }
-      .bar select {
-        min-width: 0;
-        max-width: 100%;
-        flex: 1 1 auto;
-      }
-      .bar input {
-        width: 5em;
-      }
-      .stats {
-        color: var(--ink2);
-      }
-      .note {
-        margin-left: auto;
-        color: var(--ink2);
-        font-style: italic;
-      }
-    </style>
+    <meta
+      name="description"
+      content="Rosse draws galaxies entirely from hand-made marks: dots, strokes, stars and whole drawings, in ink on paper."
+    />
+    <link rel="stylesheet" href="/src/ui/page.css" />
   </head>
   <body>
-    <!-- The page proper arrives in milestone M11; until then: the plate, a preset, a seed and a surface switch. -->
-    <main>
-      <canvas
-        id="plate"
-        class="plate"
-        width="800"
-        height="800"
-        tabindex="0"
-        role="application"
-        aria-label="Galaxy plate: drag to orbit, shift-drag to roll, arrows to turn, Q and E to roll, + and − to zoom, 0 to reset the zoom"
-      ></canvas>
-      <div class="bar" role="group" aria-label="Galaxy">
-        <label
-          >Preset
-          <select id="preset"></select
-        ></label>
-        <label>Seed <input id="seed" type="number" min="1" max="9999" step="1" value="7" /></label>
-        <span id="stats" class="stats" aria-live="polite"></span>
-      </div>
-      <div class="bar" role="group" aria-label="Surface">
-        <button type="button" data-surface="paper" aria-pressed="true">Paper</button>
-        <button type="button" data-surface="chalk" aria-pressed="false">Chalkboard</button>
-        <label
-          >Plates
-          <select id="plates">
-            <option value="ink">ink</option>
-            <option value="slip">slipped CMY plates</option>
-            <option value="colour">colour by population</option>
-          </select></label
-        >
-        <span id="note" class="note"></span>
-      </div>
-    </main>
+    <a class="skip" href="#plate">Skip to the plate</a>
+    <div class="wrap">
+      <header class="top">
+        <div class="title">
+          <h1>Rosse</h1>
+          <p class="tag">GALAXIES, DRAWN BY HAND</p>
+        </div>
+        <div class="surface" role="group" aria-label="Surface">
+          <button type="button" class="btn" data-surface="paper" aria-pressed="true">Paper</button>
+          <button type="button" class="btn" data-surface="chalk" aria-pressed="false">
+            Chalkboard
+          </button>
+        </div>
+        <p class="intro">
+          Rosse builds galaxies in three dimensions and draws them entirely from hand-made marks:
+          dots, strokes, stars and whole galaxies, drawn with a fineliner and cut out. Start from a
+          type of galaxy and change its parts: arms, bar, bulge, dust. Drag to turn it; every view
+          is drawn afresh.
+        </p>
+      </header>
+
+      <main class="main">
+        <div class="stage">
+          <div class="plate-frame">
+            <canvas
+              id="plate"
+              class="plate"
+              width="800"
+              height="800"
+              tabindex="0"
+              role="application"
+              aria-label="Galaxy plate: drag to orbit, shift-drag to roll, arrows to turn, Q and E to roll, + and − to zoom, 0 to reset the zoom"
+            ></canvas>
+            <p id="platecapt" class="platecapt" aria-hidden="true"></p>
+          </div>
+          <p class="platecap">
+            drag to orbit · pinch to zoom · twist or Shift-drag to roll · double-click resets
+          </p>
+
+          <section class="timeline" id="timeline" aria-label="Timeline of the merger" hidden>
+            <button type="button" class="btn tlplay" id="tl-play" aria-label="Play the merger">
+              <svg class="icon icon-play" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M3 1.5v13l11-6.5z" />
+              </svg>
+              <svg class="icon icon-pause" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M3 1.5h3.5v13H3zM9.5 1.5H13v13H9.5z" />
+              </svg>
+            </button>
+            <div class="tltrack">
+              <label class="sr" for="tl-scrub">Moment in the merger</label>
+              <input id="tl-scrub" type="range" min="0" max="2" step="0.002" value="1" />
+            </div>
+            <p class="tlread" id="tl-read">t = 1.00</p>
+            <div class="tlrow">
+              <label class="opt-inline" for="tl-end">
+                End
+                <input
+                  id="tl-end"
+                  class="num"
+                  type="text"
+                  inputmode="decimal"
+                  size="5"
+                  value="2.00"
+                  aria-describedby="tl-end-hint"
+                />
+              </label>
+              <span id="tl-end-hint" class="hint-inline">0.2 to 30</span>
+              <label class="opt-inline check">
+                <input id="tl-loop" type="checkbox" />
+                <span>Loop</span>
+              </label>
+              <label class="opt-inline" for="tl-speed">
+                Speed
+                <input id="tl-speed" type="range" min="0.25" max="4" step="0.25" value="1" />
+                <span id="tl-speed-v" aria-hidden="true">1×</span>
+              </label>
+            </div>
+          </section>
+
+          <div class="facts">
+            <p id="stats" class="stats" aria-live="polite"></p>
+            <p id="note" class="note" role="status"></p>
+            <div class="actions">
+              <label class="seed" for="seed"
+                >Seed
+                <input id="seed" class="num" type="number" min="1" max="9999" step="1" value="7"
+              /></label>
+              <button type="button" class="btn" id="reseed">New stars</button>
+              <button type="button" class="btn primary" id="surprise">Surprise me</button>
+              <button type="button" class="btn" id="export-png">Export PNG</button>
+              <button type="button" class="btn" id="copy-link">Copy link</button>
+            </div>
+            <p id="status" class="status" role="status"></p>
+          </div>
+        </div>
+
+        <aside id="controls" class="panel" aria-label="Galaxy controls"></aside>
+      </main>
+
+      <section class="about" aria-labelledby="about-h">
+        <h2 id="about-h">About Rosse</h2>
+        <p>
+          Rosse is the drawing engine behind Almagest, a study of what a self-supervised encoder
+          learns about galaxies. Every galaxy is built in three dimensions first: a bulge and a
+          disc, arms with their spurs and clumps, a bar, rings, dust and a halo of stars. Then it is
+          drawn from a library of real hand drawings, placed and inked by the graphics card, or by
+          the processor when the browser has no WebGPU.
+        </p>
+        <p>
+          It is named after William Parsons, the third Earl of Rosse, who in 1845 became the first
+          person to see a galaxy’s spiral arms, and drew them.
+        </p>
+      </section>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
