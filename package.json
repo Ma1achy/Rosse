@@ -25,6 +25,8 @@
     "screenshots": "node tools/gpu-test/screenshot.mjs",
     "golden": "node tests/golden/compare/compare.mjs",
     "perf": "node tools/perf/perf.mjs",
+    "perf:report": "node tools/perf/report.mjs",
+    "l1": "node tools/l1/l1.mjs",
     "perf:worker": "node tools/perf/worker.mjs",
     "capture:reference": "node tools/capture-reference/capture.mjs",
     "profile:reference": "node tools/profile-reference/profile.mjs",
