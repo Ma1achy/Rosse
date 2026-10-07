@@ -50,6 +50,11 @@ export class Renderer {
     return new Renderer(server, browser, page);
   }
 
+  /** a data op of the render page (`presetNames`, `reals`, `gz2`) */
+  async op(/** @type {string} */ name, /** @type {unknown[]} */ ...args) {
+    return this.page.evaluate(([n, a]) => window.__ra?.[n](...a), [name, args]);
+  }
+
   /** @param {number} plateCss @param {number} dpr */
   async size(plateCss, dpr) {
     await this.page.evaluate(([c, d]) => window.__ra?.setSize(c, d), [plateCss, dpr]);
@@ -160,4 +165,33 @@ export async function screenshot(
 
 export function sh(/** @type {string} */ cmd, /** @type {string[]} */ args) {
   execFileSync(cmd, args, { stdio: 'inherit' });
+}
+
+/**
+ * Screenshots a generated figure page (a path under the repository) at a fixed width, as tall as
+ * the page is. One browser and one static server for a batch of figures.
+ * @param {Array<{html: string, out: string}>} jobs @param {number} width @param {number} scale
+ */
+export async function figures(jobs, width, scale) {
+  const server = await serveRepo();
+  const browser = await chromium.launch({ headless: true });
+  try {
+    const tab = await browser.newPage({
+      viewport: { width, height: 400 },
+      deviceScaleFactor: scale,
+    });
+    for (const j of jobs) {
+      await tab.setViewportSize({ width, height: 400 });
+      await tab.goto(`${server.url}/${j.html}`);
+      await tab.evaluate(() => document.fonts.ready);
+      await tab.waitForFunction(() => [...document.images].every((i) => i.complete));
+      await tab.waitForTimeout(150);
+      const h = await tab.evaluate(() => document.documentElement.scrollHeight);
+      await tab.setViewportSize({ width, height: h });
+      await tab.screenshot({ path: j.out, fullPage: true });
+    }
+  } finally {
+    await browser.close();
+    server.close();
+  }
 }
