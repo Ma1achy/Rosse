@@ -26,7 +26,7 @@
 import { readFileSync } from 'node:fs';
 import { PNG } from 'pngjs';
 
-const BIG = { timeout: 600_000 };
+const BIG = { timeout: Number(process.env.ROSSE_UI_TIMEOUT_MS ?? 600_000) };
 
 /**
  * @param {import('playwright').Browser} browser
@@ -54,6 +54,9 @@ export async function uiSmokeCheck(browser, url) {
     /** @type {string[]} */
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
+    page.on('crash', () => {
+      console.error(`${backend}: the page crashed`);
+    });
     page.on('console', (m) => {
       if (m.type() === 'error') errors.push(m.text());
     });
