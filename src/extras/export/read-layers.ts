@@ -8,7 +8,7 @@
 import { INSTANCE_LAYOUT, type Instance } from '../../marks/instance';
 import { CAPSULE_WORDS, RIBBON_SEG_WORDS } from '../../model/ribbons';
 import type { InkLayer } from '../../render/layers';
-import type { ExportLayer } from './svg';
+import { cpuExportLayers, type ExportLayer } from './svg';
 
 /** Copies `size` bytes of `src` from `offset` to the CPU. */
 export async function readBuffer(
@@ -131,4 +131,28 @@ export async function readInkLayers(
     }
   }
   return out;
+}
+
+/** What the page's `ExportSource` (src/ui/export.ts) gives an export. */
+export interface LayerSource {
+  /** The GPU device of the engine drawing now, or null on the CPU engine. */
+  device(): GPUDevice | null;
+  /**
+   * The ink layers of the last drawing. Possibly asynchronous: with the CPU engine in a worker
+   * (M10, ADR 0071) they come back by message, so every export awaits them.
+   */
+  layers(): readonly InkLayer[] | Promise<readonly InkLayer[]>;
+}
+
+/**
+ * The export layers of a page's `ExportSource`, on either engine: awaits `layers()`, then reads the
+ * GPU buffers back (WebGPU) or takes the CPU arrays as they are. `hatchCaps` is the number of
+ * dust-hatching capsules at the front of a CPU capsule layer (`scene.ribbons.nCaps`); without it
+ * every CPU capsule goes to `drawings`. Run it inside the frame queue (see ./engine.ts).
+ */
+export async function exportLayersOf(source: LayerSource, hatchCaps = 0): Promise<ExportLayer[]> {
+  const layers = await source.layers();
+  const device = source.device();
+  if (device) return readInkLayers(device, layers);
+  return cpuExportLayers(layers, hatchCaps);
 }

@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { CpuStipple } from '../../src/fallback/stipple';
 import { exportSvgCpu } from '../../src/extras/export/engine';
+import { exportLayersOf } from '../../src/extras/export/read-layers';
 import {
   SVG_LAYERS,
   buildSvg,
@@ -139,6 +140,34 @@ describe('the SVG builder', () => {
     );
     expect(r.counts.dots).toBe(0);
     expect(r.svg).not.toContain('id="dots"');
+  });
+});
+
+describe('an export source with asynchronous layers (the CPU engine in a worker, M10)', () => {
+  it('awaits the layers, on the CPU path, and builds the same SVG as the direct path', async () => {
+    const node = new GoldenNode(ROOT);
+    const P = presetParams('Dusty spiral', 7, { starMix: 0, field: 0, fgstars: 0 });
+    const stipple = new CpuStipple(buildScene(P, node.cpu.meta));
+    const view = stipple.view(cameraOf(P, 1));
+    const direct = exportSvgCpu(stipple, view);
+    const source = {
+      device: () => null,
+      layers: () =>
+        new Promise<typeof view.layers>((ok) =>
+          setTimeout(() => {
+            ok(view.layers);
+          }, 10),
+        ),
+    };
+    const layers = await exportLayersOf(source, stipple.scene.ribbons.nCaps);
+    const viaSource = buildSvg(layers, { seed: P.seed, dotSize: node.cpu.meta.dots.size });
+    expect(viaSource.counts.dust).toBe(direct.counts.dust);
+    expect(viaSource.counts.dots).toBe(direct.counts.dots);
+    expect(viaSource.counts.arms).toBe(direct.counts.arms);
+    // a synchronous source works too
+    expect((await exportLayersOf({ device: () => null, layers: () => view.layers })).length).toBe(
+      layers.length,
+    );
   });
 });
 
