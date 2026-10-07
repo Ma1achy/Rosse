@@ -1,7 +1,9 @@
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import type { Params } from '../../src/core/params';
 import { presetParams } from '../../src/core/presets';
 import { CpuRenderer } from '../../src/fallback';
+import { CpuMerger } from '../../src/fallback/merger';
 import { CpuStipple } from '../../src/fallback/stipple';
 import {
   cubePalette,
@@ -16,6 +18,7 @@ import {
 } from '../../src/extras/export/gif';
 import { cpuInkFrame } from '../../src/extras/export/gif-frames';
 import { frameTimes, recordGif } from '../../src/extras/export/record';
+import { isTimeline, timelineSource } from '../../src/extras/export/sources';
 import { buildScene } from '../../src/model/scene';
 import { PALETTES } from '../../src/render/palette';
 import { cameraOf } from '../../src/view/camera';
@@ -190,4 +193,76 @@ describe('a GIF of the CPU engine: its frames are single renders at those moment
       expect(gif.palette[0]).toEqual([...paper]);
       expect(gif.palette[255]).toEqual([...ink]);
     }, 120_000);
+});
+
+describe('the merger timeline as a GIF (M8)', () => {
+  const S = 160;
+  const atlases = loadAtlases(ROOT);
+  const vectors = loadVectors(ROOT);
+  const meta = metaOf(atlases, vectors.penlines, vectors);
+  const renderer = new CpuRenderer(
+    { plateCss: S, dpr: 1 },
+    { width: 1, height: 1, data: new Uint8Array(4) },
+  );
+  for (const a of atlases) renderer.addAtlas(a);
+  const P0 = presetParams('Merger: the Mice', 7, { starMix: 0, field: 0, fgstars: 0 });
+  /** a fresh merger at the parameters' own mTime: the single render at that moment */
+  const draw = (P: Params) => {
+    const view = new CpuMerger(P, meta).view(1);
+    renderer.setLayers(view.layers);
+    renderer.drawInk({ plates: 'ink', palette: PALETTES.light });
+    return cpuInkFrame(renderer.ink);
+  };
+  /** the timeline as the page runs it: one simulation, `mTime` re-blended per frame (ADR 0009) */
+  const sim = new CpuMerger({ ...P0 }, meta);
+  const timeline = (P: Params) => {
+    const view = sim.view(1, P.mTime);
+    renderer.setLayers(view.layers);
+    renderer.drawInk({ plates: 'ink', palette: PALETTES.light });
+    return cpuInkFrame(renderer.ink);
+  };
+
+  it('is a timeline only for a merger or a lensed quasar', () => {
+    expect(isTimeline(P0)).toBe(true);
+    expect(isTimeline(presetParams('Grand design', 7))).toBe(false);
+    expect(isTimeline({ ...P0, merger: 0, lensOn: 1, lensSource: 'quasar' })).toBe(true);
+    expect(() => timelineSource(S, S, presetParams('Grand design', 7), timeline)).toThrow();
+  });
+
+  it('moves the Mice through mTime, and every frame is the single render at its moment', async () => {
+    const n = 4;
+    const end = 2;
+    const src = timelineSource(S, S, P0, timeline);
+    const bytes = await recordGif(
+      src,
+      { frames: n, end, speed: 1, paper: PAPER, ink: INK, mode: 'ramp' },
+      (frames, spec: GifSpec) => encodeGif(frames, spec),
+    );
+    const gif = decodeGif(bytes);
+    expect(gif.frames).toHaveLength(n);
+    const times = frameTimes(n, end);
+    const singles = times.map((t) =>
+      quantiseFrame(draw({ ...P0, mTime: t }), {
+        width: S,
+        height: S,
+        paper: PAPER,
+        ink: INK,
+        mode: 'ramp',
+      }),
+    );
+    gif.frames.forEach((f, k) => {
+      expect(Array.from(f.pixels), `frame ${String(k)} (t = ${String(times[k])})`).toEqual(
+        Array.from(singles[k] as Uint8Array),
+      );
+    });
+    // the pair really moves: consecutive frames differ in many pixels
+    for (let k = 1; k < n; k++) {
+      const a = gif.frames[k - 1]?.pixels as Uint8Array;
+      const b = gif.frames[k]?.pixels as Uint8Array;
+      expect(
+        a.filter((v, i) => v !== b[i]).length,
+        `frames ${String(k - 1)} and ${String(k)}`,
+      ).toBeGreaterThan(500);
+    }
+  }, 300_000);
 });

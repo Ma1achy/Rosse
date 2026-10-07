@@ -120,7 +120,7 @@ One layer per pen (`background`, `drawings`, `arms`, `dust`, `cores`, `knots`, `
 v21's encoder (`gifEncode`) is ported unchanged and tested against an independent decoder (`tests/unit/support/gif-decode.ts`: header, palette, extensions, variable-width LZW including the 4,096-entry table reset) and, once, against Pillow (3 frames of noise through a reset: every pixel equal). v21's two palettes: the 256-step ramp from the surface to the ink for the key ink (an ink pixel is its alpha, to 8 bits, on the paper and on the chalkboard: tested for both), and the 6 × 7 × 6 colour cube plus the surface for colour plates. The frame's times (`k / n · end`, so the GIF loops) and the delay (`round(12 / speed · end / 2 / n · 100)`, at least 2 cs) are v21's. The frames are the engine's ink target at the GIF's size, read back (`cpuInkFrame`, `gpuInkFrame`); the encoder runs in a worker (`encodeInWorker`).
 
 - **Frames match single renders at those moments,** index for index: on the CPU engine in Node (`gif.test.ts`: the orbit swept through the timeline, on paper and on the chalkboard), and on WebGPU through the real worker in Chromium (`tests/gpu/gif.ts`: 4 frames, delay 150 cs at speed 2, 29 KB at 160 px). GPU frames are within 2/255 of the CPU's on all but 0.1% of pixels (measured: worst difference 1).
-- **The merger timeline and the quasar flare.** `recordGif` takes any source, `frame(t)` giving the ink at time t; for the merger v21 sets `mTime = t` and renders (L1722). MERGER_GIF
+- **The merger timeline and the quasar flare.** `recordGif` takes any source, `frame(t)` giving the ink at time t; for the merger v21 sets `mTime = t` and renders (L1722). `timelineSource` (`sources.ts`) is that: `frame(t)` draws `{ ...params, mTime: t }`. With M8 merged, **the merger timeline is wired and tested on both engines**: the Mice at `mTime` 0, 0.5, 1 and 1.5, one simulation with `mTime` re-blended per frame (`CpuMerger.view(1, t)`, `GpuMerger.view(1, t)`), and every frame equals a fresh build at that moment (CPU in Node, WebGPU through the worker in Chromium); consecutive frames differ in hundreds of pixels; WebGPU against the CPU engine scores a coarse SSIM of 1.000 on all four frames (strict band 0.98).
 - **Quasar flare: deferred** with M9 (the lens source `quasar` and its flare are M9's); the source is the same `mTime`, so the page wires it when M9 lands.
 
 ## What else changed
@@ -139,7 +139,8 @@ v21's encoder (`gifEncode`) is ported unchanged and tested against an independen
 
 ## Not done, or deferred
 
-- The quasar-flare GIF (M9), and the merger GIF unless MERGER_STATE.
+- The quasar-flare GIF (M9): `isTimeline` already accepts `lensOn` with `lensSource: 'quasar'`, and the source is the same `mTime`; it needs M9's engine to draw it.
+- The SVG export of a merger, shells or lens: `readInkLayers` and `buildSvg` take any frame's layers, but the capsule roles (hatching against placed drawings) are known only for a single galaxy's frame, so those frames would put every capsule in `drawings`. Not tested; not wired.
 - The real galaxies that are mergers, lensed or have shells (indices 34 to 36, 39) as goldens: M8 and M9 families.
 - Engine hashes (`engine-hashes.json`) for the 20 new cases were not written: the file must stay identical. `npm run golden -- --update-engine` adds them when the owner accepts the family.
 - Measurements on a phone.

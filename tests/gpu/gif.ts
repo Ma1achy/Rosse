@@ -8,19 +8,25 @@
  * The timeline's source here is the orbit swept through t (the merger's and the quasar's are M8
  * and M9, which supply `frame(t)` the same way).
  */
+import type { Params } from '../../src/core/params';
 import { presetParams } from '../../src/core/presets';
 import { CpuRenderer } from '../../src/fallback';
+import { CpuMerger } from '../../src/fallback/merger';
 import { CpuStipple } from '../../src/fallback/stipple';
 import { gifDelayCs, quantiseFrame, type Rgb } from '../../src/extras/export/gif';
 import { cpuInkFrame, gpuInkFrame } from '../../src/extras/export/gif-frames';
 import { encodeInWorker, frameTimes, recordGif } from '../../src/extras/export/record';
+import { timelineSource } from '../../src/extras/export/sources';
 import { BuiltAssets, type AtlasName } from '../../src/marks/atlas';
 import { VECTOR_ATLASES, type VectorLibrary } from '../../src/marks/vector';
 import { buildScene, drawingsMeta } from '../../src/model/scene';
 import { GpuRenderer } from '../../src/render/frame';
+import { GpuMerger } from '../../src/render/merger';
 import { GpuStipple } from '../../src/render/stipple';
 import { cameraOf } from '../../src/view/camera';
 import { decodeGif } from '../unit/support/gif-decode';
+import { coarseDensityMap, grey, ssim, type Grey } from '../golden/compare/metrics';
+import thresholds from '../golden/thresholds.json';
 import { adapterName, device, run } from './harness';
 
 const S = 160;
@@ -134,6 +140,72 @@ run('GIF export (WebGPU frames, the GIF worker)', async () => {
   lines.push(
     `GIF of ${String(n)} frames, ${String(Math.round(bytes.length / 1024))} KB, delay ${String(gifDelayCs(2, end, n))} cs, decodes, frames equal single renders`,
   );
+
+  // the merger timeline (M8): one simulation, `mTime` re-blended per frame, through the worker;
+  // each frame is a fresh build at that moment, and the CPU engine's frame within the strict band
+  {
+    const Pm = presetParams('Merger: the Mice', 7, { starMix: 0, field: 0, fgstars: 0 });
+    const merger = GpuMerger.create(dev);
+    await merger.build(Pm, meta, {});
+    const gpuMergerFrame = async (P: Params): Promise<Uint8ClampedArray> => {
+      merger.view(1, P.mTime);
+      gpuR.setLayers(merger.inkLayers());
+      gpuR.drawInk();
+      return gpuInkFrame(dev, gpuR.ink);
+    };
+    const cpuMergerFrame = (t: number): Uint8ClampedArray => {
+      const view = new CpuMerger({ ...Pm, mTime: t }, meta).view(1);
+      cpuR.setLayers(view.layers);
+      cpuR.drawInk();
+      return cpuInkFrame(cpuR.ink);
+    };
+    const mn = 4;
+    const mend = 2;
+    const mbytes = await recordGif(
+      timelineSource(S, S, Pm, gpuMergerFrame),
+      { frames: mn, end: mend, speed: 1, paper: PAPER, ink: INK, mode: 'ramp' },
+      encodeInWorker,
+    );
+    const mgif = decodeGif(mbytes);
+    if (mgif.frames.length !== mn) fail(`merger GIF: ${String(mgif.frames.length)} frames`);
+    const mt = frameTimes(mn, mend);
+    const alphaOf = (rgba: Uint8ClampedArray): Grey => {
+      const g = grey(S, S);
+      for (let i = 0; i < S * S; i++) g.data[i] = (rgba[i * 4 + 3] as number) / 255;
+      return g;
+    };
+    const ssims: string[] = [];
+    for (let k = 0; k < mgif.frames.length; k++) {
+      const f = mgif.frames[k];
+      if (!f) continue;
+      const rgba = await gpuMergerFrame({ ...Pm, mTime: mt[k] as number });
+      const single = quantiseFrame(rgba, {
+        width: S,
+        height: S,
+        paper: PAPER,
+        ink: INK,
+        mode: 'ramp',
+      });
+      if (!f.pixels.every((v, i) => v === single[i]))
+        fail(`merger frame ${String(k)} is not the single render at t = ${String(mt[k])}`);
+      const cpu = cpuMergerFrame(mt[k] as number);
+      const s = ssim(coarseDensityMap(alphaOf(rgba)), coarseDensityMap(alphaOf(cpu)));
+      ssims.push(s.toFixed(3));
+      if (!(s >= thresholds.strict.ssimCoarse))
+        fail(
+          `merger frame ${String(k)}: WebGPU against the CPU engine, coarse SSIM ${s.toFixed(3)}`,
+        );
+      if (k > 0) {
+        const prev = mgif.frames[k - 1]?.pixels;
+        if (prev && prev.every((v, i) => v === f.pixels[i]))
+          fail(`merger frames ${String(k - 1)} and ${String(k)} are equal`);
+      }
+    }
+    lines.push(
+      `merger GIF (the Mice, mTime 0 to ${String(mend)}): ${String(mn)} frames, ${String(Math.round(mbytes.length / 1024))} KB; frames equal single renders; WebGPU against CPU coarse SSIM ${ssims.join(', ')} (strict band ${String(thresholds.strict.ssimCoarse)})`,
+    );
+    merger.destroy();
+  }
   st.destroy();
   return { pass, lines };
 });
