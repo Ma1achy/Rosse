@@ -146,7 +146,7 @@ if (want('gifs')) {
         if (g.kind === 'wipe') {
           const [paper, chalk] = [await r.plate('paper'), await r.plate('chalk')];
           // the line sweeps right and back (eased); chalk on its left, paper on its right
-          const x = Math.round(w * (0.5 - 0.5 * Math.cos(2 * Math.PI * t)));
+          const x = Math.round(w * (0.5 - 0.5 * Math.cos(2 * Math.PI * (t + 0.25))));
           rgba = Buffer.alloc(w * w * 4);
           for (let y = 0; y < w; y++)
             for (let c = 0; c < w; c++) {
