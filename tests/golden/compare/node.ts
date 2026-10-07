@@ -74,6 +74,9 @@ export function goldenFamily(preset: string, variant?: string): string {
   const f = presetFamily(preset);
   if (f === 'merger' || f === 'lens' || f === 'star' || f === 'artefact') return f;
   if (preset === 'Layered: lensed merger') return 'merger';
+  // the slipped plates print each mark four times, offset: the same galaxy's alpha, a noisier image
+  // for the density measures (docs/adr/0025-the-slipped-plates-are-their-own-golden-family.md)
+  if (preset === 'Plates slipped') return 'slip';
   const smooth = [
     'Smooth, round',
     'Cigar-shaped',

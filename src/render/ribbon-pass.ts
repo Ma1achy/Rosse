@@ -10,6 +10,7 @@ import { bufferWithData, packStruct } from '../gpu/buffers';
 import type { GpuAtlas } from '../marks/atlas';
 import type { StructLayout } from '../marks/instance';
 import { INK_FORMAT } from './sprites';
+import { KEY_STYLE, styleKey, withStyle, type PassStyle } from './pass-style';
 
 /** The `RibbonDraw` uniform of ribbon.wgsl. */
 export const RIBBON_DRAW_LAYOUT: StructLayout = {
@@ -25,8 +26,7 @@ export const RIBBON_DRAW_LAYOUT: StructLayout = {
     { name: 'cell', type: 'vec2<f32>', offset: 40, size: 8 },
     { name: 'max_lod', type: 'f32', offset: 48, size: 4 },
     { name: 'pad0', type: 'f32', offset: 52, size: 4 },
-    { name: 'pad1', type: 'f32', offset: 56, size: 4 },
-    { name: 'pad2', type: 'f32', offset: 60, size: 4 },
+    { name: 'off', type: 'vec2<f32>', offset: 56, size: 8 },
   ],
 };
 
@@ -158,6 +158,7 @@ interface DrawOpts {
   pxPerUnit: number;
   gain: number;
   ink?: readonly [number, number, number];
+  off?: readonly [number, number];
 }
 
 function drawUniforms(
@@ -177,18 +178,46 @@ function drawUniforms(
       cell: [atlas?.cellWidth ?? 1, atlas?.cellHeight ?? 1],
       max_lod: atlas?.maxLod ?? 0,
       pad0: 0,
-      pad1: 0,
-      pad2: 0,
+      off: opts.off ?? [0, 0],
     }),
     GPUBufferUsage.UNIFORM,
     label,
   );
 }
 
+/**
+ * The uniforms and bind group of a layer for one pass of the plates (ink, gain, offset): made on
+ * first use and kept, so switching plates builds a few uniform buffers and no instance data.
+ */
+class PassGroups<G> {
+  private readonly made = new Map<string, { uniforms: GPUBuffer; group: G }>();
+
+  constructor(
+    private readonly opts: DrawOpts,
+    private readonly build: (opts: DrawOpts) => { uniforms: GPUBuffer; group: G },
+  ) {}
+
+  get(style: PassStyle): G {
+    const key = styleKey(style);
+    let e = this.made.get(key);
+    if (!e) {
+      e = this.build(withStyle(this.opts, style));
+      this.made.set(key, e);
+    }
+    return e.group;
+  }
+
+  destroy(): void {
+    this.made.forEach((e) => {
+      e.uniforms.destroy();
+    });
+    this.made.clear();
+  }
+}
+
 /** One layer of textured ribbon segments (the strokes atlas must fit one texture array). */
 export class RibbonBatch {
-  private readonly uniforms: GPUBuffer;
-  private readonly group: GPUBindGroup;
+  private readonly groups: PassGroups<GPUBindGroup>;
 
   constructor(
     private readonly pipe: RibbonPipeline,
@@ -199,27 +228,42 @@ export class RibbonBatch {
   ) {
     const arr = atlas.arrays[0];
     if (!arr || atlas.arrays.length !== 1) throw new Error('strokes must fit one texture array');
-    this.uniforms = drawUniforms(pipe.device, opts, atlas, 'ribbon uniforms');
-    this.group = pipe.device.createBindGroup({
-      layout: pipe.ribbonLayout,
-      entries: [
-        { binding: 0, resource: { buffer: this.uniforms } },
-        { binding: 1, resource: { buffer } },
-        { binding: 2, resource: arr.view },
-        { binding: 3, resource: pipe.sampler },
-      ],
+    this.groups = new PassGroups(opts, (o) => {
+      const uniforms = drawUniforms(pipe.device, o, atlas, 'ribbon uniforms');
+      const group = pipe.device.createBindGroup({
+        layout: pipe.ribbonLayout,
+        entries: [
+          { binding: 0, resource: { buffer: uniforms } },
+          { binding: 1, resource: { buffer } },
+          { binding: 2, resource: arr.view },
+          { binding: 3, resource: pipe.sampler },
+        ],
+      });
+      return { uniforms, group };
     });
   }
 
-  encode(pass: GPURenderPassEncoder): void {
+  /** The batch as the frame's `Batch` methods (its pop is the caller's). */
+  bind() {
+    return {
+      encode: (pass: GPURenderPassEncoder, style: PassStyle) => {
+        this.encode(pass, style);
+      },
+      destroy: () => {
+        this.destroy();
+      },
+    };
+  }
+
+  encode(pass: GPURenderPassEncoder, style: PassStyle = KEY_STYLE): void {
     if (!this.count) return;
     pass.setPipeline(this.pipe.ribbon);
-    pass.setBindGroup(0, this.group);
+    pass.setBindGroup(0, this.groups.get(style));
     pass.draw(this.count * 6);
   }
 
   destroy(): void {
-    this.uniforms.destroy();
+    this.groups.destroy();
   }
 }
 
@@ -228,13 +272,13 @@ export class RibbonBatch {
  * coverage target (shared, and kept across rebuilds), outside the ink pass; `encode` resolves that
  * coverage over the ink. It draws each source's `count` quads, or, with `indirect`, as many as its
  * draw arguments [6·n, 1, 0, 0] say (a compaction's output, `count` being the buffer's capacity).
+ * Each pass of the plates has its own uniforms (ink, gain, offset), made on first use; the target
+ * is shared, because the prepass and the resolve of one pass run one after the other.
  */
 export class CapsuleBatch {
-  private readonly uniforms: GPUBuffer;
   private readonly maskView: GPUTextureView;
-  private readonly resolveGroup: GPUBindGroup;
-  /** the layer's capsule buffers, each with its own draw: unioned in the one coverage target */
-  private readonly sources: { group: GPUBindGroup; count: number; indirect?: GPUBuffer }[];
+  private readonly groups: PassGroups<{ sources: GPUBindGroup[]; resolve: GPUBindGroup }>;
+  private readonly sources: { count: number; indirect?: GPUBuffer }[];
   readonly count: number;
 
   constructor(
@@ -243,30 +287,55 @@ export class CapsuleBatch {
     opts: DrawOpts,
   ) {
     const d = pipe.device;
-    this.uniforms = drawUniforms(d, opts, null, 'pen-line uniforms');
     this.sources = sources.map((s) => ({
-      group: d.createBindGroup({
-        layout: pipe.capsuleLayout,
-        entries: [
-          { binding: 0, resource: { buffer: this.uniforms } },
-          { binding: 4, resource: { buffer: s.buffer } },
-        ],
-      }),
       count: s.count,
       ...(s.indirect ? { indirect: s.indirect } : {}),
     }));
     this.count = sources.reduce((n, s) => n + s.count, 0);
     this.maskView = pipe.penMaskTarget(opts.targetWidth, opts.targetHeight);
-    this.resolveGroup = d.createBindGroup({
-      layout: pipe.resolveLayout,
-      entries: [
-        { binding: 0, resource: { buffer: this.uniforms } },
-        { binding: 5, resource: this.maskView },
-      ],
+    this.groups = new PassGroups(opts, (o) => {
+      const uniforms = drawUniforms(d, o, null, 'pen-line uniforms');
+      return {
+        uniforms,
+        group: {
+          sources: sources.map((s) =>
+            d.createBindGroup({
+              layout: pipe.capsuleLayout,
+              entries: [
+                { binding: 0, resource: { buffer: uniforms } },
+                { binding: 4, resource: { buffer: s.buffer } },
+              ],
+            }),
+          ),
+          resolve: d.createBindGroup({
+            layout: pipe.resolveLayout,
+            entries: [
+              { binding: 0, resource: { buffer: uniforms } },
+              { binding: 5, resource: this.maskView },
+            ],
+          }),
+        },
+      };
     });
   }
 
-  prepass(encoder: GPUCommandEncoder): void {
+  /** The batch as the frame's `Batch` methods (its pop is the caller's). */
+  bind() {
+    return {
+      prepass: (encoder: GPUCommandEncoder, style: PassStyle) => {
+        this.prepass(encoder, style);
+      },
+      encode: (pass: GPURenderPassEncoder, style: PassStyle) => {
+        this.encode(pass, style);
+      },
+      destroy: () => {
+        this.destroy();
+      },
+    };
+  }
+
+  prepass(encoder: GPUCommandEncoder, style: PassStyle = KEY_STYLE): void {
+    const g = this.groups.get(style);
     const pass = encoder.beginRenderPass({
       label: 'pen-line coverage',
       colorAttachments: [
@@ -274,23 +343,23 @@ export class CapsuleBatch {
       ],
     });
     pass.setPipeline(this.pipe.penMask);
-    for (const s of this.sources) {
-      if (!s.count) continue;
-      pass.setBindGroup(0, s.group);
+    this.sources.forEach((s, i) => {
+      if (!s.count) return;
+      pass.setBindGroup(0, g.sources[i]);
       if (s.indirect) pass.drawIndirect(s.indirect, 0);
       else pass.draw(s.count * 6);
-    }
+    });
     pass.end();
   }
 
-  encode(pass: GPURenderPassEncoder): void {
+  encode(pass: GPURenderPassEncoder, style: PassStyle = KEY_STYLE): void {
     if (!this.count) return;
     pass.setPipeline(this.pipe.penResolve);
-    pass.setBindGroup(0, this.resolveGroup);
+    pass.setBindGroup(0, this.groups.get(style).resolve);
     pass.draw(3);
   }
 
   destroy(): void {
-    this.uniforms.destroy();
+    this.groups.destroy();
   }
 }

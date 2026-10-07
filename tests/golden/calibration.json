@@ -508,7 +508,7 @@
         },
         "halo off": {
           "applicable": 28,
-          "detected": 2,
+          "detected": 1,
           "missed": [
             "Grand design s7 incl 30",
             "Ringed s7 incl 30",
@@ -521,6 +521,7 @@
             "Dusty spiral (ribbons) s4242 incl 55",
             "Flocculent (ribbons) s7 incl 30",
             "Hand wobble (ribbons) s7 incl 30",
+            "Tightly wound (ribbons) s4242 incl 50",
             "Grand design s7 incl 50",
             "Barred spiral s7 incl 30",
             "Flocculent s7 incl 50",
@@ -771,7 +772,7 @@
             {
               "config": "Ringed s7 incl 30",
               "failed": true,
-              "by": ["r25 -3.06%", "r90 -10.34%", "outer ink -3.76%"]
+              "by": ["r90 -10.34%", "outer ink -3.76%"]
             },
             {
               "config": "Disc, no arms (stipple) s3 incl 45",
@@ -793,7 +794,7 @@
         },
         "thick ×3": {
           "applicable": 28,
-          "detected": 8,
+          "detected": 7,
           "missed": [
             "Grand design s7 incl 30",
             "Ringed s7 incl 30",
@@ -809,6 +810,7 @@
             "Flocculent s7 incl 50",
             "Barred spiral (ribbons) s4242 incl 30",
             "Disc, no arms (stipple) s4242 incl 45",
+            "Flocculent (ribbons) s7 incl 50",
             "Grand design (stipple-arms) s4242 incl 30",
             "Grand design s4242 incl 30",
             "Ringed s4242 incl 30",
@@ -1356,11 +1358,12 @@
         },
         "bulgeSize ×1.5": {
           "applicable": 10,
-          "detected": 1,
+          "detected": 0,
           "missed": [
             "Ringed s7 incl 30",
             "Disc, no arms (stipple) s3 incl 45",
             "Tightly wound (ribbons) s4242 incl 30",
+            "Disc, no arms (stipple) s3 incl 65",
             "Tightly wound (ribbons) s4242 incl 50",
             "Disc, no arms (stipple) s4242 incl 45",
             "Ringed s7 incl 50",
@@ -1482,8 +1485,8 @@
             },
             {
               "config": "Disc, no arms (stipple) s3 incl 65",
-              "failed": true,
-              "by": ["axis ratio 0.0210"]
+              "failed": false,
+              "by": []
             }
           ]
         },
@@ -2237,12 +2240,7 @@
             {
               "config": "Cigar-shaped s7 incl 108",
               "failed": true,
-              "by": [
-                "coarse ssim 0.8290",
-                "r90 -7.03%",
-                "outer ink -1.70%",
-                "position angle -31.46°"
-              ]
+              "by": ["coarse ssim 0.8290", "outer ink -1.70%", "position angle -31.46°"]
             }
           ]
         },
@@ -2618,7 +2616,6 @@
               "failed": true,
               "by": [
                 "ink 5.42%",
-                "r90 -6.74%",
                 "outer ink -1.64%",
                 "axis ratio 0.0773",
                 "inner axis ratio 0.0575"
@@ -2730,7 +2727,7 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["ink 19.95%", "r25 11.15%", "r50 12.93%", "r90 5.91%", "outer ink 1.35%"]
+              "by": ["ink 19.95%", "r25 11.15%", "r50 12.93%", "outer ink 1.35%"]
             },
             {
               "config": "Smooth, round (stipple) s3 incl 10",
@@ -3127,7 +3124,6 @@
                 "p90 width 30.04%",
                 "r25 17.78%",
                 "r50 16.82%",
-                "r90 6.47%",
                 "outer ink 1.38%",
                 "inner axis ratio 0.0466"
               ]
@@ -3142,7 +3138,6 @@
                 "p90 width 24.96%",
                 "r25 19.02%",
                 "r50 17.22%",
-                "r90 7.90%",
                 "outer ink 1.89%"
               ]
             },
@@ -3290,20 +3285,13 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 108",
               "failed": true,
-              "by": [
-                "ink 10.84%",
-                "r25 3.07%",
-                "r50 3.88%",
-                "axis ratio 0.1876",
-                "inner axis ratio 0.1256"
-              ]
+              "by": ["ink 10.84%", "axis ratio 0.1876", "inner axis ratio 0.1256"]
             },
             {
               "config": "Cigar-shaped s7 incl 108",
               "failed": true,
               "by": [
                 "ink 9.96%",
-                "r90 -6.92%",
                 "outer ink -1.59%",
                 "axis ratio 0.1676",
                 "inner axis ratio 0.1242"
@@ -3676,9 +3664,10 @@
         },
         "halo off": {
           "applicable": 13,
-          "detected": 3,
+          "detected": 2,
           "missed": [
             "Grand design (zoom 2) s4242 incl 30 zoom 2",
+            "Flocculent (ribbons) s4242 incl 30 zoom 2",
             "Hand wobble (ribbons) s4242 incl 30 zoom 2",
             "Grand design (zoom 2) s7 incl 30 zoom 2",
             "Ringed (zoom 2) s7 incl 30 zoom 2",
@@ -3793,8 +3782,8 @@
             },
             {
               "config": "Flocculent (ribbons) s4242 incl 30 zoom 2",
-              "failed": true,
-              "by": ["r25 4.96%"]
+              "failed": false,
+              "by": []
             },
             {
               "config": "Hand wobble (ribbons) s4242 incl 30 zoom 2",
@@ -5122,7 +5111,7 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.7475", "r90 5.75%", "outer ink 1.39%", "position angle 30.52°"]
+              "by": ["coarse ssim 0.7475", "outer ink 1.39%", "position angle 30.52°"]
             }
           ]
         },

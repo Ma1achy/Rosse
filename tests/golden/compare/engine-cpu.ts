@@ -26,6 +26,8 @@ import {
 } from '../../../src/model/scene';
 import { VECTOR_ATLASES, type VectorLibrary, type VectorSheet } from '../../../src/marks/vector';
 import { cameraOf } from '../../../src/view/camera';
+import { PALETTES } from '../../../src/render/palette';
+import type { Plates } from '../../../src/render/plates';
 import { grey, type Grey } from './metrics';
 
 export const ATLASES: AtlasName[] = ['dots', 'knots', 'stars', 'cores', 'pieces', 'strokes'];
@@ -115,7 +117,7 @@ export class CpuGolden {
       });
       const mv = m.view(zoom);
       this.renderer.setLayers(mv.layers);
-      this.renderer.drawInk();
+      this.renderer.drawInk({ plates: P.plates as Plates, palette: PALETTES.light });
       const mink = this.renderer.ink;
       return {
         alpha: alphaOf(mink.width, mink.height, mink.data),
@@ -138,7 +140,7 @@ export class CpuGolden {
       view.counts.dots += v.dots;
     }
     this.renderer.setLayers(view.layers);
-    this.renderer.drawInk();
+    this.renderer.drawInk({ plates: P.plates as Plates, palette: PALETTES.light });
     const ink = this.renderer.ink;
     return {
       alpha: alphaOf(ink.width, ink.height, ink.data),

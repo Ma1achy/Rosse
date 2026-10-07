@@ -3,13 +3,14 @@
 // inset box-shadows (a 1 px rim; on Chalkboard also a 60 px vignette), reproducing the
 // reference's CSS (head23.html, .plate). The ink target holds premultiplied ink in which
 // (1, 1, 1) means the key ink; here it takes the palette's colour, so switching surface (and
-// palette) re-runs only this pass. The twin is `composite` in src/fallback/raster.ts, with the
+// palette) re-runs only this pass. On the coloured plates (slip, colour) the target holds the
+// colours themselves, and `ink` is white (src/render/plates.ts). The twin is `composite` in src/fallback/raster.ts, with the
 // helpers of src/render/surface.ts.
 
 struct Composite {
   // background colour, sRGB
   field: vec4<f32>,
-  // the palette's key ink, sRGB
+  // the palette's key ink, sRGB (white on the coloured plates)
   ink: vec4<f32>,
   // inset shadows, topmost first: colour (sRGB) and alpha; alpha 0 means none
   shadow0: vec4<f32>,

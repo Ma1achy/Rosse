@@ -8,6 +8,7 @@
  */
 import type { Params } from '../core/params';
 import type { AtlasName } from '../marks/atlas';
+import type { Pop } from '../render/plates';
 import { Cls } from './classes';
 import type { StrokesMeta } from '../marks/strokes';
 import type { VectorLibrary, VectorSheet } from '../marks/vector';
@@ -136,15 +137,17 @@ export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {
 
 /**
  * The stipple classes that are drawn, in draw order, with their atlas (after the line-work). The
- * streams' dots and knots (old ink) go after `young` (scene(), app23.js:L1295).
+ * streams' dots and knots (old ink) go after `young` (scene(), app23.js:L1295). `pop` is the
+ * population the colour plate inks the layer as (L1295–1296: knots as HII, sparkle stars as young).
  */
-export const STIPPLE_LAYERS: readonly { cls: number; atlas: AtlasName; name: string }[] = [
-  { cls: Cls.old, atlas: 'dots', name: 'old' },
-  { cls: Cls.disc, atlas: 'dots', name: 'disc' },
-  { cls: Cls.young, atlas: 'dots', name: 'young' },
-  { cls: Cls.knot, atlas: 'knots', name: 'knots' },
-  { cls: Cls.star, atlas: 'stars', name: 'stars' },
-];
+export const STIPPLE_LAYERS: readonly { cls: number; atlas: AtlasName; name: string; pop: Pop }[] =
+  [
+    { cls: Cls.old, atlas: 'dots', name: 'old', pop: 'old' },
+    { cls: Cls.disc, atlas: 'dots', name: 'disc', pop: 'disc' },
+    { cls: Cls.young, atlas: 'dots', name: 'young', pop: 'young' },
+    { cls: Cls.knot, atlas: 'knots', name: 'knots', pop: 'hii' },
+    { cls: Cls.star, atlas: 'stars', name: 'stars', pop: 'young' },
+  ];
 
 /** Mark counts, comparable with the reference's `__GEN.stats()` (app23.js:L1302). */
 export interface MarkCounts {

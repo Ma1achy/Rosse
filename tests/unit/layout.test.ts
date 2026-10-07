@@ -117,9 +117,14 @@ describe('struct layouts (WGSL = TS)', () => {
       max_lod: 5,
       layer_base: 256,
       layer_count: 256,
+      off: [-3.6, -1.2],
     });
     expect(new Float32Array(b)[10]).toBe(32);
     expect(new Uint32Array(b)[12]).toBe(256);
+    expect(Array.from(new Float32Array(b).slice(14, 16))).toEqual([
+      Math.fround(-3.6),
+      Math.fround(-1.2),
+    ]);
     expect(() => packStruct(SPRITE_UNIFORMS_LAYOUT, {})).toThrow(/missing/);
   });
 

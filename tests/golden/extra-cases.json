@@ -1,5 +1,5 @@
 {
-  "about": "Extra reference captures (npm run capture:reference -- --extra tests/golden/extra-cases.json): a preset with overrides set after the preset and the seed, at seeds 7 and 4242 unless `seeds` says otherwise, home and orbit cameras, and (from M3) the zoom camera for the seeds a case lists in `zoom`: home at zoom 2 through v21's __GEN.zoom(2), so VIEW.scale = 168 (open question Q8). They are the required golden cases (tests/golden/README.md, ADR 0015). 'stipple': lines, knots and envelope off, as the roadmap's M2 acceptance says, and also starMix (drawn stars among the dots), field (the deep field) and fgstars (foreground stars), which are vector or sky marks of later milestones; these extra overrides await the owner's sign-off (ADR 0016, proposed). Seeds 3 and 11 give v21 hands of 2 and 3 pens. 'Radio jet' also has its jet off (the Sersic profile). 'stipple-arms' is Grand design with vary 0 (no spurs, clumps or dust patches, lopsidedness or warp, and every dot drawing) and dustScribble 0 (no dust lanes), so its stipple has arms and nothing M2 does not draw. From M4, 'ribbons' (seeds 7 and 4242, home, orbit and zoom): the M4 presets (docs/roadmap.md) with what M4 does not draw switched off: starMix 0 (drawn stars among the stipple, vector sstars; ring knots and clumps keep theirs, classified and counted but not drawn), field 0 (the deep field), fgstars 0 (foreground stars), bubbles 0 (rings drawings at the clumps, vector), whole 0 and envelope 0 (whole drawings and envelopes, vector; already 0 in these presets). Barred spiral draws its bar and ring as ribbons (barStyle and ringStyle 'ribbon') instead of the vector drawings of its default style. Lines, knots, dust lanes and their hatching, carving lines (Dusty spiral), the drawn core and the hand wobble (Hand wobble) stay on. From M4's review (QA D3), 'lines': the same presets and overrides as 'ribbons' with the stipple, the knots along the arms and the sparkle stars off (stipple 0, knots 0, sparkle 0), so that the line-work (curves, pieces, hatching, the drawn core, and the ring knots' and clumps' own marks) is compared on its own at home and orbit. Seeds 7 and 4242 are gated; seeds 3, 11, 23 and 101 are captured for the calibration only (\"calibration\": true, ADR 0018): the line-work is drawn the same way at every placement key, so its thresholds come from the renderers' own differences on held-out seeds. From M5, 'vectors' (seeds 7 and 4242, home, orbit and zoom): the M5 presets (docs/roadmap.md) as v21 draws them, with their drawn parts (envelopes, drawn arms, bars and rings, bubbles at the clumps, the jet, the streams, drawn shells, the hatching and the core), with only what M5 does not draw switched off: starMix 0 (drawn stars among the stipple, vector sstars of M7; ring knots and clumps keep theirs, counted), field 0 (the deep field, M7) and fgstars 0 (foreground stars, M7). 'Shell galaxy' draws its drawn shells (shells 1) instead of its simulated ones (shellsOn 0; the shell simulation is M8). These overrides await the owner's sign-off (ADR 0022, proposed). From M8, 'mergers' (seeds 7 and 4242, home, orbit and zoom): the eight `Merger: \u2026` presets, `Sketches, torn apart` and `Layered: lensed merger` as v21 draws them, with only what M8 does not draw switched off: starMix 0 (the debris's and the galaxies' drawn stars, vector sstars of M7), field 0 and fgstars 0 (the sky, M7), and lensOn 0 for the lensed merger (the lens is M9). 'mergers-t05' and 'mergers-t15': the Mice at the timeline's moments mTime 0.5 (on the way in) and 1.5 (on the way out, horizon 2). 'shells': `Shell galaxy` with its simulated shells (shellsOn 1, as the preset), starMix 0, field 0 and fgstars 0, and held-out seeds 3, 11, 23 and 101 (home, orbit and zoom) captured for the calibration only (`\"calibration\": true`, ADR 0018 item 7 and ADR 0044): the satellite's stars are v21's own draw, which the engine's re-draws do not carry. These overrides await the owner's sign-off (ADR 0040, proposed).",
+  "about": "Extra reference captures (npm run capture:reference -- --extra tests/golden/extra-cases.json): a preset with overrides set after the preset and the seed, at seeds 7 and 4242 unless `seeds` says otherwise, home and orbit cameras, and (from M3) the zoom camera for the seeds a case lists in `zoom`: home at zoom 2 through v21's __GEN.zoom(2), so VIEW.scale = 168 (open question Q8). They are the required golden cases (tests/golden/README.md, ADR 0015). 'stipple': lines, knots and envelope off, as the roadmap's M2 acceptance says, and also starMix (drawn stars among the dots), field (the deep field) and fgstars (foreground stars), which are vector or sky marks of later milestones; these extra overrides await the owner's sign-off (ADR 0016, proposed). Seeds 3 and 11 give v21 hands of 2 and 3 pens. 'Radio jet' also has its jet off (the Sersic profile). 'stipple-arms' is Grand design with vary 0 (no spurs, clumps or dust patches, lopsidedness or warp, and every dot drawing) and dustScribble 0 (no dust lanes), so its stipple has arms and nothing M2 does not draw. From M4, 'ribbons' (seeds 7 and 4242, home, orbit and zoom): the M4 presets (docs/roadmap.md) with what M4 does not draw switched off: starMix 0 (drawn stars among the stipple, vector sstars; ring knots and clumps keep theirs, classified and counted but not drawn), field 0 (the deep field), fgstars 0 (foreground stars), bubbles 0 (rings drawings at the clumps, vector), whole 0 and envelope 0 (whole drawings and envelopes, vector; already 0 in these presets). Barred spiral draws its bar and ring as ribbons (barStyle and ringStyle 'ribbon') instead of the vector drawings of its default style. Lines, knots, dust lanes and their hatching, carving lines (Dusty spiral), the drawn core and the hand wobble (Hand wobble) stay on. From M4's review (QA D3), 'lines': the same presets and overrides as 'ribbons' with the stipple, the knots along the arms and the sparkle stars off (stipple 0, knots 0, sparkle 0), so that the line-work (curves, pieces, hatching, the drawn core, and the ring knots' and clumps' own marks) is compared on its own at home and orbit. Seeds 7 and 4242 are gated; seeds 3, 11, 23 and 101 are captured for the calibration only (\"calibration\": true, ADR 0018): the line-work is drawn the same way at every placement key, so its thresholds come from the renderers' own differences on held-out seeds. From M5, 'vectors' (seeds 7 and 4242, home, orbit and zoom): the M5 presets (docs/roadmap.md) as v21 draws them, with their drawn parts (envelopes, drawn arms, bars and rings, bubbles at the clumps, the jet, the streams, drawn shells, the hatching and the core), with only what M5 does not draw switched off: starMix 0 (drawn stars among the stipple, vector sstars of M7; ring knots and clumps keep theirs, counted), field 0 (the deep field, M7) and fgstars 0 (foreground stars, M7). 'Shell galaxy' draws its drawn shells (shells 1) instead of its simulated ones (shellsOn 0; the shell simulation is M8). These overrides await the owner's sign-off (ADR 0022, proposed). From M6, 'single' (seeds 7 and 4242, home, orbit and zoom): the M6 presets that M2 and M4 captured with more overrides (`Grand design`, `Flocculent`, `Tightly wound`, `Loose, open arms`, `Dusty spiral`, `Hand wobble`, `Smooth, round`, `Cigar-shaped`) and the two plates presets (`Plates slipped`, `Stellar populations`), with only starMix 0, field 0 and fgstars 0 switched off (the sky and the drawn stars, M7); a case with `chalk: true` is captured on the Chalkboard (seed 7, home and orbit). The other eight single-galaxy presets are the 'vectors' cases. 'knob-*' (seeds 7 and 4242, home and orbit): single-parameter probes of what no preset exercises (patchy, irr, tail, sersicN, ringOnlyLines, dust, halo with envelope and outline, nuclear with whole and envelope). These overrides await the owner's sign-off (ADR 0023, proposed). From M8, 'mergers' (seeds 7 and 4242, home, orbit and zoom): the eight `Merger: …` presets, `Sketches, torn apart` and `Layered: lensed merger` as v21 draws them, with only what M8 does not draw switched off: starMix 0 (the debris's and the galaxies' drawn stars, vector sstars of M7), field 0 and fgstars 0 (the sky, M7), and lensOn 0 for the lensed merger (the lens is M9). 'mergers-t05' and 'mergers-t15': the Mice at the timeline's moments mTime 0.5 (on the way in) and 1.5 (on the way out, horizon 2). 'shells': `Shell galaxy` with its simulated shells (shellsOn 1, as the preset), starMix 0, field 0 and fgstars 0, and held-out seeds 3, 11, 23 and 101 (home, orbit and zoom) captured for the calibration only (`\"calibration\": true`, ADR 0018 item 7 and ADR 0044): the satellite's stars are v21's own draw, which the engine's re-draws do not carry. These overrides await the owner's sign-off (ADR 0040, proposed).",
   "cases": [
     {
       "preset": "Smooth, round",
@@ -394,126 +394,445 @@
       "preset": "Hand-drawn arms",
       "variant": "vectors",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
     },
     {
       "preset": "Ringed",
       "variant": "vectors",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
     },
     {
       "preset": "Disc, no arms",
       "variant": "vectors",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
     },
     {
       "preset": "Barred spiral",
       "variant": "vectors",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
     },
     {
       "preset": "Edge-on with dust",
       "variant": "vectors",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
     },
     {
       "preset": "Radio jet",
       "variant": "vectors",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
     },
     {
       "preset": "Stellar streams",
       "variant": "vectors",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
     },
     {
       "preset": "Shell galaxy",
       "variant": "vectors",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0, "shellsOn": 0, "shells": 1 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "shellsOn": 0,
+        "shells": 1
+      }
+    },
+    {
+      "preset": "Grand design",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Flocculent",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Tightly wound",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Loose, open arms",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Dusty spiral",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Hand wobble",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Smooth, round",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Cigar-shaped",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Plates slipped",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Stellar populations",
+      "variant": "single",
+      "zoom": [7, 4242],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Grand design",
+      "variant": "single",
+      "chalk": true,
+      "seeds": [7],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Plates slipped",
+      "variant": "single",
+      "chalk": true,
+      "seeds": [7],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Stellar populations",
+      "variant": "single",
+      "chalk": true,
+      "seeds": [7],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Grand design",
+      "variant": "knob-patchy",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "patchy": 0.9
+      }
+    },
+    {
+      "preset": "Grand design",
+      "variant": "knob-irr",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "irr": 1,
+        "arms": 0,
+        "bulge": 0.1
+      }
+    },
+    {
+      "preset": "Disc, no arms",
+      "variant": "knob-tail",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "tail": 0.8
+      }
+    },
+    {
+      "preset": "Disc, no arms",
+      "variant": "knob-sersic",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "sersicN": 2,
+        "re": 0.8,
+        "bulge": 1,
+        "bulgeFlat": 0.6,
+        "incl": 60
+      }
+    },
+    {
+      "preset": "Barred spiral",
+      "variant": "knob-ring-lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "ringOnlyLines": 1,
+        "ring": 0.85,
+        "ringR": 1.5,
+        "ringStyle": "ribbon",
+        "stroke": "faint",
+        "outline": 0
+      }
+    },
+    {
+      "preset": "Grand design",
+      "variant": "knob-dust",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "dust": 0.7,
+        "thick": 0.12,
+        "incl": 75
+      }
+    },
+    {
+      "preset": "Smooth, round",
+      "variant": "knob-halo",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "halo": 0.9,
+        "envelope": 1,
+        "outline": 0.6
+      }
+    },
+    {
+      "preset": "Grand design",
+      "variant": "knob-whole",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "nuclear": 1,
+        "whole": 1,
+        "envelope": 1
+      }
     },
     {
       "preset": "Merger: the Mice",
       "variant": "mergers",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
     },
     {
       "preset": "Merger: long tails",
       "variant": "mergers",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
     },
     {
       "preset": "Merger: minor, a stream",
       "variant": "mergers",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
     },
     {
       "preset": "Merger: spiral meets elliptical",
       "variant": "mergers",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
     },
     {
       "preset": "Merger: dry (two ellipticals)",
       "variant": "mergers",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
     },
     {
       "preset": "Merger: polar collision",
       "variant": "mergers",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
     },
     {
       "preset": "Merger: three-armed pair",
       "variant": "mergers",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
     },
     {
       "preset": "Merger: coalescing",
       "variant": "mergers",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
     },
     {
       "preset": "Sketches, torn apart",
       "variant": "mergers",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
     },
     {
       "preset": "Layered: lensed merger",
       "variant": "mergers",
       "zoom": [7, 4242],
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0, "lensOn": 0 }
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "lensOn": 0
+      }
     },
     {
       "preset": "Merger: the Mice",
       "variant": "mergers-t05",
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0, "mTime": 0.5 },
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "mTime": 0.5
+      },
       "zoom": [7, 4242]
     },
     {
       "preset": "Merger: the Mice",
       "variant": "mergers-t15",
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0, "mTime": 1.5 },
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "mTime": 1.5
+      },
       "zoom": [7, 4242]
     },
     {
       "preset": "Shell galaxy",
       "variant": "shells",
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 },
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
       "zoom": [7, 4242]
     },
     {
@@ -521,7 +840,11 @@
       "variant": "shells",
       "seeds": [3, 11, 23, 101],
       "calibration": true,
-      "overrides": { "starMix": 0, "field": 0, "fgstars": 0 },
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
       "zoom": [3, 11, 23, 101]
     }
   ]
