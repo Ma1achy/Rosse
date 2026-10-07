@@ -524,33 +524,52 @@ async function calibrate(G, node) {
     const file = join(ROOT, `test-results/calibration-shard-${k}.json`);
     // written after every configuration; with --resume, the configurations a stopped run
     // measured with this K are kept (a full calibration takes hours)
-    /** @type {{ keys: number, standIns: number, pairs: Record<string, any[]>, controls: Record<string, Record<string, any[]>>, heldOut: Record<string, any[]> }} */
-    let part = { keys: K, standIns: R, pairs: {}, controls: {}, heldOut: {} };
-    // with --resume, every configuration any shard has measured with this K is kept, by label
+    /** @type {{ keys: number, standIns: number, controlsEvery: number, controlsDone: string[], pairs: Record<string, any[]>, controls: Record<string, Record<string, any[]>>, heldOut: Record<string, any[]> }} */
+    let part = {
+      keys: K,
+      standIns: R,
+      controlsEvery,
+      controlsDone: [],
+      pairs: {},
+      controls: {},
+      heldOut: {},
+    };
+    // with --resume, every configuration any shard has measured with this K is kept, by label: its
+    // pairs, and (separately) its controls, which a later run may add
     /** @type {Set<string>} */
     const done = new Set();
+    /** @type {Set<string>} */
+    const controlsDone = new Set();
     if (flag('--resume'))
       for (let j = 0; existsSync(join(ROOT, `test-results/calibration-shard-${j}.json`)); j++) {
         const old = JSON.parse(
           readFileSync(join(ROOT, `test-results/calibration-shard-${j}.json`), 'utf8'),
         );
         if (old.keys !== K || old.standIns !== R) continue;
-        if (j === k) part = { heldOut: {}, ...old };
+        if (j === k) part = { heldOut: {}, controlsDone: [], ...old, controlsEvery };
         for (const list of Object.values(old.pairs ?? {}))
           for (const e of /** @type {any[]} */ (list)) done.add(e.config);
+        for (const label of old.controlsDone ?? []) controlsDone.add(label);
+        // a shard from before `controlsDone`: the configurations whose controls it holds
+        for (const byName of Object.values(old.controls ?? {}))
+          for (const list of Object.values(/** @type {any} */ (byName)))
+            for (const e of /** @type {any[]} */ (list)) controlsDone.add(e.config);
       }
     for (let i = k; i < cases.length; i += n) {
       const c = cases[i];
-      if (!c || done.has(G.configLabel(c))) continue;
-      const one = node.calibrateEngine(
-        [c],
-        K,
-        R,
-        (s) => console.log(`[${shard}] ${s}`),
-        // every n-th of each shard's own configurations, so the shards stay balanced; the
-        // line-work alone has its own breaks instead (docs/milestones/m4/README.md)
-        c.family !== 'lines' && Math.floor(i / n) % controlsEvery === 0,
-      );
+      if (!c) continue;
+      const label = G.configLabel(c);
+      // the controls on every n-th of each shard's own configurations, so the shards stay
+      // balanced; the line-work alone has its own breaks instead (docs/milestones/m4/README.md)
+      const wantControls = c.family !== 'lines' && Math.floor(i / n) % controlsEvery === 0;
+      const needPairs = !done.has(label);
+      const needControls = wantControls && !controlsDone.has(label);
+      if (!needPairs && !needControls) continue;
+      const one = node.calibrateEngine([c], K, R, (s) => console.log(`[${shard}] ${s}`), {
+        pairs: needPairs,
+        controls: needControls,
+      });
+      if (needControls) part.controlsDone.push(label);
       for (const [f, list] of Object.entries(one.pairs)) (part.pairs[f] ??= []).push(...list);
       for (const [f, list] of Object.entries(one.heldOut)) (part.heldOut[f] ??= []).push(...list);
       for (const [f, byName] of Object.entries(one.controls))
@@ -558,6 +577,9 @@ async function calibrate(G, node) {
           ((part.controls[f] ??= {})[name] ??= []).push(...list);
       writeFileSync(file, JSON.stringify(part));
     }
+    // a shard with nothing left to do still records how it was asked
+    part.controlsEvery = controlsEvery;
+    writeFileSync(file, JSON.stringify(part));
     return;
   }
   const jobs = Number(opt('--jobs') ?? 4);
@@ -581,11 +603,19 @@ async function calibrate(G, node) {
   };
   /** @type {{ pairs: Record<string, any[]>, controls: Record<string, Record<string, any[]>>, heldOut: Record<string, any[]> }} */
   const eng = { pairs: {}, controls: {}, heldOut: {} };
+  // which configurations the negative controls ran on, as the shards recorded it (a
+  // re-aggregation must not write its own defaults)
+  /** @type {Set<string>} */
+  const withControls = new Set();
   for (let k = 0; existsSync(join(ROOT, `test-results/calibration-shard-${k}.json`)); k++) {
     if (k >= jobs && !flag('--reuse-shards')) break;
     const part = JSON.parse(
       readFileSync(join(ROOT, `test-results/calibration-shard-${k}.json`), 'utf8'),
     );
+    for (const label of part.controlsDone ?? []) withControls.add(label);
+    for (const byName of Object.values(part.controls ?? {}))
+      for (const list of Object.values(/** @type {any} */ (byName)))
+        for (const e of /** @type {any[]} */ (list)) withControls.add(e.config);
     for (const [f, list] of Object.entries(part.pairs))
       (eng.pairs[f] ??= []).push(
         ...list.map((/** @type {any} */ e) => ({ ...mean(e.cs), preset: e.preset })),
@@ -809,7 +839,12 @@ async function calibrate(G, node) {
       "ADR 0013 / 0015 / 0018 calibration: per family, summaries (n, min, p5, median, p95, max) of each measure. engineRekey: the new engine (CPU, equal to WebGPU at L1) drawing v21's replayed variation and re-keying its placement stream: per configuration, each of `standIns` draws stands in for v21 against the mean of each measure over the `keys` draws of keys 0..K − 1 (a full re-draw). negativeControls: one structural or pen change per control, drawn with the same K keys, against the first stand-in, with how many applicable configurations the thresholds caught. v21Reroll: v21 at az and az + 0.3° where its stipple re-rolled (a partial re-draw, one draw against one).",
     keys: K,
     standIns: R,
-    controlsEvery,
+    // the negative controls ran on this many of the configurations that have them (every
+    // configuration but the line-work alone's): the controls' detection rates are over these
+    controls: {
+      configurations: withControls.size,
+      ofConfigurations: cases.filter((c) => c.family !== 'lines').length,
+    },
     configurations: cases.map((c) => `${c.preset} s${c.params.seed} incl ${c.params.incl}`),
     families: numbers,
   });

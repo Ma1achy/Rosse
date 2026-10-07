@@ -1,0 +1,205 @@
+{
+  "about": "The seven line-work breaks, each one source edit (as in QA's break table), run through the CPU golden on the `lines` (stipple off) and `ribbons` (stipple on) cases at the final thresholds: per family and camera, the number of cases (of 14 each) that fail. `base` is the unbroken source. Written by tools/m4-summary.mjs breaks from copies of test-results/golden.json.",
+  "breaks": {
+    "base": {
+      "edit": null,
+      "cells": {
+        "lines/home": {
+          "cases": 14,
+          "fail": 0
+        },
+        "lines/orbit": {
+          "cases": 14,
+          "fail": 0
+        },
+        "ribbons/home": {
+          "cases": 14,
+          "fail": 0
+        },
+        "ribbons/orbit": {
+          "cases": 14,
+          "fail": 0
+        },
+        "ribbons/zoom": {
+          "cases": 14,
+          "fail": 0
+        }
+      }
+    },
+    "width": {
+      "edit": "model/curves.ts: the arm ribbons' width w = 1 becomes 1.5",
+      "cells": {
+        "lines/home": {
+          "cases": 14,
+          "fail": 13
+        },
+        "lines/orbit": {
+          "cases": 14,
+          "fail": 14
+        },
+        "ribbons/home": {
+          "cases": 14,
+          "fail": 1
+        },
+        "ribbons/orbit": {
+          "cases": 14,
+          "fail": 0
+        },
+        "ribbons/zoom": {
+          "cases": 14,
+          "fail": 6
+        }
+      }
+    },
+    "phase": {
+      "edit": "model/curves.ts: arm and spur phase +45° (π/4)",
+      "cells": {
+        "lines/home": {
+          "cases": 14,
+          "fail": 14
+        },
+        "lines/orbit": {
+          "cases": 14,
+          "fail": 14
+        },
+        "ribbons/home": {
+          "cases": 14,
+          "fail": 2
+        },
+        "ribbons/orbit": {
+          "cases": 14,
+          "fail": 1
+        },
+        "ribbons/zoom": {
+          "cases": 14,
+          "fail": 11
+        }
+      }
+    },
+    "taper": {
+      "edit": "model/ribbons.ts: the taper flag is never set (arms keep full width to the tip)",
+      "cells": {
+        "lines/home": {
+          "cases": 14,
+          "fail": 7
+        },
+        "lines/orbit": {
+          "cases": 14,
+          "fail": 6
+        },
+        "ribbons/home": {
+          "cases": 14,
+          "fail": 0
+        },
+        "ribbons/orbit": {
+          "cases": 14,
+          "fail": 0
+        },
+        "ribbons/zoom": {
+          "cases": 14,
+          "fail": 1
+        }
+      }
+    },
+    "pieces": {
+      "edit": "model/ribbons.ts: no curve is re-spaced as pieces (flocculent arms drawn as plain ribbons)",
+      "cells": {
+        "lines/home": {
+          "cases": 14,
+          "fail": 12
+        },
+        "lines/orbit": {
+          "cases": 14,
+          "fail": 11
+        },
+        "ribbons/home": {
+          "cases": 14,
+          "fail": 0
+        },
+        "ribbons/orbit": {
+          "cases": 14,
+          "fail": 0
+        },
+        "ribbons/zoom": {
+          "cases": 14,
+          "fail": 5
+        }
+      }
+    },
+    "lane": {
+      "edit": "model/lanes.ts: laneR = 0 (the lane cull thins nothing)",
+      "cells": {
+        "lines/home": {
+          "cases": 14,
+          "fail": 0
+        },
+        "lines/orbit": {
+          "cases": 14,
+          "fail": 0
+        },
+        "ribbons/home": {
+          "cases": 14,
+          "fail": 5
+        },
+        "ribbons/orbit": {
+          "cases": 14,
+          "fail": 8
+        },
+        "ribbons/zoom": {
+          "cases": 14,
+          "fail": 6
+        }
+      }
+    },
+    "hatch": {
+      "edit": "model/lanes.ts: no hatches are made",
+      "cells": {
+        "lines/home": {
+          "cases": 14,
+          "fail": 14
+        },
+        "lines/orbit": {
+          "cases": 14,
+          "fail": 14
+        },
+        "ribbons/home": {
+          "cases": 14,
+          "fail": 0
+        },
+        "ribbons/orbit": {
+          "cases": 14,
+          "fail": 1
+        },
+        "ribbons/zoom": {
+          "cases": 14,
+          "fail": 4
+        }
+      }
+    },
+    "clumps": {
+      "edit": "model/clumps.ts: no clumps (their marks and drawn stars)",
+      "cells": {
+        "lines/home": {
+          "cases": 14,
+          "fail": 14
+        },
+        "lines/orbit": {
+          "cases": 14,
+          "fail": 14
+        },
+        "ribbons/home": {
+          "cases": 14,
+          "fail": 14
+        },
+        "ribbons/orbit": {
+          "cases": 14,
+          "fail": 14
+        },
+        "ribbons/zoom": {
+          "cases": 14,
+          "fail": 14
+        }
+      }
+    }
+  }
+}

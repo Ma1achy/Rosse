@@ -177,6 +177,8 @@ describe("the engine's own line-work choices have v21's distributions (review M-
     ['Flocculent (arm pieces)', 'Flocculent', {}],
     ['Dusty spiral (lanes and feathers)', 'Dusty spiral', {}],
     ['Barred spiral (ring lane)', 'Barred spiral', { barStyle: 'ribbon', ringStyle: 'ribbon' }],
+    // incE > 74: the edge-on midplane stroke and its three rows of hatches
+    ['Edge-on with dust (midplane stroke and hatches)', 'Edge-on with dust', {}],
   ];
   for (const [name, preset, extra] of configs)
     it(

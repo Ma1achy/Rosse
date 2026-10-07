@@ -4,7 +4,7 @@ Date: 2026-10-03
 
 ## Status
 
-Accepted. The vector half is backed by the spike in `spikes/vector-lines/` (RESULTS.md).
+Accepted. The vector half is backed by the spike in `spikes/vector-lines/` (RESULTS.md). Amended in part by [0019](0019-pen-lines-as-sampled-quads.md) (proposed) for pen lines such as the dust hatching: v21's overlap quads, unioned per sample, in place of capsule coverage.
 
 ## Context
 
