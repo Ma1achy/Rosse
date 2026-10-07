@@ -36,6 +36,8 @@ struct Sprite {
   // how many layers it holds: instances of other layers are not drawn by this draw (an atlas
   // split over several arrays is drawn once per array from the same instance buffer)
   layer_count: u32,
+  // the plate's offset, plate units (the slipped plates' `uOff`, app23.js:L1093)
+  off: vec2<f32>,
 }
 
 @group(0) @binding(0) var<uniform> sprite: Sprite;
@@ -86,7 +88,7 @@ fn vs(@builtin(vertex_index) v: u32, @builtin(instance_index) i: u32) -> VertexO
   // one device pixel of padding on each side, along each of the quad's axes
   let axes = vec2<f32>(length(m.xy), length(m.zw));
   let c = corner(v) * (axes + 2.0) / max(axes, vec2<f32>(1e-6));
-  let centre = s.pos * sprite.px_per_unit;
+  let centre = (s.pos + sprite.off) * sprite.px_per_unit;
   let p = centre + vec2<f32>(m.x * c.x + m.z * c.y, m.y * c.x + m.w * c.y);
   let d = p / sprite.target_size * 2.0 - 1.0;
   out.position = vec4<f32>(d.x, -d.y, 0.0, 1.0);

@@ -6,7 +6,8 @@
  * when WebGPU is missing, fails, or `?backend=cpu` is given), load the packed drawings, build the
  * scene description on the CPU, run the model and view tiers (compute passes, or their CPU twins),
  * ink the layers, and composite onto the surface. Switching surface re-runs only the composite (the
- * present tier of ADR 0010). The plate is drawn at its CSS width × device pixel ratio (capped at
+ * present tier of ADR 0010), and so does switching plates, which re-inks the existing buffers with
+ * the plates' passes (src/render/plates.ts) and runs no compute pass. The plate is drawn at its CSS width × device pixel ratio (capped at
  * 2, as v21) and redrawn when either changes. If the GPU device is lost it is recreated and
  * everything rebuilt; if that fails, or a frame fails for another reason, the page carries on
  * with the CPU engine.
@@ -37,6 +38,8 @@ import { VECTOR_ATLASES, type VectorLibrary } from './marks/vector';
 import { drawingsMeta, markCounts, type MarkCounts } from './model/scene';
 import type { DrawingsMeta } from './model/variation';
 import { GpuRenderer, type FrameSize } from './render/frame';
+import { PALETTES } from './render/palette';
+import type { InkLook, Plates } from './render/plates';
 import { GpuStipple } from './render/stipple';
 import { SURFACES, type SurfaceName } from './render/surface';
 import { attachOrbit, type OrbitState } from './ui/orbit';
@@ -49,6 +52,8 @@ declare global {
     __rosse?: {
       backend: Backend;
       surface: SurfaceName;
+      /** the plates the ink was printed with */
+      plates: Plates;
       frames: number;
       size: FrameSize;
       preset: string;
@@ -138,8 +143,12 @@ interface Engine {
    * the frame queue.
    */
   counts(): Promise<MarkCounts>;
-  /** Composites onto the surface and shows it. Rejects if the frame could not be shown. */
-  present(surface: SurfaceName): Promise<void>;
+  /**
+   * Inks the target for the plates if they or the surface's palette changed since the last ink
+   * (the present tier), composites onto the surface and shows it. Rejects if the frame could not
+   * be shown.
+   */
+  present(surface: SurfaceName, plates: Plates): Promise<void>;
   /** A new plate size or DPR: re-inks at that size, keeping the drawings loaded. */
   resize(size: FrameSize): void;
   /**
@@ -150,6 +159,18 @@ interface Engine {
   recovering(err: unknown): Promise<boolean>;
   destroy(): void;
 }
+
+/**
+ * What the ink target is printed with for a plates mode on a surface. Only the coloured plates
+ * depend on the surface's palette; the `ink` plate is the same on both (the composite colours it).
+ */
+function inkLook(plates: Plates, surface: SurfaceName): InkLook {
+  return { plates, palette: surface === 'chalk' ? PALETTES.dark : PALETTES.light };
+}
+
+/** A key that changes when the printed ink target must be redone. */
+const inkKey = (look: InkLook) =>
+  look.plates === 'ink' ? 'ink' : `${look.plates}|${look.palette.ink.join()}`;
 
 function plateCanvas(): HTMLCanvasElement {
   const c = document.getElementById('plate');
@@ -187,9 +208,14 @@ function cpuEngine(scene: Scene, size: FrameSize): Engine {
   scene.atlases.forEach((a) => {
     r.addAtlas(a);
   });
-  const ink = () => {
-    r.drawInk();
+  /** the key of the look the ink buffer holds; null when it is stale */
+  let inked: string | null = null;
+  const ink = (look: InkLook) => {
+    const key = inkKey(look);
+    if (key === inked) return;
+    r.drawInk(look);
     canvas.width = canvas.height = r.width;
+    inked = key;
   };
   let counts: MarkCounts = markCounts([]);
   const stipple = new CpuStippleTiers(scene.meta);
@@ -199,19 +225,20 @@ function cpuEngine(scene: Scene, size: FrameSize): Engine {
     draw(P, zoom, home) {
       const { view, work } = stipple.frame(P, zoom, home ? { lens: { home } } : {});
       if (work.view) r.setLayers(view.layers);
-      ink();
+      inked = null;
       counts = view.counts;
     },
     tierRuns: () => ({ ...stipple.tiers.runs }),
     counts: () => Promise.resolve(counts),
-    present(surface) {
+    present(surface, plates) {
+      ink(inkLook(plates, surface));
       const out = r.present(SURFACES[surface]);
       ctx.putImageData(new ImageData(out, r.width, r.height), 0, 0);
       return Promise.resolve();
     },
     resize(s) {
       r.resize(s);
-      ink();
+      inked = null;
     },
     recovering: () => Promise.resolve(false),
     destroy: () => undefined,
@@ -245,6 +272,8 @@ async function gpuEngine(
     /** tier runs on earlier devices */
     const pastRuns = { model: 0, view: 0 };
     let out: GPUTexture | null = null;
+    /** the key of the look the ink target holds; null when it is stale */
+    let inked: string | null = null;
     /** the output texture (copy mode) and canvas, at the renderer's size */
     const fitOutput = (r: GpuRenderer) => {
       out?.destroy();
@@ -284,7 +313,7 @@ async function gpuEngine(
       const work = st.frame(P, zoom, scene.meta, home ? { lens: { home } } : {});
       // every layer in scene() order: line-work, drawn parts, stipple, streams, cores
       if (work.view) r.setLayers(st.inkLayers());
-      r.drawInk();
+      inked = null;
       drawn = { P, zoom, home };
       return st;
     };
@@ -314,8 +343,13 @@ async function gpuEngine(
         // a read-back of the indirect draw arguments: never awaited by the frame queue
         return (await st.readCounts()).counts;
       },
-      async present(surface) {
+      async present(surface, plates) {
         const r = current();
+        const look = inkLook(plates, surface);
+        if (inkKey(look) !== inked) {
+          r.drawInk(look);
+          inked = inkKey(look);
+        }
         if (out && ctx2d) {
           r.present(out.createView(), format, SURFACES[surface]);
           const px = new Uint8ClampedArray((await readTexture(r.device, out, 4)).buffer);
@@ -335,7 +369,7 @@ async function gpuEngine(
         // keep the atlases and pipelines: a new ink target, batches and composite uniforms
         const r = current();
         r.resize(s);
-        r.drawInk();
+        inked = null;
         fitOutput(r);
       },
       recovering(err) {
@@ -466,6 +500,7 @@ async function start(): Promise<void> {
     // updated wantedSize, which drew (and reported in __rosse.size) the old DPR for one frame
     wantedSize = plateSize(plateCanvas());
     const wantedSurface = surface;
+    const wantedPlates = wanted.P.plates as Plates;
     try {
       if (drawnBy !== e || drawn !== wanted) {
         e.draw(wanted.P, wanted.zoom, wanted.home);
@@ -473,7 +508,7 @@ async function start(): Promise<void> {
         drawn = wanted;
       }
       if (!sameSize(e.size(), wantedSize)) e.resize(wantedSize);
-      await e.present(wantedSurface);
+      await e.present(wantedSurface, wantedPlates);
     } catch (err) {
       if (e !== engine) return; // a newer engine has taken over
       // a lost device is being recreated, and onRebuilt will show the frame again
@@ -485,6 +520,7 @@ async function start(): Promise<void> {
     const rosse = {
       backend: e.backend,
       surface: wantedSurface,
+      plates: wantedPlates,
       frames,
       size: e.size(),
       // what is on the plate, which may lag the controls by a frame
@@ -568,11 +604,28 @@ async function start(): Promise<void> {
     });
   });
 
+  // plates are a present-tier input (ADR 0010): the choice re-inks and re-composites, and runs no
+  // compute pass; it is kept when the preset changes (the presets that set plates set it)
+  const platesSelect = document.getElementById('plates');
+  const syncPlates = () => {
+    if (platesSelect instanceof HTMLSelectElement) platesSelect.value = wanted.P.plates;
+  };
+  syncPlates();
+  platesSelect?.addEventListener('change', () => {
+    if (!(platesSelect instanceof HTMLSelectElement)) return;
+    const plates =
+      platesSelect.value === 'slip' || platesSelect.value === 'colour' ? platesSelect.value : 'ink';
+    wanted = { ...wanted, P: { ...wanted.P, plates } };
+    // the frame runs no tier for it (dirtyTier says `present`) and re-inks
+    schedule();
+  });
+
   select.addEventListener('change', () => {
     preset = select.value;
     const P = params0();
     // choosing a lens preset fixes its sources at the camera it shows (the explicit home, Q3)
     wanted = { P, preset, zoom: wanted.zoom, home: P.lensOn ? lensHomeOf(P) : undefined };
+    syncPlates();
     schedule();
   });
   seedInput.addEventListener('change', () => {
@@ -581,6 +634,7 @@ async function start(): Promise<void> {
     // a new seed keeps the camera
     const { az, incl, pa } = wanted.P;
     wanted = { P: { ...params0(), az, incl, pa }, preset, zoom: wanted.zoom, home: wanted.home };
+    syncPlates();
     schedule();
   });
 

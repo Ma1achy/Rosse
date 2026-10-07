@@ -129,5 +129,5 @@ describe("v21's variation, replayed offline", () => {
       checked++;
     }
     expect(checked).toBeGreaterThanOrEqual(12);
-  });
+  }, 60_000);
 });

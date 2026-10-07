@@ -32,7 +32,7 @@ The `lens` family's thresholds are calibrated (ADR 0053, proposed): 28 configura
 
 ### Against v21 (K-mean, ADR 0018)
 
-- `npm run golden`: **26 of 28 lens cases pass.** Two fail on the inner axis ratio by a hair, `A sketch, lensed` s4242 orbit (+0.0332, band 0.033) and `Lens: galaxy cluster` s7 home (−0.0395, 0.033). ADR 0054 proposes 0.044 for them; with it, **all 28 pass.** Each of the others of those two cases' measures passes.
+- `npm run golden`: **26 of 28 lens cases pass.** Two fail on the inner axis ratio by a hair, `A sketch, lensed` s4242 orbit (+0.0332, band 0.033) and `Lens: galaxy cluster` s7 home (−0.0395, 0.033). ADR 0054 (accepted by the owner on 2026-10-07) sets 0.044 for them; with it, **all 28 pass.** Each of the others of those two cases' measures passes.
 - Over the 28: ink within 4.3% (band 5%), the largest p90 width difference 8.0% (10%), the largest axis-ratio difference 0.033 (0.044), the largest r25 difference 3.9% (5.9%); coarse SSIM of every case at or above the band of 0.91.
 - The whole run is **175 of 180 required cases** with ADR 0054 not applied, and 177 of 180 with it. The other three are M5's `Edge-on with dust` cases (owner decision, see docs/milestones/m5), whose thresholds are untouched here. 12 of 12 drawn-star gates pass.
 
@@ -56,6 +56,6 @@ The `lens` family's thresholds are calibrated (ADR 0053, proposed): 28 configura
 
 ## Open for the owner
 
-- ADRs 0050 to 0054 are proposed. 0054 decides whether two lens cases pass; 0053 whether the lens's count gate may be 4.5σ.
+- ADRs 0050 to 0053 are proposed; 0054 was accepted by the owner on 2026-10-07 (it decides that two lens cases pass). 0053 decides whether the lens's count gate may be 4.5σ.
 - `Layered: lensed merger` waits for M8.
 - The three M5 `Edge-on with dust` cases (see M5).

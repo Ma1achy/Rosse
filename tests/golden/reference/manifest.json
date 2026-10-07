@@ -33,78 +33,6 @@
   "seconds": 430,
   "captures": [
     {
-      "name": "a-sketch-lensed__s4242__home",
-      "preset": "A sketch, lensed",
-      "seed": 4242,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "0ad4c13ce94e8bf4480c492bd76850081eb2fac913e71f99c921cb430a45b48f",
-      "stats": {
-        "rstars": 424,
-        "dots": 9811,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 45,
-        "ms": 117
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "a-sketch-lensed__s4242__orbit",
-      "preset": "A sketch, lensed",
-      "seed": 4242,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "c615b4ef598fb7f8e55dd229870f3b8c780483144cfdf0ba4320c3e329586e44",
-      "stats": {
-        "rstars": 424,
-        "dots": 9828,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 49,
-        "ms": 72
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "a-sketch-lensed__s7__home",
-      "preset": "A sketch, lensed",
-      "seed": 7,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "cb93376143a7a7e1cd9a744b321c1790cc706779655dfb3bab653c52a39c4a2d",
-      "stats": {
-        "rstars": 401,
-        "dots": 8429,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 54,
-        "ms": 103
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "a-sketch-lensed__s7__orbit",
-      "preset": "A sketch, lensed",
-      "seed": 7,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "e023ee71263eaae5e6ff6aff3128fe434efc257dfcd9b7045e4e0756574c2f9b",
-      "stats": {
-        "rstars": 401,
-        "dots": 8428,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 49,
-        "ms": 66
-      },
-      "pageErrors": 0
-    },
-    {
       "name": "a-sketch-lensed--lens__s101__home",
       "preset": "A sketch, lensed",
       "variant": "lens",
@@ -519,58 +447,6 @@
       "pageErrors": 0
     },
     {
-      "name": "a-sketch-lensed--lens__s5__home",
-      "preset": "A sketch, lensed",
-      "variant": "lens",
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      },
-      "calibration": true,
-      "seed": 5,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "4dd4c6377811986531824b70132f3ced5b3cf02986bec38f8f6be80a5f5d89d0",
-      "captured": "2026-10-07T00:26:41.554Z",
-      "stats": {
-        "rstars": 0,
-        "dots": 9500,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 4,
-        "ms": 80
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "a-sketch-lensed--lens__s5__orbit",
-      "preset": "A sketch, lensed",
-      "variant": "lens",
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      },
-      "calibration": true,
-      "seed": 5,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "79242949950099042087b4750926392957c8ab61ea5010f913dc0ddf2ed583c4",
-      "captured": "2026-10-07T00:26:46.935Z",
-      "stats": {
-        "rstars": 0,
-        "dots": 9500,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 4,
-        "ms": 65
-      },
-      "pageErrors": 0
-    },
-    {
       "name": "a-sketch-lensed--lens__s53__home",
       "preset": "A sketch, lensed",
       "variant": "lens",
@@ -619,6 +495,58 @@
         "curves": 0,
         "used": 4,
         "ms": 73
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "a-sketch-lensed--lens__s5__home",
+      "preset": "A sketch, lensed",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 5,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "4dd4c6377811986531824b70132f3ced5b3cf02986bec38f8f6be80a5f5d89d0",
+      "captured": "2026-10-07T00:26:41.554Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 4,
+        "ms": 80
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "a-sketch-lensed--lens__s5__orbit",
+      "preset": "A sketch, lensed",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 5,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "79242949950099042087b4750926392957c8ab61ea5010f913dc0ddf2ed583c4",
+      "captured": "2026-10-07T00:26:46.935Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 4,
+        "ms": 65
       },
       "pageErrors": 0
     },
@@ -721,6 +649,78 @@
         "curves": 0,
         "used": 3,
         "ms": 81
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "a-sketch-lensed__s4242__home",
+      "preset": "A sketch, lensed",
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "0ad4c13ce94e8bf4480c492bd76850081eb2fac913e71f99c921cb430a45b48f",
+      "stats": {
+        "rstars": 424,
+        "dots": 9811,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 45,
+        "ms": 117
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "a-sketch-lensed__s4242__orbit",
+      "preset": "A sketch, lensed",
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "c615b4ef598fb7f8e55dd229870f3b8c780483144cfdf0ba4320c3e329586e44",
+      "stats": {
+        "rstars": 424,
+        "dots": 9828,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 49,
+        "ms": 72
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "a-sketch-lensed__s7__home",
+      "preset": "A sketch, lensed",
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "cb93376143a7a7e1cd9a744b321c1790cc706779655dfb3bab653c52a39c4a2d",
+      "stats": {
+        "rstars": 401,
+        "dots": 8429,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 54,
+        "ms": 103
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "a-sketch-lensed__s7__orbit",
+      "preset": "A sketch, lensed",
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "e023ee71263eaae5e6ff6aff3128fe434efc257dfcd9b7045e4e0756574c2f9b",
+      "stats": {
+        "rstars": 401,
+        "dots": 8428,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 49,
+        "ms": 66
       },
       "pageErrors": 0
     },
@@ -941,74 +941,126 @@
       "pageErrors": 0
     },
     {
-      "name": "barred-spiral__s4242__home",
+      "name": "barred-spiral--knob-ring-lines__s4242__home",
       "preset": "Barred spiral",
+      "variant": "knob-ring-lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "ringOnlyLines": 1,
+        "ring": 0.85,
+        "ringR": 1.5,
+        "ringStyle": "ribbon",
+        "stroke": "faint",
+        "outline": 0
+      },
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "ebd8cf10ae4744451f7ba00c04106231ff8ed5807a98ba366db3898ce092b8ac",
+      "inkPixelSha256": "1e801739eabe50dc66f812576a655b9dfa577e58a47ca26e58eefeae8f444cee",
+      "captured": "2026-10-06T16:39:12.377Z",
       "stats": {
-        "rstars": 1609,
-        "dots": 5336,
-        "knots": 135,
-        "stars": 17,
-        "curves": 3,
-        "used": 100,
-        "ms": 616
+        "rstars": 15,
+        "dots": 9553,
+        "knots": 133,
+        "stars": 9,
+        "curves": 1,
+        "used": 59,
+        "ms": 517
       },
       "pageErrors": 0
     },
     {
-      "name": "barred-spiral__s4242__orbit",
+      "name": "barred-spiral--knob-ring-lines__s4242__orbit",
       "preset": "Barred spiral",
+      "variant": "knob-ring-lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "ringOnlyLines": 1,
+        "ring": 0.85,
+        "ringR": 1.5,
+        "ringStyle": "ribbon",
+        "stroke": "faint",
+        "outline": 0
+      },
       "seed": 4242,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "33ea831a245cc85464a5554cc56549f12eb3746e4d5a070636be7bb28e9392cd",
+      "inkPixelSha256": "a5c5107ef56160efac111b1f35d671be76ac71ee8bf5327b7182d3da3025f4bd",
+      "captured": "2026-10-06T16:39:18.487Z",
       "stats": {
-        "rstars": 1624,
-        "dots": 4927,
-        "knots": 138,
-        "stars": 16,
-        "curves": 3,
-        "used": 105,
-        "ms": 174
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "barred-spiral__s7__home",
-      "preset": "Barred spiral",
-      "seed": 7,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "dd0949249df661f568f2be3c7acc5ba8e97fdb56978cd78ad92748a2709498e6",
-      "stats": {
-        "rstars": 1761,
-        "dots": 5772,
-        "knots": 194,
-        "stars": 12,
-        "curves": 4,
-        "used": 103,
-        "ms": 463
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "barred-spiral__s7__orbit",
-      "preset": "Barred spiral",
-      "seed": 7,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "0eaec6acf2b9855f7787e4bc6df5b8709ab7169fb3ffac80a02292212e2b7366",
-      "stats": {
-        "rstars": 1766,
-        "dots": 5831,
-        "knots": 194,
+        "rstars": 15,
+        "dots": 9515,
+        "knots": 136,
         "stars": 10,
-        "curves": 4,
-        "used": 105,
-        "ms": 157
+        "curves": 1,
+        "used": 60,
+        "ms": 85
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--knob-ring-lines__s7__home",
+      "preset": "Barred spiral",
+      "variant": "knob-ring-lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "ringOnlyLines": 1,
+        "ring": 0.85,
+        "ringR": 1.5,
+        "ringStyle": "ribbon",
+        "stroke": "faint",
+        "outline": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "5d96369cf4a7319a5ee2f6846ab693f030750840aa5576df38b570f2e8ea2b6c",
+      "captured": "2026-10-06T16:38:54.427Z",
+      "stats": {
+        "rstars": 15,
+        "dots": 9699,
+        "knots": 185,
+        "stars": 10,
+        "curves": 1,
+        "used": 66,
+        "ms": 52
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "barred-spiral--knob-ring-lines__s7__orbit",
+      "preset": "Barred spiral",
+      "variant": "knob-ring-lines",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "ringOnlyLines": 1,
+        "ring": 0.85,
+        "ringR": 1.5,
+        "ringStyle": "ribbon",
+        "stroke": "faint",
+        "outline": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "41482e5784fb3f7053a93c2963558a8f171619a2f2b05c4f9cfaff547818049b",
+      "captured": "2026-10-06T16:39:02.259Z",
+      "stats": {
+        "rstars": 15,
+        "dots": 9669,
+        "knots": 192,
+        "stars": 10,
+        "curves": 1,
+        "used": 62,
+        "ms": 98
       },
       "pageErrors": 0
     },
@@ -1751,74 +1803,226 @@
       "pageErrors": 0
     },
     {
-      "name": "cigar-shaped__s4242__home",
-      "preset": "Cigar-shaped",
+      "name": "barred-spiral__s4242__home",
+      "preset": "Barred spiral",
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "8b7f817766ffc37cabff461ae229811cf404e959e83e4e74183963e5bebec2c9",
+      "inkPixelSha256": "ebd8cf10ae4744451f7ba00c04106231ff8ed5807a98ba366db3898ce092b8ac",
       "stats": {
-        "rstars": 781,
-        "dots": 5651,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 44,
-        "ms": 62
+        "rstars": 1609,
+        "dots": 5336,
+        "knots": 135,
+        "stars": 17,
+        "curves": 3,
+        "used": 100,
+        "ms": 616
       },
       "pageErrors": 0
     },
     {
-      "name": "cigar-shaped__s4242__orbit",
-      "preset": "Cigar-shaped",
+      "name": "barred-spiral__s4242__orbit",
+      "preset": "Barred spiral",
       "seed": 4242,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "d1f3c2cbdb5ec994958d2cf16888ba49ec5bf12079a2f7d68c2ea63f947b0cc4",
+      "inkPixelSha256": "33ea831a245cc85464a5554cc56549f12eb3746e4d5a070636be7bb28e9392cd",
       "stats": {
-        "rstars": 781,
-        "dots": 6115,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 46,
-        "ms": 60
+        "rstars": 1624,
+        "dots": 4927,
+        "knots": 138,
+        "stars": 16,
+        "curves": 3,
+        "used": 105,
+        "ms": 174
       },
       "pageErrors": 0
     },
     {
-      "name": "cigar-shaped__s7__home",
-      "preset": "Cigar-shaped",
+      "name": "barred-spiral__s7__home",
+      "preset": "Barred spiral",
       "seed": 7,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "0e0f58264e1ca5194535b54701240e92388baabad152791b6f388fd2c4c49de5",
+      "inkPixelSha256": "dd0949249df661f568f2be3c7acc5ba8e97fdb56978cd78ad92748a2709498e6",
       "stats": {
-        "rstars": 714,
-        "dots": 5956,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 52,
-        "ms": 62
+        "rstars": 1761,
+        "dots": 5772,
+        "knots": 194,
+        "stars": 12,
+        "curves": 4,
+        "used": 103,
+        "ms": 463
       },
       "pageErrors": 0
     },
     {
-      "name": "cigar-shaped__s7__orbit",
-      "preset": "Cigar-shaped",
+      "name": "barred-spiral__s7__orbit",
+      "preset": "Barred spiral",
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "e6e82ae59397bc53b936ec24f6bd0ab547109511c42098b7ec89a2713bf27b6b",
+      "inkPixelSha256": "0eaec6acf2b9855f7787e4bc6df5b8709ab7169fb3ffac80a02292212e2b7366",
       "stats": {
-        "rstars": 714,
-        "dots": 6478,
+        "rstars": 1766,
+        "dots": 5831,
+        "knots": 194,
+        "stars": 10,
+        "curves": 4,
+        "used": 105,
+        "ms": 157
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "cigar-shaped--single__s4242__home",
+      "preset": "Cigar-shaped",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "6cdf01e337dab6a8b4add4bb9ef24b673ecb8726459ace59ec27cb56be5e92ef",
+      "captured": "2026-10-06T16:05:45.530Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
         "knots": 0,
         "stars": 0,
         "curves": 0,
-        "used": 43,
-        "ms": 54
+        "used": 1,
+        "ms": 16
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "cigar-shaped--single__s4242__orbit",
+      "preset": "Cigar-shaped",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "a9263eb1bde79e0f7521de1b431fec5fbbd4c36a02c04375d07b0ca461d31bad",
+      "captured": "2026-10-06T16:05:49.643Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 9
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "cigar-shaped--single__s4242__zoom",
+      "preset": "Cigar-shaped",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "1d7c411dab5f98783998342f05bb5612582acd1dcd5d9a7ed4c6aa505c7d56b8",
+      "captured": "2026-10-06T16:05:53.340Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 14
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "cigar-shaped--single__s7__home",
+      "preset": "Cigar-shaped",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "c5267d2eead66106cf8ef8bc4a3649899a06b9b30431ae40bb6103bb3121e11f",
+      "captured": "2026-10-06T16:05:41.320Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 9
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "cigar-shaped--single__s7__orbit",
+      "preset": "Cigar-shaped",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "36e5dc6263b1b6513755a696c22d190e05a3b6cb61221e8555a7544f0fa4ac54",
+      "captured": "2026-10-06T16:05:45.236Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 11
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "cigar-shaped--single__s7__zoom",
+      "preset": "Cigar-shaped",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "f8adf0c94381786f119a20ccf14f30609b20888d11004c0c2f83a9a5b74a1cc9",
+      "captured": "2026-10-06T16:05:48.755Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 23
       },
       "pageErrors": 0
     },
@@ -1989,6 +2193,78 @@
       "pageErrors": 0
     },
     {
+      "name": "cigar-shaped__s4242__home",
+      "preset": "Cigar-shaped",
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "8b7f817766ffc37cabff461ae229811cf404e959e83e4e74183963e5bebec2c9",
+      "stats": {
+        "rstars": 781,
+        "dots": 5651,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 44,
+        "ms": 62
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "cigar-shaped__s4242__orbit",
+      "preset": "Cigar-shaped",
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "d1f3c2cbdb5ec994958d2cf16888ba49ec5bf12079a2f7d68c2ea63f947b0cc4",
+      "stats": {
+        "rstars": 781,
+        "dots": 6115,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 46,
+        "ms": 60
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "cigar-shaped__s7__home",
+      "preset": "Cigar-shaped",
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "0e0f58264e1ca5194535b54701240e92388baabad152791b6f388fd2c4c49de5",
+      "stats": {
+        "rstars": 714,
+        "dots": 5956,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 52,
+        "ms": 62
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "cigar-shaped__s7__orbit",
+      "preset": "Cigar-shaped",
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "e6e82ae59397bc53b936ec24f6bd0ab547109511c42098b7ec89a2713bf27b6b",
+      "stats": {
+        "rstars": 714,
+        "dots": 6478,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 43,
+        "ms": 54
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "deep-field__s4242__home",
       "preset": "Deep field",
       "seed": 4242,
@@ -2061,74 +2337,226 @@
       "pageErrors": 0
     },
     {
-      "name": "disc-no-arms__s4242__home",
+      "name": "disc-no-arms--knob-sersic__s4242__home",
       "preset": "Disc, no arms",
+      "variant": "knob-sersic",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "sersicN": 2,
+        "re": 0.8,
+        "bulge": 1,
+        "bulgeFlat": 0.6,
+        "incl": 60
+      },
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "d2a9e520773ea551196ffd6544dfe5029c6224b9615c652914e44d0c6d25eb22",
+      "inkPixelSha256": "6dcd7e3145748385afd4169d44b3d5ed9768b4cb3b1c89620a58ef1904f453de",
+      "captured": "2026-10-06T16:38:28.293Z",
       "stats": {
-        "rstars": 1055,
-        "dots": 8217,
+        "rstars": 0,
+        "dots": 9500,
         "knots": 0,
         "stars": 0,
         "curves": 2,
-        "used": 58,
-        "ms": 65
+        "used": 4,
+        "ms": 15
       },
       "pageErrors": 0
     },
     {
-      "name": "disc-no-arms__s4242__orbit",
+      "name": "disc-no-arms--knob-sersic__s4242__orbit",
       "preset": "Disc, no arms",
+      "variant": "knob-sersic",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "sersicN": 2,
+        "re": 0.8,
+        "bulge": 1,
+        "bulgeFlat": 0.6,
+        "incl": 60
+      },
       "seed": 4242,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "de68b15fa885cdba11cdb3a3a80bfa002c1901c4bc51b0f81c9bb3de4129f1ef",
+      "inkPixelSha256": "31c916e0be614367f23b7c2cfa069711c6242ff176478553d286e3cb06157c50",
+      "captured": "2026-10-06T16:38:34.601Z",
       "stats": {
-        "rstars": 1055,
-        "dots": 8028,
+        "rstars": 0,
+        "dots": 9500,
         "knots": 0,
         "stars": 0,
         "curves": 2,
-        "used": 53,
-        "ms": 99
+        "used": 4,
+        "ms": 21
       },
       "pageErrors": 0
     },
     {
-      "name": "disc-no-arms__s7__home",
+      "name": "disc-no-arms--knob-sersic__s7__home",
       "preset": "Disc, no arms",
+      "variant": "knob-sersic",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "sersicN": 2,
+        "re": 0.8,
+        "bulge": 1,
+        "bulgeFlat": 0.6,
+        "incl": 60
+      },
       "seed": 7,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "63263d40497e168879cf0c723d84bfcbaf8e817e9fe2b8310519fb9ce3aab023",
+      "inkPixelSha256": "f2761d83582e48fa82e44fd52b1e337d1114a4bc7f60669077cbcb2afc280fc6",
+      "captured": "2026-10-06T16:38:34.637Z",
       "stats": {
-        "rstars": 1016,
-        "dots": 8011,
+        "rstars": 0,
+        "dots": 9500,
         "knots": 0,
         "stars": 0,
         "curves": 2,
-        "used": 52,
-        "ms": 91
+        "used": 4,
+        "ms": 30
       },
       "pageErrors": 0
     },
     {
-      "name": "disc-no-arms__s7__orbit",
+      "name": "disc-no-arms--knob-sersic__s7__orbit",
       "preset": "Disc, no arms",
+      "variant": "knob-sersic",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "sersicN": 2,
+        "re": 0.8,
+        "bulge": 1,
+        "bulgeFlat": 0.6,
+        "incl": 60
+      },
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "74e9a386f0c794a551b5df1abefbe8e1fcbf431244b7a463a36c898f3634f96c",
+      "inkPixelSha256": "99cbc1df012786ec741d2d7b2d734e3c1aa47d7c4b6675e9f1af6893dd74e16b",
+      "captured": "2026-10-06T16:38:38.617Z",
       "stats": {
-        "rstars": 1016,
-        "dots": 7732,
+        "rstars": 0,
+        "dots": 9500,
         "knots": 0,
         "stars": 0,
         "curves": 2,
-        "used": 56,
-        "ms": 74
+        "used": 4,
+        "ms": 32
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--knob-tail__s4242__home",
+      "preset": "Disc, no arms",
+      "variant": "knob-tail",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "tail": 0.8
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "cd9ba9f45f582f3bcafc71533d69cf2ffdd01ae78670a76da95b48df0d558f85",
+      "captured": "2026-10-06T16:38:33.566Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9469,
+        "knots": 0,
+        "stars": 3,
+        "curves": 3,
+        "used": 10,
+        "ms": 28
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--knob-tail__s4242__orbit",
+      "preset": "Disc, no arms",
+      "variant": "knob-tail",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "tail": 0.8
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "8b3cf9c2824024a9647cad5e9cca222937cca2d29658a96ee3884e2dc34ddfb3",
+      "captured": "2026-10-06T16:38:37.198Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9469,
+        "knots": 0,
+        "stars": 3,
+        "curves": 3,
+        "used": 10,
+        "ms": 33
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--knob-tail__s7__home",
+      "preset": "Disc, no arms",
+      "variant": "knob-tail",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "tail": 0.8
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "22435add0cad009ade30ca44014eaea119cc4114ae8642a204dd6ac203d81856",
+      "captured": "2026-10-06T16:38:34.558Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9442,
+        "knots": 0,
+        "stars": 1,
+        "curves": 3,
+        "used": 8,
+        "ms": 33
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "disc-no-arms--knob-tail__s7__orbit",
+      "preset": "Disc, no arms",
+      "variant": "knob-tail",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "tail": 0.8
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "c493d23d71bda5d64b0e8350377e00e07663c1f48fb876254081f4dd51b9dc19",
+      "captured": "2026-10-06T16:38:38.657Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9442,
+        "knots": 0,
+        "stars": 1,
+        "curves": 3,
+        "used": 8,
+        "ms": 15
       },
       "pageErrors": 0
     },
@@ -2559,74 +2987,74 @@
       "pageErrors": 0
     },
     {
-      "name": "dusty-spiral__s4242__home",
-      "preset": "Dusty spiral",
+      "name": "disc-no-arms__s4242__home",
+      "preset": "Disc, no arms",
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "e542e1ec7972e92f225d8fe3da6794b3f2aa178784157f0e44e435d692a745fb",
+      "inkPixelSha256": "d2a9e520773ea551196ffd6544dfe5029c6224b9615c652914e44d0c6d25eb22",
       "stats": {
-        "rstars": 1176,
-        "dots": 6807,
-        "knots": 127,
-        "stars": 10,
-        "curves": 3,
-        "used": 92,
-        "ms": 120
+        "rstars": 1055,
+        "dots": 8217,
+        "knots": 0,
+        "stars": 0,
+        "curves": 2,
+        "used": 58,
+        "ms": 65
       },
       "pageErrors": 0
     },
     {
-      "name": "dusty-spiral__s4242__orbit",
-      "preset": "Dusty spiral",
+      "name": "disc-no-arms__s4242__orbit",
+      "preset": "Disc, no arms",
       "seed": 4242,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "fc6ae9aa3511a2edc6df7a54289d712d1003e5dc52a2b924a99e768bb2f9d359",
+      "inkPixelSha256": "de68b15fa885cdba11cdb3a3a80bfa002c1901c4bc51b0f81c9bb3de4129f1ef",
       "stats": {
-        "rstars": 1134,
-        "dots": 6323,
-        "knots": 118,
-        "stars": 13,
-        "curves": 3,
-        "used": 98,
-        "ms": 104
+        "rstars": 1055,
+        "dots": 8028,
+        "knots": 0,
+        "stars": 0,
+        "curves": 2,
+        "used": 53,
+        "ms": 99
       },
       "pageErrors": 0
     },
     {
-      "name": "dusty-spiral__s7__home",
-      "preset": "Dusty spiral",
+      "name": "disc-no-arms__s7__home",
+      "preset": "Disc, no arms",
       "seed": 7,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "405aa829bd24a226b2cf000c637401946cd1971001d377fd455461997c1e0708",
+      "inkPixelSha256": "63263d40497e168879cf0c723d84bfcbaf8e817e9fe2b8310519fb9ce3aab023",
       "stats": {
-        "rstars": 1163,
-        "dots": 7130,
-        "knots": 147,
-        "stars": 22,
-        "curves": 4,
-        "used": 97,
-        "ms": 126
+        "rstars": 1016,
+        "dots": 8011,
+        "knots": 0,
+        "stars": 0,
+        "curves": 2,
+        "used": 52,
+        "ms": 91
       },
       "pageErrors": 0
     },
     {
-      "name": "dusty-spiral__s7__orbit",
-      "preset": "Dusty spiral",
+      "name": "disc-no-arms__s7__orbit",
+      "preset": "Disc, no arms",
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "5ec609e60f83b63a8deb2c6c9503b23a105bcfb7400932d7efbe938b65120ba8",
+      "inkPixelSha256": "74e9a386f0c794a551b5df1abefbe8e1fcbf431244b7a463a36c898f3634f96c",
       "stats": {
-        "rstars": 1100,
-        "dots": 6597,
-        "knots": 137,
-        "stars": 20,
-        "curves": 4,
-        "used": 98,
-        "ms": 144
+        "rstars": 1016,
+        "dots": 7732,
+        "knots": 0,
+        "stars": 0,
+        "curves": 2,
+        "used": 56,
+        "ms": 74
       },
       "pageErrors": 0
     },
@@ -3181,74 +3609,226 @@
       "pageErrors": 0
     },
     {
-      "name": "edge-on-with-dust__s4242__home",
-      "preset": "Edge-on with dust",
+      "name": "dusty-spiral--single__s4242__home",
+      "preset": "Dusty spiral",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "77c973393cc6842d8a2ceab7643688441f9ab23378c46a42c939abc8430f4776",
+      "inkPixelSha256": "c6852c1eed4c4c85b14dafb83dfa40200ceba3c110ca360a755b0fb664701357",
+      "captured": "2026-10-06T16:05:00.175Z",
       "stats": {
-        "rstars": 295,
-        "dots": 3130,
-        "knots": 98,
-        "stars": 2,
-        "curves": 4,
-        "used": 88,
-        "ms": 53
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "edge-on-with-dust__s4242__orbit",
-      "preset": "Edge-on with dust",
-      "seed": 4242,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "045ebc97ef38e3850eb7fb79972a014e0693b0cd16b4d94ea11da66aa7e082e1",
-      "stats": {
-        "rstars": 773,
-        "dots": 4701,
-        "knots": 110,
-        "stars": 9,
+        "rstars": 0,
+        "dots": 8005,
+        "knots": 147,
+        "stars": 20,
         "curves": 3,
-        "used": 90,
-        "ms": 208
+        "used": 54,
+        "ms": 37
       },
       "pageErrors": 0
     },
     {
-      "name": "edge-on-with-dust__s7__home",
-      "preset": "Edge-on with dust",
+      "name": "dusty-spiral--single__s4242__orbit",
+      "preset": "Dusty spiral",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "ecfc3bd323317e988706b3f643e281c0eccedd205a919516481e9d7a98e9aa34",
+      "captured": "2026-10-06T16:05:07.455Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 7704,
+        "knots": 137,
+        "stars": 14,
+        "curves": 3,
+        "used": 50,
+        "ms": 145
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--single__s4242__zoom",
+      "preset": "Dusty spiral",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "ab733f334d1696297432d613dec1c2444e935a6f046f4c69bcfc3d040b303a8c",
+      "captured": "2026-10-06T16:05:13.658Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 8568,
+        "knots": 173,
+        "stars": 25,
+        "curves": 3,
+        "used": 55,
+        "ms": 44
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--single__s7__home",
+      "preset": "Dusty spiral",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
       "seed": 7,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "e802d58baec8d6a32c851d3e67ac3c3f02f1acf6af15eccdeaa251b294c44035",
+      "inkPixelSha256": "55efbc7a57a642b3318d9121dae9aa9f69e7163ac3e045ffde87a184af8fc61e",
+      "captured": "2026-10-06T16:04:58.391Z",
       "stats": {
-        "rstars": 298,
-        "dots": 3401,
-        "knots": 122,
-        "stars": 5,
-        "curves": 5,
-        "used": 98,
-        "ms": 67
+        "rstars": 0,
+        "dots": 8270,
+        "knots": 168,
+        "stars": 14,
+        "curves": 4,
+        "used": 53,
+        "ms": 96
       },
       "pageErrors": 0
     },
     {
-      "name": "edge-on-with-dust__s7__orbit",
-      "preset": "Edge-on with dust",
+      "name": "dusty-spiral--single__s7__orbit",
+      "preset": "Dusty spiral",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "882006f0c950472695ef2fde3737b2929a59339f39aeec901599fbddd5fbea2c",
+      "inkPixelSha256": "4df82b5d36d24d86365313e00429323373522de3ebc31ad553340507d7e940f7",
+      "captured": "2026-10-06T16:05:00.870Z",
       "stats": {
-        "rstars": 755,
-        "dots": 5139,
-        "knots": 137,
-        "stars": 10,
+        "rstars": 0,
+        "dots": 8047,
+        "knots": 156,
+        "stars": 14,
         "curves": 4,
-        "used": 86,
-        "ms": 135
+        "used": 54,
+        "ms": 62
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral--single__s7__zoom",
+      "preset": "Dusty spiral",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "82410bbd4a9631944b1f07953a6f8bf6cf0e62f0177a8bb4838c4902b370be2e",
+      "captured": "2026-10-06T16:05:08.007Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 8861,
+        "knots": 169,
+        "stars": 18,
+        "curves": 4,
+        "used": 56,
+        "ms": 45
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral__s4242__home",
+      "preset": "Dusty spiral",
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "e542e1ec7972e92f225d8fe3da6794b3f2aa178784157f0e44e435d692a745fb",
+      "stats": {
+        "rstars": 1176,
+        "dots": 6807,
+        "knots": 127,
+        "stars": 10,
+        "curves": 3,
+        "used": 92,
+        "ms": 120
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral__s4242__orbit",
+      "preset": "Dusty spiral",
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "fc6ae9aa3511a2edc6df7a54289d712d1003e5dc52a2b924a99e768bb2f9d359",
+      "stats": {
+        "rstars": 1134,
+        "dots": 6323,
+        "knots": 118,
+        "stars": 13,
+        "curves": 3,
+        "used": 98,
+        "ms": 104
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral__s7__home",
+      "preset": "Dusty spiral",
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "405aa829bd24a226b2cf000c637401946cd1971001d377fd455461997c1e0708",
+      "stats": {
+        "rstars": 1163,
+        "dots": 7130,
+        "knots": 147,
+        "stars": 22,
+        "curves": 4,
+        "used": 97,
+        "ms": 126
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "dusty-spiral__s7__orbit",
+      "preset": "Dusty spiral",
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "5ec609e60f83b63a8deb2c6c9503b23a105bcfb7400932d7efbe938b65120ba8",
+      "stats": {
+        "rstars": 1100,
+        "dots": 6597,
+        "knots": 137,
+        "stars": 20,
+        "curves": 4,
+        "used": 98,
+        "ms": 144
       },
       "pageErrors": 0
     },
@@ -3405,74 +3985,74 @@
       "pageErrors": 0
     },
     {
-      "name": "flocculent__s4242__home",
-      "preset": "Flocculent",
+      "name": "edge-on-with-dust__s4242__home",
+      "preset": "Edge-on with dust",
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "33ab5106b1ef645765ba0cef3b74b39db44837d1529b7a29af0e7f437ad4ded2",
+      "inkPixelSha256": "77c973393cc6842d8a2ceab7643688441f9ab23378c46a42c939abc8430f4776",
       "stats": {
-        "rstars": 1308,
-        "dots": 8859,
-        "knots": 136,
-        "stars": 19,
-        "curves": 17,
-        "used": 107,
-        "ms": 124
+        "rstars": 295,
+        "dots": 3130,
+        "knots": 98,
+        "stars": 2,
+        "curves": 4,
+        "used": 88,
+        "ms": 53
       },
       "pageErrors": 0
     },
     {
-      "name": "flocculent__s4242__orbit",
-      "preset": "Flocculent",
+      "name": "edge-on-with-dust__s4242__orbit",
+      "preset": "Edge-on with dust",
       "seed": 4242,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "82aad48153eaa3c3afe4b87354d84b2115f5fc4c2f912124b8a2120cd2a6cbf4",
+      "inkPixelSha256": "045ebc97ef38e3850eb7fb79972a014e0693b0cd16b4d94ea11da66aa7e082e1",
       "stats": {
-        "rstars": 1269,
-        "dots": 8600,
-        "knots": 140,
-        "stars": 18,
-        "curves": 17,
-        "used": 111,
-        "ms": 179
+        "rstars": 773,
+        "dots": 4701,
+        "knots": 110,
+        "stars": 9,
+        "curves": 3,
+        "used": 90,
+        "ms": 208
       },
       "pageErrors": 0
     },
     {
-      "name": "flocculent__s7__home",
-      "preset": "Flocculent",
+      "name": "edge-on-with-dust__s7__home",
+      "preset": "Edge-on with dust",
       "seed": 7,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "a6d0e1e863f19dbe21a56cebf8b2c4cab121cefe6bc5076438ce1b3e639be527",
+      "inkPixelSha256": "e802d58baec8d6a32c851d3e67ac3c3f02f1acf6af15eccdeaa251b294c44035",
       "stats": {
-        "rstars": 1260,
-        "dots": 8950,
-        "knots": 65,
-        "stars": 24,
-        "curves": 17,
-        "used": 99,
-        "ms": 122
+        "rstars": 298,
+        "dots": 3401,
+        "knots": 122,
+        "stars": 5,
+        "curves": 5,
+        "used": 98,
+        "ms": 67
       },
       "pageErrors": 0
     },
     {
-      "name": "flocculent__s7__orbit",
-      "preset": "Flocculent",
+      "name": "edge-on-with-dust__s7__orbit",
+      "preset": "Edge-on with dust",
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "3868574e7183ae8dda528eca5dc9578ceb918e8613cbc018b96ab7d8757e25f7",
+      "inkPixelSha256": "882006f0c950472695ef2fde3737b2929a59339f39aeec901599fbddd5fbea2c",
       "stats": {
-        "rstars": 1226,
-        "dots": 8803,
-        "knots": 58,
-        "stars": 21,
-        "curves": 17,
-        "used": 96,
-        "ms": 169
+        "rstars": 755,
+        "dots": 5139,
+        "knots": 137,
+        "stars": 10,
+        "curves": 4,
+        "used": 86,
+        "ms": 135
       },
       "pageErrors": 0
     },
@@ -4027,110 +4607,666 @@
       "pageErrors": 0
     },
     {
-      "name": "grand-design__s4242__home",
-      "preset": "Grand design",
+      "name": "flocculent--single__s4242__home",
+      "preset": "Flocculent",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "27af9cb1e9208fd90000992466eca30e227ad8163eba99162fb6aa67cfe124f9",
+      "inkPixelSha256": "809eba0023e8a19df4bbc31a02d8753a3f8fed7c028ff51012ddd06e2d267636",
+      "captured": "2026-10-06T16:03:52.854Z",
       "stats": {
-        "rstars": 1519,
-        "dots": 7527,
-        "knots": 151,
-        "stars": 16,
-        "curves": 3,
-        "used": 89,
-        "ms": 1607
+        "rstars": 0,
+        "dots": 9239,
+        "knots": 153,
+        "stars": 21,
+        "curves": 17,
+        "used": 68,
+        "ms": 70
       },
       "pageErrors": 0
     },
     {
-      "name": "grand-design__s4242__orbit",
-      "preset": "Grand design",
+      "name": "flocculent--single__s4242__orbit",
+      "preset": "Flocculent",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
       "seed": 4242,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "19318459fd14b7d2b3cd37254d627fa9fd59504c11d1a1fc38480f223f98a81f",
+      "inkPixelSha256": "7901b68420cd7cb45f62a866ac1e9a046c26210e675dab1c120f82785f6a30b2",
+      "captured": "2026-10-06T16:03:59.204Z",
       "stats": {
-        "rstars": 1486,
-        "dots": 7350,
-        "knots": 149,
+        "rstars": 0,
+        "dots": 9137,
+        "knots": 156,
+        "stars": 21,
+        "curves": 17,
+        "used": 67,
+        "ms": 97
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--single__s4242__zoom",
+      "preset": "Flocculent",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "f4e547a51cf0cf9df5fc6aa70c1b7534b2fffdde5b2bf73ea36e6f3aae13f6fa",
+      "captured": "2026-10-06T16:04:07.438Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9239,
+        "knots": 153,
+        "stars": 21,
+        "curves": 17,
+        "used": 68,
+        "ms": 72
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--single__s7__home",
+      "preset": "Flocculent",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "c054d12d19da74e9ec82dbe0fe04be2ae71a4d931392a0188b91dad88b53495b",
+      "captured": "2026-10-06T16:03:48.815Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9115,
+        "knots": 62,
         "stars": 14,
+        "curves": 17,
+        "used": 56,
+        "ms": 67
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--single__s7__orbit",
+      "preset": "Flocculent",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "1b311014b4c19251a9e46c00119594549d1e72b7154da73f7edd4a27d27891b3",
+      "captured": "2026-10-06T16:03:52.960Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9014,
+        "knots": 76,
+        "stars": 12,
+        "curves": 17,
+        "used": 56,
+        "ms": 91
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent--single__s7__zoom",
+      "preset": "Flocculent",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "3146d0bc02cb54e66821c97334825f7e8fd00b91570194448e598713406444ef",
+      "captured": "2026-10-06T16:03:59.100Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9115,
+        "knots": 62,
+        "stars": 14,
+        "curves": 17,
+        "used": 56,
+        "ms": 68
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent__s4242__home",
+      "preset": "Flocculent",
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "33ab5106b1ef645765ba0cef3b74b39db44837d1529b7a29af0e7f437ad4ded2",
+      "stats": {
+        "rstars": 1308,
+        "dots": 8859,
+        "knots": 136,
+        "stars": 19,
+        "curves": 17,
+        "used": 107,
+        "ms": 124
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent__s4242__orbit",
+      "preset": "Flocculent",
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "82aad48153eaa3c3afe4b87354d84b2115f5fc4c2f912124b8a2120cd2a6cbf4",
+      "stats": {
+        "rstars": 1269,
+        "dots": 8600,
+        "knots": 140,
+        "stars": 18,
+        "curves": 17,
+        "used": 111,
+        "ms": 179
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent__s7__home",
+      "preset": "Flocculent",
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "a6d0e1e863f19dbe21a56cebf8b2c4cab121cefe6bc5076438ce1b3e639be527",
+      "stats": {
+        "rstars": 1260,
+        "dots": 8950,
+        "knots": 65,
+        "stars": 24,
+        "curves": 17,
+        "used": 99,
+        "ms": 122
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "flocculent__s7__orbit",
+      "preset": "Flocculent",
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "3868574e7183ae8dda528eca5dc9578ceb918e8613cbc018b96ab7d8757e25f7",
+      "stats": {
+        "rstars": 1226,
+        "dots": 8803,
+        "knots": 58,
+        "stars": 21,
+        "curves": 17,
+        "used": 96,
+        "ms": 169
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-dust__s4242__home",
+      "preset": "Grand design",
+      "variant": "knob-dust",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "dust": 0.7,
+        "thick": 0.12,
+        "incl": 75
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "9b5a6a239971c8d950023171c3bf03ea511ac9f6d77c9b5531a51083dd20d8a7",
+      "captured": "2026-10-06T16:39:12.815Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 5782,
+        "knots": 121,
+        "stars": 13,
         "curves": 3,
-        "used": 92,
-        "ms": 149
+        "used": 53,
+        "ms": 574
       },
       "pageErrors": 0
     },
     {
-      "name": "grand-design__s7__home",
+      "name": "grand-design--knob-dust__s4242__orbit",
       "preset": "Grand design",
+      "variant": "knob-dust",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "dust": 0.7,
+        "thick": 0.12,
+        "incl": 75
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "f9cea1640f789281122581747c051b8e6f5567038f13d59e8cdffa6eb7de7501",
+      "captured": "2026-10-06T16:39:20.262Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 4444,
+        "knots": 101,
+        "stars": 9,
+        "curves": 4,
+        "used": 52,
+        "ms": 138
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-dust__s7__home",
+      "preset": "Grand design",
+      "variant": "knob-dust",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "dust": 0.7,
+        "thick": 0.12,
+        "incl": 75
+      },
       "seed": 7,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "a8701ac1520c824c1dc145e153d8e0c01217a274a8eaa88d86d57384042a4d1f",
+      "inkPixelSha256": "8fe8ba63ebf96ed33f8fff0f5c81bb73579b60f5d8a856b48d063ca4ebb6618c",
+      "captured": "2026-10-06T16:39:13.207Z",
       "stats": {
-        "rstars": 1570,
-        "dots": 8133,
-        "knots": 136,
-        "stars": 18,
+        "rstars": 0,
+        "dots": 5949,
+        "knots": 144,
+        "stars": 14,
         "curves": 4,
-        "used": 90,
-        "ms": 414
+        "used": 59,
+        "ms": 508
       },
       "pageErrors": 0
     },
     {
-      "name": "grand-design__s7__home__chalk",
+      "name": "grand-design--knob-dust__s7__orbit",
       "preset": "Grand design",
-      "seed": 7,
-      "camera": "home",
-      "surface": "chalkboard",
-      "inkPixelSha256": "993f3e60e0509868f25e7311311aa4dd37861add661dc7d67d58c8f0ac511f5a",
-      "stats": {
-        "rstars": 1570,
-        "dots": 8133,
-        "knots": 136,
-        "stars": 18,
-        "curves": 4,
-        "used": 90,
-        "ms": 400
+      "variant": "knob-dust",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "dust": 0.7,
+        "thick": 0.12,
+        "incl": 75
       },
-      "pageErrors": 0
-    },
-    {
-      "name": "grand-design__s7__orbit",
-      "preset": "Grand design",
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "30a9b754c697d43d5fbe91e336c9188b282a840eddfdec85d029f403866320fc",
+      "inkPixelSha256": "7b6cefc354381ff0faf1092c5ddea22a933927da045663d5fad0f67ff6c3f6fe",
+      "captured": "2026-10-06T16:39:20.416Z",
       "stats": {
-        "rstars": 1568,
-        "dots": 7810,
-        "knots": 137,
-        "stars": 20,
-        "curves": 4,
-        "used": 91,
-        "ms": 509
+        "rstars": 0,
+        "dots": 4573,
+        "knots": 125,
+        "stars": 9,
+        "curves": 5,
+        "used": 58,
+        "ms": 194
       },
       "pageErrors": 0
     },
     {
-      "name": "grand-design__s7__orbit__chalk",
+      "name": "grand-design--knob-irr__s4242__home",
       "preset": "Grand design",
+      "variant": "knob-irr",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "irr": 1,
+        "arms": 0,
+        "bulge": 0.1
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "1603edc3b8ea8c182f19eab263f7fa17f5e0d864a8333f8cdb587d06332fb1b7",
+      "captured": "2026-10-06T16:37:57.438Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 7202,
+        "knots": 70,
+        "stars": 8,
+        "curves": 0,
+        "used": 25,
+        "ms": 1220
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-irr__s4242__orbit",
+      "preset": "Grand design",
+      "variant": "knob-irr",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "irr": 1,
+        "arms": 0,
+        "bulge": 0.1
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "0d3c22ca42c5624ed148b8c002aa59358279201d5d5d1f185ebd68be99378395",
+      "captured": "2026-10-06T16:38:02.283Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 7202,
+        "knots": 70,
+        "stars": 8,
+        "curves": 0,
+        "used": 25,
+        "ms": 43
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-irr__s7__home",
+      "preset": "Grand design",
+      "variant": "knob-irr",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "irr": 1,
+        "arms": 0,
+        "bulge": 0.1
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "b678f0014c834f78be9b03e923918a109bf9ad478efa76e97280307a5460ecad",
+      "captured": "2026-10-06T16:37:57.951Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 7293,
+        "knots": 116,
+        "stars": 8,
+        "curves": 0,
+        "used": 27,
+        "ms": 37
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-irr__s7__orbit",
+      "preset": "Grand design",
+      "variant": "knob-irr",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "irr": 1,
+        "arms": 0,
+        "bulge": 0.1
+      },
       "seed": 7,
       "camera": "orbit",
-      "surface": "chalkboard",
-      "inkPixelSha256": "3adf716146ac6ea041d4fa8eb64ddeda9eedfa8347ba6a3929498cf798038005",
+      "surface": "paper",
+      "inkPixelSha256": "a057999728d4be4377aee5aa711a9493868613ae02cfb4faec1e8e62781b7266",
+      "captured": "2026-10-06T16:38:03.737Z",
       "stats": {
-        "rstars": 1568,
-        "dots": 7810,
-        "knots": 137,
-        "stars": 20,
+        "rstars": 0,
+        "dots": 7293,
+        "knots": 116,
+        "stars": 8,
+        "curves": 0,
+        "used": 27,
+        "ms": 85
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-patchy__s4242__home",
+      "preset": "Grand design",
+      "variant": "knob-patchy",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "patchy": 0.9
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "5516ee7824b2f9111ab191fa1cc3c225c1d1b81fc561aebe1b1247251e9f4976",
+      "captured": "2026-10-06T16:37:58.070Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9757,
+        "knots": 260,
+        "stars": 19,
+        "curves": 2,
+        "used": 57,
+        "ms": 1473
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-patchy__s4242__orbit",
+      "preset": "Grand design",
+      "variant": "knob-patchy",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "patchy": 0.9
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "3fbde4f43b3a68a1417e6becfbd57451fe299f31e76e8e7bc8511ada5ee49619",
+      "captured": "2026-10-06T16:38:03.773Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9679,
+        "knots": 287,
+        "stars": 21,
+        "curves": 2,
+        "used": 56,
+        "ms": 202
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-patchy__s7__home",
+      "preset": "Grand design",
+      "variant": "knob-patchy",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "patchy": 0.9
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "9181cae05978fa487ee153e2c5770c5657408a0712c67a7e364d35fd0d0245a4",
+      "captured": "2026-10-06T16:37:57.369Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9947,
+        "knots": 361,
+        "stars": 18,
+        "curves": 3,
+        "used": 52,
+        "ms": 224
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-patchy__s7__orbit",
+      "preset": "Grand design",
+      "variant": "knob-patchy",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "patchy": 0.9
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "c42b0ce0d53394bc86c2bbcd35a0df54c381a544fa64802101eba6bf764bcd82",
+      "captured": "2026-10-06T16:38:03.700Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9930,
+        "knots": 363,
+        "stars": 17,
+        "curves": 3,
+        "used": 52,
+        "ms": 283
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-whole__s4242__home",
+      "preset": "Grand design",
+      "variant": "knob-whole",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "nuclear": 1,
+        "whole": 1,
+        "envelope": 1
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "3a311d6f8407248a802664b8716576c961f095190b817ae05347c630c452a395",
+      "captured": "2026-10-06T16:39:48.801Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9272,
+        "knots": 148,
+        "stars": 30,
+        "curves": 3,
+        "used": 59,
+        "ms": 43
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-whole__s4242__orbit",
+      "preset": "Grand design",
+      "variant": "knob-whole",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "nuclear": 1,
+        "whole": 1,
+        "envelope": 1
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "cd23291c0e83d252cf176bead212b521364ba37d5e92d3b3817a7bf13ea0d98d",
+      "captured": "2026-10-06T16:39:53.871Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9189,
+        "knots": 161,
+        "stars": 28,
+        "curves": 3,
+        "used": 59,
+        "ms": 70
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-whole__s7__home",
+      "preset": "Grand design",
+      "variant": "knob-whole",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "nuclear": 1,
+        "whole": 1,
+        "envelope": 1
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "435facd68e616e8b90f6c6640f07d7452dc99aaff4ce374065d1f91edca66111",
+      "captured": "2026-10-06T16:39:50.172Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9492,
+        "knots": 175,
+        "stars": 22,
         "curves": 4,
-        "used": 91,
-        "ms": 368
+        "used": 54,
+        "ms": 108
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--knob-whole__s7__orbit",
+      "preset": "Grand design",
+      "variant": "knob-whole",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "nuclear": 1,
+        "whole": 1,
+        "envelope": 1
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "fb6d86663418dbd2da0ab4b4a273ae81f3fc947771c7305477fc47e187084988",
+      "captured": "2026-10-06T16:39:55.052Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9477,
+        "knots": 161,
+        "stars": 22,
+        "curves": 4,
+        "used": 54,
+        "ms": 87
       },
       "pageErrors": 0
     },
@@ -4685,6 +5821,208 @@
       "pageErrors": 0
     },
     {
+      "name": "grand-design--single__s4242__home",
+      "preset": "Grand design",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "f8b5a755dac21138325d8b2e63f0d2af204e3d70118d3fd4e32b42d7566d3db3",
+      "captured": "2026-10-06T16:03:52.258Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9272,
+        "knots": 148,
+        "stars": 30,
+        "curves": 3,
+        "used": 53,
+        "ms": 33
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--single__s4242__orbit",
+      "preset": "Grand design",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "364fa1a08d1ce6dc238040da3ac0d4edb36c22c51e970b8f3568cd43dc79b3ed",
+      "captured": "2026-10-06T16:03:58.504Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9189,
+        "knots": 161,
+        "stars": 28,
+        "curves": 3,
+        "used": 53,
+        "ms": 65
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--single__s4242__zoom",
+      "preset": "Grand design",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "399afbce0c7a68290873c8b25719260b897a99d7d29a4ae7894fba97ef581b65",
+      "captured": "2026-10-06T16:04:05.490Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9272,
+        "knots": 148,
+        "stars": 30,
+        "curves": 3,
+        "used": 53,
+        "ms": 46
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--single__s7__home",
+      "preset": "Grand design",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "37c61aa0c05a5beca763887bf1ace64bf582ebfcad3d1366ed3a60b6b0604836",
+      "captured": "2026-10-06T16:03:52.538Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9492,
+        "knots": 175,
+        "stars": 22,
+        "curves": 4,
+        "used": 51,
+        "ms": 56
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--single__s7__home__chalk",
+      "preset": "Grand design",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "chalkboard",
+      "inkPixelSha256": "c2c3d82745d175a5e53c8dae1c8647f800ddef578075fb2c936d5ed782f77d7e",
+      "captured": "2026-10-06T16:07:05.946Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9492,
+        "knots": 175,
+        "stars": 22,
+        "curves": 4,
+        "used": 51,
+        "ms": 110
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--single__s7__orbit",
+      "preset": "Grand design",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "6fbf17f4580407e5f7122e627095e8d651099234b6befacf0e858bd8296dcfff",
+      "captured": "2026-10-06T16:03:58.724Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9477,
+        "knots": 161,
+        "stars": 22,
+        "curves": 4,
+        "used": 51,
+        "ms": 78
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--single__s7__orbit__chalk",
+      "preset": "Grand design",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "chalkboard",
+      "inkPixelSha256": "3be2291e6d18c2421f0d456cdcc04db0b213ed7f20ea946ed8a271e8c63d6283",
+      "captured": "2026-10-06T16:07:10.768Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9477,
+        "knots": 161,
+        "stars": 22,
+        "curves": 4,
+        "used": 51,
+        "ms": 64
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design--single__s7__zoom",
+      "preset": "Grand design",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "c9a211f47cb5ad42d63c9472126bcdb3ae1959dc91cb83fd2ef11fae2d862248",
+      "captured": "2026-10-06T16:04:05.422Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9492,
+        "knots": 175,
+        "stars": 22,
+        "curves": 4,
+        "used": 51,
+        "ms": 43
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "grand-design--stipple-arms__s4242__home",
       "preset": "Grand design",
       "variant": "stipple-arms",
@@ -4805,74 +6143,110 @@
       "pageErrors": 0
     },
     {
-      "name": "hand-drawn-arms__s4242__home",
-      "preset": "Hand-drawn arms",
+      "name": "grand-design__s4242__home",
+      "preset": "Grand design",
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "33e3b88522112e159f11ad16920094b266bfd4624ad8b490da4990c9378bfe78",
+      "inkPixelSha256": "27af9cb1e9208fd90000992466eca30e227ad8163eba99162fb6aa67cfe124f9",
       "stats": {
-        "rstars": 1475,
-        "dots": 7586,
-        "knots": 178,
-        "stars": 17,
-        "curves": 0,
-        "used": 97,
-        "ms": 118
+        "rstars": 1519,
+        "dots": 7527,
+        "knots": 151,
+        "stars": 16,
+        "curves": 3,
+        "used": 89,
+        "ms": 1607
       },
       "pageErrors": 0
     },
     {
-      "name": "hand-drawn-arms__s4242__orbit",
-      "preset": "Hand-drawn arms",
+      "name": "grand-design__s4242__orbit",
+      "preset": "Grand design",
       "seed": 4242,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "4fde53ae59c8edd02752001896dca8b2848f67c9b6fb976e8550e3b84d73d36e",
+      "inkPixelSha256": "19318459fd14b7d2b3cd37254d627fa9fd59504c11d1a1fc38480f223f98a81f",
       "stats": {
-        "rstars": 1454,
-        "dots": 6987,
-        "knots": 145,
-        "stars": 19,
-        "curves": 0,
-        "used": 102,
-        "ms": 194
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "hand-drawn-arms__s7__home",
-      "preset": "Hand-drawn arms",
-      "seed": 7,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "5d9ae8cecf39c606c258770bbcdbc2e28eaadca380d65c4360f71fc2f0b2cd9a",
-      "stats": {
-        "rstars": 1509,
-        "dots": 7152,
-        "knots": 115,
+        "rstars": 1486,
+        "dots": 7350,
+        "knots": 149,
         "stars": 14,
-        "curves": 0,
-        "used": 100,
-        "ms": 1895
+        "curves": 3,
+        "used": 92,
+        "ms": 149
       },
       "pageErrors": 0
     },
     {
-      "name": "hand-drawn-arms__s7__orbit",
-      "preset": "Hand-drawn arms",
+      "name": "grand-design__s7__home",
+      "preset": "Grand design",
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "a8701ac1520c824c1dc145e153d8e0c01217a274a8eaa88d86d57384042a4d1f",
+      "stats": {
+        "rstars": 1570,
+        "dots": 8133,
+        "knots": 136,
+        "stars": 18,
+        "curves": 4,
+        "used": 90,
+        "ms": 414
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design__s7__home__chalk",
+      "preset": "Grand design",
+      "seed": 7,
+      "camera": "home",
+      "surface": "chalkboard",
+      "inkPixelSha256": "993f3e60e0509868f25e7311311aa4dd37861add661dc7d67d58c8f0ac511f5a",
+      "stats": {
+        "rstars": 1570,
+        "dots": 8133,
+        "knots": 136,
+        "stars": 18,
+        "curves": 4,
+        "used": 90,
+        "ms": 400
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design__s7__orbit",
+      "preset": "Grand design",
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "24ea5afb1647bd15b80f5a1b8f78211d5d877e6cd5e9b93426d9b0e9457c0bb0",
+      "inkPixelSha256": "30a9b754c697d43d5fbe91e336c9188b282a840eddfdec85d029f403866320fc",
       "stats": {
-        "rstars": 1479,
-        "dots": 6999,
-        "knots": 103,
-        "stars": 13,
-        "curves": 0,
-        "used": 103,
-        "ms": 181
+        "rstars": 1568,
+        "dots": 7810,
+        "knots": 137,
+        "stars": 20,
+        "curves": 4,
+        "used": 91,
+        "ms": 509
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "grand-design__s7__orbit__chalk",
+      "preset": "Grand design",
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "chalkboard",
+      "inkPixelSha256": "3adf716146ac6ea041d4fa8eb64ddeda9eedfa8347ba6a3929498cf798038005",
+      "stats": {
+        "rstars": 1568,
+        "dots": 7810,
+        "knots": 137,
+        "stars": 20,
+        "curves": 4,
+        "used": 91,
+        "ms": 368
       },
       "pageErrors": 0
     },
@@ -5029,74 +6403,74 @@
       "pageErrors": 0
     },
     {
-      "name": "hand-wobble__s4242__home",
-      "preset": "Hand wobble",
+      "name": "hand-drawn-arms__s4242__home",
+      "preset": "Hand-drawn arms",
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "24028cb434a3e40910b91d363d56a1a0ee7064c9eb5fd9ab83dc21e06d75a685",
+      "inkPixelSha256": "33e3b88522112e159f11ad16920094b266bfd4624ad8b490da4990c9378bfe78",
       "stats": {
-        "rstars": 1399,
-        "dots": 7374,
-        "knots": 155,
-        "stars": 24,
-        "curves": 5,
+        "rstars": 1475,
+        "dots": 7586,
+        "knots": 178,
+        "stars": 17,
+        "curves": 0,
+        "used": 97,
+        "ms": 118
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-drawn-arms__s4242__orbit",
+      "preset": "Hand-drawn arms",
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "4fde53ae59c8edd02752001896dca8b2848f67c9b6fb976e8550e3b84d73d36e",
+      "stats": {
+        "rstars": 1454,
+        "dots": 6987,
+        "knots": 145,
+        "stars": 19,
+        "curves": 0,
+        "used": 102,
+        "ms": 194
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-drawn-arms__s7__home",
+      "preset": "Hand-drawn arms",
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "5d9ae8cecf39c606c258770bbcdbc2e28eaadca380d65c4360f71fc2f0b2cd9a",
+      "stats": {
+        "rstars": 1509,
+        "dots": 7152,
+        "knots": 115,
+        "stars": 14,
+        "curves": 0,
         "used": 100,
-        "ms": 188
+        "ms": 1895
       },
       "pageErrors": 0
     },
     {
-      "name": "hand-wobble__s4242__orbit",
-      "preset": "Hand wobble",
-      "seed": 4242,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "4d4fcc52675e74c539a47cef836acbdda2ae6d095986b15bd073fc14d28e20c0",
-      "stats": {
-        "rstars": 1397,
-        "dots": 7171,
-        "knots": 161,
-        "stars": 26,
-        "curves": 5,
-        "used": 104,
-        "ms": 141
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "hand-wobble__s7__home",
-      "preset": "Hand wobble",
-      "seed": 7,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "cbdb6fb6abeaec669da6a0ee22433861b83e203a611ca5c2dbc97caf0eb6e0be",
-      "stats": {
-        "rstars": 1532,
-        "dots": 8004,
-        "knots": 102,
-        "stars": 20,
-        "curves": 5,
-        "used": 104,
-        "ms": 126
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "hand-wobble__s7__orbit",
-      "preset": "Hand wobble",
+      "name": "hand-drawn-arms__s7__orbit",
+      "preset": "Hand-drawn arms",
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "0ca1cd886d9d4aa0c57a18eefcfb6c473c1df39feac239f70eca0bf4530fb97f",
+      "inkPixelSha256": "24ea5afb1647bd15b80f5a1b8f78211d5d877e6cd5e9b93426d9b0e9457c0bb0",
       "stats": {
-        "rstars": 1528,
-        "dots": 7593,
-        "knots": 87,
-        "stars": 25,
-        "curves": 5,
-        "used": 104,
-        "ms": 232
+        "rstars": 1479,
+        "dots": 6999,
+        "knots": 103,
+        "stars": 13,
+        "curves": 0,
+        "used": 103,
+        "ms": 181
       },
       "pageErrors": 0
     },
@@ -5651,6 +7025,230 @@
       "pageErrors": 0
     },
     {
+      "name": "hand-wobble--single__s4242__home",
+      "preset": "Hand wobble",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "4dad65df08364bc59cebbf7c8a9f6c15cf27a77dac961e6667e20a55537468fe",
+      "captured": "2026-10-06T16:05:14.155Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9024,
+        "knots": 153,
+        "stars": 24,
+        "curves": 5,
+        "used": 58,
+        "ms": 59
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--single__s4242__orbit",
+      "preset": "Hand wobble",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "3a5dcc240781c3a1a8049fd27abb2ef80ac15b83dc526019d6de666d6c36a77d",
+      "captured": "2026-10-06T16:05:18.243Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 8975,
+        "knots": 149,
+        "stars": 27,
+        "curves": 5,
+        "used": 59,
+        "ms": 190
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--single__s4242__zoom",
+      "preset": "Hand wobble",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "b75571e911aee468bdf8778c11317ab2faa28a81107147d0614afca2febd1c48",
+      "captured": "2026-10-06T16:05:24.556Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9024,
+        "knots": 153,
+        "stars": 24,
+        "curves": 5,
+        "used": 58,
+        "ms": 42
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--single__s7__home",
+      "preset": "Hand wobble",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "0653b46ed8edb09b0e5d86c4b89eb56d1a524e4812d9700e9dc7be548decd553",
+      "captured": "2026-10-06T16:05:11.764Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9228,
+        "knots": 128,
+        "stars": 21,
+        "curves": 5,
+        "used": 63,
+        "ms": 1353
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--single__s7__orbit",
+      "preset": "Hand wobble",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "9730a0da4f534bde4626acd6882852b839ac4a1ea56e7c9db79df7977917584d",
+      "captured": "2026-10-06T16:05:14.187Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9159,
+        "knots": 129,
+        "stars": 24,
+        "curves": 5,
+        "used": 62,
+        "ms": 137
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble--single__s7__zoom",
+      "preset": "Hand wobble",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "9d25957747c69bccc8253b30c5420040db5fe4af72fbb23f44e5bfd1d977d23a",
+      "captured": "2026-10-06T16:05:18.493Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9228,
+        "knots": 128,
+        "stars": 21,
+        "curves": 5,
+        "used": 63,
+        "ms": 72
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble__s4242__home",
+      "preset": "Hand wobble",
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "24028cb434a3e40910b91d363d56a1a0ee7064c9eb5fd9ab83dc21e06d75a685",
+      "stats": {
+        "rstars": 1399,
+        "dots": 7374,
+        "knots": 155,
+        "stars": 24,
+        "curves": 5,
+        "used": 100,
+        "ms": 188
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble__s4242__orbit",
+      "preset": "Hand wobble",
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "4d4fcc52675e74c539a47cef836acbdda2ae6d095986b15bd073fc14d28e20c0",
+      "stats": {
+        "rstars": 1397,
+        "dots": 7171,
+        "knots": 161,
+        "stars": 26,
+        "curves": 5,
+        "used": 104,
+        "ms": 141
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble__s7__home",
+      "preset": "Hand wobble",
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "cbdb6fb6abeaec669da6a0ee22433861b83e203a611ca5c2dbc97caf0eb6e0be",
+      "stats": {
+        "rstars": 1532,
+        "dots": 8004,
+        "knots": 102,
+        "stars": 20,
+        "curves": 5,
+        "used": 104,
+        "ms": 126
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "hand-wobble__s7__orbit",
+      "preset": "Hand wobble",
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "0ca1cd886d9d4aa0c57a18eefcfb6c473c1df39feac239f70eca0bf4530fb97f",
+      "stats": {
+        "rstars": 1528,
+        "dots": 7593,
+        "knots": 87,
+        "stars": 25,
+        "curves": 5,
+        "used": 104,
+        "ms": 232
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "layered-barred-spiral-satellite-trail__s4242__home",
       "preset": "Layered: barred spiral, satellite trail",
       "seed": 4242,
@@ -6007,78 +7605,6 @@
         "curves": 4,
         "used": 92,
         "ms": 156
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "lens-a-quad__s4242__home",
-      "preset": "Lens: a quad",
-      "seed": 4242,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "56bc797d69b395269b9851baacd3be7ea78fbb5b109b5fdafb3619ff13f5267f",
-      "stats": {
-        "rstars": 2341,
-        "dots": 13220,
-        "knots": 223,
-        "stars": 7,
-        "curves": 0,
-        "used": 87,
-        "ms": 2511
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "lens-a-quad__s4242__orbit",
-      "preset": "Lens: a quad",
-      "seed": 4242,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "a8c69c70912eec5c5fc6bb43e2e4225a98d1be053a26bc7a5e1235befe0062f4",
-      "stats": {
-        "rstars": 824,
-        "dots": 13237,
-        "knots": 45,
-        "stars": 2,
-        "curves": 0,
-        "used": 89,
-        "ms": 272
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "lens-a-quad__s7__home",
-      "preset": "Lens: a quad",
-      "seed": 7,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "14ab9da2464f46cb560bc8807a8533425f5681d13873d40cee27f0204c8e83cd",
-      "stats": {
-        "rstars": 2208,
-        "dots": 11743,
-        "knots": 171,
-        "stars": 16,
-        "curves": 0,
-        "used": 92,
-        "ms": 608
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "lens-a-quad__s7__orbit",
-      "preset": "Lens: a quad",
-      "seed": 7,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "d20f4b6a3117103d1ed6cdbf8e960aaa3e73cda2b627d19b91161bdbd354b900",
-      "stats": {
-        "rstars": 774,
-        "dots": 11708,
-        "knots": 39,
-        "stars": 4,
-        "curves": 0,
-        "used": 86,
-        "ms": 230
       },
       "pageErrors": 0
     },
@@ -6497,58 +8023,6 @@
       "pageErrors": 0
     },
     {
-      "name": "lens-a-quad--lens__s5__home",
-      "preset": "Lens: a quad",
-      "variant": "lens",
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      },
-      "calibration": true,
-      "seed": 5,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "155a45dcd9911f1ba67e2503aba03cad0633c292343bfbe888de2541a8aeba13",
-      "captured": "2026-10-07T00:25:36.284Z",
-      "stats": {
-        "rstars": 0,
-        "dots": 13025,
-        "knots": 197,
-        "stars": 16,
-        "curves": 0,
-        "used": 45,
-        "ms": 7692
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "lens-a-quad--lens__s5__orbit",
-      "preset": "Lens: a quad",
-      "variant": "lens",
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      },
-      "calibration": true,
-      "seed": 5,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "4217ee14b457ee366ef0f767a0234f0b34821b63717d59f79b5c52dd1950e3d0",
-      "captured": "2026-10-07T00:25:43.529Z",
-      "stats": {
-        "rstars": 0,
-        "dots": 13007,
-        "knots": 42,
-        "stars": 4,
-        "curves": 0,
-        "used": 45,
-        "ms": 225
-      },
-      "pageErrors": 0
-    },
-    {
       "name": "lens-a-quad--lens__s53__home",
       "preset": "Lens: a quad",
       "variant": "lens",
@@ -6597,6 +8071,58 @@
         "curves": 0,
         "used": 49,
         "ms": 103
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-a-quad--lens__s5__home",
+      "preset": "Lens: a quad",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 5,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "155a45dcd9911f1ba67e2503aba03cad0633c292343bfbe888de2541a8aeba13",
+      "captured": "2026-10-07T00:25:36.284Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 13025,
+        "knots": 197,
+        "stars": 16,
+        "curves": 0,
+        "used": 45,
+        "ms": 7692
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-a-quad--lens__s5__orbit",
+      "preset": "Lens: a quad",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 5,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "4217ee14b457ee366ef0f767a0234f0b34821b63717d59f79b5c52dd1950e3d0",
+      "captured": "2026-10-07T00:25:43.529Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 13007,
+        "knots": 42,
+        "stars": 4,
+        "curves": 0,
+        "used": 45,
+        "ms": 225
       },
       "pageErrors": 0
     },
@@ -6703,74 +8229,74 @@
       "pageErrors": 0
     },
     {
-      "name": "lens-double-einstein-ring__s4242__home",
-      "preset": "Lens: double Einstein ring",
+      "name": "lens-a-quad__s4242__home",
+      "preset": "Lens: a quad",
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "25882baf284a04a8467fe23cd6620ac37d4eab178001582800006059ad972f51",
+      "inkPixelSha256": "56bc797d69b395269b9851baacd3be7ea78fbb5b109b5fdafb3619ff13f5267f",
       "stats": {
-        "rstars": 2565,
-        "dots": 15014,
-        "knots": 216,
-        "stars": 6,
+        "rstars": 2341,
+        "dots": 13220,
+        "knots": 223,
+        "stars": 7,
         "curves": 0,
-        "used": 97,
-        "ms": 814
+        "used": 87,
+        "ms": 2511
       },
       "pageErrors": 0
     },
     {
-      "name": "lens-double-einstein-ring__s4242__orbit",
-      "preset": "Lens: double Einstein ring",
+      "name": "lens-a-quad__s4242__orbit",
+      "preset": "Lens: a quad",
       "seed": 4242,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "c0613180b44d2a78426c19aab3895bbe647e6ca6bda71a6c523f0b60f743f63b",
+      "inkPixelSha256": "a8c69c70912eec5c5fc6bb43e2e4225a98d1be053a26bc7a5e1235befe0062f4",
       "stats": {
         "rstars": 824,
-        "dots": 13490,
-        "knots": 51,
+        "dots": 13237,
+        "knots": 45,
         "stars": 2,
         "curves": 0,
-        "used": 99,
-        "ms": 301
+        "used": 89,
+        "ms": 272
       },
       "pageErrors": 0
     },
     {
-      "name": "lens-double-einstein-ring__s7__home",
-      "preset": "Lens: double Einstein ring",
+      "name": "lens-a-quad__s7__home",
+      "preset": "Lens: a quad",
       "seed": 7,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "a4f03509a2fa1ba914c4d026adc7879ca956c636fbbc3e0ae4bb7f44147986ee",
+      "inkPixelSha256": "14ab9da2464f46cb560bc8807a8533425f5681d13873d40cee27f0204c8e83cd",
       "stats": {
-        "rstars": 2510,
-        "dots": 13865,
-        "knots": 233,
-        "stars": 9,
+        "rstars": 2208,
+        "dots": 11743,
+        "knots": 171,
+        "stars": 16,
         "curves": 0,
-        "used": 107,
-        "ms": 747
+        "used": 92,
+        "ms": 608
       },
       "pageErrors": 0
     },
     {
-      "name": "lens-double-einstein-ring__s7__orbit",
-      "preset": "Lens: double Einstein ring",
+      "name": "lens-a-quad__s7__orbit",
+      "preset": "Lens: a quad",
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "21dcae177498eb31d2547dc8f5323e415fd568bf224b6d640a2e1ee9ef7c7d9d",
+      "inkPixelSha256": "d20f4b6a3117103d1ed6cdbf8e960aaa3e73cda2b627d19b91161bdbd354b900",
       "stats": {
         "rstars": 774,
-        "dots": 12396,
-        "knots": 31,
-        "stars": 3,
+        "dots": 11708,
+        "knots": 39,
+        "stars": 4,
         "curves": 0,
-        "used": 101,
-        "ms": 219
+        "used": 86,
+        "ms": 230
       },
       "pageErrors": 0
     },
@@ -7189,58 +8715,6 @@
       "pageErrors": 0
     },
     {
-      "name": "lens-double-einstein-ring--lens__s5__home",
-      "preset": "Lens: double Einstein ring",
-      "variant": "lens",
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      },
-      "calibration": true,
-      "seed": 5,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "4219660d36d2ec95bd2290aa1c978bf2042d6700d0d7a9432be7b635dab40a57",
-      "captured": "2026-10-07T00:23:24.637Z",
-      "stats": {
-        "rstars": 0,
-        "dots": 14444,
-        "knots": 423,
-        "stars": 14,
-        "curves": 0,
-        "used": 57,
-        "ms": 622
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "lens-double-einstein-ring--lens__s5__orbit",
-      "preset": "Lens: double Einstein ring",
-      "variant": "lens",
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      },
-      "calibration": true,
-      "seed": 5,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "a3663fb8dc332bb43c02a2ed8f54095324295e86cfd09cef696c1d5618c6bdca",
-      "captured": "2026-10-07T00:23:33.479Z",
-      "stats": {
-        "rstars": 0,
-        "dots": 13005,
-        "knots": 41,
-        "stars": 6,
-        "curves": 0,
-        "used": 57,
-        "ms": 263
-      },
-      "pageErrors": 0
-    },
-    {
       "name": "lens-double-einstein-ring--lens__s53__home",
       "preset": "Lens: double Einstein ring",
       "variant": "lens",
@@ -7289,6 +8763,58 @@
         "curves": 0,
         "used": 58,
         "ms": 633
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-double-einstein-ring--lens__s5__home",
+      "preset": "Lens: double Einstein ring",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 5,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "4219660d36d2ec95bd2290aa1c978bf2042d6700d0d7a9432be7b635dab40a57",
+      "captured": "2026-10-07T00:23:24.637Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 14444,
+        "knots": 423,
+        "stars": 14,
+        "curves": 0,
+        "used": 57,
+        "ms": 622
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-double-einstein-ring--lens__s5__orbit",
+      "preset": "Lens: double Einstein ring",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 5,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "a3663fb8dc332bb43c02a2ed8f54095324295e86cfd09cef696c1d5618c6bdca",
+      "captured": "2026-10-07T00:23:33.479Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 13005,
+        "knots": 41,
+        "stars": 6,
+        "curves": 0,
+        "used": 57,
+        "ms": 263
       },
       "pageErrors": 0
     },
@@ -7395,74 +8921,74 @@
       "pageErrors": 0
     },
     {
-      "name": "lens-einstein-cross-quasar__s4242__home",
-      "preset": "Lens: Einstein cross (quasar)",
+      "name": "lens-double-einstein-ring__s4242__home",
+      "preset": "Lens: double Einstein ring",
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "1bd9a52e20944df9cb48e480e1fea0f8a5df50ce98834ac93f6c2338f4da5fb8",
+      "inkPixelSha256": "25882baf284a04a8467fe23cd6620ac37d4eab178001582800006059ad972f51",
       "stats": {
-        "rstars": 1547,
-        "dots": 14822,
-        "knots": 221,
-        "stars": 5,
+        "rstars": 2565,
+        "dots": 15014,
+        "knots": 216,
+        "stars": 6,
         "curves": 0,
-        "used": 85,
-        "ms": 982
+        "used": 97,
+        "ms": 814
       },
       "pageErrors": 0
     },
     {
-      "name": "lens-einstein-cross-quasar__s4242__orbit",
-      "preset": "Lens: Einstein cross (quasar)",
+      "name": "lens-double-einstein-ring__s4242__orbit",
+      "preset": "Lens: double Einstein ring",
       "seed": 4242,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "138712d976183db4585cc3003cd913577234e169616827ef7dfd989f5328d7ce",
+      "inkPixelSha256": "c0613180b44d2a78426c19aab3895bbe647e6ca6bda71a6c523f0b60f743f63b",
       "stats": {
-        "rstars": 660,
-        "dots": 10821,
-        "knots": 38,
-        "stars": 0,
+        "rstars": 824,
+        "dots": 13490,
+        "knots": 51,
+        "stars": 2,
         "curves": 0,
-        "used": 82,
-        "ms": 217
+        "used": 99,
+        "ms": 301
       },
       "pageErrors": 0
     },
     {
-      "name": "lens-einstein-cross-quasar__s7__home",
-      "preset": "Lens: Einstein cross (quasar)",
+      "name": "lens-double-einstein-ring__s7__home",
+      "preset": "Lens: double Einstein ring",
       "seed": 7,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "49a8cfa92e4def48f23d2e54707d6a7653a50c0603711f6fa6f830cc6b6202d4",
+      "inkPixelSha256": "a4f03509a2fa1ba914c4d026adc7879ca956c636fbbc3e0ae4bb7f44147986ee",
       "stats": {
-        "rstars": 1506,
-        "dots": 13280,
-        "knots": 315,
-        "stars": 7,
+        "rstars": 2510,
+        "dots": 13865,
+        "knots": 233,
+        "stars": 9,
         "curves": 0,
-        "used": 94,
-        "ms": 425
+        "used": 107,
+        "ms": 747
       },
       "pageErrors": 0
     },
     {
-      "name": "lens-einstein-cross-quasar__s7__orbit",
-      "preset": "Lens: Einstein cross (quasar)",
+      "name": "lens-double-einstein-ring__s7__orbit",
+      "preset": "Lens: double Einstein ring",
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "fe0bf52d475f7acbb7c5078ad965d4d7a3e26d9633173eb81da2263002aef122",
+      "inkPixelSha256": "21dcae177498eb31d2547dc8f5323e415fd568bf224b6d640a2e1ee9ef7c7d9d",
       "stats": {
-        "rstars": 625,
-        "dots": 9299,
-        "knots": 56,
+        "rstars": 774,
+        "dots": 12396,
+        "knots": 31,
         "stars": 3,
         "curves": 0,
-        "used": 84,
-        "ms": 129
+        "used": 101,
+        "ms": 219
       },
       "pageErrors": 0
     },
@@ -7881,58 +9407,6 @@
       "pageErrors": 0
     },
     {
-      "name": "lens-einstein-cross-quasar--lens__s5__home",
-      "preset": "Lens: Einstein cross (quasar)",
-      "variant": "lens",
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      },
-      "calibration": true,
-      "seed": 5,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "06e24e1f174356e4ee6dbdae0ff6b42539eea2210a45adef98fac75178866351",
-      "captured": "2026-10-07T00:21:09.827Z",
-      "stats": {
-        "rstars": 4,
-        "dots": 14536,
-        "knots": 317,
-        "stars": 5,
-        "curves": 0,
-        "used": 54,
-        "ms": 261
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "lens-einstein-cross-quasar--lens__s5__orbit",
-      "preset": "Lens: Einstein cross (quasar)",
-      "variant": "lens",
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      },
-      "calibration": true,
-      "seed": 5,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "b5ba1033d2e583f194435f5f7d13b08a3187786bf266c98ad1ea5991fd13c255",
-      "captured": "2026-10-07T00:21:14.660Z",
-      "stats": {
-        "rstars": 1,
-        "dots": 10573,
-        "knots": 65,
-        "stars": 1,
-        "curves": 0,
-        "used": 48,
-        "ms": 191
-      },
-      "pageErrors": 0
-    },
-    {
       "name": "lens-einstein-cross-quasar--lens__s53__home",
       "preset": "Lens: Einstein cross (quasar)",
       "variant": "lens",
@@ -7981,6 +9455,58 @@
         "curves": 0,
         "used": 55,
         "ms": 148
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-einstein-cross-quasar--lens__s5__home",
+      "preset": "Lens: Einstein cross (quasar)",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 5,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "06e24e1f174356e4ee6dbdae0ff6b42539eea2210a45adef98fac75178866351",
+      "captured": "2026-10-07T00:21:09.827Z",
+      "stats": {
+        "rstars": 4,
+        "dots": 14536,
+        "knots": 317,
+        "stars": 5,
+        "curves": 0,
+        "used": 54,
+        "ms": 261
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-einstein-cross-quasar--lens__s5__orbit",
+      "preset": "Lens: Einstein cross (quasar)",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 5,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "b5ba1033d2e583f194435f5f7d13b08a3187786bf266c98ad1ea5991fd13c255",
+      "captured": "2026-10-07T00:21:14.660Z",
+      "stats": {
+        "rstars": 1,
+        "dots": 10573,
+        "knots": 65,
+        "stars": 1,
+        "curves": 0,
+        "used": 48,
+        "ms": 191
       },
       "pageErrors": 0
     },
@@ -8087,110 +9613,74 @@
       "pageErrors": 0
     },
     {
-      "name": "lens-einstein-ring__s4242__home",
-      "preset": "Lens: Einstein ring",
+      "name": "lens-einstein-cross-quasar__s4242__home",
+      "preset": "Lens: Einstein cross (quasar)",
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "ca4ba314d9d9d4898c054f532636d7a7256d57cf0cf4d73d6ac8f3ab15641afa",
+      "inkPixelSha256": "1bd9a52e20944df9cb48e480e1fea0f8a5df50ce98834ac93f6c2338f4da5fb8",
       "stats": {
-        "rstars": 2094,
-        "dots": 13099,
-        "knots": 179,
+        "rstars": 1547,
+        "dots": 14822,
+        "knots": 221,
         "stars": 5,
         "curves": 0,
-        "used": 87,
-        "ms": 659
+        "used": 85,
+        "ms": 982
       },
       "pageErrors": 0
     },
     {
-      "name": "lens-einstein-ring__s4242__orbit",
-      "preset": "Lens: Einstein ring",
+      "name": "lens-einstein-cross-quasar__s4242__orbit",
+      "preset": "Lens: Einstein cross (quasar)",
       "seed": 4242,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "9b22afaf9e20bd47b867cd9c0b94c4499f46a94d2a462178b0d9415392210396",
+      "inkPixelSha256": "138712d976183db4585cc3003cd913577234e169616827ef7dfd989f5328d7ce",
       "stats": {
-        "rstars": 824,
-        "dots": 13037,
-        "knots": 42,
+        "rstars": 660,
+        "dots": 10821,
+        "knots": 38,
         "stars": 0,
         "curves": 0,
-        "used": 89,
-        "ms": 222
+        "used": 82,
+        "ms": 217
       },
       "pageErrors": 0
     },
     {
-      "name": "lens-einstein-ring__s7__home",
-      "preset": "Lens: Einstein ring",
+      "name": "lens-einstein-cross-quasar__s7__home",
+      "preset": "Lens: Einstein cross (quasar)",
       "seed": 7,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "1ab2462a73962885ea70f061b63c4a75c8d630dc01afa527c2db6df2daaae37a",
+      "inkPixelSha256": "49a8cfa92e4def48f23d2e54707d6a7653a50c0603711f6fa6f830cc6b6202d4",
       "stats": {
-        "rstars": 1920,
-        "dots": 11910,
-        "knots": 131,
-        "stars": 15,
+        "rstars": 1506,
+        "dots": 13280,
+        "knots": 315,
+        "stars": 7,
         "curves": 0,
-        "used": 92,
-        "ms": 1194
+        "used": 94,
+        "ms": 425
       },
       "pageErrors": 0
     },
     {
-      "name": "lens-einstein-ring__s7__home__chalk",
-      "preset": "Lens: Einstein ring",
-      "seed": 7,
-      "camera": "home",
-      "surface": "chalkboard",
-      "inkPixelSha256": "07324c210c95f5bdabe21fc5ce5ef260427566969dedd8ee2e005990bc6983e3",
-      "stats": {
-        "rstars": 1920,
-        "dots": 11910,
-        "knots": 131,
-        "stars": 15,
-        "curves": 0,
-        "used": 92,
-        "ms": 520
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "lens-einstein-ring__s7__orbit",
-      "preset": "Lens: Einstein ring",
+      "name": "lens-einstein-cross-quasar__s7__orbit",
+      "preset": "Lens: Einstein cross (quasar)",
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "aba5d4774daff375c4d2ef29e6f3fb32b870f87af1ea31e1f1cfb1a59a83fd60",
+      "inkPixelSha256": "fe0bf52d475f7acbb7c5078ad965d4d7a3e26d9633173eb81da2263002aef122",
       "stats": {
-        "rstars": 774,
-        "dots": 11955,
-        "knots": 35,
-        "stars": 5,
+        "rstars": 625,
+        "dots": 9299,
+        "knots": 56,
+        "stars": 3,
         "curves": 0,
-        "used": 86,
-        "ms": 226
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "lens-einstein-ring__s7__orbit__chalk",
-      "preset": "Lens: Einstein ring",
-      "seed": 7,
-      "camera": "orbit",
-      "surface": "chalkboard",
-      "inkPixelSha256": "3f57b6519f802c33d49959dfd10646c654d0aadc91e4734534926ff4806dfcf8",
-      "stats": {
-        "rstars": 774,
-        "dots": 11955,
-        "knots": 35,
-        "stars": 5,
-        "curves": 0,
-        "used": 86,
-        "ms": 223
+        "used": 84,
+        "ms": 129
       },
       "pageErrors": 0
     },
@@ -8609,58 +10099,6 @@
       "pageErrors": 0
     },
     {
-      "name": "lens-einstein-ring--lens__s5__home",
-      "preset": "Lens: Einstein ring",
-      "variant": "lens",
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      },
-      "calibration": true,
-      "seed": 5,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "7a8abce7efef02a8c24c3684a099a346a58f331c5d9d333face05d5abc01c48b",
-      "captured": "2026-10-07T00:20:28.424Z",
-      "stats": {
-        "rstars": 0,
-        "dots": 12522,
-        "knots": 171,
-        "stars": 16,
-        "curves": 0,
-        "used": 45,
-        "ms": 368
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "lens-einstein-ring--lens__s5__orbit",
-      "preset": "Lens: Einstein ring",
-      "variant": "lens",
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      },
-      "calibration": true,
-      "seed": 5,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "6b859a259299fb1cc2f42d094ab564410866349773a1fd363944bf5f29387149",
-      "captured": "2026-10-07T00:20:32.792Z",
-      "stats": {
-        "rstars": 0,
-        "dots": 12503,
-        "knots": 51,
-        "stars": 6,
-        "curves": 0,
-        "used": 45,
-        "ms": 172
-      },
-      "pageErrors": 0
-    },
-    {
       "name": "lens-einstein-ring--lens__s53__home",
       "preset": "Lens: Einstein ring",
       "variant": "lens",
@@ -8709,6 +10147,58 @@
         "curves": 0,
         "used": 49,
         "ms": 417
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-einstein-ring--lens__s5__home",
+      "preset": "Lens: Einstein ring",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 5,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "7a8abce7efef02a8c24c3684a099a346a58f331c5d9d333face05d5abc01c48b",
+      "captured": "2026-10-07T00:20:28.424Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 12522,
+        "knots": 171,
+        "stars": 16,
+        "curves": 0,
+        "used": 45,
+        "ms": 368
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-einstein-ring--lens__s5__orbit",
+      "preset": "Lens: Einstein ring",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 5,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "6b859a259299fb1cc2f42d094ab564410866349773a1fd363944bf5f29387149",
+      "captured": "2026-10-07T00:20:32.792Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 12503,
+        "knots": 51,
+        "stars": 6,
+        "curves": 0,
+        "used": 45,
+        "ms": 172
       },
       "pageErrors": 0
     },
@@ -8815,74 +10305,110 @@
       "pageErrors": 0
     },
     {
-      "name": "lens-galaxy-cluster__s4242__home",
-      "preset": "Lens: galaxy cluster",
+      "name": "lens-einstein-ring__s4242__home",
+      "preset": "Lens: Einstein ring",
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "fbc50da9d6f04d49cdbd17290406e49daa6f7f5395b0033d3614b150f4d9fd4b",
+      "inkPixelSha256": "ca4ba314d9d9d4898c054f532636d7a7256d57cf0cf4d73d6ac8f3ab15641afa",
       "stats": {
-        "rstars": 3213,
-        "dots": 15472,
-        "knots": 663,
-        "stars": 6,
+        "rstars": 2094,
+        "dots": 13099,
+        "knots": 179,
+        "stars": 5,
         "curves": 0,
-        "used": 161,
-        "ms": 1588
+        "used": 87,
+        "ms": 659
       },
       "pageErrors": 0
     },
     {
-      "name": "lens-galaxy-cluster__s4242__orbit",
-      "preset": "Lens: galaxy cluster",
+      "name": "lens-einstein-ring__s4242__orbit",
+      "preset": "Lens: Einstein ring",
       "seed": 4242,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "34860bf2888a195f90177499130a64fcc8beee36079c094797829bb6a466960b",
+      "inkPixelSha256": "9b22afaf9e20bd47b867cd9c0b94c4499f46a94d2a462178b0d9415392210396",
       "stats": {
-        "rstars": 1482,
-        "dots": 14539,
-        "knots": 219,
-        "stars": 2,
+        "rstars": 824,
+        "dots": 13037,
+        "knots": 42,
+        "stars": 0,
         "curves": 0,
-        "used": 168,
-        "ms": 517
+        "used": 89,
+        "ms": 222
       },
       "pageErrors": 0
     },
     {
-      "name": "lens-galaxy-cluster__s7__home",
-      "preset": "Lens: galaxy cluster",
+      "name": "lens-einstein-ring__s7__home",
+      "preset": "Lens: Einstein ring",
       "seed": 7,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "6ea68026e7373697685e32424bf3524aa4b35a774bdc86e5c66e46e7d521b6ff",
+      "inkPixelSha256": "1ab2462a73962885ea70f061b63c4a75c8d630dc01afa527c2db6df2daaae37a",
       "stats": {
-        "rstars": 4228,
-        "dots": 14029,
-        "knots": 1070,
-        "stars": 41,
+        "rstars": 1920,
+        "dots": 11910,
+        "knots": 131,
+        "stars": 15,
         "curves": 0,
-        "used": 179,
-        "ms": 4928
+        "used": 92,
+        "ms": 1194
       },
       "pageErrors": 0
     },
     {
-      "name": "lens-galaxy-cluster__s7__orbit",
-      "preset": "Lens: galaxy cluster",
+      "name": "lens-einstein-ring__s7__home__chalk",
+      "preset": "Lens: Einstein ring",
+      "seed": 7,
+      "camera": "home",
+      "surface": "chalkboard",
+      "inkPixelSha256": "07324c210c95f5bdabe21fc5ce5ef260427566969dedd8ee2e005990bc6983e3",
+      "stats": {
+        "rstars": 1920,
+        "dots": 11910,
+        "knots": 131,
+        "stars": 15,
+        "curves": 0,
+        "used": 92,
+        "ms": 520
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-einstein-ring__s7__orbit",
+      "preset": "Lens: Einstein ring",
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "94f91a8c587eae50287482a7f65fdde74f792ba1aeee735e676a4d246736a189",
+      "inkPixelSha256": "aba5d4774daff375c4d2ef29e6f3fb32b870f87af1ea31e1f1cfb1a59a83fd60",
       "stats": {
-        "rstars": 1804,
-        "dots": 12550,
-        "knots": 370,
-        "stars": 1,
+        "rstars": 774,
+        "dots": 11955,
+        "knots": 35,
+        "stars": 5,
         "curves": 0,
-        "used": 164,
-        "ms": 434
+        "used": 86,
+        "ms": 226
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-einstein-ring__s7__orbit__chalk",
+      "preset": "Lens: Einstein ring",
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "chalkboard",
+      "inkPixelSha256": "3f57b6519f802c33d49959dfd10646c654d0aadc91e4734534926ff4806dfcf8",
+      "stats": {
+        "rstars": 774,
+        "dots": 11955,
+        "knots": 35,
+        "stars": 5,
+        "curves": 0,
+        "used": 86,
+        "ms": 223
       },
       "pageErrors": 0
     },
@@ -9301,58 +10827,6 @@
       "pageErrors": 0
     },
     {
-      "name": "lens-galaxy-cluster--lens__s5__home",
-      "preset": "Lens: galaxy cluster",
-      "variant": "lens",
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      },
-      "calibration": true,
-      "seed": 5,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "7ea2fae75cacd5386605506bd9c8ffeb729b75d55679e79c9d3125eddcc983ae",
-      "captured": "2026-10-07T00:22:35.399Z",
-      "stats": {
-        "rstars": 0,
-        "dots": 14987,
-        "knots": 348,
-        "stars": 15,
-        "curves": 0,
-        "used": 104,
-        "ms": 898
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "lens-galaxy-cluster--lens__s5__orbit",
-      "preset": "Lens: galaxy cluster",
-      "variant": "lens",
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      },
-      "calibration": true,
-      "seed": 5,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "2060a3093078ee1ffb72a91a2d9015fc515269ab95747adf1fc91fc4e6f7b042",
-      "captured": "2026-10-07T00:22:45.094Z",
-      "stats": {
-        "rstars": 0,
-        "dots": 11934,
-        "knots": 67,
-        "stars": 1,
-        "curves": 0,
-        "used": 98,
-        "ms": 701
-      },
-      "pageErrors": 0
-    },
-    {
       "name": "lens-galaxy-cluster--lens__s53__home",
       "preset": "Lens: galaxy cluster",
       "variant": "lens",
@@ -9401,6 +10875,58 @@
         "curves": 0,
         "used": 101,
         "ms": 667
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-galaxy-cluster--lens__s5__home",
+      "preset": "Lens: galaxy cluster",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 5,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "7ea2fae75cacd5386605506bd9c8ffeb729b75d55679e79c9d3125eddcc983ae",
+      "captured": "2026-10-07T00:22:35.399Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 14987,
+        "knots": 348,
+        "stars": 15,
+        "curves": 0,
+        "used": 104,
+        "ms": 898
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-galaxy-cluster--lens__s5__orbit",
+      "preset": "Lens: galaxy cluster",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 5,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "2060a3093078ee1ffb72a91a2d9015fc515269ab95747adf1fc91fc4e6f7b042",
+      "captured": "2026-10-07T00:22:45.094Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 11934,
+        "knots": 67,
+        "stars": 1,
+        "curves": 0,
+        "used": 98,
+        "ms": 701
       },
       "pageErrors": 0
     },
@@ -9507,74 +11033,74 @@
       "pageErrors": 0
     },
     {
-      "name": "lens-giant-arc__s4242__home",
-      "preset": "Lens: giant arc",
+      "name": "lens-galaxy-cluster__s4242__home",
+      "preset": "Lens: galaxy cluster",
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "27c1071e6a29ed82b24769e9082b638eb9c00992285648ec410122df552c99cf",
+      "inkPixelSha256": "fbc50da9d6f04d49cdbd17290406e49daa6f7f5395b0033d3614b150f4d9fd4b",
       "stats": {
-        "rstars": 1624,
-        "dots": 12992,
-        "knots": 158,
-        "stars": 4,
+        "rstars": 3213,
+        "dots": 15472,
+        "knots": 663,
+        "stars": 6,
         "curves": 0,
-        "used": 87,
-        "ms": 1095
+        "used": 161,
+        "ms": 1588
       },
       "pageErrors": 0
     },
     {
-      "name": "lens-giant-arc__s4242__orbit",
-      "preset": "Lens: giant arc",
+      "name": "lens-galaxy-cluster__s4242__orbit",
+      "preset": "Lens: galaxy cluster",
       "seed": 4242,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "8bbf4efe082c3257d50ddf4b7c996df406439c766b54c921da8e644a803f86cc",
+      "inkPixelSha256": "34860bf2888a195f90177499130a64fcc8beee36079c094797829bb6a466960b",
       "stats": {
-        "rstars": 824,
-        "dots": 12966,
-        "knots": 48,
+        "rstars": 1482,
+        "dots": 14539,
+        "knots": 219,
         "stars": 2,
         "curves": 0,
-        "used": 89,
-        "ms": 158
+        "used": 168,
+        "ms": 517
       },
       "pageErrors": 0
     },
     {
-      "name": "lens-giant-arc__s7__home",
-      "preset": "Lens: giant arc",
+      "name": "lens-galaxy-cluster__s7__home",
+      "preset": "Lens: galaxy cluster",
       "seed": 7,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "11ad18a412e6b774c98e85c4b855d0599e4aaafc7fb8031ac2ee2d98f91a88db",
+      "inkPixelSha256": "6ea68026e7373697685e32424bf3524aa4b35a774bdc86e5c66e46e7d521b6ff",
       "stats": {
-        "rstars": 1520,
-        "dots": 11765,
-        "knots": 83,
-        "stars": 11,
+        "rstars": 4228,
+        "dots": 14029,
+        "knots": 1070,
+        "stars": 41,
         "curves": 0,
-        "used": 92,
-        "ms": 2177
+        "used": 179,
+        "ms": 4928
       },
       "pageErrors": 0
     },
     {
-      "name": "lens-giant-arc__s7__orbit",
-      "preset": "Lens: giant arc",
+      "name": "lens-galaxy-cluster__s7__orbit",
+      "preset": "Lens: galaxy cluster",
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "bfa00616b3de7a5b3ced806db1b46e03ef4a4300dfd6753fbf25a81867190279",
+      "inkPixelSha256": "94f91a8c587eae50287482a7f65fdde74f792ba1aeee735e676a4d246736a189",
       "stats": {
-        "rstars": 774,
-        "dots": 11821,
-        "knots": 34,
-        "stars": 4,
+        "rstars": 1804,
+        "dots": 12550,
+        "knots": 370,
+        "stars": 1,
         "curves": 0,
-        "used": 86,
-        "ms": 133
+        "used": 164,
+        "ms": 434
       },
       "pageErrors": 0
     },
@@ -9993,58 +11519,6 @@
       "pageErrors": 0
     },
     {
-      "name": "lens-giant-arc--lens__s5__home",
-      "preset": "Lens: giant arc",
-      "variant": "lens",
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      },
-      "calibration": true,
-      "seed": 5,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "839d92b7ef3fb5e53110508d0b1be799c0ebeaacafcc64d4a2b4362276278fa6",
-      "captured": "2026-10-07T00:24:53.310Z",
-      "stats": {
-        "rstars": 0,
-        "dots": 12508,
-        "knots": 142,
-        "stars": 15,
-        "curves": 0,
-        "used": 45,
-        "ms": 7810
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "lens-giant-arc--lens__s5__orbit",
-      "preset": "Lens: giant arc",
-      "variant": "lens",
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      },
-      "calibration": true,
-      "seed": 5,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "13d4373a2f5070dd3e013599c76cdc57f919d4b37742e2fe83afac5271770793",
-      "captured": "2026-10-07T00:24:59.929Z",
-      "stats": {
-        "rstars": 0,
-        "dots": 12530,
-        "knots": 47,
-        "stars": 2,
-        "curves": 0,
-        "used": 45,
-        "ms": 277
-      },
-      "pageErrors": 0
-    },
-    {
       "name": "lens-giant-arc--lens__s53__home",
       "preset": "Lens: giant arc",
       "variant": "lens",
@@ -10093,6 +11567,58 @@
         "curves": 0,
         "used": 49,
         "ms": 164
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-giant-arc--lens__s5__home",
+      "preset": "Lens: giant arc",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 5,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "839d92b7ef3fb5e53110508d0b1be799c0ebeaacafcc64d4a2b4362276278fa6",
+      "captured": "2026-10-07T00:24:53.310Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 12508,
+        "knots": 142,
+        "stars": 15,
+        "curves": 0,
+        "used": 45,
+        "ms": 7810
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "lens-giant-arc--lens__s5__orbit",
+      "preset": "Lens: giant arc",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 5,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "13d4373a2f5070dd3e013599c76cdc57f919d4b37742e2fe83afac5271770793",
+      "captured": "2026-10-07T00:24:59.929Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 12530,
+        "knots": 47,
+        "stars": 2,
+        "curves": 0,
+        "used": 45,
+        "ms": 277
       },
       "pageErrors": 0
     },
@@ -10199,74 +11725,74 @@
       "pageErrors": 0
     },
     {
-      "name": "loose-open-arms__s4242__home",
-      "preset": "Loose, open arms",
+      "name": "lens-giant-arc__s4242__home",
+      "preset": "Lens: giant arc",
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "e044ffb6e9d5d2d037a75f4a9efdec5136a18410c62410f503e2c580df3b85a1",
+      "inkPixelSha256": "27c1071e6a29ed82b24769e9082b638eb9c00992285648ec410122df552c99cf",
       "stats": {
-        "rstars": 1621,
-        "dots": 7758,
-        "knots": 183,
-        "stars": 25,
-        "curves": 3,
-        "used": 89,
-        "ms": 123
+        "rstars": 1624,
+        "dots": 12992,
+        "knots": 158,
+        "stars": 4,
+        "curves": 0,
+        "used": 87,
+        "ms": 1095
       },
       "pageErrors": 0
     },
     {
-      "name": "loose-open-arms__s4242__orbit",
-      "preset": "Loose, open arms",
+      "name": "lens-giant-arc__s4242__orbit",
+      "preset": "Lens: giant arc",
       "seed": 4242,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "9767874cd309cf43450eab5219a88461cb9d37e776652e2bddc86c0ea992c584",
+      "inkPixelSha256": "8bbf4efe082c3257d50ddf4b7c996df406439c766b54c921da8e644a803f86cc",
       "stats": {
-        "rstars": 1598,
-        "dots": 7622,
-        "knots": 181,
-        "stars": 24,
-        "curves": 3,
-        "used": 94,
-        "ms": 127
+        "rstars": 824,
+        "dots": 12966,
+        "knots": 48,
+        "stars": 2,
+        "curves": 0,
+        "used": 89,
+        "ms": 158
       },
       "pageErrors": 0
     },
     {
-      "name": "loose-open-arms__s7__home",
-      "preset": "Loose, open arms",
+      "name": "lens-giant-arc__s7__home",
+      "preset": "Lens: giant arc",
       "seed": 7,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "cd05af90b58bf6dec8e1c62b6d526a7d8166272c1ddc547e0069cca4c0ccf3a5",
+      "inkPixelSha256": "11ad18a412e6b774c98e85c4b855d0599e4aaafc7fb8031ac2ee2d98f91a88db",
       "stats": {
-        "rstars": 1595,
-        "dots": 7940,
-        "knots": 194,
-        "stars": 18,
-        "curves": 4,
-        "used": 89,
-        "ms": 192
+        "rstars": 1520,
+        "dots": 11765,
+        "knots": 83,
+        "stars": 11,
+        "curves": 0,
+        "used": 92,
+        "ms": 2177
       },
       "pageErrors": 0
     },
     {
-      "name": "loose-open-arms__s7__orbit",
-      "preset": "Loose, open arms",
+      "name": "lens-giant-arc__s7__orbit",
+      "preset": "Lens: giant arc",
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "fd301900fbb08030007a7c73583e3e2039c13708d8f4582802b6fa29e5b9b3a8",
+      "inkPixelSha256": "bfa00616b3de7a5b3ced806db1b46e03ef4a4300dfd6753fbf25a81867190279",
       "stats": {
-        "rstars": 1574,
-        "dots": 7605,
-        "knots": 195,
-        "stars": 18,
-        "curves": 4,
-        "used": 91,
-        "ms": 147
+        "rstars": 774,
+        "dots": 11821,
+        "knots": 34,
+        "stars": 4,
+        "curves": 0,
+        "used": 86,
+        "ms": 133
       },
       "pageErrors": 0
     },
@@ -10817,6 +12343,230 @@
         "curves": 4,
         "used": 46,
         "ms": 75
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--single__s4242__home",
+      "preset": "Loose, open arms",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "4cc9283e12e2950a2cb5e54b6206974f8b1188a97df4ad299a879902d14a1118",
+      "captured": "2026-10-06T16:04:31.149Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9238,
+        "knots": 208,
+        "stars": 23,
+        "curves": 3,
+        "used": 49,
+        "ms": 61
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--single__s4242__orbit",
+      "preset": "Loose, open arms",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "d58110d8c2cc7c8497fa1abdb212eb2ccc69afce33f28cafd06b1e5a559cdd22",
+      "captured": "2026-10-06T16:04:37.518Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9210,
+        "knots": 200,
+        "stars": 20,
+        "curves": 3,
+        "used": 49,
+        "ms": 138
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--single__s4242__zoom",
+      "preset": "Loose, open arms",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "7ca8d54745df6fea6a44b5f325639a1b0dd6f39b0887d38f636bec308de2e835",
+      "captured": "2026-10-06T16:04:46.150Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9238,
+        "knots": 208,
+        "stars": 23,
+        "curves": 3,
+        "used": 49,
+        "ms": 101
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--single__s7__home",
+      "preset": "Loose, open arms",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "7fcef380994c34ab353544c4e8d4c493f6acbcb8bfdb3c821569edbb1bb1037d",
+      "captured": "2026-10-06T16:04:23.502Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9285,
+        "knots": 219,
+        "stars": 22,
+        "curves": 4,
+        "used": 47,
+        "ms": 66
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--single__s7__orbit",
+      "preset": "Loose, open arms",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "238f9276a2f45c760d33ecfaca72161dfe56f0a728357f3583ef6051cc7e0d57",
+      "captured": "2026-10-06T16:04:30.692Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9257,
+        "knots": 213,
+        "stars": 23,
+        "curves": 4,
+        "used": 48,
+        "ms": 90
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms--single__s7__zoom",
+      "preset": "Loose, open arms",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "c18242e13f9df40cf0eb4b4642bb242eabcefda24c69babc60f8da1003195d13",
+      "captured": "2026-10-06T16:04:42.609Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9285,
+        "knots": 219,
+        "stars": 22,
+        "curves": 4,
+        "used": 47,
+        "ms": 56
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms__s4242__home",
+      "preset": "Loose, open arms",
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "e044ffb6e9d5d2d037a75f4a9efdec5136a18410c62410f503e2c580df3b85a1",
+      "stats": {
+        "rstars": 1621,
+        "dots": 7758,
+        "knots": 183,
+        "stars": 25,
+        "curves": 3,
+        "used": 89,
+        "ms": 123
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms__s4242__orbit",
+      "preset": "Loose, open arms",
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "9767874cd309cf43450eab5219a88461cb9d37e776652e2bddc86c0ea992c584",
+      "stats": {
+        "rstars": 1598,
+        "dots": 7622,
+        "knots": 181,
+        "stars": 24,
+        "curves": 3,
+        "used": 94,
+        "ms": 127
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms__s7__home",
+      "preset": "Loose, open arms",
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "cd05af90b58bf6dec8e1c62b6d526a7d8166272c1ddc547e0069cca4c0ccf3a5",
+      "stats": {
+        "rstars": 1595,
+        "dots": 7940,
+        "knots": 194,
+        "stars": 18,
+        "curves": 4,
+        "used": 89,
+        "ms": 192
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "loose-open-arms__s7__orbit",
+      "preset": "Loose, open arms",
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "fd301900fbb08030007a7c73583e3e2039c13708d8f4582802b6fa29e5b9b3a8",
+      "stats": {
+        "rstars": 1574,
+        "dots": 7605,
+        "knots": 195,
+        "stars": 18,
+        "curves": 4,
+        "used": 91,
+        "ms": 147
       },
       "pageErrors": 0
     },
@@ -11433,6 +13183,208 @@
       "pageErrors": 0
     },
     {
+      "name": "plates-slipped--single__s4242__home",
+      "preset": "Plates slipped",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "a36271792fa0fd06dee76d23e2e9b6d776b520ff70a669d92473721b4df27667",
+      "captured": "2026-10-06T16:06:16.021Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9310,
+        "knots": 135,
+        "stars": 25,
+        "curves": 3,
+        "used": 49,
+        "ms": 1044
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "plates-slipped--single__s4242__orbit",
+      "preset": "Plates slipped",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "2db7d4c5ab36703d1073fe2464f7df1573808fda1a608e4adb27c7e7767e0465",
+      "captured": "2026-10-06T16:06:23.365Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9244,
+        "knots": 128,
+        "stars": 23,
+        "curves": 3,
+        "used": 47,
+        "ms": 110
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "plates-slipped--single__s4242__zoom",
+      "preset": "Plates slipped",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "ef40b8548d3efc4b04c3e297dbadbbd394f0642052eb66bc81f5cfa455eda2f3",
+      "captured": "2026-10-06T16:06:43.801Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9310,
+        "knots": 135,
+        "stars": 25,
+        "curves": 3,
+        "used": 49,
+        "ms": 367
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "plates-slipped--single__s7__home",
+      "preset": "Plates slipped",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "144a4ae2ce98929d64e2e0d6eb998c736d5010ef28c9263a34d2416142bb254f",
+      "captured": "2026-10-06T16:06:16.170Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9510,
+        "knots": 174,
+        "stars": 25,
+        "curves": 4,
+        "used": 53,
+        "ms": 149
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "plates-slipped--single__s7__home__chalk",
+      "preset": "Plates slipped",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "chalkboard",
+      "inkPixelSha256": "39e244be8e0022e57960586b7095251ad65dc8d5c33d8869742fa8dcd2c1add0",
+      "captured": "2026-10-06T16:07:07.511Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9510,
+        "knots": 174,
+        "stars": 25,
+        "curves": 4,
+        "used": 53,
+        "ms": 83
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "plates-slipped--single__s7__orbit",
+      "preset": "Plates slipped",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "dc122206bd319f84d0ec3dd5ab70aa6f594b9306956dfdeeacea56151256a271",
+      "captured": "2026-10-06T16:06:23.400Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9472,
+        "knots": 161,
+        "stars": 26,
+        "curves": 4,
+        "used": 54,
+        "ms": 58
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "plates-slipped--single__s7__orbit__chalk",
+      "preset": "Plates slipped",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "chalkboard",
+      "inkPixelSha256": "bdfdea3bb3a10bcfd5de09cf827c5a157063bfb0eb0a3048402b238cbed4c9f4",
+      "captured": "2026-10-06T16:07:11.456Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9472,
+        "knots": 161,
+        "stars": 26,
+        "curves": 4,
+        "used": 54,
+        "ms": 96
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "plates-slipped--single__s7__zoom",
+      "preset": "Plates slipped",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "a7339b7ec6ec44c8d2f2ddff9a9392c429d4270e4c2c709f40e8aed97308826a",
+      "captured": "2026-10-06T16:06:43.876Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9510,
+        "knots": 174,
+        "stars": 25,
+        "curves": 4,
+        "used": 53,
+        "ms": 438
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "plates-slipped__s4242__home",
       "preset": "Plates slipped",
       "seed": 4242,
@@ -11501,78 +13453,6 @@
         "curves": 4,
         "used": 94,
         "ms": 2838
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "radio-jet__s4242__home",
-      "preset": "Radio jet",
-      "seed": 4242,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "d3d7c659e144621f33c8fd8d724c0b4c8339c4a353864ef793a20268bd9e8245",
-      "stats": {
-        "rstars": 424,
-        "dots": 10058,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 43,
-        "ms": 57
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "radio-jet__s4242__orbit",
-      "preset": "Radio jet",
-      "seed": 4242,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "e316e781e5a5606637998aa9494cc1dd142962107abc4fa4814e7f2c582b5e08",
-      "stats": {
-        "rstars": 424,
-        "dots": 10056,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 47,
-        "ms": 110
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "radio-jet__s7__home",
-      "preset": "Radio jet",
-      "seed": 7,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "05e9442a4dc71af20d8a0ef8b7a0e029887ef3eb5e1e25e4a650d6d122394503",
-      "stats": {
-        "rstars": 401,
-        "dots": 9045,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 56,
-        "ms": 77
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "radio-jet__s7__orbit",
-      "preset": "Radio jet",
-      "seed": 7,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "d48766455e195972e69d1936554f97818476f770b03b7d1348ef03ee9b8804cb",
-      "stats": {
-        "rstars": 401,
-        "dots": 9037,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 46,
-        "ms": 51
       },
       "pageErrors": 0
     },
@@ -11841,74 +13721,74 @@
       "pageErrors": 0
     },
     {
-      "name": "ringed__s4242__home",
-      "preset": "Ringed",
+      "name": "radio-jet__s4242__home",
+      "preset": "Radio jet",
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "f9547c6c8cb175d58c7be427153ff39dcb10ce0af785a6cc59767ecc60d4f126",
+      "inkPixelSha256": "d3d7c659e144621f33c8fd8d724c0b4c8339c4a353864ef793a20268bd9e8245",
       "stats": {
-        "rstars": 1750,
-        "dots": 5855,
-        "knots": 47,
-        "stars": 4,
-        "curves": 2,
-        "used": 93,
-        "ms": 136
+        "rstars": 424,
+        "dots": 10058,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 43,
+        "ms": 57
       },
       "pageErrors": 0
     },
     {
-      "name": "ringed__s4242__orbit",
-      "preset": "Ringed",
+      "name": "radio-jet__s4242__orbit",
+      "preset": "Radio jet",
       "seed": 4242,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "c8a82b45e6c5f778d2672c4378f4be29673ad4fdae865608c69d811e4ffdf3d8",
+      "inkPixelSha256": "e316e781e5a5606637998aa9494cc1dd142962107abc4fa4814e7f2c582b5e08",
       "stats": {
-        "rstars": 1745,
-        "dots": 5460,
-        "knots": 47,
-        "stars": 5,
-        "curves": 2,
-        "used": 96,
-        "ms": 107
+        "rstars": 424,
+        "dots": 10056,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 47,
+        "ms": 110
       },
       "pageErrors": 0
     },
     {
-      "name": "ringed__s7__home",
-      "preset": "Ringed",
+      "name": "radio-jet__s7__home",
+      "preset": "Radio jet",
       "seed": 7,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "4362fd26bacf803e2a0084e765c118aa1817c9b2442dc2f7a6da32e6d313e0c0",
+      "inkPixelSha256": "05e9442a4dc71af20d8a0ef8b7a0e029887ef3eb5e1e25e4a650d6d122394503",
       "stats": {
-        "rstars": 1770,
-        "dots": 5518,
-        "knots": 57,
-        "stars": 3,
-        "curves": 2,
-        "used": 96,
-        "ms": 153
+        "rstars": 401,
+        "dots": 9045,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 56,
+        "ms": 77
       },
       "pageErrors": 0
     },
     {
-      "name": "ringed__s7__orbit",
-      "preset": "Ringed",
+      "name": "radio-jet__s7__orbit",
+      "preset": "Radio jet",
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "dc964d6e416876183f961ec6ace977113467ee6fb598e54ecdc612b3fa8f3830",
+      "inkPixelSha256": "d48766455e195972e69d1936554f97818476f770b03b7d1348ef03ee9b8804cb",
       "stats": {
-        "rstars": 1751,
-        "dots": 5165,
-        "knots": 57,
-        "stars": 4,
-        "curves": 2,
-        "used": 97,
-        "ms": 109
+        "rstars": 401,
+        "dots": 9037,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 46,
+        "ms": 51
       },
       "pageErrors": 0
     },
@@ -12065,74 +13945,74 @@
       "pageErrors": 0
     },
     {
-      "name": "shell-galaxy__s4242__home",
-      "preset": "Shell galaxy",
+      "name": "ringed__s4242__home",
+      "preset": "Ringed",
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "2b7ce3f189f5bfd85c1d5a8dd3f9449f9a2428fa431a571f687244c9c0938be5",
+      "inkPixelSha256": "f9547c6c8cb175d58c7be427153ff39dcb10ce0af785a6cc59767ecc60d4f126",
       "stats": {
-        "rstars": 384,
-        "dots": 15457,
-        "knots": 0,
-        "stars": 0,
-        "curves": 6,
-        "used": 45,
-        "ms": 302
+        "rstars": 1750,
+        "dots": 5855,
+        "knots": 47,
+        "stars": 4,
+        "curves": 2,
+        "used": 93,
+        "ms": 136
       },
       "pageErrors": 0
     },
     {
-      "name": "shell-galaxy__s4242__orbit",
-      "preset": "Shell galaxy",
+      "name": "ringed__s4242__orbit",
+      "preset": "Ringed",
       "seed": 4242,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "c1526dbcf01cb501dfa40d8d175e0954da410c719df6a843b23d6f79f7fb50f0",
+      "inkPixelSha256": "c8a82b45e6c5f778d2672c4378f4be29673ad4fdae865608c69d811e4ffdf3d8",
       "stats": {
-        "rstars": 384,
-        "dots": 15467,
-        "knots": 0,
-        "stars": 0,
-        "curves": 6,
-        "used": 46,
-        "ms": 51
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "shell-galaxy__s7__home",
-      "preset": "Shell galaxy",
-      "seed": 7,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "3c4ab3946d8bfcd67ad986e32aa0467681e313381cca447e7937309ef653b205",
-      "stats": {
-        "rstars": 397,
-        "dots": 14067,
-        "knots": 0,
-        "stars": 0,
-        "curves": 4,
-        "used": 54,
+        "rstars": 1745,
+        "dots": 5460,
+        "knots": 47,
+        "stars": 5,
+        "curves": 2,
+        "used": 96,
         "ms": 107
       },
       "pageErrors": 0
     },
     {
-      "name": "shell-galaxy__s7__orbit",
-      "preset": "Shell galaxy",
+      "name": "ringed__s7__home",
+      "preset": "Ringed",
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "4362fd26bacf803e2a0084e765c118aa1817c9b2442dc2f7a6da32e6d313e0c0",
+      "stats": {
+        "rstars": 1770,
+        "dots": 5518,
+        "knots": 57,
+        "stars": 3,
+        "curves": 2,
+        "used": 96,
+        "ms": 153
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "ringed__s7__orbit",
+      "preset": "Ringed",
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "048091c17115db578d9dbf11500131714aeea61e5739c9551b09d357b6056490",
+      "inkPixelSha256": "dc964d6e416876183f961ec6ace977113467ee6fb598e54ecdc612b3fa8f3830",
       "stats": {
-        "rstars": 397,
-        "dots": 14067,
-        "knots": 0,
-        "stars": 0,
-        "curves": 4,
-        "used": 46,
-        "ms": 106
+        "rstars": 1751,
+        "dots": 5165,
+        "knots": 57,
+        "stars": 4,
+        "curves": 2,
+        "used": 97,
+        "ms": 109
       },
       "pageErrors": 0
     },
@@ -12301,6 +14181,78 @@
       "pageErrors": 0
     },
     {
+      "name": "shell-galaxy__s4242__home",
+      "preset": "Shell galaxy",
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "2b7ce3f189f5bfd85c1d5a8dd3f9449f9a2428fa431a571f687244c9c0938be5",
+      "stats": {
+        "rstars": 384,
+        "dots": 15457,
+        "knots": 0,
+        "stars": 0,
+        "curves": 6,
+        "used": 45,
+        "ms": 302
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy__s4242__orbit",
+      "preset": "Shell galaxy",
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "c1526dbcf01cb501dfa40d8d175e0954da410c719df6a843b23d6f79f7fb50f0",
+      "stats": {
+        "rstars": 384,
+        "dots": 15467,
+        "knots": 0,
+        "stars": 0,
+        "curves": 6,
+        "used": 46,
+        "ms": 51
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy__s7__home",
+      "preset": "Shell galaxy",
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "3c4ab3946d8bfcd67ad986e32aa0467681e313381cca447e7937309ef653b205",
+      "stats": {
+        "rstars": 397,
+        "dots": 14067,
+        "knots": 0,
+        "stars": 0,
+        "curves": 4,
+        "used": 54,
+        "ms": 107
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy__s7__orbit",
+      "preset": "Shell galaxy",
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "048091c17115db578d9dbf11500131714aeea61e5739c9551b09d357b6056490",
+      "stats": {
+        "rstars": 397,
+        "dots": 14067,
+        "knots": 0,
+        "stars": 0,
+        "curves": 4,
+        "used": 46,
+        "ms": 106
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "sketches-torn-apart__s4242__home",
       "preset": "Sketches, torn apart",
       "seed": 4242,
@@ -12373,74 +14325,266 @@
       "pageErrors": 0
     },
     {
-      "name": "smooth-round__s4242__home",
+      "name": "smooth-round--knob-halo__s4242__home",
       "preset": "Smooth, round",
+      "variant": "knob-halo",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "halo": 0.9,
+        "envelope": 1,
+        "outline": 0.6
+      },
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "a8330999a5120d811354ef1073cd7ebde73ad59e598b9ede2acbe5ac21c3ebfb",
+      "inkPixelSha256": "c3db4901559c018436c7123f1b1d2fd4e00e4f4c3ad39dff99d51cfca529fda5",
+      "captured": "2026-10-06T16:39:50.285Z",
       "stats": {
-        "rstars": 756,
-        "dots": 7578,
+        "rstars": 0,
+        "dots": 9500,
         "knots": 0,
         "stars": 0,
         "curves": 0,
-        "used": 44,
-        "ms": 61
+        "used": 2,
+        "ms": 20
       },
       "pageErrors": 0
     },
     {
-      "name": "smooth-round__s4242__orbit",
+      "name": "smooth-round--knob-halo__s4242__orbit",
       "preset": "Smooth, round",
+      "variant": "knob-halo",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "halo": 0.9,
+        "envelope": 1,
+        "outline": 0.6
+      },
       "seed": 4242,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "8e1ced20b3bee919b2a198fd809920898ea1f734c7cec5d8dc0334fba3c92485",
+      "inkPixelSha256": "a4c09396f3708a8d944a5e39fdac932bc4c52770f0644662ba41f6b31ba08df7",
+      "captured": "2026-10-06T16:39:56.547Z",
       "stats": {
-        "rstars": 756,
-        "dots": 7569,
+        "rstars": 0,
+        "dots": 9500,
         "knots": 0,
         "stars": 0,
         "curves": 0,
-        "used": 39,
-        "ms": 58
+        "used": 2,
+        "ms": 11
       },
       "pageErrors": 0
     },
     {
-      "name": "smooth-round__s7__home",
+      "name": "smooth-round--knob-halo__s7__home",
       "preset": "Smooth, round",
+      "variant": "knob-halo",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "halo": 0.9,
+        "envelope": 1,
+        "outline": 0.6
+      },
       "seed": 7,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "c5f79bad04c26a5074807728747cca172ec085ad30a6ee95e2e96de55f02ddb4",
+      "inkPixelSha256": "51c81c1123843f7bdfda2f2772911ef430694cfe6908c56cc44f15e1a6934ed3",
+      "captured": "2026-10-06T16:39:30.927Z",
       "stats": {
-        "rstars": 720,
-        "dots": 7785,
+        "rstars": 0,
+        "dots": 9500,
         "knots": 0,
         "stars": 0,
         "curves": 0,
-        "used": 50,
-        "ms": 55
+        "used": 2,
+        "ms": 32
       },
       "pageErrors": 0
     },
     {
-      "name": "smooth-round__s7__orbit",
+      "name": "smooth-round--knob-halo__s7__orbit",
       "preset": "Smooth, round",
+      "variant": "knob-halo",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0,
+        "halo": 0.9,
+        "envelope": 1,
+        "outline": 0.6
+      },
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "e48c62f783c08094975d6f5e32fc60897fe836847a4d940c7699e2b838f8edc2",
+      "inkPixelSha256": "8fd3edeab51bdcdbfe8e08df3545aa35f41f793b83eefb59cf8abc04181872dc",
+      "captured": "2026-10-06T16:39:35.668Z",
       "stats": {
-        "rstars": 720,
-        "dots": 7774,
+        "rstars": 0,
+        "dots": 9500,
         "knots": 0,
         "stars": 0,
         "curves": 0,
-        "used": 50,
-        "ms": 79
+        "used": 2,
+        "ms": 16
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round--single__s4242__home",
+      "preset": "Smooth, round",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "94ea1965b699492680bbb0c2b1a78db266b8d4ba0a81ec1c5d64298db08ab39c",
+      "captured": "2026-10-06T16:05:30.733Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 23
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round--single__s4242__orbit",
+      "preset": "Smooth, round",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "20ff70686aa126d6155498fadac5deabc1c8c24d683c89c9cbfbee456c4b8f9f",
+      "captured": "2026-10-06T16:05:35.609Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 24
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round--single__s4242__zoom",
+      "preset": "Smooth, round",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "2d97148c344be03bb492cb1a98986068ddaeb90d5b7fe91a498afb289601cc73",
+      "captured": "2026-10-06T16:05:43.993Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 16
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round--single__s7__home",
+      "preset": "Smooth, round",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "d87b257d91e25ce13128d802470367a020ea998f4be30da58416ccdeb0a8751b",
+      "captured": "2026-10-06T16:05:30.681Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 23
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round--single__s7__orbit",
+      "preset": "Smooth, round",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "c157440d24af54d3356ecad765ba36d00f81c3e1cf686be4919420c3a149e75a",
+      "captured": "2026-10-06T16:05:34.786Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 23
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round--single__s7__zoom",
+      "preset": "Smooth, round",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "62f4b7d8e0be3c54917fbd7519cc8118e6a738539dc21cabd847bf04b9cd955a",
+      "captured": "2026-10-06T16:05:42.266Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9500,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 17
       },
       "pageErrors": 0
     },
@@ -12719,6 +14863,78 @@
       "pageErrors": 0
     },
     {
+      "name": "smooth-round__s4242__home",
+      "preset": "Smooth, round",
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "a8330999a5120d811354ef1073cd7ebde73ad59e598b9ede2acbe5ac21c3ebfb",
+      "stats": {
+        "rstars": 756,
+        "dots": 7578,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 44,
+        "ms": 61
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round__s4242__orbit",
+      "preset": "Smooth, round",
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "8e1ced20b3bee919b2a198fd809920898ea1f734c7cec5d8dc0334fba3c92485",
+      "stats": {
+        "rstars": 756,
+        "dots": 7569,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 39,
+        "ms": 58
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round__s7__home",
+      "preset": "Smooth, round",
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "c5f79bad04c26a5074807728747cca172ec085ad30a6ee95e2e96de55f02ddb4",
+      "stats": {
+        "rstars": 720,
+        "dots": 7785,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 50,
+        "ms": 55
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "smooth-round__s7__orbit",
+      "preset": "Smooth, round",
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "e48c62f783c08094975d6f5e32fc60897fe836847a4d940c7699e2b838f8edc2",
+      "stats": {
+        "rstars": 720,
+        "dots": 7774,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 50,
+        "ms": 79
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "star-bright-with-spikes__s4242__home",
       "preset": "Star: bright, with spikes",
       "seed": 4242,
@@ -12863,6 +15079,208 @@
       "pageErrors": 0
     },
     {
+      "name": "stellar-populations--single__s4242__home",
+      "preset": "Stellar populations",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "a147a352e3532909acc66e6b377164d32e8fb54767fd7ba3d09cf8546a8a7ed4",
+      "captured": "2026-10-06T16:06:30.579Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9226,
+        "knots": 183,
+        "stars": 37,
+        "curves": 3,
+        "used": 51,
+        "ms": 43
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "stellar-populations--single__s4242__orbit",
+      "preset": "Stellar populations",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "0122ed0d1c0aeeb0039686f724731f44f8c596977957f34fef542da0a4c3404d",
+      "captured": "2026-10-06T16:06:43.756Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9184,
+        "knots": 190,
+        "stars": 37,
+        "curves": 3,
+        "used": 50,
+        "ms": 87
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "stellar-populations--single__s4242__zoom",
+      "preset": "Stellar populations",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "d414ddae9483965fc872c112158dac079dddc88ffdb8ab02339ca5095b8e88da",
+      "captured": "2026-10-06T16:06:47.235Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9226,
+        "knots": 183,
+        "stars": 37,
+        "curves": 3,
+        "used": 51,
+        "ms": 46
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "stellar-populations--single__s7__home",
+      "preset": "Stellar populations",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "f05aafd70a82492c6e9a982c437f30ef0790981cf0db482bdb65b63ffbd1d487",
+      "captured": "2026-10-06T16:06:21.725Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9466,
+        "knots": 212,
+        "stars": 43,
+        "curves": 4,
+        "used": 55,
+        "ms": 217
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "stellar-populations--single__s7__home__chalk",
+      "preset": "Stellar populations",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "chalkboard",
+      "inkPixelSha256": "0272062c17dc2de1ac27773b3cf80208f9fdb187bf104c95f8a647dcffd82997",
+      "captured": "2026-10-06T16:07:06.264Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9466,
+        "knots": 212,
+        "stars": 43,
+        "curves": 4,
+        "used": 55,
+        "ms": 144
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "stellar-populations--single__s7__orbit",
+      "preset": "Stellar populations",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "343d3bb7cd26a5e74713622a2459c1c5779447031084ff63bd9f81ae53828f14",
+      "captured": "2026-10-06T16:06:27.856Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9456,
+        "knots": 205,
+        "stars": 42,
+        "curves": 4,
+        "used": 54,
+        "ms": 78
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "stellar-populations--single__s7__orbit__chalk",
+      "preset": "Stellar populations",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "chalkboard",
+      "inkPixelSha256": "7b659d925c63382ea0046aa922dd28dff6dff334369a8ba24872b9c076d21ec2",
+      "captured": "2026-10-06T16:07:11.419Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9456,
+        "knots": 205,
+        "stars": 42,
+        "curves": 4,
+        "used": 54,
+        "ms": 59
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "stellar-populations--single__s7__zoom",
+      "preset": "Stellar populations",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "4871e107de64297ee6cd7876ae6b9c4a3f6ca408e46cbc92f40d1459f0511760",
+      "captured": "2026-10-06T16:06:43.239Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9466,
+        "knots": 212,
+        "stars": 43,
+        "curves": 4,
+        "used": 55,
+        "ms": 39
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "stellar-populations__s4242__home",
       "preset": "Stellar populations",
       "seed": 4242,
@@ -12931,78 +15349,6 @@
         "curves": 4,
         "used": 93,
         "ms": 237
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "stellar-streams__s4242__home",
-      "preset": "Stellar streams",
-      "seed": 4242,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "8e8e17ca8bcf4657bf19f13a23520723a3c1374f7517e48355e6ae330aa8ed7b",
-      "stats": {
-        "rstars": 297,
-        "dots": 7562,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 53,
-        "ms": 43
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "stellar-streams__s4242__orbit",
-      "preset": "Stellar streams",
-      "seed": 4242,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "508b9544a50e93ddb784b85062f17e7330d0f890483c4ad418a4f6b6e73cc0ee",
-      "stats": {
-        "rstars": 297,
-        "dots": 7569,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 54,
-        "ms": 31
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "stellar-streams__s7__home",
-      "preset": "Stellar streams",
-      "seed": 7,
-      "camera": "home",
-      "surface": "paper",
-      "inkPixelSha256": "93e1836573191512c53bd15b0eb17efecfe9f939188f33be333e03adb5eed3f3",
-      "stats": {
-        "rstars": 323,
-        "dots": 6721,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 65,
-        "ms": 49
-      },
-      "pageErrors": 0
-    },
-    {
-      "name": "stellar-streams__s7__orbit",
-      "preset": "Stellar streams",
-      "seed": 7,
-      "camera": "orbit",
-      "surface": "paper",
-      "inkPixelSha256": "c74b590b49e00971345fe5993d50d2a464adda9ff97acfd4c936e833e07782f3",
-      "stats": {
-        "rstars": 323,
-        "dots": 6724,
-        "knots": 0,
-        "stars": 0,
-        "curves": 0,
-        "used": 57,
-        "ms": 36
       },
       "pageErrors": 0
     },
@@ -13159,74 +15505,74 @@
       "pageErrors": 0
     },
     {
-      "name": "tightly-wound__s4242__home",
-      "preset": "Tightly wound",
+      "name": "stellar-streams__s4242__home",
+      "preset": "Stellar streams",
       "seed": 4242,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "b80acdde81914c50800183c75f4d2da0244ae5c00710b744c12c267905150777",
+      "inkPixelSha256": "8e8e17ca8bcf4657bf19f13a23520723a3c1374f7517e48355e6ae330aa8ed7b",
       "stats": {
-        "rstars": 1347,
-        "dots": 7617,
-        "knots": 151,
-        "stars": 17,
-        "curves": 5,
-        "used": 98,
-        "ms": 275
+        "rstars": 297,
+        "dots": 7562,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 53,
+        "ms": 43
       },
       "pageErrors": 0
     },
     {
-      "name": "tightly-wound__s4242__orbit",
-      "preset": "Tightly wound",
+      "name": "stellar-streams__s4242__orbit",
+      "preset": "Stellar streams",
       "seed": 4242,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "a07121562c34c371e00fb64d5eca72b4024c683212175df791e0f08b6f963e79",
+      "inkPixelSha256": "508b9544a50e93ddb784b85062f17e7330d0f890483c4ad418a4f6b6e73cc0ee",
       "stats": {
-        "rstars": 1312,
-        "dots": 7567,
-        "knots": 149,
-        "stars": 17,
-        "curves": 5,
-        "used": 102,
-        "ms": 125
+        "rstars": 297,
+        "dots": 7569,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 54,
+        "ms": 31
       },
       "pageErrors": 0
     },
     {
-      "name": "tightly-wound__s7__home",
-      "preset": "Tightly wound",
+      "name": "stellar-streams__s7__home",
+      "preset": "Stellar streams",
       "seed": 7,
       "camera": "home",
       "surface": "paper",
-      "inkPixelSha256": "e9dbf2d45788772502d4e46f6b3de62e9f9df3f175e0d1e9b7767a42b96dba19",
+      "inkPixelSha256": "93e1836573191512c53bd15b0eb17efecfe9f939188f33be333e03adb5eed3f3",
       "stats": {
-        "rstars": 1441,
-        "dots": 7389,
-        "knots": 97,
-        "stars": 13,
-        "curves": 5,
-        "used": 102,
-        "ms": 338
+        "rstars": 323,
+        "dots": 6721,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 65,
+        "ms": 49
       },
       "pageErrors": 0
     },
     {
-      "name": "tightly-wound__s7__orbit",
-      "preset": "Tightly wound",
+      "name": "stellar-streams__s7__orbit",
+      "preset": "Stellar streams",
       "seed": 7,
       "camera": "orbit",
       "surface": "paper",
-      "inkPixelSha256": "9664a249615671149402ca53f1c2d7ba78064a00bf124911ed73965fecd0b9af",
+      "inkPixelSha256": "c74b590b49e00971345fe5993d50d2a464adda9ff97acfd4c936e833e07782f3",
       "stats": {
-        "rstars": 1387,
-        "dots": 7369,
-        "knots": 102,
-        "stars": 16,
-        "curves": 5,
-        "used": 103,
-        "ms": 124
+        "rstars": 323,
+        "dots": 6724,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 57,
+        "ms": 36
       },
       "pageErrors": 0
     },
@@ -13779,10 +16125,234 @@
         "ms": 62
       },
       "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--single__s4242__home",
+      "preset": "Tightly wound",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "10366b69597e74b5712cdb3fdc41c2235a07c1dc237dc9b0983dce1ddd4d7232",
+      "captured": "2026-10-06T16:04:23.216Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9229,
+        "knots": 162,
+        "stars": 22,
+        "curves": 5,
+        "used": 60,
+        "ms": 65
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--single__s4242__orbit",
+      "preset": "Tightly wound",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "8926f12a47682d69335747aef483eb5ceb0cf11ce65d0d6ec3a0d416a7c36140",
+      "captured": "2026-10-06T16:04:30.758Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9193,
+        "knots": 161,
+        "stars": 20,
+        "curves": 5,
+        "used": 59,
+        "ms": 75
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--single__s4242__zoom",
+      "preset": "Tightly wound",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "272ac392ba94f5d8fc786784c799c18f7ef631b600d40039bd8fd8aff46e8396",
+      "captured": "2026-10-06T16:04:38.496Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9229,
+        "knots": 162,
+        "stars": 22,
+        "curves": 5,
+        "used": 60,
+        "ms": 40
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--single__s7__home",
+      "preset": "Tightly wound",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "690f05aa51415fa3d12237b22c741b52575ab53a92d82b5669c2c71cb94d6cbe",
+      "captured": "2026-10-06T16:04:16.258Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9306,
+        "knots": 101,
+        "stars": 15,
+        "curves": 5,
+        "used": 60,
+        "ms": 612
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--single__s7__orbit",
+      "preset": "Tightly wound",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "b4f250da9ea58a802f4fc56ce4a845d7b7417a2fdea7e76eebf6c73f4b5910ab",
+      "captured": "2026-10-06T16:04:24.321Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9281,
+        "knots": 99,
+        "stars": 14,
+        "curves": 5,
+        "used": 59,
+        "ms": 83
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound--single__s7__zoom",
+      "preset": "Tightly wound",
+      "variant": "single",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "4d21c0c3698d0c6a55a17afaf4e4d647bfdb2a6d195a56c2d68764a43be25e34",
+      "captured": "2026-10-06T16:04:31.181Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9306,
+        "knots": 101,
+        "stars": 15,
+        "curves": 5,
+        "used": 60,
+        "ms": 55
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound__s4242__home",
+      "preset": "Tightly wound",
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "b80acdde81914c50800183c75f4d2da0244ae5c00710b744c12c267905150777",
+      "stats": {
+        "rstars": 1347,
+        "dots": 7617,
+        "knots": 151,
+        "stars": 17,
+        "curves": 5,
+        "used": 98,
+        "ms": 275
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound__s4242__orbit",
+      "preset": "Tightly wound",
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "a07121562c34c371e00fb64d5eca72b4024c683212175df791e0f08b6f963e79",
+      "stats": {
+        "rstars": 1312,
+        "dots": 7567,
+        "knots": 149,
+        "stars": 17,
+        "curves": 5,
+        "used": 102,
+        "ms": 125
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound__s7__home",
+      "preset": "Tightly wound",
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "e9dbf2d45788772502d4e46f6b3de62e9f9df3f175e0d1e9b7767a42b96dba19",
+      "stats": {
+        "rstars": 1441,
+        "dots": 7389,
+        "knots": 97,
+        "stars": 13,
+        "curves": 5,
+        "used": 102,
+        "ms": 338
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "tightly-wound__s7__orbit",
+      "preset": "Tightly wound",
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "9664a249615671149402ca53f1c2d7ba78064a00bf124911ed73965fecd0b9af",
+      "stats": {
+        "rstars": 1387,
+        "dots": 7369,
+        "knots": 102,
+        "stars": 16,
+        "curves": 5,
+        "used": 103,
+        "ms": 124
+      },
+      "pageErrors": 0
     }
   ],
   "extra": {
-    "file": "/tmp/claude-0/extra-new.json",
+    "file": "tests/golden/extra-cases.json",
     "cameras": {
       "home": "the preset's own incl, az, pa",
       "orbit": "az + 35°, incl + 20° (clamped), from home",
@@ -13814,7 +16384,7 @@
         }
       },
       "zoom": {
-        "generated": "2026-10-06T11:02:24.643Z",
+        "generated": "2026-10-06T16:07:12.066Z",
         "browser": {
           "name": "chromium",
           "version": "141.0.7390.37",

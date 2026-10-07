@@ -39,15 +39,14 @@
  *     --controls-every n  the negative controls on every n-th configuration only (default 1)
  *     --reuse-shards  only aggregate the last calibration's measurements (test-results/
  *                     calibration-shard-*.json, made with at least K keys) for this K
+ *     --only-family f  calibrate the families named f (and f@zoom) alone and merge them into the
+ *                     two files, leaving every other family as it is (M6: `slip`; M9: `lens`)
  *   --jobs n          parallel processes for the re-draws and the calibration (default 4)
  *   --no-gpu          the CPU engine only (no browser)
  *   --only a,b        only the cases whose name contains one of these (for working on a few; the
  *                     run then checks fewer than the required set)
  *   --report-all      a report for every case, not only failing ones
  *   --update-engine   write ../engine-hashes.json from this run (the engine's own goldens)
- *   --family f        with --calibrate: measure only the configurations of family f (and f@zoom)
- *                     and merge its thresholds and numbers into the existing files, leaving the
- *                     other families as they are (a new family's calibration; M9: `lens`)
  */
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -456,7 +455,8 @@ async function calibrate(G, node) {
   ];
   /** @type {import('./node.ts').CalibrationCase[]} */
   const cases = [];
-  for (const preset of presets)
+  const onlyFamily = opt('--only-family');
+  for (const preset of onlyFamily ? [] : presets)
     for (const seed of [7, 4242])
       for (const camera of ['home', 'orbit']) {
         const rec = node.record(`${manifestSlug(preset)}__s${seed}__${camera}`);
@@ -472,7 +472,22 @@ async function calibrate(G, node) {
             zoom: 2,
           });
       }
+  if (onlyFamily) {
+    // held-out configurations of the family's presets: other seeds, home, an orbit, and zoom 2, as
+    // the captures are (they need no v21 capture: the pairs are the engine's own re-draws)
+    for (const preset of onlyFamilyPresets(onlyFamily))
+      for (const seed of [3, 11, 5, 19, 1, 2, 9, 13, 17, 21]) {
+        const P = G.presetCase(preset, seed, { starMix: 0, field: 0, fgstars: 0 });
+        const orbit = { ...P, az: P.az + 35, incl: Math.min(180, P.incl + 20) };
+        const family = G.goldenFamily(preset);
+        cases.push({ preset, base: preset, family, params: P });
+        cases.push({ preset, base: preset, family, params: orbit });
+        cases.push({ preset, base: preset, family: `${family}@zoom`, params: P, zoom: 2 });
+      }
+  }
   for (const c of manifest.captures.filter((/** @type {any} */ x) => x.variant)) {
+    if (onlyFamily && G.goldenFamily(node.record(c.name).preset) !== onlyFamily) continue;
+    if (c.name.endsWith('__chalk')) continue; // the same parameters as the paper capture
     const rec = node.record(c.name);
     const zoom = rec.zoom ?? 1;
     // the zoom camera is calibrated on its own (`<family>@zoom`), the line-work alone too
@@ -486,7 +501,6 @@ async function calibrate(G, node) {
       ...(c.calibration ? { heldOut: c.name } : {}),
     });
   }
-  const onlyFamily = opt('--family');
   if (onlyFamily) {
     const keep = cases.filter((c) => c.family === onlyFamily || c.family === `${onlyFamily}@zoom`);
     cases.length = 0;
@@ -577,7 +591,7 @@ async function calibrate(G, node) {
         '--controls-every',
         String(controlsEvery),
         ...(flag('--resume') ? ['--resume'] : []),
-        ...(onlyFamily ? ['--family', onlyFamily] : []),
+        ...(onlyFamily ? ['--only-family', onlyFamily] : []),
       ],
       jobs,
     );
@@ -629,7 +643,7 @@ async function calibrate(G, node) {
   /**
    * the lens family's least inner axis-ratio band: 1.1 × the largest |Δq| of the inner aperture
    * over the 84 v21 captures of the family (the 56 held out, 0.027, and the 28 acceptance cases,
-   * 0.0395), ADR 0054 (proposed). ADR 0018 sets the band no lower than 1.1 × the largest value of
+   * 0.0395), ADR 0054 (accepted). ADR 0018 sets the band no lower than 1.1 × the largest value of
    * the held-out sample, and the acceptance captures are 28 more such samples.
    */
   const LENS_QINNER = 0.044;
@@ -760,6 +774,24 @@ async function calibrate(G, node) {
         // than a galaxy with a sparse halo); the family's paA
         paEps0: Math.max(0.01, positionAngle(mine).paEps0),
       };
+      // ADR 0026 (widen-only): for the radii, the axis ratio and the position angle, the band is
+      // the larger of the band that applies to the preset now (the family's, or for the axis
+      // ratio the preset's own, set above) and 1.5 × the preset's own largest re-draw spread.
+      // Only a preset whose own spread exceeds that band gets a change, so none gets narrower.
+      const own = /** @type {Record<string, number>} */ (byPreset[preset]);
+      const fam = /** @type {Record<string, number>} */ (t);
+      for (const [k, m] of /** @type {const} */ ([
+        ['r25', 'r25Abs'],
+        ['r50', 'r50Abs'],
+        ['r90', 'r90Abs'],
+        ['q', 'qAbs'],
+      ])) {
+        const wide = ceil3(1.5 * (ps[m]?.max ?? 0));
+        if (wide > (own[k] ?? fam[k] ?? 0)) own[k] = wide;
+      }
+      const eps0 = /** @type {number} */ (own.paEps0);
+      const paWide = positionAngle(mine, { eps0, largest: true }).paA;
+      if (paWide > (fam.paA ?? 0)) own.paA = paWide;
     }
     parity[family].byPreset = byPreset;
     // the negative controls against these thresholds
@@ -823,7 +855,7 @@ async function calibrate(G, node) {
     standIns: R,
     // the negative controls ran on this many of the configurations that have them (every
     // configuration but the line-work alone's): the controls' detection rates are over these. A
-    // run of one family (--family) leaves the others' as they are and records its own apart.
+    // run of one family (--only-family) leaves the others' as they are and records its own apart.
     ...(previousCal
       ? {
           ...(previousCal.controlsEvery ? { controlsEvery: previousCal.controlsEvery } : {}),
@@ -862,21 +894,37 @@ async function calibrate(G, node) {
 }
 
 /**
+ * The presets of a calibration family that --only-family adds held-out configurations for (those
+ * whose held-out configurations are not captured).
+ *
+ * @param {string} family
+ */
+function onlyFamilyPresets(family) {
+  if (family === 'slip') return ['Plates slipped'];
+  // the lens presets' held-out configurations are captured (`calibration` cases of the manifest)
+  if (family === 'lens') return [];
+  throw new Error(`no held-out presets for family ${family}`);
+}
+
+/**
  * The position-angle tolerance's parameters (thresholds.ts `paTolerance`), fitted from re-draws:
  * paEps0 is 1.5 × the 95th percentile of the change of ellipticity ε = (1 − q²)/(1 + q²) between
  * re-draws (below it the axis is noise), and paA 1.5 × the 95th percentile of |Δpa| · (ε − paEps0)
  * over the pairs above it, so that |Δpa| ≤ paA / (ε − paEps0).
  *
  * @param {any[]} list
+ * @param {{ eps0?: number, largest?: boolean }} [own] eps0: use this noise floor instead of the
+ *   fitted one; largest: the largest spread instead of the 95th percentile (ADR 0026)
  */
-function positionAngle(list) {
+function positionAngle(list, own = {}) {
   const eps = (/** @type {number} */ q) => (1 - q * q) / (1 + q * q);
   const p95 = (/** @type {number[]} */ xs) => {
     const s = xs.slice().sort((a, b) => a - b);
-    return s[Math.max(0, Math.ceil(0.95 * s.length) - 1)] ?? 0;
+    return s[own.largest ? s.length - 1 : Math.max(0, Math.ceil(0.95 * s.length) - 1)] ?? 0;
   };
   const ceil3 = (/** @type {number} */ x) => Math.ceil(x * 1000) / 1000;
-  const paEps0 = ceil3(1.5 * p95(list.map((c) => Math.abs(eps(c.render.q) - eps(c.ref.q)))));
+  const paEps0 =
+    own.eps0 ?? ceil3(1.5 * p95(list.map((c) => Math.abs(eps(c.render.q) - eps(c.ref.q)))));
   const above = list.filter((c) => eps(c.ref.q) > paEps0);
   const paA = ceil3(
     Math.max(0.5, 1.5 * p95(above.map((c) => Math.abs(c.paDiff) * (eps(c.ref.q) - paEps0)))),

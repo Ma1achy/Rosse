@@ -32,11 +32,15 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0020](adr/0020-m4-acceptance-overrides.md) | _Proposed:_ the overrides of the M4 acceptance captures (`starMix`, `field`, `fgstars`, `bubbles`, `whole`, `envelope`; `barStyle` and `ringStyle` for `Barred spiral`), and the line-work-only `lines` captures with their held-out seeds. |
 | [0021](adr/0021-goldens-drawn-with-v21s-part-picks.md) | _Proposed:_ the goldens draw the parts with v21's part picks, replayed from `mulberry32(seed · 57 + 3)` and checked against v21's own `parts()`; the engine's own picks are tested by their distributions. Extends 0015 item 5. |
 | [0022](adr/0022-m5-acceptance-overrides.md) | _Proposed:_ the overrides of the M5 acceptance captures (`starMix`, `field`, `fgstars`; the drawn shells for `Shell galaxy`). |
+| [0023](adr/0023-m6-acceptance-overrides.md) | _Proposed:_ the overrides of the M6 acceptance captures (`starMix`, `field`, `fgstars`, as before; the Chalkboard captures; the `knob-*` probes). |
+| [0024](adr/0024-plates-are-present-tier-passes.md) | Plates (`slip`, `colour`) are present-tier passes over layers that carry their population; switching them builds uniforms only. |
+| [0025](adr/0025-the-slipped-plates-are-their-own-golden-family.md) | _Proposed:_ the slipped plates are their own golden family (`slip`), calibrated alone. |
+| [0026](adr/0026-per-preset-bands-widen-only.md) | _Proposed:_ per-preset bands for the radii, the position angle and the axis ratio: the larger of the current band and 1.5 × the preset's largest re-draw spread (the owner's decision of 2026-10-07). |
 | [0050](adr/0050-the-lens-marks-slots-and-explicit-home.md) | _Proposed:_ the lens's marks, slots and explicit home: 8 slots per mark, mark classes, the fixed-point κ, the saved source orientation (open question Q3, option b) that the orbit never re-rolls. |
 | [0051](adr/0051-goldens-drawn-with-v21s-lens-picks.md) | _Proposed:_ the goldens draw the lens with v21's lens picks, replayed from v21's own streams and checked against v21's solver; the engine's own picks are tested by their distributions. Extends 0015 item 5 and 0021. |
 | [0052](adr/0052-m9-acceptance-overrides.md) | _Proposed:_ the overrides of the M9 acceptance captures (the deep field, drawn stars and foreground stars; `Layered: lensed merger` after M8). |
-| [0053](adr/0053-lens-family-calibration-and-count-gate.md) | _Proposed:_ the `lens` family's calibration (28 configurations, `--family lens`), and its count gate at `poisson` 4.5 (lensed knots are over-dispersed: 1.27 against 0.82). |
-| [0054](adr/0054-lens-inner-axis-ratio-band.md) | _Proposed:_ the `lens` family's inner axis-ratio band becomes 0.044 (1.1 × the largest of 84 v21 captures, 0.0395), after two of the 28 acceptance cases missed 0.033 by 0.0002 and 0.0065. |
+| [0053](adr/0053-lens-family-calibration-and-count-gate.md) | _Proposed:_ the `lens` family's calibration (28 configurations, `--only-family lens`), and its count gate at `poisson` 4.5 (lensed knots are over-dispersed: 1.27 against 0.82). |
+| [0054](adr/0054-lens-inner-axis-ratio-band.md) | the `lens` family's inner axis-ratio band becomes 0.044 (1.1 × the largest of 84 v21 captures, 0.0395), after two of the 28 acceptance cases missed 0.033 by 0.0002 and 0.0065. |
 
 ## Modules
 

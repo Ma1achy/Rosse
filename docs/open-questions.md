@@ -137,3 +137,17 @@ The options:
 - (c) Decide each one.
 
 **Recommendation:** (a) for M2–M9, so parity tests stay meaningful; each reproduced bug is marked in code with `// v21 parity: …` and a link to the notes. Then (c) as a pass after M9, each fix in its own pull request with a render diff. The `RMAX` truncation in particular changes the look of every galaxy (fainter, wider haloes), so it is your call rather than ours.
+
+### Q14. Recalibrate the golden thresholds on real hardware
+
+The golden thresholds (including the per-preset widening of ADR 0026, decided on 2026-10-07 for M5) were calibrated on SwiftShader, the software WebGPU the build environment has. The owner will re-run the calibration on their MacBook (a real GPU) after the M5 widening, and commit the result:
+
+```
+npm run golden -- --calibrate        # all shards, from scratch (long)
+npm run golden                       # all 152 required cases must pass
+npx prettier --write tests/golden/thresholds.json tests/golden/calibration.json
+```
+
+If a case then fails, or a negative control that was caught is missed, the thresholds or the ADR are revisited.
+
+**Recommendation:** do it with M10's real-hardware pass (it is on that row's acceptance in docs/roadmap.md), or earlier if convenient.

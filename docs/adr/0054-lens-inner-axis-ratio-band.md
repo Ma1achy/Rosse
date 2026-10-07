@@ -4,7 +4,7 @@ Date: 2026-10-07
 
 ## Status
 
-Proposed, awaiting the owner's sign-off. Applies [0018](0018-comparison-draws-and-the-mean-of-k-redraws.md)'s rule for held-out v21 captures to the acceptance captures of the `lens` family, and changes one number of [0053](0053-lens-family-calibration-and-count-gate.md)'s calibration (the inner axis ratio), for that family only. Nothing in either ADR is changed.
+Accepted. The owner accepted it on 2026-10-07. Applies [0018](0018-comparison-draws-and-the-mean-of-k-redraws.md)'s rule for held-out v21 captures to the acceptance captures of the `lens` family, and changes one number of [0053](0053-lens-family-calibration-and-count-gate.md)'s calibration (the inner axis ratio), for that family only. Nothing in either ADR is changed.
 
 ## Context
 
@@ -24,7 +24,7 @@ The held-out sample that set 0053's band has a largest |Δ| of 0.027 for `qInner
 ## Decision
 
 1. **The `lens` family's `qInner` band is 0.044**, which is 1.1 × 0.0395, the largest value of the 84 v21 captures (56 held out, 28 acceptance). It was 0.033. No other number of the row changes (`q` 0.044, `r25` 0.059, the count gate of 0053 and the rest stay).
-2. The band is a constant of the calibrator (`LENS_QINNER` in `tests/golden/compare/compare.mjs`), as 0053's `LENS_POISSON` is, so a re-calibration of the family keeps it. The negative controls were re-evaluated against it from the same measurements (`--calibrate --family lens --controls-every 2 --reuse-shards`; nothing was re-measured).
+2. The band is a constant of the calibrator (`LENS_QINNER` in `tests/golden/compare/compare.mjs`), as 0053's `LENS_POISSON` is, so a re-calibration of the family keeps it. The negative controls were re-evaluated against it from the same measurements (`--calibrate --only-family lens --controls-every 2 --reuse-shards`; nothing was re-measured).
 3. **What that costs in detection** (`calibration.json`): `bulgeFlat` +0.15 is caught in 10 of 12 configurations (it was 12 of 12), `bulgeFlat` −0.15 in 12 of 16 (13), `lensR` ×1.12 in 13 of 16 (13, unchanged), `lensSize` ×1.4 in 10 of 12 and the others as before. The two controls that lose a catch each lose it on the inner axis ratio alone; the full lists of what each control still misses are in `calibration.json`.
 
 ## Consequences
