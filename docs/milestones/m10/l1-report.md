@@ -25,22 +25,22 @@ Measured 2026-10-07, 141.0.7390.37, 16 cases against the CPU engine (Node).
 
 | case                                 | L1   | L0        | CPU engine ms | adapter ms |
 | ------------------------------------ | ---- | --------- | ------------- | ---------- |
-| smooth-round--stipple__s7__home      | pass | identical | 271           | 6479       |
-| cigar-shaped--stipple__s7__home      | pass | identical | 391           | 739        |
-| disc-no-arms--stipple__s7__home      | pass | identical | 446           | 896        |
-| grand-design--stipple-arms__s7__home | pass | identical | 461           | 1026       |
-| grand-design--ribbons__s7__home      | pass | identical | 655           | 1349       |
-| grand-design--ribbons__s7__orbit     | pass | identical | 509           | 904        |
-| grand-design--ribbons__s7__zoom      | pass | identical | 512           | 1066       |
-| barred-spiral--ribbons__s7__home     | pass | identical | 377           | 768        |
-| dusty-spiral--ribbons__s7__home      | pass | identical | 321           | 924        |
-| hand-wobble--ribbons__s7__home       | pass | identical | 480           | 1299       |
-| grand-design--lines__s7__home        | pass | identical | 292           | 255        |
-| hand-drawn-arms--vectors__s7__home   | pass | identical | 422           | 829        |
-| edge-on-with-dust--vectors__s7__home | pass | identical | 442           | 662        |
-| stellar-streams--vectors__s7__home   | pass | identical | 550           | 815        |
-| shell-galaxy--vectors__s7__home      | pass | identical | 419           | 802        |
-| plates-slipped--single__s7__home     | pass | identical | 1751          | 2721       |
+| smooth-round--stipple__s7__home      | pass | identical | 303           | 35414      |
+| cigar-shaped--stipple__s7__home      | pass | identical | 196           | 618        |
+| disc-no-arms--stipple__s7__home      | pass | identical | 268           | 608        |
+| grand-design--stipple-arms__s7__home | pass | identical | 369           | 701        |
+| grand-design--ribbons__s7__home      | pass | identical | 458           | 875        |
+| grand-design--ribbons__s7__orbit     | pass | identical | 373           | 861        |
+| grand-design--ribbons__s7__zoom      | pass | identical | 449           | 723        |
+| barred-spiral--ribbons__s7__home     | pass | identical | 368           | 691        |
+| dusty-spiral--ribbons__s7__home      | pass | identical | 350           | 674        |
+| hand-wobble--ribbons__s7__home       | pass | identical | 368           | 851        |
+| grand-design--lines__s7__home        | pass | identical | 89            | 137        |
+| hand-drawn-arms--vectors__s7__home   | pass | identical | 383           | 732        |
+| edge-on-with-dust--vectors__s7__home | pass | identical | 239           | 339        |
+| stellar-streams--vectors__s7__home   | pass | identical | 132           | 479        |
+| shell-galaxy--vectors__s7__home      | pass | identical | 202           | 577        |
+| plates-slipped--single__s7__home     | pass | identical | 1261          | 2697       |
 
 ## Adapters not yet measured
 
