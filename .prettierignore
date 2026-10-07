@@ -10,3 +10,4 @@ spikes/
 tests/vectors/*.json
 assets-built/
 tmp-scratch/
+tools/readme-assets/gz2-picks.json
