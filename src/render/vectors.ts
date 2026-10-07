@@ -225,10 +225,18 @@ export class GpuVectors {
       31: tide ?? buf(16, STORAGE, 'no tides'),
     };
     const dotArgs = keep(
-      res.init(new Uint32Array([4, D.nDots, 0, 0]), GPUBufferUsage.INDIRECT, 'dots args'),
+      res.init(
+        new Uint32Array([4, D.nDots, 0, 0]),
+        GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC,
+        'dots args',
+      ),
     );
     const blobArgs = keep(
-      res.init(new Uint32Array([4, D.nBlobs, 0, 0]), GPUBufferUsage.INDIRECT, 'blob args'),
+      res.init(
+        new Uint32Array([4, D.nBlobs, 0, 0]),
+        GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC,
+        'blob args',
+      ),
     );
     const withJob = (J: Job): Record<number, GPUBuffer> => ({
       ...buffers,

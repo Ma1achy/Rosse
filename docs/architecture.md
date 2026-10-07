@@ -53,6 +53,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0052](adr/0052-m9-acceptance-overrides.md) | _Proposed:_ the overrides of the M9 acceptance captures (the deep field, drawn stars and foreground stars; and `Layered: lensed merger`, lens on, since M8). |
 | [0053](adr/0053-lens-family-calibration-and-count-gate.md) | _Proposed:_ the `lens` family's calibration (28 configurations, `--only-family lens`), and its count gate at `poisson` 4.5 (lensed knots are over-dispersed: 1.27 against 0.82). |
 | [0054](adr/0054-lens-inner-axis-ratio-band.md) | the `lens` family's inner axis-ratio band becomes 0.044 (1.1 × the largest of 84 v21 captures, 0.0395), after two of the 28 acceptance cases missed 0.033 by 0.0002 and 0.0065. |
+| [0060](adr/0060-the-real-galaxies-are-their-own-golden-family.md) | _Accepted (owner, 2026-10-07):_ the real galaxies are their own golden family (`real`), calibrated on engine re-draws of the 20 captures and one held-out seed |
 | [0070](adr/0070-pooled-scratch-shared-uploads-and-kept-batches.md) | _Proposed:_ pooled scratch buffers (cleared on reuse), content-addressed shared uploads and kept ink batches, so a model rebuild and an orbit frame create almost no resources. Output unchanged. |
 | [0071](adr/0071-the-cpu-engine-runs-in-a-worker.md) | _Proposed:_ the CPU engine runs in a worker behind messages (`fallback/core.ts`, `worker.ts`, `client.ts`), so a CPU frame never blocks the page. |
 

@@ -77,6 +77,8 @@ export interface CaptureRecord {
  */
 export function goldenFamily(preset: string, variant?: string): string {
   if (variant === 'lines') return 'lines';
+  // the real galaxies of M12 (ADR 0060): fromVotes' parameters, a mix of the spiral and smooth drawings
+  if (variant === 'real') return 'real';
   // the simulated shells (M8, ADR 0044): the satellite's stars are v21's own random draw, which the
   // engine's re-draws do not carry, so the family is calibrated on held-out v21 captures too
   if (variant === 'shells') return 'shells';

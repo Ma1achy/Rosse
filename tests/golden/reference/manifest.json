@@ -19649,6 +19649,526 @@
         "ms": 300
       },
       "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-0--real__s2009__home",
+      "preset": "Real galaxy 0",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 0,
+      "seed": 2009,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "3518599a65131872669e5deb0128f1773dcc7dd2f59df9e5818d8ea72a419dd2",
+      "captured": "2026-10-07T11:26:33.976Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 13742,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 29
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-0--real__s2009__orbit",
+      "preset": "Real galaxy 0",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 0,
+      "seed": 2009,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "8c0e36b90608ba01ba46f07c720a12c66a5df2481bbf22027bc34718475a5b8a",
+      "captured": "2026-10-07T11:26:45.135Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 13742,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 1,
+        "ms": 45
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-10--real__s7941__home",
+      "preset": "Real galaxy 10",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 10,
+      "seed": 7941,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "d079a1e1a651dac515bbcd210b26c8264879fa99bca39474a00541738bc9cc54",
+      "captured": "2026-10-07T11:26:41.443Z",
+      "stats": {
+        "rstars": 15,
+        "dots": 10091,
+        "knots": 47,
+        "stars": 10,
+        "curves": 1,
+        "used": 62,
+        "ms": 131
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-10--real__s7941__orbit",
+      "preset": "Real galaxy 10",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 10,
+      "seed": 7941,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "451607b7bdaa9ba4a93cddc02c554d29c343a61b531110281ec030aa3dd22376",
+      "captured": "2026-10-07T11:26:48.829Z",
+      "stats": {
+        "rstars": 15,
+        "dots": 9641,
+        "knots": 47,
+        "stars": 16,
+        "curves": 2,
+        "used": 60,
+        "ms": 87
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-12--real__s6057__home",
+      "preset": "Real galaxy 12",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 12,
+      "seed": 6057,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "f30a075bbcdff58cec1c9fdfe8d06a82ea839a89b38d797cf8f53957916d6421",
+      "captured": "2026-10-07T11:27:15.489Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9807,
+        "knots": 162,
+        "stars": 18,
+        "curves": 4,
+        "used": 55,
+        "ms": 134
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-12--real__s6057__orbit",
+      "preset": "Real galaxy 12",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 12,
+      "seed": 6057,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "e83b387000b0397cea82f57471732321211c8e2eb3825a1e2e874197c9541c7f",
+      "captured": "2026-10-07T11:27:24.823Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9720,
+        "knots": 154,
+        "stars": 16,
+        "curves": 4,
+        "used": 52,
+        "ms": 80
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-15--real__s9946__home",
+      "preset": "Real galaxy 15",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 15,
+      "seed": 9946,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "9c38abfc2b7be1be4576d389a9838b94cc48483a37efc88ab3569e4604842e18",
+      "captured": "2026-10-07T11:27:10.082Z",
+      "stats": {
+        "rstars": 12,
+        "dots": 10096,
+        "knots": 104,
+        "stars": 9,
+        "curves": 4,
+        "used": 63,
+        "ms": 146
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-15--real__s9946__orbit",
+      "preset": "Real galaxy 15",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 15,
+      "seed": 9946,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "7a117f356f6f4bd897738a7b6a3086e97660f4eca9908405e8fa4e35dbeefda3",
+      "captured": "2026-10-07T11:27:19.191Z",
+      "stats": {
+        "rstars": 12,
+        "dots": 10086,
+        "knots": 115,
+        "stars": 9,
+        "curves": 4,
+        "used": 63,
+        "ms": 76
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-19--real__s1884__home",
+      "preset": "Real galaxy 19",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 19,
+      "seed": 1884,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "58935480a60e6518b462150b97ad4779d64d5f49b7e746fda1d2906a82cc5248",
+      "captured": "2026-10-07T11:27:26.145Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 10099,
+        "knots": 78,
+        "stars": 9,
+        "curves": 9,
+        "used": 51,
+        "ms": 176
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-19--real__s1884__orbit",
+      "preset": "Real galaxy 19",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 19,
+      "seed": 1884,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "9d2c6b1c7201351decbf591b364e82a9240568cdab915ad862090dcc42d0a3fc",
+      "captured": "2026-10-07T11:27:31.352Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9978,
+        "knots": 74,
+        "stars": 10,
+        "curves": 9,
+        "used": 53,
+        "ms": 170
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-23--real__s8748__home",
+      "preset": "Real galaxy 23",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 23,
+      "seed": 8748,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "72520d385271d011be2feadbb440948910dfca110e4072892d380859245ba036",
+      "captured": "2026-10-07T11:27:26.104Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9470,
+        "knots": 174,
+        "stars": 20,
+        "curves": 5,
+        "used": 52,
+        "ms": 115
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-23--real__s8748__orbit",
+      "preset": "Real galaxy 23",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 23,
+      "seed": 8748,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "2aa2c990c751e2ad63b7a21dcd88ba1d2ff385871d8f594dc3e407bcd341a235",
+      "captured": "2026-10-07T11:27:34.183Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 8296,
+        "knots": 159,
+        "stars": 15,
+        "curves": 6,
+        "used": 54,
+        "ms": 239
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-26--real__s7121__home",
+      "preset": "Real galaxy 26",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 26,
+      "seed": 7121,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "3dfc1dde0350ea8b185c17c2b6159f740a9a11321aa7d90da5c1654ec0c8f776",
+      "captured": "2026-10-07T11:27:40.580Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9732,
+        "knots": 91,
+        "stars": 9,
+        "curves": 6,
+        "used": 57,
+        "ms": 83
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-26--real__s7121__orbit",
+      "preset": "Real galaxy 26",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 26,
+      "seed": 7121,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "33b9b8f4fe7660d5913352b0628954c608885cdde781557e2baab5cc5a3982cc",
+      "captured": "2026-10-07T11:27:48.531Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 9646,
+        "knots": 88,
+        "stars": 8,
+        "curves": 6,
+        "used": 56,
+        "ms": 73
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-3--real__s4288__home",
+      "preset": "Real galaxy 3",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 3,
+      "seed": 4288,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "0246a4df4ac7de8d69e774b23f8fb9eaa668f8ddcecb818a4164af4ef17519b0",
+      "captured": "2026-10-07T11:26:38.844Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 5480,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 20
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-3--real__s4288__orbit",
+      "preset": "Real galaxy 3",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 3,
+      "seed": 4288,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "b373e534f2e31d308346cb2d2fa4b114edb96699dd97f3a6c9dc905d1e6b1fc2",
+      "captured": "2026-10-07T11:26:47.289Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 5480,
+        "knots": 0,
+        "stars": 0,
+        "curves": 0,
+        "used": 2,
+        "ms": 6
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-37--real__s3937__home",
+      "preset": "Real galaxy 37",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 37,
+      "seed": 3937,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "c5c32460fa876d4adef2ad4184b674d17cb1742276fb3da93f2e6aeb4cd5e904",
+      "captured": "2026-10-07T11:27:50.607Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 8094,
+        "knots": 44,
+        "stars": 4,
+        "curves": 0,
+        "used": 26,
+        "ms": 58
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-37--real__s3937__orbit",
+      "preset": "Real galaxy 37",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 37,
+      "seed": 3937,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "87804b66ffa120b8fd74d3c1a74bf3bdec708f37388fc1f32775a7174d2a2f33",
+      "captured": "2026-10-07T11:27:53.766Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 8094,
+        "knots": 44,
+        "stars": 4,
+        "curves": 0,
+        "used": 26,
+        "ms": 27
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-6--real__s586__home",
+      "preset": "Real galaxy 6",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 6,
+      "seed": 586,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "4cc28422bdc289d26af2234f6f63f55e105c083c26ac0ca64da366db648b62b9",
+      "captured": "2026-10-07T11:26:33.885Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 4110,
+        "knots": 109,
+        "stars": 8,
+        "curves": 4,
+        "used": 57,
+        "ms": 123
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "real-galaxy-6--real__s586__orbit",
+      "preset": "Real galaxy 6",
+      "variant": "real",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "real": 6,
+      "seed": 586,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "0afd2e26dae5c27fce7d6a08a3ea7548b4323cb0822b42d4369a76fefc4b7551",
+      "captured": "2026-10-07T11:26:41.351Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 5771,
+        "knots": 126,
+        "stars": 11,
+        "curves": 3,
+        "used": 59,
+        "ms": 96
+      },
+      "pageErrors": 0
     }
   ],
   "extra": {

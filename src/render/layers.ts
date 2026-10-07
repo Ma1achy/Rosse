@@ -21,6 +21,12 @@ interface LayerBase {
   gain: number;
   /** the population: the colour plate's ink for the layer; the line work, when absent */
   pop?: Pop;
+  /**
+   * The SVG export's layer for this layer's marks (src/extras/export/svg.ts), when its atlas does
+   * not say: M7's deep-field dots set `'background'`. Honoured for sprite layers only (ribbons are
+   * `arms`; capsules are assigned by their drawings). No effect on drawing.
+   */
+  svgLayer?: 'background' | 'drawings' | 'arms' | 'dust' | 'cores' | 'knots' | 'dots' | 'stars';
 }
 
 export interface SpriteLayer extends LayerBase {

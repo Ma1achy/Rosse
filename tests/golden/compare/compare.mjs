@@ -468,7 +468,8 @@ async function compareAll(G, node) {
       about:
         "The new engine's own goldens (ADR 0013 test e): SHA-256 of the 8-bit ink alpha of each required case, WebGPU on SwiftShader in Chromium. Written by npm run golden -- --update-engine.",
       adapter: gpu.adapter,
-      hashes: newHashes,
+      // a run narrowed with --only adds to the hashes already there and changes none of them
+      hashes: opt('--only') ? { ...engineHashes, ...newHashes } : newHashes,
     });
     console.log(`wrote ${enginePath}`);
   }
@@ -628,8 +629,25 @@ function calibrationCases(G, node) {
         cases.push({ preset, base: preset, family: `${family}@zoom`, params: P, zoom: 2 });
       }
   }
+  if (onlyFamily === 'real') {
+    // held-out configurations of the real galaxies (ADR 0060): their captured parameters with
+    // other seeds, home and an orbit (re-draw pairs need no v21 capture)
+    for (const c of manifest.captures.filter(
+      (/** @type {any} */ x) => x.variant === 'real' && x.camera === 'home',
+    )) {
+      const rec = node.record(c.name);
+      for (const seed of [3]) {
+        const P = { ...rec.params, seed };
+        const orbit = { ...P, az: P.az + 35, incl: Math.min(180, P.incl + 20) };
+        const label = `${rec.preset}`;
+        cases.push({ preset: label, base: label, family: 'real', params: P });
+        cases.push({ preset: label, base: label, family: 'real', params: orbit });
+      }
+    }
+  }
   for (const c of manifest.captures.filter((/** @type {any} */ x) => x.variant)) {
-    if (onlyFamily && G.goldenFamily(node.record(c.name).preset) !== onlyFamily) continue;
+    if (onlyFamily && G.goldenFamily(node.record(c.name).preset, c.variant) !== onlyFamily)
+      continue;
     if (c.name.endsWith('__chalk')) continue; // the same parameters as the paper capture
     const rec = node.record(c.name);
     const zoom = rec.zoom ?? 1;
@@ -1086,14 +1104,18 @@ async function calibrate(G, node) {
       const c = JSON.parse(readFileSync(cPath, 'utf8'));
       Object.assign(t.parity, parity);
       Object.assign(c.families, numbers);
+      // the other families' configurations keep their order; this family's are added after them
+      const have = new Set(c.configurations);
       c.configurations = [
-        ...new Set([
-          ...c.configurations,
-          ...cases.map((x) => `${x.preset} s${x.params.seed} incl ${x.params.incl}`),
-        ]),
-      ].sort();
-      writeFileSync(tPath, JSON.stringify(t, null, 2) + '\n');
-      writeFileSync(cPath, JSON.stringify(c, null, 2) + '\n');
+        ...c.configurations,
+        ...new Set(
+          cases
+            .map((x) => `${x.preset} s${x.params.seed} incl ${x.params.incl}`)
+            .filter((x) => !have.has(x)),
+        ),
+      ];
+      await writeJson(tPath, t);
+      await writeJson(cPath, c);
     }
     console.log(JSON.stringify(parity, null, 1));
     return;
@@ -1175,6 +1197,7 @@ function onlyFamilyPresets(family) {
   if (family === 'slip') return ['Plates slipped'];
   // the lens presets' held-out configurations are captured (`calibration` cases of the manifest)
   if (family === 'lens') return [];
+  if (family === 'real') return []; // its held-out configurations come from the captures (ADR 0060)
   throw new Error(`no held-out presets for family ${family}`);
 }
 

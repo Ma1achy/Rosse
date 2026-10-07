@@ -158,10 +158,18 @@ export class GpuRibbons {
       30: noise,
     };
     const hdotArgs = keep(
-      data(new Uint32Array([4, R.nHDots, 0, 0]), 'hatch dots args', GPUBufferUsage.INDIRECT),
+      data(
+        new Uint32Array([4, R.nHDots, 0, 0]),
+        'hatch dots args',
+        GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC,
+      ),
     );
     const hblobArgs = keep(
-      data(new Uint32Array([4, R.nHBlobs, 0, 0]), 'hatch blobs args', GPUBufferUsage.INDIRECT),
+      data(
+        new Uint32Array([4, R.nHBlobs, 0, 0]),
+        'hatch blobs args',
+        GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC,
+      ),
     );
     const carve = keep(data(R.carve, 'carving segments'));
     const groups = Object.fromEntries(

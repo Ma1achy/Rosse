@@ -1,5 +1,5 @@
 {
-  "about": "Extra reference captures (npm run capture:reference -- --extra tests/golden/extra-cases.json): a preset with overrides set after the preset and the seed, at seeds 7 and 4242 unless `seeds` says otherwise, home and orbit cameras, and (from M3) the zoom camera for the seeds a case lists in `zoom`: home at zoom 2 through v21's __GEN.zoom, so VIEW.scale = 168 (open question Q8). They are the required golden cases (tests/golden/README.md, ADR 0015). 'stipple': lines, knots and envelope off, as the roadmap's M2 acceptance says (the arms, the spurs and the clumps' marks are drawn; the lines, the knots and the envelope come with later milestones' own cases); 'Radio jet' also has its jet off (the Sersic profile). Seeds 3 and 11 give v21 hands of 2 and 3 pens. 'stipple-arms' is Grand design with vary 0 (no spurs, clumps or dust patches, lopsidedness or warp, and every dot drawing) and dustScribble 0 (no dust lanes). From M4, 'ribbons' (seeds 7 and 4242, home, orbit and zoom): the M4 presets with bubbles 0, whole 0 and envelope 0 (rings drawings at the clumps, whole drawings and envelopes, vector parts that M5 draws and these cases leave to its own); Barred spiral draws its bar and ring as ribbons (barStyle and ringStyle 'ribbon') instead of the vector drawings of its default style. From M4's review (QA D3), 'lines': the same presets and overrides as 'ribbons' with the stipple, the knots along the arms and the sparkle stars off (stipple 0, knots 0, sparkle 0), and also starMix, field and fgstars 0, which isolate the line-work from the stars and the sky (they are kept here on purpose, see ADR 0034, proposed), so that the line-work (curves, pieces, hatching, the drawn core, and the ring knots' and clumps' own marks) is compared on its own at home and orbit. Seeds 7 and 4242 are gated; seeds 3, 11, 23, 101, 5, 13, 29, 53, 89 and 211 are captured for the calibration only (\"calibration\": true, ADR 0018): the line-work is drawn the same way at every placement key, so its thresholds come from the renderers' own differences on held-out seeds. From M5, 'vectors': the M5 presets as v21 draws them, with their drawn parts; 'Shell galaxy' draws its drawn shells (shells 1) instead of its simulated ones (shellsOn 0; the shell simulation is M8). From M7 none of these cases (but 'lines', which isolates the line-work) switches off the drawn stars among the dots (starMix), the deep field (field) or the foreground stars (fgstars): they were overrides of M2 to M5, retired when M7 built the stars and the sky (ADR 0031), and the captures were made again with them on. The stars, artefacts, layered scenes and the deep field are tests/golden/m7-cases.json. From M6, 'single' (seeds 7 and 4242, home, orbit and zoom): the M6 presets that M2 and M4 captured with more overrides (`Grand design`, `Flocculent`, `Tightly wound`, `Loose, open arms`, `Dusty spiral`, `Hand wobble`, `Smooth, round`, `Cigar-shaped`) and the two plates presets (`Plates slipped`, `Stellar populations`), with only starMix 0, field 0 and fgstars 0 switched off (the sky and the drawn stars, M7); a case with `chalk: true` is captured on the Chalkboard (seed 7, home and orbit). The other eight single-galaxy presets are the 'vectors' cases. 'knob-*' (seeds 7 and 4242, home and orbit): single-parameter probes of what no preset exercises (patchy, irr, tail, sersicN, ringOnlyLines, dust, halo with envelope and outline, nuclear with whole and envelope). These overrides await the owner's sign-off (ADR 0023, proposed). From M8, 'mergers' (seeds 7 and 4242, home, orbit and zoom): the eight `Merger: …` presets, `Sketches, torn apart` and `Layered: lensed merger` as v21 draws them, with only what M8 does not draw switched off: starMix 0 (the debris's and the galaxies' drawn stars, vector sstars of M7), field 0 and fgstars 0 (the sky, M7), and lensOn 0 for the lensed merger (the lens is M9). 'mergers-t05' and 'mergers-t15': the Mice at the timeline's moments mTime 0.5 (on the way in) and 1.5 (on the way out, horizon 2). 'shells': `Shell galaxy` with its simulated shells (shellsOn 1, as the preset), starMix 0, field 0 and fgstars 0, and held-out seeds 3, 11, 23 and 101 (home, orbit and zoom) captured for the calibration only (`\"calibration\": true`, ADR 0018 item 7 and ADR 0044): the satellite's stars are v21's own draw, which the engine's re-draws do not carry. These overrides await the owner's sign-off (ADR 0040, proposed). From M9, 'lens' (seeds 7 and 4242, home and orbit): the six `Lens: …` presets and `A sketch, lensed` as v21 draws them (the lensed source galaxies, their curves, drawn cores and drawings, the quasar with its time-delay flare, the cluster's member galaxies and the double ring), with only what M9 does not draw switched off: starMix 0 (drawn stars among the stipple, vector sstars of M7), field 0 (the deep field, which the cluster and the sketch show, M7; the weak-lensing hook for it is documented in docs/milestones/m9) and fgstars 0 (foreground stars, M7). v21's lens source orientation depends on its navigation history (`homeFor`), so each capture is a fresh page, the home camera first and the orbit camera reached from it, as the capture tool always does; the engine draws the sources at the preset's own camera (its explicit lens home, ADR 0050). These overrides await the owner's sign-off (ADR 0052, proposed). The `lens` family is also captured at seeds 3, 11, 23, 101, 5, 13, 29, 53, 89 and 211 (`calibration`: held out, never gated), as the line-work is (ADR 0018 item 7): v21's own spread about the engine's mean sets the thresholds with the re-draws' (ADR 0053, proposed). With M8 merged, `Layered: lensed merger` is also captured with its lens on (variant 'lens', seeds 7 and 4242 gated, home and orbit, gated only: it is a merger, and passes with the `merger` family's thresholds; ADR 0052): starMix 0, field 0 and fgstars 0 as the other lens cases, the merger itself drawn in full.",
+  "about": "Extra reference captures (npm run capture:reference -- --extra tests/golden/extra-cases.json): a preset with overrides set after the preset and the seed, at seeds 7 and 4242 unless `seeds` says otherwise, home and orbit cameras, and (from M3) the zoom camera for the seeds a case lists in `zoom`: home at zoom 2 through v21's __GEN.zoom, so VIEW.scale = 168 (open question Q8). They are the required golden cases (tests/golden/README.md, ADR 0015). 'stipple': lines, knots and envelope off, as the roadmap's M2 acceptance says (the arms, the spurs and the clumps' marks are drawn; the lines, the knots and the envelope come with later milestones' own cases); 'Radio jet' also has its jet off (the Sersic profile). Seeds 3 and 11 give v21 hands of 2 and 3 pens. 'stipple-arms' is Grand design with vary 0 (no spurs, clumps or dust patches, lopsidedness or warp, and every dot drawing) and dustScribble 0 (no dust lanes). From M4, 'ribbons' (seeds 7 and 4242, home, orbit and zoom): the M4 presets with bubbles 0, whole 0 and envelope 0 (rings drawings at the clumps, whole drawings and envelopes, vector parts that M5 draws and these cases leave to its own); Barred spiral draws its bar and ring as ribbons (barStyle and ringStyle 'ribbon') instead of the vector drawings of its default style. From M4's review (QA D3), 'lines': the same presets and overrides as 'ribbons' with the stipple, the knots along the arms and the sparkle stars off (stipple 0, knots 0, sparkle 0), and also starMix, field and fgstars 0, which isolate the line-work from the stars and the sky (they are kept here on purpose, see ADR 0034, proposed), so that the line-work (curves, pieces, hatching, the drawn core, and the ring knots' and clumps' own marks) is compared on its own at home and orbit. Seeds 7 and 4242 are gated; seeds 3, 11, 23, 101, 5, 13, 29, 53, 89 and 211 are captured for the calibration only (\"calibration\": true, ADR 0018): the line-work is drawn the same way at every placement key, so its thresholds come from the renderers' own differences on held-out seeds. From M5, 'vectors': the M5 presets as v21 draws them, with their drawn parts; 'Shell galaxy' draws its drawn shells (shells 1) instead of its simulated ones (shellsOn 0; the shell simulation is M8). From M7 none of these cases (but 'lines', which isolates the line-work) switches off the drawn stars among the dots (starMix), the deep field (field) or the foreground stars (fgstars): they were overrides of M2 to M5, retired when M7 built the stars and the sky (ADR 0031), and the captures were made again with them on. The stars, artefacts, layered scenes and the deep field are tests/golden/m7-cases.json. From M6, 'single' (seeds 7 and 4242, home, orbit and zoom): the M6 presets that M2 and M4 captured with more overrides (`Grand design`, `Flocculent`, `Tightly wound`, `Loose, open arms`, `Dusty spiral`, `Hand wobble`, `Smooth, round`, `Cigar-shaped`) and the two plates presets (`Plates slipped`, `Stellar populations`), with only starMix 0, field 0 and fgstars 0 switched off (the sky and the drawn stars, M7); a case with `chalk: true` is captured on the Chalkboard (seed 7, home and orbit). The other eight single-galaxy presets are the 'vectors' cases. 'knob-*' (seeds 7 and 4242, home and orbit): single-parameter probes of what no preset exercises (patchy, irr, tail, sersicN, ringOnlyLines, dust, halo with envelope and outline, nuclear with whole and envelope). These overrides await the owner's sign-off (ADR 0023, proposed). From M8, 'mergers' (seeds 7 and 4242, home, orbit and zoom): the eight `Merger: …` presets, `Sketches, torn apart` and `Layered: lensed merger` as v21 draws them, with only what M8 does not draw switched off: starMix 0 (the debris's and the galaxies' drawn stars, vector sstars of M7), field 0 and fgstars 0 (the sky, M7), and lensOn 0 for the lensed merger (the lens is M9). 'mergers-t05' and 'mergers-t15': the Mice at the timeline's moments mTime 0.5 (on the way in) and 1.5 (on the way out, horizon 2). 'shells': `Shell galaxy` with its simulated shells (shellsOn 1, as the preset), starMix 0, field 0 and fgstars 0, and held-out seeds 3, 11, 23 and 101 (home, orbit and zoom) captured for the calibration only (`\"calibration\": true`, ADR 0018 item 7 and ADR 0044): the satellite's stars are v21's own draw, which the engine's re-draws do not carry. These overrides await the owner's sign-off (ADR 0040, proposed). From M9, 'lens' (seeds 7 and 4242, home and orbit): the six `Lens: …` presets and `A sketch, lensed` as v21 draws them (the lensed source galaxies, their curves, drawn cores and drawings, the quasar with its time-delay flare, the cluster's member galaxies and the double ring), with only what M9 does not draw switched off: starMix 0 (drawn stars among the stipple, vector sstars of M7), field 0 (the deep field, which the cluster and the sketch show, M7; the weak-lensing hook for it is documented in docs/milestones/m9) and fgstars 0 (foreground stars, M7). v21's lens source orientation depends on its navigation history (`homeFor`), so each capture is a fresh page, the home camera first and the orbit camera reached from it, as the capture tool always does; the engine draws the sources at the preset's own camera (its explicit lens home, ADR 0050). These overrides await the owner's sign-off (ADR 0052, proposed). The `lens` family is also captured at seeds 3, 11, 23, 101, 5, 13, 29, 53, 89 and 211 (`calibration`: held out, never gated), as the line-work is (ADR 0018 item 7): v21's own spread about the engine's mean sets the thresholds with the re-draws' (ADR 0053, proposed). With M8 merged, `Layered: lensed merger` is also captured with its lens on (variant 'lens', seeds 7 and 4242 gated, home and orbit, gated only: it is a merger, and passes with the `merger` family's thresholds; ADR 0052): starMix 0, field 0 and fgstars 0 as the other lens cases, the merger itself drawn in full. From M12, 'real' (home and orbit, the one seed fromVotes gives each): 10 of the 42 real galaxies (indices 0, 3, 6, 10, 12, 15, 19, 23, 26 and 37: a round and a cigar-shaped elliptical, an edge-on disc with a dust lane, a ringed disc, a two-armed spiral, barred spirals with a ring, three and four arms, a spiral at 73 degrees and an irregular), as v21 draws them from their Galaxy Zoo 2 votes (`real`: the index, through __GEN.real(i); tools/capture-reference/README.md), with only starMix 0, field 0 and fgstars 0 switched off (the sky and the drawn stars, M7). The mergers, the lensed galaxy and the shells need M8 and M9. Their own golden family `real` (ADR 0060, proposed).",
   "cases": [
     {
       "preset": "Smooth, round",
@@ -1000,6 +1000,116 @@
     {
       "preset": "Layered: lensed merger",
       "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Real galaxy 0",
+      "variant": "real",
+      "real": 0,
+      "seeds": [2009],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Real galaxy 3",
+      "variant": "real",
+      "real": 3,
+      "seeds": [4288],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Real galaxy 6",
+      "variant": "real",
+      "real": 6,
+      "seeds": [586],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Real galaxy 10",
+      "variant": "real",
+      "real": 10,
+      "seeds": [7941],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Real galaxy 12",
+      "variant": "real",
+      "real": 12,
+      "seeds": [6057],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Real galaxy 15",
+      "variant": "real",
+      "real": 15,
+      "seeds": [9946],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Real galaxy 19",
+      "variant": "real",
+      "real": 19,
+      "seeds": [1884],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Real galaxy 23",
+      "variant": "real",
+      "real": 23,
+      "seeds": [8748],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Real galaxy 26",
+      "variant": "real",
+      "real": 26,
+      "seeds": [7121],
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      }
+    },
+    {
+      "preset": "Real galaxy 37",
+      "variant": "real",
+      "real": 37,
+      "seeds": [3937],
       "overrides": {
         "starMix": 0,
         "field": 0,
