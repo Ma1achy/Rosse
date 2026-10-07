@@ -24,6 +24,7 @@
     "validate:wgsl": "node tools/validate-wgsl.mjs",
     "prepare-assets": "node tools/pack-atlas/pack.mjs",
     "screenshots": "node tools/gpu-test/screenshot.mjs",
+    "readme:assets": "node tools/readme-assets/build.mjs",
     "golden": "node tests/golden/compare/compare.mjs",
     "capture:reference": "node tools/capture-reference/capture.mjs",
     "profile:reference": "node tools/profile-reference/profile.mjs",
