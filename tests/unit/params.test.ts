@@ -97,7 +97,11 @@ describe('schema', () => {
     for (const g of groups)
       for (const c of g[1] as [string, string, number, number, number][]) {
         const s = SCHEMA[c[0] as keyof typeof SCHEMA] as NumberSpec;
-        expect([s.min, s.max, s.step], c[0]).toEqual([c[2], c[3], c[4]]);
+        // One deliberate difference from the reference (owner decision of 2026-10-07): the moment
+        // in the merger runs to the timeline's horizon, which v21's own timeline lets reach 30
+        // (`tlSetEnd`, app23.js:L1659), so `mTime`'s maximum is 30 rather than the slider's 2.
+        const want = c[0] === 'mTime' ? [c[2], 30, c[4]] : [c[2], c[3], c[4]];
+        expect([s.min, s.max, s.step], c[0]).toEqual(want);
         expect(s.control).toBe(true);
         checked++;
       }

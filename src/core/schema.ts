@@ -173,7 +173,8 @@ export const SCHEMA: { readonly [K in ParamKey]: ParamSpec } = {
   ovStarD: num('Its distance from the galaxy', 0, 3, 0.05),
   ovStarA: num('Its direction', 0, 360, 1, { unit: '°' }),
   ovArtefact: choice('An artefact across it', ['none', 'trail', 'ghost', 'cosmic']),
-  mTime: num('Moment in the merger', 0, 2, 0.005, { tier: 'view' }),
+  // the timeline's end can reach 30 (`mHorizon`, v21's tlSetEnd, app23.js:L1659), so does the moment
+  mTime: num('Moment in the merger', 0, 30, 0.005, { tier: 'view' }),
   az: num('Orbit round the axis', 0, 360, 1, { unit: '°', tier: 'view' }),
   starMix: num('Drawn stars among the dots', 0, 1, 0.01),
   dustScribble: num('Dust lanes, hatched with pen lines', 0, 1, 0.01),
