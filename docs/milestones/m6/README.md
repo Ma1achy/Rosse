@@ -50,8 +50,35 @@ Nothing else is overridden: no parameter of any preset is changed. M2's `lines`,
 
 The metric is the one on the base, with no change to any family. One family is added, by ADR 0015's rule (ADR 0025, proposed): **`Plates slipped` is its own family, `slip`** (and `slip@zoom`). On the slipped plates v21's α is the union of four offset prints of every mark, and the same galaxy re-drawn by the engine agrees with itself less in the coarse SSIM (median 0.872 against the spirals' 0.935) than a plain plate does. The first run against `spiral` failed the three cases whose SSIM is below its band, 0.862, 0.872 and 0.813 at the zoom camera, while the engine's own re-draws scored 0.869 to 0.873. It was calibrated alone (`npm run golden -- --calibrate --only-family slip`: 18 configurations including seeds 3, 11, 5 and 19, × 3 re-keys, with every negative control), and merged into `thresholds.json` and `calibration.json` without touching any other family.
 
-<!-- RESULTS -->
+### Results
+
+`npm run golden` on the merge with M4 (main) and M5, on SwiftShader (4,436 s), the metric as calibrated, K = 6 draws:
+
+| set | cases | pass | CPU = WebGPU (strict) |
+| --- | --- | --- | --- |
+| M6 `single` (10 presets, 2 seeds, 3 cameras) | 60 | 60 | all |
+| Chalkboard (`Grand design`, `Plates slipped`, `Stellar populations`) | 6 | 6 | all |
+| M5 `vectors` (the other eight presets) | 48 | 45 | all |
+| `knob-*` probes | 32 | 31 | all |
+| M2 to M4 sets, retained | 104 | 104 | all |
+| **required total** | **250** | **246** | **250** |
+
+The 12 drawn-star gates pass. The engine's hashes (`engine-hashes.json`) are unchanged by the merge, so nothing was recalibrated.
+
+Four cases fail, none of them in the 70 new cases of the M6 acceptance (`single` and Chalkboard):
+
+- **Three `Edge-on with dust` cases of M5** (`s4242` home, r25 3.41% against ±3.00%; `s4242` orbit, position angle 1.53° against ±1.45°; `s7` orbit, axis ratio −0.0308 against ±0.0300). They await the owner's decision, and their thresholds are untouched.
+- **One probe, `Barred spiral` with `ringOnlyLines`, seed 7, home**: r25 3.27% against ±3.00%. Every other metric is inside its band (ink 0.1%, coarse SSIM 0.946, pen 0.2%, r50 −0.6%) and the seed 4242 cases pass. It is a probe for a gap, not a roadmap case. No threshold has been changed; the owner may accept it or ask for a family calibration of the probes in a new ADR.
+
 
 ## Checks
 
-<!-- CHECKS -->
+| check | result |
+| --- | --- |
+| `npm run lint` (ESLint and Prettier) | clean |
+| `npm run typecheck` | clean |
+| `npm test` | 22 files, 337 tests pass (the v21 hands replay takes an explicit 60 s timeout, as the other slow tests do) |
+| `npm run validate:wgsl` (naga) | all files valid |
+| `npm run build` | builds |
+| `npm run test:gpu` | 11 of 11 pass (including the plates, the Plates menu and the surface) |
+| `npm run golden` | 246 of 250 required cases pass; strict CPU = WebGPU on all 250; 12 of 12 drawn-star gates |
