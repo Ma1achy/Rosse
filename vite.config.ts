@@ -19,6 +19,8 @@ export default defineConfig({
   publicDir: 'assets-built',
   test: {
     include: ['tests/unit/**/*.test.ts'],
+    // the merger and shell tests run v21's own simulators beside the engine's: seconds each, more under load
+    testTimeout: 120_000,
     // wgsl_reflect's "main" is a CommonJS build inside a "type": "module" package; use its ES build.
     alias: { wgsl_reflect: 'wgsl_reflect/wgsl_reflect.module.js' },
   },

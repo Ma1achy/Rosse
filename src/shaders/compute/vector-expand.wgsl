@@ -9,7 +9,8 @@
 //                  tile units (L1202), its piece by binary search on the densified prefix. Both
 //                  ends through tf (warp, matrix, wobble); half width PEN.line / 2 * ps plate px.
 //                  A warped segment longer than 22 px is dropped (L1207), and under the `post`
-//                  hook one stretched more than 1.8x (L1208): the slot's key says so;
+//                  hook (and a merging galaxy's tides) one stretched more than 1.8x (L1208): the
+//                  slot's key says so;
 //   expand_dots    one dot of a drawing: a dots sprite through tf, its drawing from the hand by
 //                  the coordinate hash, VAR.dotPool[|round(997 x + 131 y)| % len], sized
 //                  dotSprite(t, clamp(2 r sc 0.42 / 2.6, 0.8, 1.6) * max(0.55, ps)) (L1215);
@@ -31,6 +32,7 @@
 
 // #import "common/instance.wgsl"
 // #import "common/rng.wgsl"
+// #import "common/tide.wgsl"
 // #import "common/warp.wgsl"
 
 // VEC_LAYOUT in src/model/vectors.ts
@@ -63,7 +65,8 @@ struct VInst {
   ps: f32,
   // sqrt |det m|, the dots' and blobs' scale
   sc: f32,
-  // warp parameters: rewind (dk, flip, 0, 0); post (cx, cy, 0, 0)
+  // warp parameters: rewind (dk, flip, 0, 0); post (cx, cy, 0, 0); tide (galaxy, R2, 0, 0);
+  // tide on the screen (mWarp) (galaxy, flip, 0, 0)
   w: vec4<f32>,
   // post: the affine S, column-major
   w2: vec4<f32>,
@@ -108,6 +111,8 @@ struct Job {
 const WARP_NONE: u32 = 0u;
 const WARP_REWIND: u32 = 1u;
 const WARP_POST: u32 = 2u;
+const WARP_TIDE: u32 = 3u;
+const WARP_TIDE_SCREEN: u32 = 4u;
 const KNOT_POOL: u32 = 24u;
 const DRAWING_WORDS: u32 = 8u;
 const DROP: u32 = 0xffffffffu;
@@ -197,6 +202,18 @@ fn tf(I: VInst, p: vec2<f32>) -> vec2<f32> {
   if (I.warp == WARP_POST) {
     return sm_warp(post(I, place(I, p)), vu.wobble);
   }
+  if (I.warp == WARP_TIDE) {
+    // a merging galaxy's mark carried by its tides (L1195): the grid, after the matrix
+    return sm_warp(tide_post(u32(I.w.x), place(I, p), I.w.y), vu.wobble);
+  }
+  if (I.warp == WARP_TIDE_SCREEN) {
+    // mWarp's whole drawing (L1196): the tidal map itself, on the raw drawing coordinates
+    var q = p;
+    if (I.w.y != 0.0) {
+      q.x = -q.x;
+    }
+    return sm_warp(tide_nn(u32(I.w.x), q.x, q.y), vu.wobble);
+  }
   return sm_warp(place(I, p), vu.wobble);
 }
 
@@ -253,7 +270,7 @@ fn expand_caps(@builtin(global_invocation_id) id: vec3<u32>) {
     if (ml > 22.0) {
       key = DROP;
     }
-    if (I.warp == WARP_POST) {
+    if (I.warp == WARP_POST || I.warp == WARP_TIDE) {
       let ex = rb.x - ra.x;
       let ey = rb.y - ra.y;
       let ox = I.m.x * ex + I.m.z * ey;

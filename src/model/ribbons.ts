@@ -265,8 +265,10 @@ export function describeRibbons(
   noise: NoiseField = packNoise(),
   key: number = P.seed,
   dustPicks?: DustPicks,
+  /** more curves, drawn with these (a shell galaxy's arcs, M8) */
+  extra: readonly Curve[] = [],
 ): RibbonDesc {
-  const C = curves(P, V, strokes, incl, picks, noise);
+  const C = [...curves(P, V, strokes, incl, picks, noise), ...extra];
   const lanes = dustLanes(P, V, penlines, incl, noise, key, dustPicks);
   const pen = packPen(penlines);
   const pcs = packPieces(strokes);

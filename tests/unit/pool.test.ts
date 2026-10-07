@@ -105,9 +105,7 @@ describe('BufferPool', () => {
     expect(b).toBe(a);
     expect(created).toHaveLength(1);
     expect(b.label).toBe('b');
-    // not zero until the pool's clears are recorded, and then it is
-    expect(b.data[0]).toBe(7);
-    pool.flush();
+    // cleared at once (the fake runs a clear when recorded)
     expect(b.data.every((x) => x === 0)).toBe(true);
     expect(submits).toEqual([['clear b']]);
     expect(pool.stats).toMatchObject({ created: 1, reused: 1, idle: 0, live: 1 });
@@ -123,18 +121,6 @@ describe('BufferPool', () => {
     expect(created).toHaveLength(3);
     const again = pool.acquire(1000, GPUBufferUsage.STORAGE, 'a2', { zero: false });
     expect(again).toBe(a);
-    pool.flush();
-    expect(submits).toHaveLength(0);
-  });
-
-  it('drops a pending clear when the buffer is released before the flush', () => {
-    const { device, submits } = fakeDevice();
-    const pool = new BufferPool(device);
-    const a = pool.acquire(64, GPUBufferUsage.STORAGE, 'a');
-    pool.release(a);
-    const b = pool.acquire(64, GPUBufferUsage.STORAGE, 'b');
-    pool.release(b);
-    pool.flush();
     expect(submits).toHaveLength(0);
   });
 
@@ -250,12 +236,8 @@ describe('GpuResources', () => {
     // a counter the GPU writes: reused scratch, cleared first, then the initial value
     const args = res.init(new Uint32Array([4, 0, 0, 0]), GPUBufferUsage.STORAGE, 'args');
     expect(args).toBe(s);
+    // the clear went out before the write, so the write is not wiped
     const words = new Uint32Array((args as unknown as FakeBuffer).data.buffer);
     expect([...words.slice(0, 4)]).toEqual([4, 0, 0, 0]);
-    res.flush();
-    // the pool's clear went out before the write, so the write is not wiped
-    expect([...new Uint32Array((args as unknown as FakeBuffer).data.buffer).slice(0, 4)]).toEqual([
-      4, 0, 0, 0,
-    ]);
   });
 });

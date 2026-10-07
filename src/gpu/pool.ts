@@ -7,7 +7,7 @@
  *   a readback's staging buffer). `release` keeps a buffer for the next `acquire` of its size
  *   class instead of destroying it. A buffer a compute pass reads before it writes must read as
  *   zero, as a new buffer does, so a reused buffer is cleared (`zero`, the default) with
- *   `clearBuffer`, recorded by `flush()` ahead of the submit that uses it.
+ *   `clearBuffer` submitted at once, so the queue's order puts it ahead of any later use.
  * - `UploadCache`: immutable uploads (the galaxy's shape, pools, dot sizes and noise field, the
  *   pen tables), content-addressed, so the same bytes are uploaded once however many times a
  *   model tier is rebuilt. A hit is checked byte for byte, so the cache can never serve other
@@ -52,7 +52,6 @@ export class BufferPool {
   private readonly idleOrder: GPUBuffer[] = [];
   private readonly entries = new WeakMap<GPUBuffer, Entry>();
   private readonly out = new Set<GPUBuffer>();
-  private pendingClears: GPUBuffer[] = [];
   private created = 0;
   private reused = 0;
   private idleBytes = 0;
@@ -91,7 +90,7 @@ export class BufferPool {
       this.idleBytes -= bytes;
       this.reused++;
       buffer.label = label;
-      if (opts.zero ?? true) this.pendingClears.push(buffer);
+      if (opts.zero ?? true) this.clear(buffer);
     } else {
       buffer = this.device.createBuffer({ label, size: bytes, usage: use });
       this.entries.set(buffer, { key, size: bytes });
@@ -102,16 +101,11 @@ export class BufferPool {
     return buffer;
   }
 
-  /**
-   * Records the clears of the reused buffers, in one submit that goes ahead of any later submit on
-   * the queue. Call it after acquiring and before submitting work that reads them.
-   */
-  flush(): void {
-    if (!this.pendingClears.length) return;
-    const enc = this.device.createCommandEncoder({ label: 'pool clears' });
-    for (const b of this.pendingClears) enc.clearBuffer(b);
+  /** Zeroes a reused buffer: in the queue's order, so before any later write or dispatch. */
+  private clear(buffer: GPUBuffer): void {
+    const enc = this.device.createCommandEncoder({ label: 'pool clear' });
+    enc.clearBuffer(buffer);
     this.device.queue.submit([enc.finish()]);
-    this.pendingClears = [];
   }
 
   /** Hands a buffer back. A buffer this pool did not make is destroyed. */
@@ -122,9 +116,6 @@ export class BufferPool {
       return;
     }
     this.liveBytes -= e.size;
-    // a clear queued for it is no longer needed: it will be cleared again when it is reused
-    const at = this.pendingClears.indexOf(buffer);
-    if (at >= 0) this.pendingClears.splice(at, 1);
     const list = this.free.get(e.key) ?? [];
     list.push(buffer);
     this.free.set(e.key, list);
@@ -163,7 +154,6 @@ export class BufferPool {
     this.trim(-1);
     for (const b of this.out) b.destroy();
     this.out.clear();
-    this.pendingClears = [];
     this.liveBytes = 0;
   }
 }
@@ -325,15 +315,8 @@ export class GpuResources {
    */
   init(data: ArrayBufferView<ArrayBuffer>, usage: GPUBufferUsageFlags, label: string): GPUBuffer {
     const b = this.scratch(data.byteLength, usage, label);
-    // the clear of a reused buffer goes first, or it would wipe the data
-    this.pool.flush();
     this.device.queue.writeBuffer(b, 0, data);
     return b;
-  }
-
-  /** Records the clears of reused scratch buffers; call before the submit that uses them. */
-  flush(): void {
-    this.pool.flush();
   }
 
   release(buffer: GPUBuffer): void {

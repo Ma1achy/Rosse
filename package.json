@@ -17,6 +17,7 @@
     "test:gpu": "node tools/gpu-test/run.mjs",
     "vectors": "node tools/rng-vectors.mjs",
     "vectors:camera": "node tools/camera-vectors.mjs",
+    "vectors:merger": "node tools/merger-vectors.mjs",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",

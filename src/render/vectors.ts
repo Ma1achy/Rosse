@@ -12,7 +12,7 @@
  */
 import vectorWgsl from '../shaders/compute/vector-expand.wgsl';
 import { bufferWithData, packStruct } from '../gpu/buffers';
-import type { GpuResources } from '../gpu/pool';
+import { GpuResources } from '../gpu/pool';
 import { INSTANCE_LAYOUT } from '../marks/instance';
 import type { PackedVectors } from '../marks/vector';
 import { CAPSULE_LAYOUT } from '../model/ribbons';
@@ -46,9 +46,9 @@ type Entry = (typeof ENTRIES)[number];
 
 /** Which bindings of vector-expand.wgsl each entry point uses (its auto layout). */
 const USES: Record<Entry, number[]> = {
-  expand_caps: [0, 1, 2, 3, 4, 9, 10, 30],
-  expand_dots: [0, 1, 2, 5, 7, 8, 11, 30],
-  expand_blobs: [0, 1, 2, 6, 7, 12, 30],
+  expand_caps: [0, 1, 2, 3, 4, 9, 10, 30, 31],
+  expand_dots: [0, 1, 2, 5, 7, 8, 11, 30, 31],
+  expand_blobs: [0, 1, 2, 6, 7, 12, 30, 31],
   stream_marks: [0, 7, 8, 10, 13, 14, 30],
   scan_local: [10, 15, 16, 17],
   scan_blocks: [15, 17, 18, 19],
@@ -100,7 +100,7 @@ export class GpuVectors {
     private readonly res: GpuResources,
   ) {}
 
-  static create(device: GPUDevice, res: GpuResources): GpuVectors {
+  static create(device: GPUDevice, res: GpuResources = new GpuResources(device)): GpuVectors {
     const module = device.createShaderModule({ label: 'vector-expand.wgsl', code: vectorWgsl });
     const pipes = Object.fromEntries(
       ENTRIES.map((e) => [
@@ -137,8 +137,17 @@ export class GpuVectors {
     return bufs;
   }
 
-  /** Model tier: buffers for these placed drawings, reading the galaxy's pools and noise field. */
-  load(D: VectorDesc, pool: GPUBuffer, dotBase: GPUBuffer, noise: GPUBuffer): void {
+  /**
+   * Model tier: buffers for these placed drawings, reading the galaxy's pools and noise field, and
+   * (a merging galaxy's, M8) the tidal map's words, which the tide warps read at binding 31.
+   */
+  load(
+    D: VectorDesc,
+    pool: GPUBuffer,
+    dotBase: GPUBuffer,
+    noise: GPUBuffer,
+    tide?: GPUBuffer,
+  ): void {
     this.unload();
     const d = this.device;
     const own: GPUBuffer[] = [];
@@ -200,6 +209,7 @@ export class GpuVectors {
       20: buf(capCap * CAPSULE_LAYOUT.size, src, 'vector capsules'),
       21: buf(2 * markCap * INSTANCE_LAYOUT.size, src, 'stream dots and knots'),
       30: noise,
+      31: tide ?? buf(16, STORAGE, 'no tides'),
     };
     const dotArgs = keep(
       res.data(new Uint32Array([4, D.nDots, 0, 0]), GPUBufferUsage.INDIRECT, 'dots args'),
@@ -241,8 +251,6 @@ export class GpuVectors {
       scan_local: group('scan_local', mb),
       scan_blocks: group('scan_blocks', mb),
     };
-    // the clears of reused scratch buffers go first, or they would wipe this write
-    this.res.flush();
     d.queue.writeBuffer(
       caps.uniform,
       0,
