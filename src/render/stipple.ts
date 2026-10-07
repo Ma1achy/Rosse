@@ -352,10 +352,10 @@ export class GpuStipple {
   }
 
   /** View tier: projection, culls and compaction for a camera. */
-  setView(cam: Camera): void {
+  setView(cam: Camera, mTime?: number): void {
     // a view `frame` did not choose: its record of the last view no longer holds
     this.tiers.invalidate();
-    this.runView(cam);
+    this.runView(cam, mTime);
   }
 
   private runView(cam: Camera, mTime?: number): void {
@@ -580,6 +580,22 @@ export class GpuStipple {
     dst.unmap();
     dst.destroy();
     return copy;
+  }
+
+  /**
+   * The lens's layers alone, in the stipple's order (a merger carries a host's lens over its own
+   * marks, app23.js:L1724).
+   */
+  lensLayers(): InkLayer[] {
+    const LL = this.scene?.lens && this.lens?.loaded ? this.lens.layers() : null;
+    return LL
+      ? [...LL.line, ...LL.vectors, ...LL.pieces, ...LL.dots, ...LL.knots, ...LL.stars, ...LL.cores]
+      : [];
+  }
+
+  /** The lens's instances per class (a read-back); empty without a lens. */
+  async lensCounts(): Promise<number[]> {
+    return this.scene?.lens && this.lens?.loaded ? this.lens.readCounts() : [];
   }
 
   /** `withLens: false` counts the galaxy's own marks alone (the stipple kernels' tests). */

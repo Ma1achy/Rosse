@@ -152,7 +152,7 @@ export class GoldenNode {
    * re-draws nothing else. From M5 (ADR 0021) also v21's part picks at this zoom.
    */
   referenceOptions(P: Params, zoom = 1, preset?: string): SceneOptions {
-    if (P.merger) return this.mergerOptions(P);
+    if (P.merger) return this.mergerOptions(P, zoom, preset);
     const variation = this.v21Variation(P);
     const kinds = this.cpu.meta.strokes?.kind ?? [];
     return {
@@ -213,7 +213,7 @@ export class GoldenNode {
    * variation, stroke choices, noise and part picks (replayed for the galaxy's own parameters); and
    * `mWarp`'s two whole drawings. The test stars' own draws are the engine's.
    */
-  mergerOptions(P: Params): SceneOptions {
+  mergerOptions(P: Params, zoom = 1, preset?: string): SceneOptions {
     const picks = v21MergerPicks(this.root, P);
     const meta = this.cpu.meta;
     const galaxy = [0, 1].map((g) => {
@@ -241,6 +241,10 @@ export class GoldenNode {
         variation: this.v21Variation(P),
         galaxy,
         ...(mwarp ? { mwarp } : {}),
+        // a merging pair can lens a galaxy behind it: the lens host's v21 draws (M9)
+        ...(P.lensOn && preset
+          ? { lens: this.referenceOptions({ ...P, merger: 0 }, zoom, preset) }
+          : {}),
       },
     };
   }

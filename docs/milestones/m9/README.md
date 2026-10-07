@@ -24,7 +24,7 @@ Roadmap M9: the six `Lens: …` presets and `A sketch, lensed`, seeds 7 and 4242
 
 Overrides (ADR 0052, proposed): `starMix`, `field` and `fgstars` are 0 on every case, as for the stipple (ADR 0016) and the vector marks (ADR 0022); they are M7's ink.
 
-**`Layered: lensed merger` is not in the set.** It needs the merger, which is M8's (ADR 0052). It joins the lens set when M8 merges.
+**`Layered: lensed merger` joins the set now that M8 is merged** (ADR 0052, amended): 4 more captures of variant `lens` (seeds 7 and 4242, home and orbit, a fresh page each, the same overrides), 32 lens captures in all. A merging pair lenses a galaxy behind it (app23.js:L1724): the engine draws the lens over the merger through a host scene of the unmerged parameters (`MergerScene.lensHost`, `GpuMerger` and `CpuMerger`), placed by the plate's camera, with v21's lens picks replayed as for the other presets. It is a merger, so its golden family is `merger` and it passes with that family's thresholds: it needed no calibration of its own, and no held-out captures were taken. The page does not yet give a merger's lens an explicit home (ADR 0050); the merger presets' lens is drawn at the preset's camera.
 
 The `lens` family's thresholds are calibrated (ADR 0053, proposed): 28 configurations, 56 held-out v21 captures (14 more seeds, home and orbit), the engine's 6 re-draws and 3 stand-ins, and the negative controls on every second configuration. Its count gate is 4.5 σ of two Poisson draws, not 3 (lensed knots arrive in groups). ADR 0054 (proposed) sets its inner axis-ratio band at 0.044.
 
@@ -57,5 +57,4 @@ The `lens` family's thresholds are calibrated (ADR 0053, proposed): 28 configura
 ## Open for the owner
 
 - ADRs 0050 to 0053 are proposed; 0054 was accepted by the owner on 2026-10-07 (it decides that two lens cases pass). 0053 decides whether the lens's count gate may be 4.5σ.
-- `Layered: lensed merger` waits for M8.
 - The three M5 `Edge-on with dust` cases (see M5).

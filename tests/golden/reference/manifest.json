@@ -7465,6 +7465,106 @@
       "pageErrors": 0
     },
     {
+      "name": "layered-lensed-merger--lens__s4242__home",
+      "preset": "Layered: lensed merger",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "3514eb882603f899046074f99aef174b7eb7a2175edf812f40552a6514d45c53",
+      "captured": "2026-10-07T11:41:02.547Z",
+      "stats": {
+        "rstars": 8,
+        "dots": 10642,
+        "knots": 361,
+        "stars": 37,
+        "curves": 0,
+        "used": 99,
+        "ms": 13933
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "layered-lensed-merger--lens__s4242__orbit",
+      "preset": "Layered: lensed merger",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 4242,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "f3794c1bf623545afe94d9ba1f014b2b48fe28444bae1748e149cee312327014",
+      "captured": "2026-10-07T11:41:11.344Z",
+      "stats": {
+        "rstars": 8,
+        "dots": 10615,
+        "knots": 264,
+        "stars": 34,
+        "curves": 0,
+        "used": 99,
+        "ms": 648
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "layered-lensed-merger--lens__s7__home",
+      "preset": "Layered: lensed merger",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "f27f49b6b65ccacd6ed748945f72bab5b5f9b52d79308f0ef68682dad1e5a4bd",
+      "captured": "2026-10-07T11:41:01.035Z",
+      "stats": {
+        "rstars": 4,
+        "dots": 10626,
+        "knots": 277,
+        "stars": 52,
+        "curves": 0,
+        "used": 90,
+        "ms": 1414
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "layered-lensed-merger--lens__s7__orbit",
+      "preset": "Layered: lensed merger",
+      "variant": "lens",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "seed": 7,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "09cb2e01302291e167703537460c08bef8b6b013005c4be7a93da23bea6505fa",
+      "captured": "2026-10-07T11:41:10.168Z",
+      "stats": {
+        "rstars": 4,
+        "dots": 10598,
+        "knots": 196,
+        "stars": 46,
+        "curves": 0,
+        "used": 90,
+        "ms": 371
+      },
+      "pageErrors": 0
+    },
+    {
       "name": "layered-lensed-merger--mergers__s4242__home",
       "preset": "Layered: lensed merger",
       "variant": "mergers",
@@ -18670,7 +18770,7 @@
     },
     "runs": {
       "home": {
-        "generated": "2026-10-07T00:27:12.018Z",
+        "generated": "2026-10-07T11:42:57.925Z",
         "browser": {
           "name": "chromium",
           "version": "141.0.7390.37",
@@ -18682,7 +18782,7 @@
         }
       },
       "orbit": {
-        "generated": "2026-10-07T00:27:12.018Z",
+        "generated": "2026-10-07T11:42:57.925Z",
         "browser": {
           "name": "chromium",
           "version": "141.0.7390.37",

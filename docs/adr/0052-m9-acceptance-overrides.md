@@ -13,7 +13,7 @@ The roadmap's M9 acceptance compares the six `Lens: …` presets, `A sketch, len
 - drawn stars among the dots (`starMix`: the vector `sstars` sheet, placed by `generate()`'s `rstar`, and the quasar's own drawn star, M7);
 - the deep field of background galaxies (`field`, M7). `Lens: galaxy cluster` sets it to 0.85 and `A sketch, lensed` to 0.5; the cluster's field is also weakly lensed (app23.js:L1273–1278), which needs it;
 - foreground stars (`fgstars`, M7), which every preset inherits from the default of 0.3;
-- `Layered: lensed merger` needs the merger (M8).
+- `Layered: lensed merger` needs the merger (M8): added after M8 merged, see the amendment below.
 
 A comparison with that ink in the reference but not in the render fails on total ink and structure for reasons unrelated to the lens.
 
@@ -24,6 +24,8 @@ The M9 captures (`tests/golden/extra-cases.json`, variant `lens`) set, on every 
 - **`starMix: 0`, `field: 0`, `fgstars: 0`**, as ADR 0016 does for the stipple, ADR 0022 for the vector marks. The drawn stars of ring knots and clumps stay, as there: both engines classify and count them (`rstars`), and M7 draws them. So do the quasar's, which the engine counts but does not yet draw.
 
 `Layered: lensed merger` is left for after M8 merges (the merger is its subject).
+
+**Amendment, after M8 merged.** `Layered: lensed merger` is captured with its lens on (variant `lens`, seeds 7 and 4242, home and orbit), with the same three overrides (`starMix`, `field`, `fgstars` 0); the merger itself is drawn in full. M8's captures of it with `lensOn` 0 stay (variant `mergers`). Its golden family is `merger` (it is a merger): it passes with that family's thresholds, so it needs no calibration of its own and no held-out captures. Status: Proposed, with the rest of this ADR.
 
 Nothing else is overridden. In particular these stay on: the lens itself (halos, shear, the cluster's members drawn in, the double ring); the source galaxies' stipple, knots, curves, drawn cores and drawings; the quasar and its time-delay flare; the main galaxy's own marks.
 

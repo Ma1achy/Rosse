@@ -65,6 +65,11 @@ export interface MergerSceneOptions {
   dotScale?: number;
   /** the simulated shells of `P.shellsOn`, drawn over the merged scene (app23.js:L1266) */
   shells?: ShellSceneOptions;
+  /**
+   * The lens host's scene options (`P.lensOn`, M9): the options of the unmerged parameters, which
+   * give the lens its pool, noise and own picks (v21's, replayed, in the goldens).
+   */
+  lens?: SceneOptions;
 }
 
 /** `mWarp`: the two whole drawings the tides tear (app23.js:L1260–1264). */
@@ -86,6 +91,11 @@ export interface MergerScene {
   /** the two merging galaxies' parameters and scenes (built face-on, carried by their tides) */
   galaxyParams: [Params, Params];
   galaxies: [GalaxyScene, GalaxyScene];
+  /**
+   * A merging pair can lens a galaxy behind it (app23.js:L1724, M9): the unmerged parameters as a
+   * scene whose lens is drawn over the merger. Only its lens is used; the plate's camera places it.
+   */
+  lensHost?: GalaxyScene;
   mwarp: MWarpDesc | null;
   hot: [boolean, boolean];
 }
@@ -143,6 +153,13 @@ export function buildMergerScene(
       };
     }
   }
+  const lensHost =
+    P.lensOn && P.subject === 'galaxy'
+      ? buildScene({ ...P, merger: 0 }, meta, {
+          ...opts.lens,
+          ...(opts.placementKey !== undefined ? { placementKey: opts.placementKey } : {}),
+        })
+      : undefined;
   return {
     P,
     meta,
@@ -152,6 +169,7 @@ export function buildMergerScene(
     dotBase,
     galaxyParams,
     galaxies,
+    ...(lensHost ? { lensHost } : {}),
     mwarp,
     hot: [typeOf(P.mType1) === 'elliptical', typeOf(P.mType2) === 'elliptical'],
   };
