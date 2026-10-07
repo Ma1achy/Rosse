@@ -70,7 +70,19 @@ if (!existsSync(manifestPath)) {
 }
 
 /** Presets whose full captures carry the drawn-star count gate. */
-const RSTAR_GATE = ['Smooth, round', 'Cigar-shaped', 'Disc, no arms'];
+const RSTAR_GATE = [
+  'Smooth, round',
+  'Cigar-shaped',
+  'Disc, no arms',
+  // from M8: the mergers' drawn stars (the debris's, tail knots' and the galaxies' clumps')
+  'Merger: the Mice',
+  'Merger: long tails',
+  'Merger: minor, a stream',
+  'Merger: spiral meets elliptical',
+  'Merger: polar collision',
+  'Merger: three-armed pair',
+  'Merger: coalescing',
+];
 
 // 1. integrity of the reference captures
 const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
@@ -376,7 +388,12 @@ async function compareAll(G, node) {
   let gateFails = 0;
   for (const c of gates) {
     const rec = node.record(c.name);
-    const r = node.renderCpu(rec.params, { variation: node.v21Variation(rec.params) });
+    const r = node.renderCpu(
+      rec.params,
+      rec.params.merger
+        ? node.referenceOptions(rec.params, 1)
+        : { variation: node.v21Variation(rec.params) },
+    );
     const ref = rec.stats.rstars;
     const ours = r.counts.rstars;
     const allowed = G.countAllowance(
@@ -501,6 +518,15 @@ async function calibrate(G, node) {
       ...(c.calibration ? { heldOut: c.name } : {}),
     });
   }
+  // --family merger: only the families starting with this (their rows of thresholds.json and
+  // calibration.json are replaced, the others kept): a milestone adds its own family without
+  // re-measuring the earlier ones
+  const famFilter = opt('--family');
+  if (famFilter) {
+    const kept = cases.filter((c) => c.family.startsWith(famFilter));
+    cases.length = 0;
+    cases.push(...kept);
+  }
   console.log(
     `calibration: ${cases.length} configurations × (${R} stand-ins, ${K} keys) and the negative controls × ${K} keys`,
   );
@@ -584,6 +610,7 @@ async function calibrate(G, node) {
         '--controls-every',
         String(controlsEvery),
         ...(flag('--resume') ? ['--resume'] : []),
+        ...(famFilter ? ['--family', famFilter] : []),
         ...(onlyFamily ? ['--only-family', onlyFamily] : []),
       ],
       jobs,
@@ -734,6 +761,21 @@ async function calibrate(G, node) {
       ]))
         t[k] = Math.max(t[k] ?? 0, ceil3(1.1 * (hs[m]?.max ?? 0)));
     }
+    // a merger's remnant is chaotic and its tails are heavy: the family's tolerances are no
+    // smaller than 1.1 × the largest of its own re-draw pairs (the rule above for held-out
+    // captures, ADR 0018 item 7; ADR 0044)
+    if (family.startsWith('merger')) {
+      const ms = stats(list);
+      for (const [k, m] of /** @type {const} */ ([
+        ['median', 'medianAbs'],
+        ['p90', 'p90Abs'],
+        ['r25', 'r25Abs'],
+        ['r50', 'r50Abs'],
+        ['r90', 'r90Abs'],
+        ['outer', 'outerAbs'],
+      ]))
+        t[k] = Math.max(t[k] ?? 0, ceil3(1.1 * (ms[m]?.max ?? 0)));
+    }
     parity[family] = { ...base, ...t, ...(held.length ? { heldOut: held.length } : {}) };
     // per-preset axis-ratio tolerances: near-round galaxies are noisier in q than flat ones, so
     // a family-wide value would be too wide for the flat ones (ADR 0015)
@@ -744,12 +786,19 @@ async function calibrate(G, node) {
       const mine = list.filter((c) => c.preset === preset);
       if (mine.length < 8) continue;
       const ps = stats(mine);
+      // the coarse SSIM too, where the preset's own re-draws agree with each other less than the
+      // family's do (a merger's chaotic remnant, ADR 0044): the same rule on its own sample, and
+      // only ever below the family's
+      const ssimOwn = floor2(ps.ssimCoarse.p5 - 0.02);
       byPreset[preset] = {
         q: spread(ps, 'qAbs', 0.005),
         qInner: spread(ps, 'qInnerAbs', 0.005),
         // the preset's own noise floor of the ellipticity (a smooth Sérsic profile is far quieter
         // than a galaxy with a sparse halo); the family's paA
         paEps0: Math.max(0.01, positionAngle(mine).paEps0),
+        ...(family.startsWith('merger') && ssimOwn < (t['ssimCoarse'] ?? 0)
+          ? { ssimCoarse: ssimOwn }
+          : {}),
       };
       // ADR 0026 (widen-only): for the radii, the axis ratio and the position angle, the band is
       // the larger of the band that applies to the preset now (the family's, or for the axis
@@ -796,22 +845,44 @@ async function calibrate(G, node) {
       v21Reroll: v21.pairs[family]?.length ? stats(v21.pairs[family]) : null,
     };
   }
-  if (onlyFamily) {
-    // merge: the other families' thresholds and numbers stay as they are
-    const tPath = join(ROOT, 'tests/golden/thresholds.json');
-    const cPath = join(ROOT, 'tests/golden/calibration.json');
-    const t = JSON.parse(readFileSync(tPath, 'utf8'));
-    const c = JSON.parse(readFileSync(cPath, 'utf8'));
-    Object.assign(t.parity, parity);
-    Object.assign(c.families, numbers);
-    c.configurations = [
-      ...new Set([
-        ...c.configurations,
-        ...cases.map((x) => `${x.preset} s${x.params.seed} incl ${x.params.incl}`),
-      ]),
-    ].sort();
-    writeFileSync(tPath, JSON.stringify(t, null, 2) + '\n');
-    writeFileSync(cPath, JSON.stringify(c, null, 2) + '\n');
+  if (famFilter || onlyFamily) {
+    if (famFilter) {
+      // keep the other families' rows as they are
+      const prev = JSON.parse(readFileSync(join(ROOT, 'tests/golden/thresholds.json'), 'utf8'));
+      const prevCal = JSON.parse(readFileSync(join(ROOT, 'tests/golden/calibration.json'), 'utf8'));
+      for (const k of Object.keys(parity)) if (!k.startsWith(famFilter)) delete parity[k];
+      for (const k of Object.keys(numbers)) if (!k.startsWith(famFilter)) delete numbers[k];
+      for (const k of Object.keys(prev.parity)) if (k.startsWith(famFilter)) delete prev.parity[k];
+      for (const k of Object.keys(prevCal.families))
+        if (k.startsWith(famFilter)) delete prevCal.families[k];
+      Object.assign(prev.parity, parity);
+      Object.assign(prevCal.families, numbers);
+      await writeJson(join(ROOT, 'tests/golden/thresholds.json'), prev);
+      prevCal.merged = [...new Set([...(prevCal.merged ?? []), famFilter])];
+      await writeJson(join(ROOT, 'tests/golden/calibration.json'), prevCal);
+      for (const [family, n] of Object.entries(numbers))
+        if (n.negativeControls)
+          for (const [name, x] of Object.entries(n.negativeControls))
+            console.log(
+              `${family.padEnd(9)} ${name.padEnd(22)} detected ${x.detected}/${x.applicable}${x.missed.length ? `  missed: ${x.missed.join(', ')}` : ''}`,
+            );
+    } else if (onlyFamily) {
+      // merge: the other families' thresholds and numbers stay as they are
+      const tPath = join(ROOT, 'tests/golden/thresholds.json');
+      const cPath = join(ROOT, 'tests/golden/calibration.json');
+      const t = JSON.parse(readFileSync(tPath, 'utf8'));
+      const c = JSON.parse(readFileSync(cPath, 'utf8'));
+      Object.assign(t.parity, parity);
+      Object.assign(c.families, numbers);
+      c.configurations = [
+        ...new Set([
+          ...c.configurations,
+          ...cases.map((x) => `${x.preset} s${x.params.seed} incl ${x.params.incl}`),
+        ]),
+      ].sort();
+      writeFileSync(tPath, JSON.stringify(t, null, 2) + '\n');
+      writeFileSync(cPath, JSON.stringify(c, null, 2) + '\n');
+    }
     console.log(JSON.stringify(parity, null, 1));
     return;
   }

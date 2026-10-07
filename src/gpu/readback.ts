@@ -28,3 +28,26 @@ export async function readTexture(
   buffer.destroy();
   return out;
 }
+
+/** Copies `size` bytes of a buffer back (it needs COPY_SRC). Tests and statistics only. */
+export async function readBuffer(
+  device: GPUDevice,
+  src: GPUBuffer,
+  size: number,
+  offset = 0,
+): Promise<ArrayBuffer> {
+  const bytes = Math.max(4, Math.ceil(size / 4) * 4);
+  const dst = device.createBuffer({
+    label: 'readback',
+    size: bytes,
+    usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+  });
+  const enc = device.createCommandEncoder({ label: 'readback' });
+  enc.copyBufferToBuffer(src, offset, dst, 0, bytes);
+  device.queue.submit([enc.finish()]);
+  await dst.mapAsync(GPUMapMode.READ);
+  const copy = dst.getMappedRange().slice(0, size);
+  dst.unmap();
+  dst.destroy();
+  return copy;
+}

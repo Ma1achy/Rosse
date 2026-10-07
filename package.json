@@ -18,6 +18,7 @@
     "test:ui": "node tools/gpu-test/ui-smoke.mjs",
     "vectors": "node tools/rng-vectors.mjs",
     "vectors:camera": "node tools/camera-vectors.mjs",
+    "vectors:merger": "node tools/merger-vectors.mjs",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
