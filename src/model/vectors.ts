@@ -19,7 +19,8 @@ import {
   type PackedVectors,
   type VectorLibrary,
 } from '../marks/vector';
-import { PLATE, UNIT_SCALE, type Camera } from '../view/camera';
+import { PLATE, UNIT_SCALE, project, type Camera } from '../view/camera';
+import type { RibbonDesc } from './ribbons';
 import { wobbleAmplitude } from '../view/warp';
 import { describeParts, vectorRows, type PartPicks, type PartsDesc, type VectorRow } from './parts';
 import { penWeights, type DrawingsMeta, type Variation } from './variation';
@@ -51,6 +52,16 @@ export const WarpKind = {
    * v21's drop of segments stretched more than 1.8× (app23.js:L1208).
    */
   post: 2,
+  /**
+   * A merging galaxy's mark carried by its tides (M8, app23.js:L1195): the galaxy's 49 × 49 grid of
+   * the tidal map (common/tide.wgsl `tide_post`) after the matrix, with the drops of `post`.
+   */
+  tide: 3,
+  /**
+   * `mWarp`'s whole drawing (app23.js:L1196, L1262): the tidal map itself (the 4 nearest stars) on
+   * the drawing's own coordinates, mirrored for an S-wise drawing; dropped only past 22 px.
+   */
+  tideScreen: 4,
 } as const;
 
 /** One placed drawing: the `VInst` struct of vector-expand.wgsl (96 bytes). */
@@ -137,6 +148,15 @@ export interface VectorDesc {
   penDot: number;
   /** 0.55 + 0.45 · streams: a stream mark is kept when its draw is at most this (L1077) */
   streamKeep: number;
+  /** a merging galaxy (0 or 1): every drawing is carried by that galaxy's tides (M8) */
+  tide?: number;
+  /**
+   * A merging galaxy's dust hatching, placed as vector drawings (M8): the hatches' `penlines`
+   * tiles, appended to the instances after the parts. v21 expands them with the rest of the
+   * galaxy's drawings, so under the tides they are densified and torn piece by piece (L1202–1208),
+   * which the line-work's own hatching kernels (undensified) cannot do.
+   */
+  hatchTiles?: number[];
 }
 
 const libCache = new WeakMap<object, PackedVectors>();
@@ -175,6 +195,8 @@ export function describeVectors(
   meta: DrawingsMeta,
   incl: number,
   picks?: PartPicks,
+  tide?: number,
+  hatchTiles?: readonly number[],
 ): VectorDesc {
   const lib = packedLibrary(meta.vectors);
   const parts = describeParts(P, V, meta, incl, picks);
@@ -195,7 +217,7 @@ export function describeVectors(
   let nBlob = 0;
   for (const r of rows) {
     const d = drawingOf(lib, r);
-    const w = r.warp ? WarpKind.rewind : WarpKind.none;
+    const w = tide !== undefined ? WarpKind.tide : r.warp ? WarpKind.rewind : WarpKind.none;
     drawings.push(d);
     warps.push(w);
     capFirst.push(nCap);
@@ -206,6 +228,19 @@ export function describeVectors(
     nDot += s.dots;
     nBlob += s.blobs;
   }
+  if (tide !== undefined && hatchTiles)
+    for (const tile of hatchTiles) {
+      const d = lib.first.penlines + tile;
+      drawings.push(d);
+      warps.push(WarpKind.tide);
+      capFirst.push(nCap);
+      dotFirst.push(nDot);
+      blobFirst.push(nBlob);
+      const s = slots(lib, d, WarpKind.tide);
+      nCap += s.caps;
+      nDot += s.dots;
+      nBlob += s.blobs;
+    }
   const pen = penWeights(P.pen);
   return {
     lib,
@@ -215,14 +250,50 @@ export function describeVectors(
     capFirst,
     dotFirst,
     blobFirst,
-    nInst: rows.length,
+    nInst: drawings.length,
     nCapSlots: nCap,
     nDots: nDot,
     nBlobs: nBlob,
     penLine: pen.line,
     penDot: pen.dot,
     streamKeep: 0.55 + 0.45 * P.streams,
+    ...(tide !== undefined ? { tide } : {}),
+    ...(tide !== undefined && hatchTiles ? { hatchTiles: [...hatchTiles] } : {}),
   };
+}
+
+/**
+ * A merging galaxy's hatches as vector rows for a camera (M8): `hatch_frame` of compute/ribbons.wgsl
+ * in f64 on the CPU: the anchors projected, the offsets and the length scaled by the zoom, the
+ * drawing laid along the hatch at a flat 0.28 (app23.js:L1047–1050), pen scale 0.38.
+ */
+export function hatchRows(R: RibbonDesc, cam: Camera): VectorRow[] {
+  const z = cam.zoom;
+  return R.lanes.hatches.map((h) => {
+    const qa = project(h.a, cam);
+    const qb = project(h.b, cam);
+    const dx = qb[0] - qa[0];
+    const dy = qb[1] - qa[1];
+    const dl = Math.hypot(dx, dy);
+    const d0x = dl === 0 ? 1 : dx / dl;
+    const d0y = dl === 0 ? 0 : dy / dl;
+    const cd = Math.cos(h.dAng);
+    const sd = Math.sin(h.dAng);
+    const ux = d0x * cd - d0y * sd;
+    const uy = d0x * sd + d0y * cd;
+    const on = h.offN * z;
+    const L = h.len * z;
+    const Lf = L * 0.28;
+    return {
+      atlas: 'penlines',
+      tile: h.tile,
+      x: qa[0] + -d0y * on + ux * (h.offF * z),
+      y: qa[1] + d0x * on + h.offY * z + uy * (h.offF * z),
+      m: [ux * L, uy * L, -(uy * Lf), ux * Lf],
+      ps: 0.38,
+      alpha: 1,
+    };
+  });
 }
 
 /** One view of the vector drawings: the packed instance table, the streams' slots, the uniform. */
@@ -280,8 +351,10 @@ export function vectorView(
   cam: Camera,
   key: number,
   nDotPool: number,
+  r2 = 0,
+  hatches: readonly VectorRow[] = [],
 ): VectorView {
-  const rows = vectorRows(P, V, meta, D.parts, cam);
+  const rows = [...vectorRows(P, V, meta, D.parts, cam), ...hatches];
   if (rows.length !== D.nInst) throw new Error('the placed drawings changed with the view');
   const inst = new ArrayBuffer(Math.max(1, rows.length) * VINST_LAYOUT.size);
   const fl = new Float32Array(inst);
@@ -293,7 +366,11 @@ export function vectorView(
     fl[o + 5] = f(r.y);
     fl[o + 6] = f(r.ps);
     fl[o + 7] = f(Math.sqrt(Math.abs(r.m[0] * r.m[3] - r.m[1] * r.m[2])));
-    if (r.warp) {
+    if (D.tide !== undefined) {
+      // the tides: the galaxy and R2, the plate px the grid spans
+      fl[o + 8] = D.tide;
+      fl[o + 9] = f(r2);
+    } else if (r.warp) {
       fl[o + 8] = f(r.warp.dk);
       fl[o + 9] = r.warp.flip ? 1 : 0;
     }

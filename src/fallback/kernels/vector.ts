@@ -28,6 +28,7 @@ import { CAPSULE_WORDS } from '../../model/ribbons';
 import { STREAM_SEG_WORDS, VINST_WORDS, WarpKind, type VectorView } from '../../model/vectors';
 import { smWarp } from '../../view/warp';
 import { INSTANCE_WORDS } from './project';
+import type { TideData } from './tide';
 
 const f = Math.fround;
 const sqrt = (x: number) => f(Math.sqrt(x));
@@ -47,6 +48,8 @@ export interface VectorInputs {
   pool: Uint32Array;
   dotBase: Float32Array;
   noise: NoiseField;
+  /** a merging galaxy's tidal map (M8), for the tide warps */
+  tide?: TideData;
 }
 
 export function vectorInputs(
@@ -55,6 +58,7 @@ export function vectorInputs(
   pool: Uint32Array,
   dotBase: Float32Array,
   noise: NoiseField,
+  tide?: TideData,
 ): VectorInputs {
   return {
     lib,
@@ -66,6 +70,7 @@ export function vectorInputs(
     pool,
     dotBase,
     noise,
+    ...(tide ? { tide } : {}),
   };
 }
 
@@ -159,7 +164,14 @@ function tf(X: VectorInputs, I: Inst, x: number, y: number): [number, number] {
     const r = rewindF(x, y, I.w[0], I.w[1] !== 0);
     q = place(I, r[0], r[1]);
   } else if (I.warp === WarpKind.post) q = post(I, place(I, x, y));
-  else q = place(I, x, y);
+  else if (I.warp === WarpKind.tide) {
+    if (!X.tide) throw new Error('a tide warp needs the tidal map');
+    const p = place(I, x, y);
+    q = X.tide.post(I.w[0], p[0], p[1], I.w[1]);
+  } else if (I.warp === WarpKind.tideScreen) {
+    if (!X.tide) throw new Error('a tide warp needs the tidal map');
+    q = X.tide.nn(I.w[0], I.w[1] !== 0 ? -x : x, y);
+  } else q = place(I, x, y);
   return smWarp(q[0], q[1], wob, X.noise);
 }
 
@@ -199,7 +211,7 @@ export function expandCap(X: VectorInputs, i: number, out: Float32Array): number
     const dy = f(b[1] - a[1]);
     const ml = sqrt(f(f(dx * dx) + f(dy * dy)));
     if (ml > 22) key = 1;
-    if (I.warp === WarpKind.post) {
+    if (I.warp === WarpKind.post || I.warp === WarpKind.tide) {
       const ex = f(rb[0] - ra[0]);
       const ey = f(rb[1] - ra[1]);
       const ox = f(f(I.m[0] * ex) + f(I.m[2] * ey));
