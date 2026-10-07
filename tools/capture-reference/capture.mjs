@@ -13,6 +13,11 @@
  *   node tools/capture-reference/capture.mjs [--out dir] [--only "Grand design,Ringed"] [--verify]
  *   node tools/capture-reference/capture.mjs --extra tests/golden/extra-cases.json [--verify]
  *   node tools/capture-reference/capture.mjs --reroll [--out dir] [--only …]
+ *   --redraws file  v21 drawn again, for the cases `file` lists ({ draws, cases: [capture names] };
+ *             tests/golden/v21-redraws.json, ADR 0036): draws 1 to N − 1 of the stipple of each, the
+ *             capture itself being draw 0. Only the stream `generate()` draws the marks from moves
+ *             (mulberry32(P.seed * 9973 + 1)); the variation, strokes, dust and parts are the
+ *             capture's own. Files `<name>__v21d<k>`, recorded under `v21Draws` in the manifest.
  *   --verify  capture again into a temporary folder and compare pixel hashes with the manifest.
  *   --extra   capture the cases of a file ({ cameras?, cases: [{ preset, variant, overrides,
  *             seeds?, zoom? }] }): a preset with parameter overrides set after it (and after the
@@ -99,9 +104,16 @@ const sha256 = (/** @type {Buffer} */ b) => createHash('sha256').update(b).diges
 
 function serve() {
   const html = readFileSync(PAGE);
-  const server = createServer((_req, res) => {
+  const text = html.toString('utf8');
+  const stream = 'mulberry32(P.seed * 9973 + 1)';
+  if (!text.includes(stream)) throw new Error('the stipple stream of generate() was not found');
+  const server = createServer((req, res) => {
     res.setHeader('content-type', 'text/html; charset=utf-8');
-    res.end(html);
+    // ?v21d=k: draw k of the stipple, the stream moved by k · 1000003 and nothing else
+    const k = Number(/[?&]v21d=(\d+)/.exec(req.url ?? '')?.[1] ?? 0);
+    res.end(
+      k ? text.replace(stream, `mulberry32(P.seed * 9973 + 1 + ${String(k * 1000003)})`) : html,
+    );
   });
   return new Promise((ok) => {
     server.listen(0, '127.0.0.1', () => {
@@ -113,7 +125,8 @@ function serve() {
 
 /**
  * @typedef {{ preset: string, seed: number, chalk: boolean, variant?: string,
- *   overrides?: Record<string, unknown>, calibration?: boolean, cameras: readonly string[] }} Job
+ *   overrides?: Record<string, unknown>, calibration?: boolean, cameras: readonly string[],
+ *   redraw?: number, keep?: string }} Job
  */
 
 /**
@@ -142,7 +155,9 @@ async function captureJob(browser, url, job, out) {
   /** @type {string[]} */
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto(url);
+  // a re-draw of v21's stipple (--redraws, ADR 0036) is the same page with the one stream
+  // `generate()` draws the marks from moved (see `serve`): nothing else in it changes
+  await page.goto(job.redraw ? `${url}?v21d=${String(job.redraw)}` : url);
   await page.addStyleTag({
     content: '#gl{width:800px!important;height:800px!important;max-width:none!important}',
   });
@@ -197,7 +212,9 @@ async function captureJob(browser, url, job, out) {
       },
     );
     const base = job.variant ? `${slug(job.preset)}--${slug(job.variant)}` : slug(job.preset);
-    const name = `${base}__s${job.seed}__${camera}${job.chalk ? '__chalk' : ''}`;
+    const name = `${base}__s${job.seed}__${camera}${job.chalk ? '__chalk' : ''}${job.redraw ? `__v21d${String(job.redraw)}` : ''}`;
+    // a re-draw of an orbit view is reached from home, which is not kept
+    if (job.keep && camera !== job.keep) continue;
     const ink = Buffer.from(state.ink.split(',')[1] ?? '', 'base64');
     writeFileSync(join(out, `${name}.ink.png`), ink);
     await page
@@ -285,6 +302,7 @@ async function main() {
   const verify = args.includes('--verify');
   const reroll = args.includes('--reroll');
   const extraFile = opt('--extra');
+  const redrawsFile = opt('--redraws');
   const goldenDir = resolve(
     ROOT,
     opt('--out') ?? (reroll ? 'tests/golden/actual/reroll' : 'tests/golden/reference'),
@@ -334,6 +352,25 @@ async function main() {
           .map((seed) => ({ ...rest, seed, chalk: !!chalk, cameras: camsFor(zoom, seed) }))
           .filter((j) => j.cameras.length);
       });
+  } else if (redrawsFile) {
+    // v21 drawn again (ADR 0036): per listed capture, draws 1..N − 1 of its stipple, the capture
+    // itself being draw 0; their files are `<name>__v21d<k>`
+    const list = JSON.parse(readFileSync(resolve(ROOT, redrawsFile), 'utf8'));
+    const manifest = JSON.parse(readFileSync(join(goldenDir, 'manifest.json'), 'utf8'));
+    const by = new Map(manifest.captures.map((/** @type {any} */ c) => [c.name, c]));
+    jobs = /** @type {string[]} */ (list.cases).flatMap((n) => {
+      const c = /** @type {any} */ (by.get(n));
+      if (!c) throw new Error(`${n} is not in the manifest`);
+      return Array.from({ length: list.draws - 1 }, (_, k) => ({
+        preset: c.preset,
+        seed: c.seed,
+        chalk: c.surface === 'chalkboard',
+        ...(c.variant ? { variant: c.variant, overrides: c.overrides } : {}),
+        cameras: c.camera === 'orbit' ? ['home', 'orbit'] : [c.camera],
+        keep: c.camera,
+        redraw: k + 1,
+      }));
+    });
   } else if (reroll) {
     jobs = names.flatMap((preset) =>
       SEEDS.map((seed) => ({ preset, seed, chalk: false, cameras: ['home', 'reroll'] })),
@@ -405,6 +442,30 @@ async function main() {
   const manifestPath = join(out, 'manifest.json');
   /** @param {any[]} list */
   const sorted = (list) => list.sort((a, b) => a.name.localeCompare(b.name));
+
+  if (redrawsFile) {
+    // the draws are recorded beside the captures, not among them
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+    const list = JSON.parse(readFileSync(resolve(ROOT, redrawsFile), 'utf8'));
+    /** @type {Record<string, any[]>} */
+    const draws = {};
+    for (const r of records) {
+      const base = r.name.replace(/__v21d\d+$/, '');
+      (draws[base] ??= []).push({
+        draw: Number(/__v21d(\d+)$/.exec(r.name)?.[1]),
+        name: r.name,
+        inkPixelSha256: r.inkPixelSha256,
+        stats: r.stats,
+        captured: r.captured,
+        pageErrors: r.pageErrors.length,
+      });
+    }
+    for (const l of Object.values(draws)) l.sort((a, b) => a.draw - b.draw);
+    manifest.v21Draws = { file: redrawsFile, draws: list.draws, cases: draws };
+    writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+    console.log(`${records.length} v21 re-draws added to ${manifestPath}`);
+    return;
+  }
 
   if (reroll) {
     console.log(`${records.length} re-roll captures in ${out} (no manifest)`);

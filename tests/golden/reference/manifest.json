@@ -15256,5 +15256,353 @@
         }
       }
     }
+  },
+  "v21Draws": {
+    "file": "tests/golden/v21-redraws.json",
+    "draws": 8,
+    "cases": {
+      "cigar-shaped--stipple__s4242__orbit": [
+        {
+          "draw": 1,
+          "name": "cigar-shaped--stipple__s4242__orbit__v21d1",
+          "inkPixelSha256": "1016717b8b4a33b297f57af89e3eed6061846d75634a952b33d8f7dfdcaa39fc",
+          "stats": {
+            "rstars": 802,
+            "dots": 5585,
+            "knots": 0,
+            "stars": 0,
+            "curves": 0,
+            "used": 51,
+            "ms": 279
+          },
+          "captured": "2026-10-07T12:56:51.358Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 2,
+          "name": "cigar-shaped--stipple__s4242__orbit__v21d2",
+          "inkPixelSha256": "dea74043f5521ce6622c4ca4a2f4abc396d00944f862222a18cee7bf38ca5e54",
+          "stats": {
+            "rstars": 790,
+            "dots": 5882,
+            "knots": 0,
+            "stars": 0,
+            "curves": 0,
+            "used": 50,
+            "ms": 122
+          },
+          "captured": "2026-10-07T12:56:45.394Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 3,
+          "name": "cigar-shaped--stipple__s4242__orbit__v21d3",
+          "inkPixelSha256": "81261b7365f4dbf0aeaf531303eeee3e7f2e6912ef1d8699e25cfb49b37dfc09",
+          "stats": {
+            "rstars": 778,
+            "dots": 6781,
+            "knots": 0,
+            "stars": 0,
+            "curves": 0,
+            "used": 50,
+            "ms": 372
+          },
+          "captured": "2026-10-07T12:56:40.249Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 4,
+          "name": "cigar-shaped--stipple__s4242__orbit__v21d4",
+          "inkPixelSha256": "5f85b4b08025f5eae054f54350d80fedbcc920a00693b5352541e0f8dabc4c67",
+          "stats": {
+            "rstars": 775,
+            "dots": 6379,
+            "knots": 0,
+            "stars": 0,
+            "curves": 0,
+            "used": 51,
+            "ms": 436
+          },
+          "captured": "2026-10-07T12:56:51.518Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 5,
+          "name": "cigar-shaped--stipple__s4242__orbit__v21d5",
+          "inkPixelSha256": "e9c188c63f78a5cb4399b33969e5b3b0cb4e284f70de6c48fdbb62ff22f332a6",
+          "stats": {
+            "rstars": 806,
+            "dots": 6390,
+            "knots": 0,
+            "stars": 0,
+            "curves": 0,
+            "used": 48,
+            "ms": 545
+          },
+          "captured": "2026-10-07T12:57:13.686Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 6,
+          "name": "cigar-shaped--stipple__s4242__orbit__v21d6",
+          "inkPixelSha256": "8d126ea95d03b9abffacb443399e3c8b797c8410bdc12fd0aac3c32f75af4d43",
+          "stats": {
+            "rstars": 805,
+            "dots": 6424,
+            "knots": 0,
+            "stars": 0,
+            "curves": 0,
+            "used": 51,
+            "ms": 661
+          },
+          "captured": "2026-10-07T12:57:31.080Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 7,
+          "name": "cigar-shaped--stipple__s4242__orbit__v21d7",
+          "inkPixelSha256": "ea53a68e4ac04e2cfb3782b50b273ae729600da4353e945167ef9ddba829f1ab",
+          "stats": {
+            "rstars": 798,
+            "dots": 6527,
+            "knots": 0,
+            "stars": 0,
+            "curves": 0,
+            "used": 46,
+            "ms": 139
+          },
+          "captured": "2026-10-07T12:57:33.998Z",
+          "pageErrors": 0
+        }
+      ],
+      "layered-barred-spiral-satellite-trail--layered__s7__zoom": [
+        {
+          "draw": 1,
+          "name": "layered-barred-spiral-satellite-trail--layered__s7__zoom__v21d1",
+          "inkPixelSha256": "2a8514c1ec1a95e3b8d8422b281e4e12181851ea34495190081638bc886fb357",
+          "stats": {
+            "rstars": 1510,
+            "dots": 8547,
+            "knots": 127,
+            "stars": 11,
+            "curves": 4,
+            "used": 83,
+            "ms": 6175
+          },
+          "captured": "2026-10-07T12:59:05.726Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 2,
+          "name": "layered-barred-spiral-satellite-trail--layered__s7__zoom__v21d2",
+          "inkPixelSha256": "eee92ecdd65ad375d91ccafb9fc4e457fa24acb78b75da1e892a228355946b04",
+          "stats": {
+            "rstars": 1543,
+            "dots": 8987,
+            "knots": 163,
+            "stars": 17,
+            "curves": 4,
+            "used": 83,
+            "ms": 926
+          },
+          "captured": "2026-10-07T12:59:07.878Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 3,
+          "name": "layered-barred-spiral-satellite-trail--layered__s7__zoom__v21d3",
+          "inkPixelSha256": "f3db540831419c9fd5a033cb18ecc78e5e159a55afaace6af0cc5136cd96b632",
+          "stats": {
+            "rstars": 1592,
+            "dots": 8597,
+            "knots": 128,
+            "stars": 9,
+            "curves": 4,
+            "used": 84,
+            "ms": 498
+          },
+          "captured": "2026-10-07T12:59:20.737Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 4,
+          "name": "layered-barred-spiral-satellite-trail--layered__s7__zoom__v21d4",
+          "inkPixelSha256": "3dd8633b1f108948f7672eb2164338f0334572b7deed29f9811e09665a0e00bc",
+          "stats": {
+            "rstars": 1480,
+            "dots": 8676,
+            "knots": 134,
+            "stars": 12,
+            "curves": 4,
+            "used": 84,
+            "ms": 4181
+          },
+          "captured": "2026-10-07T12:59:50.442Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 5,
+          "name": "layered-barred-spiral-satellite-trail--layered__s7__zoom__v21d5",
+          "inkPixelSha256": "a1953432e20d44baafeafadc451e2dd60d59fd894d2ed5d29db84812958807ee",
+          "stats": {
+            "rstars": 1491,
+            "dots": 8776,
+            "knots": 147,
+            "stars": 13,
+            "curves": 4,
+            "used": 84,
+            "ms": 559
+          },
+          "captured": "2026-10-07T13:00:01.662Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 6,
+          "name": "layered-barred-spiral-satellite-trail--layered__s7__zoom__v21d6",
+          "inkPixelSha256": "1a7098e0351b93e85f6921e61d1aa120d3e39f8e0864d4230555a981c4a91f74",
+          "stats": {
+            "rstars": 1536,
+            "dots": 8795,
+            "knots": 144,
+            "stars": 13,
+            "curves": 4,
+            "used": 84,
+            "ms": 1966
+          },
+          "captured": "2026-10-07T12:59:57.156Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 7,
+          "name": "layered-barred-spiral-satellite-trail--layered__s7__zoom__v21d7",
+          "inkPixelSha256": "be1806e67cd91b52ac45f65aacece429c7851994229bfa7fe4307923f16c40e1",
+          "stats": {
+            "rstars": 1507,
+            "dots": 8341,
+            "knots": 160,
+            "stars": 16,
+            "curves": 4,
+            "used": 83,
+            "ms": 245
+          },
+          "captured": "2026-10-07T13:00:08.524Z",
+          "pageErrors": 0
+        }
+      ],
+      "ringed--vectors__s7__zoom": [
+        {
+          "draw": 1,
+          "name": "ringed--vectors__s7__zoom__v21d1",
+          "inkPixelSha256": "198f6d327be6aff5ccc65f726c586da7ed8f937f609d082f3f110f8a1dbbf79d",
+          "stats": {
+            "rstars": 1720,
+            "dots": 7065,
+            "knots": 57,
+            "stars": 8,
+            "curves": 2,
+            "used": 92,
+            "ms": 515
+          },
+          "captured": "2026-10-07T12:57:33.686Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 2,
+          "name": "ringed--vectors__s7__zoom__v21d2",
+          "inkPixelSha256": "a18f491f1a126d53dc4b0cfaf832236918ff63e11e0df26e366959b100893f0d",
+          "stats": {
+            "rstars": 1696,
+            "dots": 7357,
+            "knots": 57,
+            "stars": 13,
+            "curves": 2,
+            "used": 91,
+            "ms": 2331
+          },
+          "captured": "2026-10-07T12:57:47.292Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 3,
+          "name": "ringed--vectors__s7__zoom__v21d3",
+          "inkPixelSha256": "920a2df8b2e5d644098a74a4559933431d852b7e28ac71ecab82a0ed3d7e6b33",
+          "stats": {
+            "rstars": 1725,
+            "dots": 7043,
+            "knots": 57,
+            "stars": 9,
+            "curves": 2,
+            "used": 91,
+            "ms": 2232
+          },
+          "captured": "2026-10-07T12:58:07.680Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 4,
+          "name": "ringed--vectors__s7__zoom__v21d4",
+          "inkPixelSha256": "e4f6e03688e4ab68e6c3e85ed13c58e279a299f13a5411c656e8f5c345ccfeaa",
+          "stats": {
+            "rstars": 1732,
+            "dots": 7167,
+            "knots": 57,
+            "stars": 6,
+            "curves": 2,
+            "used": 92,
+            "ms": 257
+          },
+          "captured": "2026-10-07T12:58:20.434Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 5,
+          "name": "ringed--vectors__s7__zoom__v21d5",
+          "inkPixelSha256": "8064cd12e7f119ed4f81740c02a7dfb974615ada8d0f00e890aa1501bda3c099",
+          "stats": {
+            "rstars": 1733,
+            "dots": 7590,
+            "knots": 57,
+            "stars": 9,
+            "curves": 2,
+            "used": 92,
+            "ms": 3968
+          },
+          "captured": "2026-10-07T12:58:25.328Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 6,
+          "name": "ringed--vectors__s7__zoom__v21d6",
+          "inkPixelSha256": "fe3967d96535e7293ef5bc69df99623c75dbb4cf8e31b75f1c40b1d1ad949e60",
+          "stats": {
+            "rstars": 1754,
+            "dots": 7766,
+            "knots": 57,
+            "stars": 7,
+            "curves": 2,
+            "used": 91,
+            "ms": 1372
+          },
+          "captured": "2026-10-07T12:58:30.306Z",
+          "pageErrors": 0
+        },
+        {
+          "draw": 7,
+          "name": "ringed--vectors__s7__zoom__v21d7",
+          "inkPixelSha256": "44f95da8da934c7fb4fc3cf5cdd9bd9caba515d7e84d3db8f63c253b74603994",
+          "stats": {
+            "rstars": 1753,
+            "dots": 7340,
+            "knots": 57,
+            "stars": 5,
+            "curves": 2,
+            "used": 91,
+            "ms": 3115
+          },
+          "captured": "2026-10-07T12:59:00.529Z",
+          "pageErrors": 0
+        }
+      ]
+    }
   }
 }

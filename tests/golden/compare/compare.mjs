@@ -111,6 +111,24 @@ for (const c of manifest.captures) {
     console.error(`FAIL  ${c.name}: ${/** @type {Error} */ (e).message}`);
   }
 }
+// v21's other draws of some cases (ADR 0036), by the same check
+let nDraws = 0;
+for (const list of Object.values(manifest.v21Draws?.cases ?? {}))
+  for (const d of /** @type {any[]} */ (list)) {
+    nDraws++;
+    try {
+      const hash = createHash('sha256')
+        .update(PNG.sync.read(readFileSync(join(dir, `${d.name}.ink.png`))).data)
+        .digest('hex');
+      if (hash !== d.inkPixelSha256) throw new Error('pixel hash differs from the manifest');
+      if (d.pageErrors) throw new Error(`${d.pageErrors} page errors during capture`);
+      if (!existsSync(join(dir, `${d.name}.json`))) throw new Error('missing .json');
+    } catch (e) {
+      bad++;
+      console.error(`FAIL  ${d.name}: ${/** @type {Error} */ (e).message}`);
+    }
+  }
+if (nDraws) console.log(`${nDraws} v21 re-draws checked`);
 console.log(
   `${manifest.captures.length - bad}/${manifest.captures.length} reference captures intact`,
 );
@@ -281,8 +299,11 @@ async function compareAll(G, node) {
     // flocculence and wobble, and only the dots differ
     const opts = node.referenceOptions(rec.params, rec.zoom ?? 1, rec.preset);
     const ref = node.reference(c.name);
-    const refM = G.measure(ref);
-    const refCounts = G.countsOf(rec.stats);
+    // v21's draws (ADR 0036): its capture, and, for a case that has them, its other draws; the
+    // comparison is with the mean of them
+    const refs = node.referenceMeasures(c.name);
+    const refM = /** @type {any} */ (refs[0]);
+    const refCounts = node.referenceCounts(c.name);
     const parity = node.parity(rec.preset, rec.zoom ?? 1, rec.variant);
     const strict = node.thresholds.strict;
     /** @type {Record<string, any>} */
@@ -319,7 +340,7 @@ async function compareAll(G, node) {
     const more = isRequired ? (redraws[c.name] ?? []) : [];
     if (isRequired && more.length !== keys - 1) throw new Error(`${c.name}: re-draws missing`);
     for (const e of engines) {
-      const single = G.compareMeasures(refM, e.measures);
+      const single = node.compareToReference(refs, e.measures);
       const cmp = G.meanComparison([single, ...more.map((x) => x.c)]);
       const ev = G.evaluate(
         cmp,
@@ -365,7 +386,7 @@ async function compareAll(G, node) {
     }
     // the engine's own variation, for information
     const own = node.renderCpu(rec.params, {}, zoom);
-    const ownCmp = G.compareMeasures(refM, G.measure(own.alpha));
+    const ownCmp = node.compareToReference(refs, G.measure(own.alpha));
     row.ownVariation = ownCmp;
     console.log(`${''.padEnd(44)} ${'own var.'.padEnd(9)} ${line(ownCmp)}  (information only)`);
     if (gpu) {
@@ -903,7 +924,6 @@ async function calibrate(G, node) {
         ['r90', 'r90Abs'],
         ['outer', 'outerAbs'],
         ['q', 'qAbs'],
-        ['qInner', 'qInnerAbs'],
       ]))
         t[k] = Math.max(t[k] ?? 0, ceil3(1.1 * (hs[m]?.max ?? 0)));
     }
@@ -935,9 +955,7 @@ async function calibrate(G, node) {
     // (none where held-out captures set the family's tolerances: re-draws alone would be tighter)
     for (const preset of held.length ? [] : [...new Set(list.map((c) => c.preset))]) {
       const mine = list.filter((c) => c.preset === preset);
-      const few = mine.length < 8;
-      // fewer than eight pairs (a zoom family has six): only a listed widening, from the pairs there are
-      if (few && !widenOnly(family, preset)) continue;
+      if (mine.length < 8) continue;
       const ps = stats(mine);
       const pa = positionAngle(mine);
       const fam = /** @type {Record<string, number>} */ (parity[family]);
@@ -953,21 +971,19 @@ async function calibrate(G, node) {
         outer: Math.max(spread(ps, 'outerAbs', 0.003), fam.outer ?? 0),
         paA: Math.max(pa.paA, fam.paA ?? 0),
       };
-      byPreset[preset] = few
-        ? {}
-        : {
-            ...wider,
-            q: spread(ps, 'qAbs', 0.005),
-            qInner: spread(ps, 'qInnerAbs', 0.005),
-            // the preset's own noise floor of the ellipticity (a smooth Sérsic profile is far quieter
-            // than a galaxy with a sparse halo); the family's paA
-            paEps0: Math.max(0.01, pa.paEps0),
-            // ADR 0035, where this preset's own count spread is wider than the ADR's tolerance
-            ...(Object.values(counted.byPreset[preset] ?? {}).some((w) => w > ADR.counts)
-              ? { countsBy: counted.byPreset[preset] }
-              : {}),
-          };
-      // ADR 0026 and ADR 0036 (widen-only): where the owner approved it (WIDEN_ONLY), the band for
+      byPreset[preset] = {
+        ...wider,
+        q: spread(ps, 'qAbs', 0.005),
+        qInner: spread(ps, 'qInnerAbs', 0.005),
+        // the preset's own noise floor of the ellipticity (a smooth Sérsic profile is far quieter
+        // than a galaxy with a sparse halo); the family's paA
+        paEps0: Math.max(0.01, pa.paEps0),
+        // ADR 0035, where this preset's own count spread is wider than the ADR's tolerance
+        ...(Object.values(counted.byPreset[preset] ?? {}).some((w) => w > ADR.counts)
+          ? { countsBy: counted.byPreset[preset] }
+          : {}),
+      };
+      // ADR 0026 (widen-only): where the owner approved it (`widenOnly`: `Edge-on with dust`), the band for
       // a measure is the larger of the band that applies to the preset now (the family's, or the
       // preset's own, set above) and 1.5 × the preset's own largest re-draw spread. Only a preset
       // whose own spread exceeds that band gets a change, so none gets narrower, and nothing
@@ -978,7 +994,6 @@ async function calibrate(G, node) {
         ['r50', 'r50Abs'],
         ['r90', 'r90Abs'],
         ['q', 'qAbs'],
-        ['qInner', 'qInnerAbs'],
       ])) {
         if (!widenOnly(family, preset, k)) continue;
         const wide = ceil3(1.5 * (ps[m]?.max ?? 0));
@@ -1143,9 +1158,8 @@ function onlyFamilyPresets(family) {
 }
 
 /**
- * The per-preset bands the owner approved to widen (ADR 0026, 2026-10-07: `Edge-on with dust`; ADR
- * 0036, 2026-10-07: three cases of M7): family, preset and measure. A preset with fewer than eight
- * pairs (a zoom family has six) is allowed its own band where it is listed.
+ * The per-preset bands the owner approved to widen (ADR 0026, 2026-10-07: `Edge-on with dust`):
+ * family, preset and measure. Nothing else is widened.
  *
  * @param {string} family
  * @param {string} preset
@@ -1156,9 +1170,6 @@ function widenOnly(family, preset, measure) {
   const listed = {
     'spiral|Edge-on with dust': ['r25', 'r50', 'r90', 'q', 'paA'],
     'spiral@zoom|Edge-on with dust': ['r25', 'r50', 'r90', 'q', 'paA'],
-    'smooth|Cigar-shaped': ['paA'],
-    'spiral@zoom|Ringed': ['qInner'],
-    'layered@zoom|Layered: barred spiral, satellite trail': ['r50'],
   };
   const m = listed[`${family}|${preset}`];
   return m ? measure === undefined || m.includes(measure) : false;

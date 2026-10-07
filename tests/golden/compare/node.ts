@@ -407,17 +407,60 @@ export class GoldenNode {
   }
 
   /**
+   * The v21 draws of a case (ADR 0036): its capture first, then the other draws of its stipple the
+   * manifest records under `v21Draws` (tools/capture-reference `--redraws`), where it lists any.
+   * `[name]` alone otherwise, and the comparison is against the one capture, as ever.
+   */
+  referenceNames(name: string): string[] {
+    const m = this.manifest().v21Draws?.cases?.[name] as { name: string }[] | undefined;
+    return [name, ...(m ?? []).map((d) => d.name)];
+  }
+
+  /** v21's ink of each of the case's draws (`referenceNames`), measured. */
+  referenceMeasures(name: string): ImageMeasures[] {
+    return this.referenceNames(name).map((n) => measure(this.reference(n)));
+  }
+
+  /** v21's mark counts: those of the capture, or the mean over the case's draws. */
+  referenceCounts(name: string): Record<string, number> {
+    const stats = this.referenceNames(name).map((n) =>
+      countsOf(n === name ? this.record(name).stats : this.record(n).stats),
+    );
+    return meanCounts(stats);
+  }
+
+  /**
+   * An engine draw against v21 (ADR 0036): against the one capture, or, for a case that has v21
+   * re-draws, the mean of its comparisons with each of v21's draws, as ADR 0018 takes the mean over
+   * the engine's draws.
+   */
+  compareToReference(refs: ImageMeasures[], render: ImageMeasures): Comparison {
+    return meanComparison(refs.map((r) => compareMeasures(r, render)));
+  }
+
+  private manifestCache: { v21Draws?: { cases?: Record<string, unknown> } } | null = null;
+  private manifest() {
+    this.manifestCache ??= JSON.parse(
+      readFileSync(join(this.root, 'tests/golden/reference/manifest.json'), 'utf8'),
+    ) as { v21Draws?: { cases?: Record<string, unknown> } };
+    return this.manifestCache;
+  }
+
+  /**
    * The comparison's re-draws (ADR 0018): the CPU engine drawing a required case with keys
    * 1..K − 1, each compared with v21's capture; key 0, the canonical draw, is each engine's own.
    */
   redraws(name: string, keys: number): { c: Comparison; counts: Record<string, number> }[] {
     const rec = this.record(name);
     const opts = this.referenceOptions(rec.params, rec.zoom ?? 1, rec.preset);
-    const ref = measure(this.reference(name));
+    const refs = this.referenceMeasures(name);
     const out: { c: Comparison; counts: Record<string, number> }[] = [];
     for (let k = 1; k < keys; k++) {
       const r = this.cpu.render(rec.params, keyed(opts, rec.params.seed, k), rec.zoom ?? 1);
-      out.push({ c: compareMeasures(ref, measure(r.alpha)), counts: engineCounts(r.counts) });
+      out.push({
+        c: this.compareToReference(refs, measure(r.alpha)),
+        counts: engineCounts(r.counts),
+      });
     }
     return out;
   }
