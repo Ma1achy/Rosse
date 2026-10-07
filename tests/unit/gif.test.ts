@@ -359,6 +359,15 @@ describe('recording a GIF', () => {
     await expect(
       recordGif({ width: 4, height: 4, frame: flat(4, 4) }, { ...rec, speed: 0.0001 }, enc),
     ).rejects.toThrow(/delay/);
+    // QA: one frame at speed 0.25 over end 30 is 72,000 cs, which a 16-bit field would wrap to 6,464
+    expect(gifDelayCs(0.25, 30, 1)).toBe(72000);
+    await expect(
+      recordGif(
+        { width: 4, height: 4, frame: flat(4, 4) },
+        { ...rec, frames: 1, speed: 0.25, end: 30 },
+        enc,
+      ),
+    ).rejects.toThrow(/delay/);
     await expect(recordGif({ width: 4, height: 4, frame: flat(3, 3) }, rec, enc)).rejects.toThrow(
       /RGBA/,
     );

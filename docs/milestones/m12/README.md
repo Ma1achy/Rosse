@@ -52,7 +52,7 @@ To draw a catalogue or real galaxy, the page uses `card.mapping.p` / `cards[i].p
 
 ### 1. `fromVotes`
 
-A pure function, v21's line for line (including its `mulberry32` stream of `seed · 101 + 9`). `tools/capture-reference/votes.mjs` runs v21's own `fromVotes`, `fromReal`, `describe` and `shortType` in Chromium (a copy of the page with one line added to expose them) for all 42 real galaxies and 339 catalogue rows (every type of v21's buttons, 24 star-or-artefact rows, rows with `q`, `conc`, `gr` missing, and shell, merger, lens and ring cases), and 14 rows through v21's own `showCat` (whose captions the module writes word for word). **`toEqual` on every parameter, exactly.** The test also checks that every branch is covered (every odd feature, `merger`, `lensOn`, `shellsOn`, `irr`, `streams`, `jet`, `ovStar`, `whole`).
+A pure function, v21's line for line (including its `mulberry32` stream of `seed · 101 + 9`). `tools/capture-reference/votes.mjs` runs v21's own `fromVotes`, `fromReal`, `describe` and `shortType` in Chromium (a copy of the page with one line added to expose them) for all 42 real galaxies and 339 catalogue rows (every type of v21's buttons, 24 star-or-artefact rows, rows with `q`, `conc`, `gr` missing, and shell, merger, lens and ring cases), and 14 rows through v21's own `showCat` (12 of them non-star: the test compares `catalogueCaption`'s text, plus the link text, with the page's own `catinfo` caption, character for character; the 2 star rows record the error v21 shows). **`toEqual` on every parameter, exactly.** The test also checks that every branch is covered (every odd feature, `merger`, `lensOn`, `shellsOn`, `irr`, `streams`, `jet`, `ovStar`, `whole`).
 
 **One deliberate difference.** v21's star-or-artefact branch returns the bare parameters (not `{ p, odd }`), so its `showReal` and `showCat` fail on such a galaxy (`Cannot read properties of undefined (reading 'bulge')`, recorded from the page). 24 of the 339 sampled catalogue rows are such galaxies (about 7%). `fromVotes` returns `{ p, odd: null }` for them, with v21's parameters.
 
@@ -74,9 +74,10 @@ Tools: v21's eleven types; `random` (uniform among every match in one scan, with
 | columns, RA, Dec, ids | 60 ms |
 | worker load, wall | 545 ms |
 | retained | 16.3 MiB: the 11.3 MB of unpacked bytes (the 39 columns are views of it), RA and Dec as `Float64Array` (1.9 MB each) and the ids as a `BigUint64Array` (1.9 MB) |
-| transient peak | about 30 to 35 MB, estimated (the text and the parsed string, the 5.4 MB of bytes, the 11.3 MB unpacked, the stream's chunks), not measured |
+| data buffers at the peak | about 30 to 35 MB, estimated (the text and the parsed string, the 5.4 MB of bytes, the 11.3 MB unpacked, the stream's chunks): the data only |
+| renderer-process RSS, measured by QA | peak +65 to +76 MB over baseline during the load, +58 to +71 MB after it, back to about +13 MB after `close()` (headless Chromium on SwiftShader, a loaded 4-core machine; not a phone) |
 
-v21 keeps the same columns but the ids as 239,695 decimal strings (several times the 1.9 MB) and decodes on the main thread. Nothing here is measured on a phone: I had none. On a phone 4 to 8 times slower than this machine the load would take 2 to 5 seconds, in a worker, and hold about 16 MiB afterwards; the risk is the transient peak on a 2 GB phone while a WebGPU context is also alive. Mitigations that need no change of the data: load only when the browser panel is first opened (the client loads on `load()`), and `close()` the worker to free the 16 MiB when the panel is closed. A smaller form (RA and Dec as `Float32Array`, losing the exact `ra.toFixed(5)` of v21's caption; or dropping the unpacked id bytes) is an owner decision, not made here.
+v21 keeps the same columns but the ids as 239,695 decimal strings (several times the 1.9 MB) and decodes on the main thread. Nothing here is measured on a phone: I had none. On a phone 4 to 8 times slower than this machine the load would take 2 to 5 seconds, in a worker, and hold about 16 MiB of data afterwards (the process grows by 58 to 71 MB, as measured above); the risk is the peak on a 2 GB phone while a WebGPU context is also alive. Mitigations that need no change of the data: load only when the browser panel is first opened (the client loads on `load()`), and `close()` the worker to free the 16 MiB when the panel is closed. A smaller form (RA and Dec as `Float32Array`, losing the exact `ra.toFixed(5)` of v21's caption; or dropping the unpacked id bytes) is an owner decision, not made here.
 
 ### 3. Real galaxies
 
@@ -127,6 +128,7 @@ One layer per pen (`background`, `drawings`, `arms`, `dust`, `cores`, `knots`, `
   - **Same layers, same counts as v21** for five presets (Grand design, Flocculent, Dusty spiral, Smooth round, Edge-on with dust; the golden `single` overrides, seed 7), the CPU engine drawing with v21's variation and picks as the golden comparison does, each layer's count within the count rule of test (d) (±3%, ±10% under 100, 3 · √(v21 + engine) under 2,000). The counts are printed by the test; for example Grand design `arms 27/27, dust 155/155, cores 1/1, knots 183/181, dots 9398/9376, stars 19/21`.
   - **GPU = CPU:** the same layers and, per layer, the same counts (within 0.1%, at least 1) on seven cases (home and orbit): in every case equal.
   - **Re-rasterised, it matches the plate's ink at the structure threshold:** Chromium rasterises the SVG, and the coarse density maps (σ = 16 px, ADR 0013 b′) of it and of the plate's ink score 0.93 to 0.97 (CPU and WebGPU SVG identical to the thousandth) against the family's band (0.89 spiral, 0.91 smooth); the same galaxy turned 30° scores 0.61 to 0.80, under the band. The SVG's ink is 0.73 to 0.78 of the plate's (circles and strokes are simplified, as in v21's own, whose SVG has 0.77 to 0.86 of its plate).
+- **Sky settings.** The comparison uses the goldens' `starMix 0, field 0, fgstars 0`. With them on (the defaults) v21 exports a `background` layer of 328 to 955 elements and thousands of star elements, and the engine exports none yet: SVG parity at the default sky waits on M7.
 - **Deferred.** A fifth preset, `Barred spiral`, is not in the five: v21's `stars` layer has 93 drawn stars there (`sstars` from the stipple's drawn-star class, `rstars`), which the engine draws from M7 on; the engine has 10. The `background` layer (deep field and foreground stars) is empty for the same reason. The merged capsule buffer holds the hatching and the placed drawings of one frame, so `drawings` includes v21's `background` drawings (none of the five has any).
 
 ### 5. GIF export
@@ -147,7 +149,7 @@ v21's encoder (`gifEncode`) is ported unchanged and tested against an independen
 
 ## Owner decisions
 
-Made on 2026-10-07: ADR 0060 accepted; the catalogue's memory accepted as it is (16.3 MiB held, about 30 to 35 MB peak: not shrunk); the page draws the star-or-artefact catalogue galaxies (as `fromVotes` now returns them); the attribution kept and made complete; the `Real galaxy 6` band not widened (re-capture mechanism above); the quasar-flare GIF deferred to M9.
+Made on 2026-10-07: ADR 0060 accepted; the catalogue's memory accepted as it is (16.3 MiB held; peak RSS +65 to +76 MB measured by QA: not shrunk); the page draws the star-or-artefact catalogue galaxies (as `fromVotes` now returns them); the attribution kept and made complete; the `Real galaxy 6` band not widened (re-capture mechanism above); the quasar-flare GIF deferred to M9.
 
 Still open:
 
