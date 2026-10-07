@@ -104,7 +104,12 @@ export class GpuRenderer {
         pxPerUnit: this.pxPerUnit,
         gain: l.gain,
       };
-      if (l.kind === 'gpu-capsules') return new CapsuleBatch(this.ribbons, l.buffer, l.count, opts);
+      if (l.kind === 'gpu-capsules')
+        return new CapsuleBatch(
+          this.ribbons,
+          [{ buffer: l.buffer, count: l.count, indirect: l.indirect }, ...(l.more ?? [])],
+          opts,
+        );
       if (l.kind === 'capsules' || l.kind === 'ribbons')
         throw new Error('the WebGPU engine draws GPU ribbon buffers only');
       const atlas = this.atlases.get(l.atlas);

@@ -16,9 +16,14 @@
  * on the next animation frame with the latest camera. Changing the preset resets the angles to the
  * preset's; the seed keeps them; the zoom is kept, as in v21.
  *
+ * The plate shows every drawn part M5 places (envelopes, whole drawings, drawn arms, bars and rings,
+ * bubbles, arcs, shells, the tail, trails, the jet and the streams, expanded on the GPU), the
+ * drawn core and the nuclear spiral, with the engine's own picks.
+ *
  * URL parameters: `preset`, `seed`, `variant=stipple` (the M2 golden overrides: no lines, knots,
- * envelope, drawn stars, deep field or foreground stars), `variant=ribbons` (the M4 overrides), `az`, `incl`, `pa`, `zoom`,
- * `backend=cpu|webgpu`, `present=copy`.
+ * envelope, drawn stars, deep field or foreground stars), `variant=ribbons` (the M4 overrides),
+ * `variant=vectors` (the M5 overrides), `az`, `incl`, `pa`, `zoom`, `backend=cpu|webgpu`,
+ * `present=copy`.
  */
 import type { Params } from './core/params';
 import { PRESET_NAMES, presetParams } from './core/presets';
@@ -27,16 +32,15 @@ import { CpuStippleTiers } from './fallback/stipple';
 import { Gpu, awaitLoss, detectBackend, type Backend } from './gpu/device';
 import { readTexture } from './gpu/readback';
 import { BuiltAssets, type AtlasData, type AtlasName, type ImageData8 } from './marks/atlas';
-import { coreInstances } from './model/parts';
+import { VECTOR_ATLASES, type VectorLibrary } from './marks/vector';
 import { drawingsMeta, markCounts, type MarkCounts } from './model/scene';
 import type { DrawingsMeta } from './model/variation';
 import { GpuRenderer, type FrameSize } from './render/frame';
-import type { InkLayer } from './render/layers';
 import { GpuStipple } from './render/stipple';
 import { SURFACES, type SurfaceName } from './render/surface';
 import { attachOrbit, type OrbitState } from './ui/orbit';
 import { parseUrlView } from './ui/url';
-import { PLATE, cameraOf } from './view/camera';
+import { PLATE } from './view/camera';
 
 declare global {
   interface Window {
@@ -90,16 +94,24 @@ function ribbonsOnly(preset: string): Partial<Params> {
   };
 }
 
+/**
+ * The M5 golden overrides (tests/golden/extra-cases.json, variant `vectors`): no drawn stars among
+ * the stipple, deep field or foreground stars (M7); `Shell galaxy` draws its drawn shells instead
+ * of its simulated ones (M8).
+ */
+function vectorsOnly(preset: string): Partial<Params> {
+  return {
+    starMix: 0,
+    field: 0,
+    fgstars: 0,
+    ...(preset === 'Shell galaxy' ? { shellsOn: 0, shells: 1 } : {}),
+  };
+}
+
 interface Scene {
   atlases: AtlasData[];
   paper: ImageData8;
   meta: DrawingsMeta;
-}
-
-/** The drawn core, a CPU-placed part (model/parts.ts), placed per view. */
-function coreLayer(P: Params, meta: DrawingsMeta, zoom: number): InkLayer[] {
-  const cores = coreInstances(P, meta, cameraOf(P, zoom));
-  return cores.length ? [{ kind: 'sprites', atlas: 'cores', gain: 1, instances: cores }] : [];
 }
 
 interface Engine {
@@ -263,8 +275,8 @@ async function gpuEngine(
       const st = stipple;
       if (!st) throw new Error('no stipple passes');
       const work = st.frame(P, zoom, scene.meta);
-      if (work.view)
-        r.setLayers([...st.lineLayers(), ...st.layers(), ...coreLayer(P, scene.meta, zoom)]);
+      // every layer in scene() order: line-work, drawn parts, stipple, streams, cores
+      if (work.view) r.setLayers(st.inkLayers());
       r.drawInk();
       drawn = { P, zoom };
       return st;
@@ -359,11 +371,12 @@ async function start(): Promise<void> {
   seedInput.value = String(seed);
 
   const assets = await BuiltAssets.load(import.meta.env.BASE_URL);
-  const [atlases, paper, penlines] = await Promise.all([
+  const [atlases, paper, sheets] = await Promise.all([
     Promise.all(ATLASES.map((n) => assets.atlas(n))),
     assets.paper(),
-    assets.vector('penlines'),
+    Promise.all(VECTOR_ATLASES.map((n) => assets.vector(n))),
   ]);
+  const vectors = Object.fromEntries(VECTOR_ATLASES.map((n, i) => [n, sheets[i]])) as VectorLibrary;
   const by = (n: AtlasName) => {
     const a = atlases.find((x) => x.name === n);
     if (!a) throw new Error(`atlas ${n} missing`);
@@ -380,14 +393,21 @@ async function start(): Promise<void> {
         cores: by('cores'),
         strokes: by('strokes'),
       },
-      penlines,
+      vectors.penlines,
+      vectors,
     ),
   };
   const params0 = () =>
     presetParams(
       preset,
       seed,
-      variant === 'stipple' ? STIPPLE_ONLY : variant === 'ribbons' ? ribbonsOnly(preset) : {},
+      variant === 'stipple'
+        ? STIPPLE_ONLY
+        : variant === 'ribbons'
+          ? ribbonsOnly(preset)
+          : variant === 'vectors'
+            ? vectorsOnly(preset)
+            : {},
     );
   /** the camera from the URL, if given (src/ui/url.ts) */
   const urlView = parseUrlView(params);

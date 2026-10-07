@@ -21,7 +21,7 @@ import {
   type MarkCounts,
   type SceneOptions,
 } from '../../../src/model/scene';
-import type { VectorSheet } from '../../../src/marks/vector';
+import { VECTOR_ATLASES, type VectorLibrary, type VectorSheet } from '../../../src/marks/vector';
 import { cameraOf } from '../../../src/view/camera';
 import { grey, type Grey } from './metrics';
 
@@ -36,6 +36,11 @@ export function loadAtlases(root: string): AtlasData[] {
   });
 }
 
+/** Every packed vector sheet (M5). */
+export function loadVectors(root: string): VectorLibrary {
+  return Object.fromEntries(VECTOR_ATLASES.map((n) => [n, loadVector(root, n)])) as VectorLibrary;
+}
+
 /** A packed vector sheet (M4: the pen lines). */
 export function loadVector(root: string, name: string): VectorSheet {
   const dir = join(root, 'assets-built');
@@ -45,7 +50,7 @@ export function loadVector(root: string, name: string): VectorSheet {
   return JSON.parse(readFileSync(join(dir, e.file), 'utf8')) as VectorSheet;
 }
 
-export function metaOf(atlases: AtlasData[], penlines?: VectorSheet) {
+export function metaOf(atlases: AtlasData[], penlines?: VectorSheet, vectors?: VectorLibrary) {
   const by = (n: string) => {
     const a = atlases.find((x) => x.name === n);
     if (!a) throw new Error(`atlas ${n} missing`);
@@ -60,6 +65,7 @@ export function metaOf(atlases: AtlasData[], penlines?: VectorSheet) {
       strokes: by('strokes'),
     },
     penlines,
+    vectors,
   );
 }
 
@@ -84,7 +90,8 @@ export class CpuGolden {
 
   constructor(root: string) {
     this.atlases = loadAtlases(root);
-    this.meta = metaOf(this.atlases, loadVector(root, 'penlines'));
+    const vectors = loadVectors(root);
+    this.meta = metaOf(this.atlases, vectors.penlines, vectors);
     this.renderer = new CpuRenderer(
       { plateCss: 800, dpr: 1 },
       { width: 1, height: 1, data: new Uint8Array(4) },

@@ -37,6 +37,7 @@ import {
   type Thresholds,
 } from './thresholds';
 import { v21Variation } from './v21';
+import { v21PartPicks } from './v21-parts';
 
 export { compareMeasures, countAllowance, evaluate, impossibleClasses, measure };
 export type { Comparison, Evaluation, Grey, ImageMeasures, Thresholds };
@@ -131,15 +132,16 @@ export class GoldenNode {
    * from M4 (ADR 0018) v21's stroke choices, noise field, dust choices (each hatch's numbers and
    * pen line, the carving lines' pen lines) and ring-knot clusters. With them, every random choice
    * the two engines make differently is v21's, and only the marks differ: the placement key
-   * re-draws nothing else.
+   * re-draws nothing else. From M5 (ADR 0021) also v21's part picks at this zoom.
    */
-  referenceOptions(P: Params): SceneOptions {
+  referenceOptions(P: Params, zoom = 1): SceneOptions {
     const variation = this.v21Variation(P);
     const kinds = this.cpu.meta.strokes?.kind ?? [];
     return {
       variation,
       curvePicks: this.v21CurvePicks(P, variation),
       noise: this.v21Noise(P.seed),
+      partPicks: v21PartPicks(P, variation, this.cpu.meta, zoom),
       dustPicks: v21DustPicks(this.root, P, variation, kinds, this.cpu.meta.penlines?.n ?? 0),
       ringKnotPicks: v21RingKnots(this.root, P, variation),
     };
@@ -221,8 +223,8 @@ export class GoldenNode {
     const controls: Record<string, Record<string, { config: string; cs: Comparison[] }[]>> = {};
     const heldOut: Record<string, { preset: string; config: string; cs: Comparison[] }[]> = {};
     for (const c of cases) {
-      const opts = this.referenceOptions(c.params);
       const zoom = c.zoom ?? 1;
+      const opts = this.referenceOptions(c.params, zoom);
       const draw = (P: Params, o: SceneOptions, k: number) =>
         measure(this.cpu.render(P, keyed(o, P.seed, k), zoom).alpha);
       // the controls compare with the first stand-in only
@@ -260,7 +262,7 @@ export class GoldenNode {
       for (const ctl of NEGATIVE_CONTROLS) {
         if (!ctl.applies(c.params, refQ)) continue;
         const P = ctl.params ? ctl.params(c.params) : c.params;
-        const o = { ...this.referenceOptions(P), ...(ctl.scene ?? {}) };
+        const o = { ...this.referenceOptions(P, zoom), ...(ctl.scene ?? {}) };
         const cs: Comparison[] = [];
         for (let k = 0; k < keys; k++) cs.push(compareMeasures(ref, draw(P, o, k)));
         ((controls[c.family] ??= {})[ctl.name] ??= []).push({ config, cs });
@@ -276,7 +278,7 @@ export class GoldenNode {
    */
   redraws(name: string, keys: number): { c: Comparison; counts: Record<string, number> }[] {
     const rec = this.record(name);
-    const opts = this.referenceOptions(rec.params);
+    const opts = this.referenceOptions(rec.params, rec.zoom ?? 1);
     const ref = measure(this.reference(name));
     const out: { c: Comparison; counts: Record<string, number> }[] = [];
     for (let k = 1; k < keys; k++) {

@@ -8,7 +8,7 @@ import type { Params } from '../../../src/core/params';
 import { requestDevice } from '../../../src/gpu/device';
 import { readTexture } from '../../../src/gpu/readback';
 import { BuiltAssets, type AtlasName } from '../../../src/marks/atlas';
-import { coreInstances } from '../../../src/model/parts';
+import { VECTOR_ATLASES, type VectorLibrary } from '../../../src/marks/vector';
 import {
   buildScene,
   drawingsMeta,
@@ -16,7 +16,6 @@ import {
   type SceneOptions,
 } from '../../../src/model/scene';
 import { GpuRenderer } from '../../../src/render/frame';
-import type { InkLayer } from '../../../src/render/layers';
 import { GpuStipple } from '../../../src/render/stipple';
 import { cameraOf } from '../../../src/view/camera';
 
@@ -62,11 +61,12 @@ async function main(): Promise<void> {
   });
   const assets = await BuiltAssets.load('/');
   const names: AtlasName[] = ['dots', 'knots', 'stars', 'cores', 'pieces', 'strokes'];
-  const [atlases, paper, penlines] = await Promise.all([
+  const [atlases, paper, sheets] = await Promise.all([
     Promise.all(names.map((n) => assets.atlas(n))),
     assets.paper(),
-    assets.vector('penlines'),
+    Promise.all(VECTOR_ATLASES.map((n) => assets.vector(n))),
   ]);
+  const vectors = Object.fromEntries(VECTOR_ATLASES.map((n, i) => [n, sheets[i]])) as VectorLibrary;
   const by = (n: string) => {
     const a = atlases.find((x) => x.name === n);
     if (!a) throw new Error(`atlas ${n} missing`);
@@ -80,7 +80,8 @@ async function main(): Promise<void> {
       cores: by('cores'),
       strokes: by('strokes'),
     },
-    penlines,
+    vectors.penlines,
+    vectors,
   );
   const renderer = new GpuRenderer(device, { plateCss: 800, dpr: 1 }, paper);
   for (const a of atlases) renderer.addAtlas(a);
@@ -94,10 +95,7 @@ async function main(): Promise<void> {
       const cam = cameraOf(P, zoom);
       stipple.setScene(scene);
       stipple.setView(cam);
-      const layers: InkLayer[] = [...stipple.lineLayers(), ...stipple.layers()];
-      const cores = coreInstances(P, meta, cam, scene.galaxy.noise);
-      if (cores.length) layers.push({ kind: 'sprites', atlas: 'cores', gain: 1, instances: cores });
-      renderer.setLayers(layers);
+      renderer.setLayers(stipple.inkLayers());
       renderer.drawInk();
       const half = new Uint16Array((await readTexture(device, renderer.ink, 8)).buffer);
       const n = renderer.width * renderer.height;

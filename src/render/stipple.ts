@@ -21,6 +21,9 @@ import { cullsUniform } from '../model/ribbons';
 import { packStruct } from '../gpu/buffers';
 import { CULLS_LAYOUT } from '../fallback/kernels/project';
 import { GpuRibbons } from './ribbons';
+import { GpuVectors } from './vectors';
+import { vectorView } from '../model/vectors';
+import { coreInstances } from '../model/parts';
 import {
   STIPPLE_LAYERS,
   buildScene,
@@ -100,6 +103,8 @@ export class GpuStipple {
     },
     /** the line-work (M4) */
     readonly ribbons: GpuRibbons,
+    /** the placed vector drawings and the streams' marks (M5) */
+    readonly vectors: GpuVectors,
   ) {}
 
   static create(device: GPUDevice): GpuStipple {
@@ -115,6 +120,7 @@ export class GpuStipple {
       device,
       { stipple, extra, project, local, blocks, scatter },
       GpuRibbons.create(device),
+      GpuVectors.create(device),
     );
   }
 
@@ -186,6 +192,7 @@ export class GpuStipple {
     const view = buf(64, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'view');
     const culls = buf(CULLS_LAYOUT.size, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'culls');
     this.ribbons.load(scene.ribbons, view, pool, dotBase, noise);
+    this.vectors.load(scene.vectors, pool, dotBase, noise);
     const scan = bufferWithData(
       d,
       new Uint32Array([n, cap, blocks, 0]),
@@ -319,6 +326,19 @@ export class GpuStipple {
       packStruct(CULLS_LAYOUT, cullsUniform(this.scene.ribbons, cam, params, galaxy.g.key)),
     );
     this.ribbons.setView(cam, params, galaxy.g.n_dot_pool);
+    const { variation, meta } = this.scene;
+    this.vectors.setView(
+      vectorView(
+        this.scene.vectors,
+        params,
+        variation,
+        meta,
+        cam,
+        galaxy.g.key,
+        galaxy.g.n_dot_pool,
+      ),
+    );
+    this.camera = cam;
     const enc = d.createCommandEncoder({ label: 'stipple view' });
     const pass = enc.beginComputePass({ label: 'project + compact' });
     const P = this.pipes;
@@ -336,8 +356,58 @@ export class GpuStipple {
     pass.setBindGroup(0, m.groups.scatter);
     pass.dispatchWorkgroups(Math.ceil(m.n / 64) || 1);
     this.ribbons.encodeExpand(pass);
+    this.vectors.encode(pass);
     pass.end();
     d.queue.submit([enc.finish()]);
+  }
+
+  /** the camera of the last view (the cores are placed for it) */
+  private camera: Camera | null = null;
+
+  /**
+   * Every ink layer of the galaxy, in the reference's order (scene(), app23.js:L1289–1301): the
+   * stroke ribbons, the vector drawings (the hatching's, then the placed parts': lines, dots,
+   * blobs; line ink), the pieces (young), the stipple's old, disc and young dots, the streams' dots
+   * and knots (old), knots (hii), sparkle stars (young), then the drawn core and nuclear spiral
+   * (old; placed on the CPU for the last view).
+   */
+  inkLayers(): InkLayer[] {
+    if (!this.model || !this.scene || !this.camera) return [];
+    const line = this.ribbons.layers();
+    const pieces = line.filter((l) => 'atlas' in l && l.atlas === 'pieces');
+    const stipple = this.layers();
+    const { P, meta, galaxy, vectors } = this.scene;
+    const cores = coreInstances(P, meta, this.camera, galaxy.noise, vectors.parts.picks.nuclear);
+    // v21 expands the hatching and the placed drawings into one line buffer: their pen-line
+    // quads are one layer, one union per sample (ADR 0019)
+    const placed = this.vectors.layers();
+    const hatch = line.find((l) => l.kind === 'gpu-capsules');
+    const parts = placed.find((l) => l.kind === 'gpu-capsules');
+    const merged: InkLayer[] = [];
+    if (hatch?.kind === 'gpu-capsules' && parts?.kind === 'gpu-capsules')
+      merged.push({
+        ...hatch,
+        more: [
+          {
+            buffer: parts.buffer,
+            count: parts.count,
+            ...(parts.indirect ? { indirect: parts.indirect } : {}),
+          },
+        ],
+      });
+    else if (hatch ?? parts) merged.push((hatch ?? parts) as InkLayer);
+    return [
+      ...line.filter((l) => !pieces.includes(l) && l !== hatch),
+      ...merged,
+      ...placed.filter((l) => l !== parts),
+      ...pieces,
+      ...stipple.slice(0, 3),
+      ...this.vectors.streamLayers(),
+      ...stipple.slice(3),
+      ...(cores.length
+        ? [{ kind: 'sprites', atlas: 'cores', gain: 1, instances: cores } as InkLayer]
+        : []),
+    ];
   }
 
   /** The line-work's layers (ribbons, hatching, pieces), drawn before the stipple. */
@@ -392,7 +462,23 @@ export class GpuStipple {
         pieces: await this.ribbons.readPieceCount(),
         ribbonSegments: R?.nSegs ?? 0,
         hatches: R?.nHatch ?? 0,
+        ...(await this.vectorCounts()),
       },
+    };
+  }
+
+  /** The placed drawings' counts (a read-back of the compactions' draw arguments). */
+  private async vectorCounts(): Promise<Partial<MarkCounts>> {
+    const D = this.scene?.vectors;
+    if (!D) return {};
+    const v = await this.vectors.readCounts();
+    return {
+      drawings: D.nInst,
+      vectorCaps: v.nCaps,
+      vectorDots: D.nDots,
+      vectorBlobs: D.nBlobs,
+      streamDots: v.nSdots,
+      streamKnots: v.nSknots,
     };
   }
 
@@ -455,11 +541,13 @@ export class GpuStipple {
     ])
       b.destroy();
     this.ribbons.destroy();
+    this.vectors.unload();
     this.model = null;
   }
 
   destroy(): void {
     this.tiers.invalidate();
     this.destroyModel();
+    this.vectors.destroy();
   }
 }

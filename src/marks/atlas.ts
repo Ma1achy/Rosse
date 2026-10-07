@@ -82,7 +82,7 @@ export interface BuiltIndex {
   packer: number;
   sourceHash: string;
   atlases: Record<AtlasName, AtlasEntry>;
-  /** from packer 3 (M4): the vector sheets the engine reads on the CPU */
+  /** from packer 3 (M4): the vector sheets; from packer 4 (M5) all 12, with their metadata */
   vectors: Record<string, VectorEntry>;
   surfaces: { paper: SurfaceEntry };
 }

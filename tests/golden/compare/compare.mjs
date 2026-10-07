@@ -251,7 +251,7 @@ async function compareAll(G, node) {
     // v21's own variation (ADR 0015) and, from M4, v21's own stroke choices (v21-curves.ts) and
     // noise field (v21-noise.ts): both engines draw the same galaxy with the same pens, strokes,
     // flocculence and wobble, and only the dots differ
-    const opts = node.referenceOptions(rec.params);
+    const opts = node.referenceOptions(rec.params, rec.zoom ?? 1);
     const ref = node.reference(c.name);
     const refM = G.measure(ref);
     const refCounts = G.countsOf(rec.stats);
@@ -732,6 +732,24 @@ async function calibrate(G, node) {
         // than a galaxy with a sparse halo); the family's paA
         paEps0: Math.max(0.01, positionAngle(mine).paEps0),
       };
+      // ADR 0026 (widen-only): for the radii, the axis ratio and the position angle, the band is
+      // the larger of the band that applies to the preset now (the family's, or for the axis
+      // ratio the preset's own, set above) and 1.5 × the preset's own largest re-draw spread.
+      // Only a preset whose own spread exceeds that band gets a change, so none gets narrower.
+      const own = /** @type {Record<string, number>} */ (byPreset[preset]);
+      const fam = /** @type {Record<string, number>} */ (t);
+      for (const [k, m] of /** @type {const} */ ([
+        ['r25', 'r25Abs'],
+        ['r50', 'r50Abs'],
+        ['r90', 'r90Abs'],
+        ['q', 'qAbs'],
+      ])) {
+        const wide = ceil3(1.5 * (ps[m]?.max ?? 0));
+        if (wide > (own[k] ?? fam[k] ?? 0)) own[k] = wide;
+      }
+      const eps0 = /** @type {number} */ (own.paEps0);
+      const paWide = positionAngle(mine, { eps0, largest: true }).paA;
+      if (paWide > (fam.paA ?? 0)) own.paA = paWide;
     }
     parity[family].byPreset = byPreset;
     // the negative controls against these thresholds
@@ -814,15 +832,18 @@ async function calibrate(G, node) {
  * over the pairs above it, so that |Δpa| ≤ paA / (ε − paEps0).
  *
  * @param {any[]} list
+ * @param {{ eps0?: number, largest?: boolean }} [own] eps0: use this noise floor instead of the
+ *   fitted one; largest: the largest spread instead of the 95th percentile (ADR 0026)
  */
-function positionAngle(list) {
+function positionAngle(list, own = {}) {
   const eps = (/** @type {number} */ q) => (1 - q * q) / (1 + q * q);
   const p95 = (/** @type {number[]} */ xs) => {
     const s = xs.slice().sort((a, b) => a - b);
-    return s[Math.max(0, Math.ceil(0.95 * s.length) - 1)] ?? 0;
+    return s[own.largest ? s.length - 1 : Math.max(0, Math.ceil(0.95 * s.length) - 1)] ?? 0;
   };
   const ceil3 = (/** @type {number} */ x) => Math.ceil(x * 1000) / 1000;
-  const paEps0 = ceil3(1.5 * p95(list.map((c) => Math.abs(eps(c.render.q) - eps(c.ref.q)))));
+  const paEps0 =
+    own.eps0 ?? ceil3(1.5 * p95(list.map((c) => Math.abs(eps(c.render.q) - eps(c.ref.q)))));
   const above = list.filter((c) => eps(c.ref.q) > paEps0);
   const paA = ceil3(
     Math.max(0.5, 1.5 * p95(above.map((c) => Math.abs(c.paDiff) * (eps(c.ref.q) - paEps0)))),

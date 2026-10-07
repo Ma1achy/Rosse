@@ -226,29 +226,36 @@ export class RibbonBatch {
 /**
  * One layer of pen lines (ADR 0019): `prepass` unions its quads per sample into the pipeline's
  * coverage target (shared, and kept across rebuilds), outside the ink pass; `encode` resolves that
- * coverage over the ink.
+ * coverage over the ink. It draws each source's `count` quads, or, with `indirect`, as many as its
+ * draw arguments [6·n, 1, 0, 0] say (a compaction's output, `count` being the buffer's capacity).
  */
 export class CapsuleBatch {
   private readonly uniforms: GPUBuffer;
-  private readonly group: GPUBindGroup;
   private readonly maskView: GPUTextureView;
   private readonly resolveGroup: GPUBindGroup;
+  /** the layer's capsule buffers, each with its own draw: unioned in the one coverage target */
+  private readonly sources: { group: GPUBindGroup; count: number; indirect?: GPUBuffer }[];
+  readonly count: number;
 
   constructor(
     private readonly pipe: RibbonPipeline,
-    buffer: GPUBuffer,
-    readonly count: number,
+    sources: { buffer: GPUBuffer; count: number; indirect?: GPUBuffer | undefined }[],
     opts: DrawOpts,
   ) {
     const d = pipe.device;
     this.uniforms = drawUniforms(d, opts, null, 'pen-line uniforms');
-    this.group = d.createBindGroup({
-      layout: pipe.capsuleLayout,
-      entries: [
-        { binding: 0, resource: { buffer: this.uniforms } },
-        { binding: 4, resource: { buffer } },
-      ],
-    });
+    this.sources = sources.map((s) => ({
+      group: d.createBindGroup({
+        layout: pipe.capsuleLayout,
+        entries: [
+          { binding: 0, resource: { buffer: this.uniforms } },
+          { binding: 4, resource: { buffer: s.buffer } },
+        ],
+      }),
+      count: s.count,
+      ...(s.indirect ? { indirect: s.indirect } : {}),
+    }));
+    this.count = sources.reduce((n, s) => n + s.count, 0);
     this.maskView = pipe.penMaskTarget(opts.targetWidth, opts.targetHeight);
     this.resolveGroup = d.createBindGroup({
       layout: pipe.resolveLayout,
@@ -266,10 +273,12 @@ export class CapsuleBatch {
         { view: this.maskView, loadOp: 'clear', storeOp: 'store', clearValue: [0, 0, 0, 0] },
       ],
     });
-    if (this.count) {
-      pass.setPipeline(this.pipe.penMask);
-      pass.setBindGroup(0, this.group);
-      pass.draw(this.count * 6);
+    pass.setPipeline(this.pipe.penMask);
+    for (const s of this.sources) {
+      if (!s.count) continue;
+      pass.setBindGroup(0, s.group);
+      if (s.indirect) pass.drawIndirect(s.indirect, 0);
+      else pass.draw(s.count * 6);
     }
     pass.end();
   }

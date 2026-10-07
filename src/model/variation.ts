@@ -14,7 +14,7 @@ import { Draws } from '../core/rng';
 import { Stream } from '../core/streams';
 import type { Params } from '../core/params';
 import type { StrokesMeta } from '../marks/strokes';
-import type { VectorSheet } from '../marks/vector';
+import type { VectorLibrary, VectorSheet } from '../marks/vector';
 
 const f = Math.fround;
 
@@ -33,13 +33,16 @@ export const VariationIndex = {
 /** What makeVariation needs to know about the drawings. */
 export interface DrawingsMeta {
   dots: { src: readonly string[]; size: readonly number[] };
-  knots: { count: number };
-  stars: { count: number };
-  cores: { kind: readonly string[]; style: readonly string[] };
+  /** `src`: each drawing's source (M5: the used-drawings count) */
+  knots: { count: number; src?: readonly string[] };
+  stars: { count: number; src?: readonly string[] };
+  cores: { kind: readonly string[]; style: readonly string[]; src?: readonly string[] };
   /** the strokes sheet (M4): without it no curves are drawn */
   strokes?: StrokesMeta;
   /** the pen lines of the dust hatching and carving (M4): without them no hatches */
   penlines?: VectorSheet;
+  /** every vector sheet (M5): without them no drawn parts */
+  vectors?: Partial<VectorLibrary>;
 }
 
 export interface ArmVariation {

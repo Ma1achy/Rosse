@@ -2,14 +2,17 @@
  * The scene description of one galaxy (ADR 0003), shared by both engines: parameters, variation,
  * the stipple model's description, and the placed parts. Built on the CPU in microseconds.
  *
- * Layer order follows the reference's `scene()` (app23.js:L1289–1301) for what M2 draws:
- * stipple by population (old, disc, young), knots, sparkle stars, then cores.
+ * Layer order follows the reference's `scene()` (app23.js:L1289–1301): stroke ribbons, the
+ * vector drawings (hatching and placed parts: lines, dots, blobs), pieces, the stipple by
+ * population (old, disc, young), the streams' dots and knots, knots, sparkle stars, then cores.
  */
 import type { Params } from '../core/params';
 import type { AtlasName } from '../marks/atlas';
 import { Cls } from './classes';
 import type { StrokesMeta } from '../marks/strokes';
-import type { VectorSheet } from '../marks/vector';
+import type { VectorLibrary, VectorSheet } from '../marks/vector';
+import type { PartPicks } from './parts';
+import { describeVectors, type VectorDesc } from './vectors';
 import type { CurvePicks } from './curves';
 import type { RingKnotPick } from './clumps';
 import type { DustPicks } from './lanes';
@@ -24,6 +27,8 @@ export interface GalaxyScene {
   galaxy: GalaxyDesc;
   /** the line-work (M4): curves, dust lanes, carving lines, hatches */
   ribbons: RibbonDesc;
+  /** the placed vector drawings (M5): the parts' picks and their slots */
+  vectors: VectorDesc;
   meta: DrawingsMeta;
 }
 
@@ -41,6 +46,12 @@ export interface SceneOptions {
    * stroke draws an arm, and which spurs are drawn, are discrete random choices too.
    */
   curvePicks?: CurvePicks;
+  /**
+   * Place the parts with these picks (src/model/parts.ts `PartPicks`): which envelope, whole
+   * drawing, arms, bar, ring… and their spins. The golden runner passes v21's own, replayed from
+   * v21's parts stream (tests/golden/compare/v21-parts.ts, ADR 0021).
+   */
+  partPicks?: PartPicks;
   /**
    * The key of the placement streams, the seed by default: the stipple, ring knots and clumps, and
    * the dust lanes' own draws (each hatch's offset, angle, length and pen line, and which pen
@@ -89,10 +100,14 @@ export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {
     key,
     opts.dustPicks,
   );
-  return { P, variation, galaxy, ribbons, meta };
+  const vectors = describeVectors(P, variation, meta, P.incl, opts.partPicks);
+  return { P, variation, galaxy, ribbons, vectors, meta };
 }
 
-/** The stipple classes that are drawn, in draw order, with their atlas (after the line-work). */
+/**
+ * The stipple classes that are drawn, in draw order, with their atlas (after the line-work). The
+ * streams' dots and knots (old ink) go after `young` (scene(), app23.js:L1295).
+ */
 export const STIPPLE_LAYERS: readonly { cls: number; atlas: AtlasName; name: string }[] = [
   { cls: Cls.old, atlas: 'dots', name: 'old' },
   { cls: Cls.disc, atlas: 'dots', name: 'disc' },
@@ -114,6 +129,16 @@ export interface MarkCounts {
   ribbonSegments?: number;
   /** dust hatches (pen-line drawings) */
   hatches?: number;
+  /** placed vector drawings (parts), and the capsules, dots and blobs they expand to (M5) */
+  drawings?: number;
+  vectorCaps?: number;
+  vectorDots?: number;
+  vectorBlobs?: number;
+  /** the streams' dots and knots */
+  streamDots?: number;
+  streamKnots?: number;
+  /** source drawings used (`STATS.used`, app23.js:L1302), where the engine can tell */
+  used?: number;
   /** per population, for the colour plates and debugging */
   old: number;
   disc: number;
@@ -137,12 +162,13 @@ export function markCounts(perClass: ArrayLike<number>): MarkCounts {
 export function drawingsMeta(
   atlases: {
     dots: { meta: Record<string, unknown[]> };
-    knots: { layers: number };
-    stars: { layers: number };
+    knots: { layers: number; meta?: Record<string, unknown[]> };
+    stars: { layers: number; meta?: Record<string, unknown[]> };
     cores: { meta: Record<string, unknown[]> };
     strokes?: { meta: Record<string, unknown[]>; levels: { width: number; height: number }[] };
   },
   penlines?: VectorSheet,
+  vectors?: Partial<VectorLibrary>,
 ): DrawingsMeta {
   const s = atlases.strokes;
   const strokes: StrokesMeta | undefined = s
@@ -158,13 +184,21 @@ export function drawingsMeta(
   return {
     ...(strokes ? { strokes } : {}),
     ...(penlines ? { penlines } : {}),
+    ...(vectors ? { vectors } : {}),
     dots: {
       src: atlases.dots.meta.src as string[],
       size: atlases.dots.meta.size as number[],
     },
-    knots: { count: atlases.knots.layers },
-    stars: { count: atlases.stars.layers },
+    knots: {
+      count: atlases.knots.layers,
+      ...(atlases.knots.meta?.src ? { src: atlases.knots.meta.src as string[] } : {}),
+    },
+    stars: {
+      count: atlases.stars.layers,
+      ...(atlases.stars.meta?.src ? { src: atlases.stars.meta.src as string[] } : {}),
+    },
     cores: {
+      ...(atlases.cores.meta.src ? { src: atlases.cores.meta.src as string[] } : {}),
       kind: atlases.cores.meta.kind as string[],
       style: atlases.cores.meta.style as string[],
     },
