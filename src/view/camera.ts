@@ -498,7 +498,7 @@ export const INCL_CONTINUOUS: readonly {
   {
     line: 442,
     token: 'P.incl',
-    what: '`orientNow` (homes of overlays and lensed sources, M7, M9). Not purely continuous in v21: through `srcNow` it feeds the DISCRETE lens seed at L647, `mulberry32(P.seed * 733 + Math.round(bc[0] * 997))`, so orbiting re-rolls the lensed marks. M9 diverges deliberately: orbiting never re-rolls (docs/architecture.md)',
+    what: "`orientNow` (homes of overlays and lensed sources). M7 made the overlays' home explicit (`SceneOptions.home`, ADR 0030), so an overlay is a pure function of the parameters, the home and the camera. Not purely continuous in v21: through `srcNow` it feeds the DISCRETE lens seed at L647, `mulberry32(P.seed * 733 + Math.round(bc[0] * 997))`, so orbiting re-rolls the lensed marks. M9 diverges deliberately: orbiting never re-rolls (docs/architecture.md)",
   },
   { line: 498, token: 'P.incl', what: 'the merger framed from its 3D extent (view, M8)' },
   {

@@ -247,14 +247,14 @@ async function cpuEngine(scene: Scene, size: FrameSize): Promise<Engine> {
     capabilities: CAPABILITIES,
     size: () => current,
     stale: () => false,
-    async draw(P, zoom, _home, busy) {
+    async draw(P, zoom, home, busy) {
       await pending;
       // a merger's integration, or the shells' simulation, is this frame's model tier: say so
       const key = P.merger || P.shellsOn ? pageModelKey(P) : null;
       const building = key !== null && key !== builtKey;
       if (building) busy(true);
       try {
-        const d = await backend.draw(P, zoom);
+        const d = await backend.draw(P, zoom, home);
         counts = d.counts;
         tiers = d.tiers;
         builtKey = key;
@@ -375,7 +375,12 @@ async function gpuEngine(
      * first (asynchronously, in chunks), serialised by the frame queue; the device may be replaced
      * while they are, and then the frame fails as a lost device does and is drawn again.
      */
-    const inkScene = async (P: Params, zoom: number, busy: (on: boolean) => void) => {
+    const inkScene = async (
+      P: Params,
+      zoom: number,
+      home: Orientation,
+      busy: (on: boolean) => void,
+    ) => {
       const r = current();
       const st = stipple;
       if (!st) throw new Error('no stipple passes');
@@ -406,7 +411,7 @@ async function gpuEngine(
         readCounts = async () => (await m.readCounts()).counts;
         mode = 'merger';
       } else {
-        const work = st.frame(P, zoom, scene.meta);
+        const work = st.frame(P, zoom, scene.meta, { home });
         let sh: GpuShells | null = null;
         if (P.shellsOn && st.current) {
           sh = shellsPass ??= GpuShells.create(r.device);
@@ -457,8 +462,8 @@ async function gpuEngine(
       size: () => current().size,
       capabilities: CAPABILITIES,
       stale: () => stale,
-      draw(P, zoom, _home, busy) {
-        return inkScene(P, zoom, busy);
+      draw(P, zoom, home, busy) {
+        return inkScene(P, zoom, home, busy);
       },
       tierRuns() {
         const now = stipple?.tiers.runs ?? { model: 0, view: 0 };

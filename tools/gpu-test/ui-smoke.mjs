@@ -289,7 +289,7 @@ export async function uiSmokeCheck(browser, url) {
     if ((await page.locator('#c-arms').inputValue()) !== '5')
       fail(`${label}: ?arms=5 did not set the slider`);
 
-    // ---- a link cannot ask for what the engine does not draw (the lens, the sky)
+    // ---- a link cannot ask for what the engine does not draw (the lens)
     await page.goto(q('&preset=Lens%3A+Einstein+ring&lensR=1.5&spikes=0.9&starMix=0.1&arms=4'));
     await page.waitForFunction(() => (window.__rosse?.frames ?? 0) >= 1, undefined, BIG);
     await page.waitForFunction(() => location.search.includes('arms=4'), undefined, {
@@ -298,8 +298,10 @@ export async function uiSmokeCheck(browser, url) {
     const search = await page.evaluate(() => location.search);
     st = await rosse();
     if (st.preset !== 'Grand design') fail(`${label}: a lens preset was drawn (${st.preset})`);
-    for (const k of ['lensR', 'spikes', 'starMix'])
-      if (search.includes(`${k}=`)) fail(`${label}: the link kept ?${k}=`);
+    // the lens is not drawn; the stars and the sky are (M7), so their parameters stay
+    if (search.includes('lensR=')) fail(`${label}: the link kept ?lensR=`);
+    for (const k of ['spikes', 'starMix'])
+      if (!search.includes(`${k}=`)) fail(`${label}: the link dropped ?${k}=`);
     if (await page.locator('button.card[data-preset="Lens: Einstein ring"]').count())
       fail(`${label}: a card for a lens preset`);
 

@@ -22,8 +22,8 @@ import { surfaceCssCheck } from './surface-css.mjs';
 import { uiSmokeCheck } from './ui-smoke.mjs';
 
 // a page test waits this long: the tier hash test takes about 100 s alone on SwiftShader and over 3 min on
-// a machine shared with other jobs
-const TIMEOUT = 600_000;
+// a machine shared with other jobs (ROSSE_GPU_TIMEOUT_MS overrides)
+const TIMEOUT = Number(process.env.ROSSE_GPU_TIMEOUT_MS ?? 600_000);
 
 const requested = process.argv.slice(2).filter((a) => !a.startsWith('-'));
 const withCss = !requested.length || requested.includes('surface-css');

@@ -13,12 +13,16 @@ import { Cls } from './classes';
 import type { StrokesMeta } from '../marks/strokes';
 import type { VectorLibrary, VectorSheet } from '../marks/vector';
 import type { PartPicks } from './parts';
-import { describeVectors, type VectorDesc } from './vectors';
+import { describeVectors, packedLibrary, type VectorDesc } from './vectors';
 import type { CurvePicks } from './curves';
 import type { RingKnotPick } from './clumps';
 import type { DustPicks } from './lanes';
 import { packNoise, type NoiseTable } from '../core/noise';
-import { describeGalaxy, type GalaxyDesc } from './galaxy';
+import { describeGalaxy, rstarBound, type GalaxyDesc } from './galaxy';
+import { sheetStrides, type DynSpec } from './dynvec';
+import { describeStars, starSlotCapacity, type StarPicks, type StarsDesc } from './stars';
+import { describeSky, type SkyCatalogue, type SkyDesc } from './sky';
+import { cameraOf, orientationOf, type Orientation } from '../view/camera';
 import { describeRibbons, type RibbonDesc } from './ribbons';
 import { makeVariation, type DrawingsMeta, type Variation } from './variation';
 import type { MergerSceneOptions } from './merger';
@@ -33,6 +37,20 @@ export interface GalaxyScene {
   /** the placed vector drawings (M5): the parts' picks and their slots */
   vectors: VectorDesc;
   meta: DrawingsMeta;
+  /** the drawn stars' rows (M7): their capacity and the slots each owns (src/model/dynvec.ts) */
+  rstars: DynSpec;
+  /** a star or an artefact, and the overlays (M7); null when the parameters draw none */
+  stars: StarsDesc | null;
+  /** the deep field, the foreground stars and the companions (M7); null when there are none */
+  sky: SkyDesc | null;
+  /** the most mark slots the stars' marks can take (at the largest zoom): buffer sizes */
+  starSlots: number;
+  /**
+   * The home orientation of the overlays (open question Q3, option b): the camera they were placed
+   * at, which the camera then moves round. v21 remembers it from navigation history (`homeFor`);
+   * here it is a parameter, by default the camera of the parameters the scene is built from.
+   */
+  home: Orientation;
 }
 
 export interface SceneOptions {
@@ -75,6 +93,22 @@ export interface SceneOptions {
    * patchiness, the lanes' gaps and the hand wobble follow v21's pattern, as the variation does.
    */
   noise?: NoiseTable[];
+  /**
+   * Draw the stars and artefacts with these choices (src/model/stars.ts `StarPicks`): the golden
+   * runner passes v21's own, replayed from `starSprites` (tests/golden/compare/v21-stars.ts).
+   */
+  starPicks?: StarPicks;
+  /**
+   * Draw this sky catalogue (src/model/sky.ts): the golden runner passes v21's own, replayed from
+   * `buildSky` and `skyParts` (tests/golden/compare/v21-sky.ts).
+   */
+  sky?: SkyCatalogue;
+  /**
+   * The overlays' home orientation (the camera they are placed at). The default is the
+   * orientation of the parameters, which pins an overlay to the plate: a page that orbits passes
+   * the orientation of the preset it started from, and the golden runner the capture's home.
+   */
+  home?: Orientation;
   /** Calibration only (negative controls, ADR 0015): a truncation radius in place of RMAX. */
   rmax?: number;
   /** Calibration only (negative controls): every dot's quad scaled by this. */
@@ -94,10 +128,46 @@ export interface SceneOptions {
   shells?: ShellSceneOptions;
 }
 
-export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {}): GalaxyScene {
+/**
+ * A star or an artefact has no galaxy (render(), app23.js:L1229–1230: `generate` and `curves` are
+ * not called, and the galaxy's own parts are emptied): the parameters of everything a galaxy
+ * draws, off. The sky, the trails, cosmic rays, the arrow, the jet and the streams stay.
+ */
+export function withoutGalaxy(P: Params): Params {
+  return {
+    ...P,
+    stars: 0,
+    arms: 0,
+    irr: 0,
+    ring: 0,
+    bar: 0,
+    bulge: 0,
+    sersicN: 0,
+    lines: 0,
+    dust: 0,
+    dustLines: 0,
+    dustScribble: 0,
+    outline: 0,
+    tail: 0,
+    lens: 0,
+    shells: 0,
+    shellsOn: 0,
+    envelope: 0,
+    whole: 0,
+    nuclear: 0,
+    bubbles: 0,
+    merger: 0,
+    lensOn: 0,
+    companions: P.companions,
+  };
+}
+
+export function buildScene(P0: Params, meta: DrawingsMeta, opts: SceneOptions = {}): GalaxyScene {
+  const P = P0;
+  const Pg = P.subject === 'galaxy' ? P : withoutGalaxy(P);
   const variation = opts.variation ?? makeVariation(P, meta);
   const key = (opts.placementKey ?? P.seed) >>> 0;
-  const galaxy = describeGalaxy(P, variation, meta, {
+  const galaxy = describeGalaxy(Pg, variation, meta, {
     key,
     ...(opts.ringKnotPicks ? { ringKnots: opts.ringKnotPicks } : {}),
   });
@@ -106,7 +176,7 @@ export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {
   if (opts.dotScale !== undefined)
     galaxy.dotBase = galaxy.dotBase.map((x) => Math.fround(x * (opts.dotScale ?? 1)));
   const ribbons = describeRibbons(
-    P,
+    Pg,
     variation,
     meta.strokes,
     meta.penlines,
@@ -116,12 +186,15 @@ export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {
     key,
     opts.dustPicks,
   );
+  const lib = packedLibrary(meta.vectors);
+  const sky = describeSky(P, meta, lib, meta.fgstars?.count ?? 0, galaxy.g.key, opts.sky);
   const vectors = describeVectors(
-    P,
+    Pg,
     variation,
     meta,
     P.incl,
     opts.partPicks,
+    sky?.catalogue.companions,
     opts.tide,
     opts.tide !== undefined ? ribbons.lanes.hatches.map((h) => h.tile) : undefined,
   );
@@ -132,7 +205,29 @@ export function buildScene(P: Params, meta: DrawingsMeta, opts: SceneOptions = {
     ribbons.nHDots = 0;
     ribbons.nHBlobs = 0;
   }
-  return { P, variation, galaxy, ribbons, vectors, meta };
+  const stars = describeStars(P, variation, meta, opts.starPicks, galaxy.g.key);
+  const home = opts.home ?? orientationOf(cameraOf(P));
+  const strides = sheetStrides(vectors.lib, ['sstars']);
+  const rstars: DynSpec = {
+    rows:
+      strides.strideCaps + strides.strideDots + strides.strideBlobs
+        ? rstarBound(galaxy) + (stars?.nDrawn ?? 0)
+        : 0,
+    ...strides,
+  };
+  return {
+    P,
+    variation,
+    galaxy,
+    ribbons,
+    vectors,
+    meta,
+    rstars,
+    stars,
+    sky,
+    starSlots: stars ? starSlotCapacity(stars, P, home) : 0,
+    home,
+  };
 }
 
 /**
@@ -170,6 +265,8 @@ export interface MarkCounts {
   /** the streams' dots and knots */
   streamDots?: number;
   streamKnots?: number;
+  /** the capsules of the drawn stars (M7) */
+  starCaps?: number;
   /** source drawings used (`STATS.used`, app23.js:L1302), where the engine can tell */
   used?: number;
   /** per population, for the colour plates and debugging */
@@ -197,6 +294,7 @@ export function drawingsMeta(
     dots: { meta: Record<string, unknown[]> };
     knots: { layers: number; meta?: Record<string, unknown[]> };
     stars: { layers: number; meta?: Record<string, unknown[]> };
+    fgstars?: { layers: number; meta?: Record<string, unknown[]> };
     cores: { meta: Record<string, unknown[]> };
     strokes?: { meta: Record<string, unknown[]>; levels: { width: number; height: number }[] };
   },
@@ -230,6 +328,14 @@ export function drawingsMeta(
       count: atlases.stars.layers,
       ...(atlases.stars.meta?.src ? { src: atlases.stars.meta.src as string[] } : {}),
     },
+    ...(atlases.fgstars
+      ? {
+          fgstars: {
+            count: atlases.fgstars.layers,
+            ...(atlases.fgstars.meta?.src ? { src: atlases.fgstars.meta.src as string[] } : {}),
+          },
+        }
+      : {}),
     cores: {
       ...(atlases.cores.meta.src ? { src: atlases.cores.meta.src as string[] } : {}),
       kind: atlases.cores.meta.kind as string[],

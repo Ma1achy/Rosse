@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * `node tools/gpu-test/side-by-side.mjs [out dir] [--set m2|m3|m4|m5|m8]`: the new engine (WebGPU on
+ * `node tools/gpu-test/side-by-side.mjs [out dir] [--set m2|m3|m4|m5|m7|m8]`: the new engine (WebGPU on
  * SwiftShader, the page with `?present=copy`) beside v21's capture of the same case
  * (tests/golden/reference/<name>.plate.jpg), as small JPEGs for the milestone notes. The page is
  * given the capture's camera (az, incl, pa) and zoom. Default: the m2 set, in docs/milestones/m2.
@@ -108,6 +108,23 @@ const SETS = {
     ],
     ['radio-jet-s7-zoom', 'radio-jet--vectors__s7__zoom', 'Radio jet', 7, 'vectors'],
   ],
+  m7: [
+    [
+      'star-bright-s7',
+      'star-bright-with-spikes--stars__s7__home',
+      'Star: bright, with spikes',
+      7,
+      'stars',
+    ],
+    [
+      'layered-spiral-star-s4242-orbit',
+      'layered-spiral-beside-a-bright-star--layered__s4242__orbit',
+      'Layered: spiral beside a bright star',
+      4242,
+      'layered',
+    ],
+    ['deep-field-s7', 'deep-field--sky__s7__home', 'Deep field', 7, 'sky'],
+  ],
   m8: [
     ['the-mice-s7', 'merger-the-mice--mergers__s7__home', 'Merger: the Mice', 7, 'mergers'],
     [
@@ -120,7 +137,7 @@ const SETS = {
     ['shell-galaxy-s7', 'shell-galaxy--shells__s7__home', 'Shell galaxy', 7, 'mergers'],
   ],
 };
-const CASES = SETS[/** @type {'m2' | 'm3' | 'm4' | 'm5' | 'm6' | 'm6all' | 'm8'} */ (set)];
+const CASES = SETS[/** @type {'m2' | 'm3' | 'm4' | 'm5' | 'm6' | 'm6all' | 'm7' | 'm8'} */ (set)];
 if (!CASES) throw new Error(`unknown set ${set}`);
 
 prepareAssets();
@@ -143,7 +160,7 @@ try {
     if (variant === 'single') {
       // M6: the plates as the page shows them, on the capture's surface (v21's variation, stroke
       // choices, noise and part picks, as the comparison draws)
-      const opts = node.referenceOptions(rec.params, rec.zoom ?? 1);
+      const opts = node.referenceOptions(rec.params, rec.zoom ?? 1, rec.preset);
       await page.goto(`${server.url}/tests/golden/render.html`);
       await page.waitForFunction(() => window.__golden !== undefined, undefined, {
         timeout: 120_000,
@@ -170,10 +187,12 @@ try {
       );
       ours = Buffer.from(png, 'base64');
       label = "new engine (WebGPU), with v21's variation, strokes, noise and part picks";
-    } else if (variant === 'ribbons' || variant === 'vectors' || variant === 'mergers') {
+    } else if (
+      ['ribbons', 'vectors', 'stars', 'layered', 'sky', 'mergers'].includes(String(variant))
+    ) {
       // M4, M5: the golden runner's draw, with v21's variation, stroke choices, noise and part
       // picks (as the comparison draws), the ink alpha shown over the plate's field colour
-      const opts = node.referenceOptions(rec.params, rec.zoom ?? 1);
+      const opts = node.referenceOptions(rec.params, rec.zoom ?? 1, rec.preset);
       await page.goto(`${server.url}/tests/golden/render.html`);
       await page.waitForFunction(() => window.__golden !== undefined, undefined, {
         timeout: 120_000,

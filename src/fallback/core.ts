@@ -19,6 +19,7 @@ import { CpuRenderer } from './index';
 import { CpuMerger } from './merger';
 import { CpuShellScene } from './shells';
 import { CpuStippleTiers } from './stipple';
+import { cameraOf, orientationOf, type Orientation } from '../view/camera';
 
 export interface CpuSize {
   plateCss: number;
@@ -74,7 +75,7 @@ export class CpuEngineCore {
   }
 
   /** The tiers these parameters and zoom need (the view only for a camera move), not yet inked. */
-  draw(P: Params, zoom: number): CpuDrawn {
+  draw(P: Params, zoom: number, home: Orientation = orientationOf(cameraOf(P))): CpuDrawn {
     const r = this.renderer;
     if (P.merger) {
       const key = pageModelKey(P);
@@ -92,7 +93,7 @@ export class CpuEngineCore {
       this.counts = v.counts;
       this.mode = 'merger';
     } else {
-      const { view, work } = this.stipple.frame(P, zoom);
+      const { view, work } = this.stipple.frame(P, zoom, { home });
       let shellsView: { layers: InkLayer[]; dots: number } | null = null;
       if (P.shellsOn && this.stipple.stipple) {
         const key = pageModelKey(P);

@@ -6,9 +6,6 @@
   "surface": "paper",
   "variant": "vectors",
   "overrides": {
-    "starMix": 0,
-    "field": 0,
-    "fgstars": 0,
     "shellsOn": 0,
     "shells": 1
   },
@@ -16,7 +13,7 @@
     "load page (theme light)",
     "__GEN.preset(\"Shell galaxy\")",
     "__GEN.set({ seed: 4242 })",
-    "__GEN.set({\"starMix\":0,\"field\":0,\"fgstars\":0,\"shellsOn\":0,\"shells\":1})",
+    "__GEN.set({\"shellsOn\":0,\"shells\":1})",
     "__GEN.zoom(2)"
   ],
   "zoom": 2,
@@ -25,13 +22,13 @@
     800
   ],
   "stats": {
-    "rstars": 0,
-    "dots": 9000,
+    "rstars": 384,
+    "dots": 9789,
     "knots": 0,
     "stars": 0,
     "curves": 0,
-    "used": 2,
-    "ms": 16
+    "used": 35,
+    "ms": 86
   },
   "hand": [
     44,
@@ -97,7 +94,7 @@
     "lens": 0,
     "shells": 1,
     "tail": 0,
-    "fgstars": 0,
+    "fgstars": 0.3,
     "trails": 0,
     "arrow": 0,
     "plates": "ink",
@@ -136,9 +133,9 @@
     "ovArtefact": "none",
     "mTime": 1,
     "az": 0,
-    "starMix": 0,
+    "starMix": 0.6,
     "dustScribble": 0.5,
-    "field": 0,
+    "field": 0.3,
     "dustLines": 0,
     "bubbles": 0.4,
     "streams": 0,
@@ -172,6 +169,6 @@
     "shellStars": 6000
   },
   "pageErrors": [],
-  "inkPixelSha256": "a48dbb5d719cd0e2635101ac7fd35884c25612628da02ecc62f10b58ae6e1de1",
-  "captured": "2026-10-06T12:38:26.752Z"
+  "inkPixelSha256": "7b43c3c4ea144e430eb4416c53f8fd734054c8ad1a3faf0c5deaa4c1ef372def",
+  "captured": "2026-10-06T17:33:02.159Z"
 }

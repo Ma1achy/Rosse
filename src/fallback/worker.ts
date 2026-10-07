@@ -21,7 +21,7 @@ async function handle(m: CpuRequest): Promise<{ reply: CpuReply; transfer?: Tran
       return { reply: { id: m.id, ok: true, op: 'init' } };
     }
     case 'draw':
-      return { reply: { id: m.id, ok: true, op: 'draw', ...need().draw(m.P, m.zoom) } };
+      return { reply: { id: m.id, ok: true, op: 'draw', ...need().draw(m.P, m.zoom, m.home) } };
     case 'resize':
       need().resize(m.size);
       return { reply: { id: m.id, ok: true, op: 'resize' } };

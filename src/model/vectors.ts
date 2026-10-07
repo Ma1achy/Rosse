@@ -23,6 +23,7 @@ import { PLATE, UNIT_SCALE, project, type Camera } from '../view/camera';
 import type { RibbonDesc } from './ribbons';
 import { wobbleAmplitude } from '../view/warp';
 import { describeParts, vectorRows, type PartPicks, type PartsDesc, type VectorRow } from './parts';
+import type { CompanionPick } from './sky';
 import { penWeights, type DrawingsMeta, type Variation } from './variation';
 
 const f = Math.fround;
@@ -148,6 +149,14 @@ export interface VectorDesc {
   penDot: number;
   /** 0.55 + 0.45 · streams: a stream mark is kept when its draw is at most this (L1077) */
   streamKeep: number;
+  /** the sky's companions, placed with the parts (M7) */
+  companions?: readonly CompanionPick[];
+  /**
+   * A dynamic set (M7: the drawn stars, the deep field's drawings): its instance rows are written
+   * by a compute pass each view (compute/dyn-rows.wgsl) at fixed strides of slots, not by the CPU
+   * (src/model/dynvec.ts); `nInst` is its capacity.
+   */
+  dynamic?: boolean;
   /** a merging galaxy (0 or 1): every drawing is carried by that galaxy's tides (M8) */
   tide?: number;
   /**
@@ -195,18 +204,26 @@ export function describeVectors(
   meta: DrawingsMeta,
   incl: number,
   picks?: PartPicks,
+  companions?: readonly CompanionPick[],
   tide?: number,
   hatchTiles?: readonly number[],
 ): VectorDesc {
   const lib = packedLibrary(meta.vectors);
   const parts = describeParts(P, V, meta, incl, picks);
-  const rows = vectorRows(P, V, meta, parts, {
-    incl,
-    az: P.az || 0,
-    pa: P.pa,
-    winding: P.winding,
-    zoom: 1,
-  });
+  const rows = vectorRows(
+    P,
+    V,
+    meta,
+    parts,
+    {
+      incl,
+      az: P.az || 0,
+      pa: P.pa,
+      winding: P.winding,
+      zoom: 1,
+    },
+    companions,
+  );
   const drawings: number[] = [];
   const warps: number[] = [];
   const capFirst: number[] = [];
@@ -257,6 +274,7 @@ export function describeVectors(
     penLine: pen.line,
     penDot: pen.dot,
     streamKeep: 0.55 + 0.45 * P.streams,
+    ...(companions?.length ? { companions } : {}),
     ...(tide !== undefined ? { tide } : {}),
     ...(tide !== undefined && hatchTiles ? { hatchTiles: [...hatchTiles] } : {}),
   };
@@ -354,7 +372,7 @@ export function vectorView(
   r2 = 0,
   hatches: readonly VectorRow[] = [],
 ): VectorView {
-  const rows = [...vectorRows(P, V, meta, D.parts, cam), ...hatches];
+  const rows = [...vectorRows(P, V, meta, D.parts, cam, D.companions), ...hatches];
   if (rows.length !== D.nInst) throw new Error('the placed drawings changed with the view');
   const inst = new ArrayBuffer(Math.max(1, rows.length) * VINST_LAYOUT.size);
   const fl = new Float32Array(inst);

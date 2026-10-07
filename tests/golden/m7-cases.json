@@ -1,0 +1,65 @@
+{
+  "about": "The M7 golden cases (npm run capture:reference -- --extra tests/golden/m7-cases.json): stars, artefacts, the layered scenes and the deep field exactly as v21 draws them, with no overrides (the lensed merger waits for M8 and M9), at seeds 7 and 4242 and the home, orbit and zoom cameras. In the layered scenes the overlays are placed at the preset's own orientation, from which the orbit camera moves round them (ADR 0030).",
+  "cases": [
+    {
+      "preset": "Star: bright, with spikes",
+      "variant": "stars",
+      "overrides": {},
+      "zoom": [7, 4242]
+    },
+    {
+      "preset": "Star: faint",
+      "variant": "stars",
+      "overrides": {},
+      "zoom": [7, 4242]
+    },
+    {
+      "preset": "Artefact: satellite trail",
+      "variant": "stars",
+      "overrides": {},
+      "zoom": [7, 4242]
+    },
+    {
+      "preset": "Artefact: ghost reflection",
+      "variant": "stars",
+      "overrides": {},
+      "zoom": [7, 4242]
+    },
+    {
+      "preset": "Artefact: cosmic rays",
+      "variant": "stars",
+      "overrides": {},
+      "zoom": [7, 4242]
+    },
+    {
+      "preset": "Layered: spiral beside a bright star",
+      "variant": "layered",
+      "overrides": {},
+      "zoom": [7, 4242]
+    },
+    {
+      "preset": "Layered: barred spiral, satellite trail",
+      "variant": "layered",
+      "overrides": {},
+      "zoom": [7, 4242]
+    },
+    {
+      "preset": "Layered: edge-on, star on top",
+      "variant": "layered",
+      "overrides": {},
+      "zoom": [7, 4242]
+    },
+    {
+      "preset": "Layered: ringed galaxy, ghost reflection",
+      "variant": "layered",
+      "overrides": {},
+      "zoom": [7, 4242]
+    },
+    {
+      "preset": "Deep field",
+      "variant": "sky",
+      "overrides": {},
+      "zoom": [7, 4242]
+    }
+  ]
+}

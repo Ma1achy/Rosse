@@ -5,16 +5,12 @@
   "camera": "zoom",
   "surface": "paper",
   "variant": "vectors",
-  "overrides": {
-    "starMix": 0,
-    "field": 0,
-    "fgstars": 0
-  },
+  "overrides": {},
   "sequence": [
     "load page (theme light)",
     "__GEN.preset(\"Radio jet\")",
     "__GEN.set({ seed: 7 })",
-    "__GEN.set({\"starMix\":0,\"field\":0,\"fgstars\":0})",
+    "__GEN.set({})",
     "__GEN.zoom(2)"
   ],
   "zoom": 2,
@@ -23,13 +19,13 @@
     800
   ],
   "stats": {
-    "rstars": 0,
-    "dots": 9500,
+    "rstars": 401,
+    "dots": 9894,
     "knots": 0,
     "stars": 0,
     "curves": 0,
-    "used": 2,
-    "ms": 61
+    "used": 46,
+    "ms": 85
   },
   "hand": [
     44,
@@ -95,7 +91,7 @@
     "lens": 0,
     "shells": 0,
     "tail": 0,
-    "fgstars": 0,
+    "fgstars": 0.3,
     "trails": 0,
     "arrow": 0,
     "plates": "ink",
@@ -134,9 +130,9 @@
     "ovArtefact": "none",
     "mTime": 1,
     "az": 0,
-    "starMix": 0,
+    "starMix": 0.6,
     "dustScribble": 0.5,
-    "field": 0,
+    "field": 0.4,
     "dustLines": 0,
     "bubbles": 0.4,
     "streams": 0,
@@ -170,6 +166,6 @@
     "shellStars": 6000
   },
   "pageErrors": [],
-  "inkPixelSha256": "7d7139316225ebe19e062b84315800ffde08fb3ebf438edfc4d3210caa7f69f6",
-  "captured": "2026-10-06T12:37:34.506Z"
+  "inkPixelSha256": "29edb4c458435afa1d1ecc573936c677ca40f1032c53c7039d18f5873529ec1f",
+  "captured": "2026-10-06T17:32:13.293Z"
 }

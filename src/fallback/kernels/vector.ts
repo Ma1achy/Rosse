@@ -25,6 +25,7 @@ import type { NoiseField } from '../../core/noise';
 import { DRAWING_WORDS, type PackedVectors } from '../../marks/vector';
 import { KNOT_POOL } from '../../model/galaxy';
 import { CAPSULE_WORDS } from '../../model/ribbons';
+import { INACTIVE } from '../../model/dynvec';
 import { STREAM_SEG_WORDS, VINST_WORDS, WarpKind, type VectorView } from '../../model/vectors';
 import { smWarp } from '../../view/warp';
 import { INSTANCE_WORDS } from './project';
@@ -181,6 +182,10 @@ export function expandCap(X: VectorInputs, i: number, out: Float32Array): number
   const k = i - I.capFirst;
   const T = X.lib.table;
   const o = I.drawing * DRAWING_WORDS;
+  if (I.drawing === INACTIVE || (I.warp === WarpKind.none && k >= (T[o + 1] ?? 0))) {
+    out.fill(0, i * CAPSULE_WORDS, (i + 1) * CAPSULE_WORDS);
+    return 1;
+  }
   const S = X.lib.segs;
   let ra: [number, number];
   let rb: [number, number];
@@ -235,6 +240,13 @@ export function expandCap(X: VectorInputs, i: number, out: Float32Array): number
 /** 2. Dot `i` as a `dots` sprite (INSTANCE_WORDS). */
 export function expandDot(X: VectorInputs, i: number, outF: Float32Array, outU: Uint32Array) {
   const I = instOf(X, i, 19);
+  if (
+    I.drawing === INACTIVE ||
+    i - I.dotFirst >= (X.lib.table[I.drawing * DRAWING_WORDS + 3] ?? 0)
+  ) {
+    outF.fill(0, i * INSTANCE_WORDS, (i + 1) * INSTANCE_WORDS);
+    return;
+  }
   const d = ((X.lib.table[I.drawing * DRAWING_WORDS + 2] ?? 0) + i - I.dotFirst) * 4;
   const D = X.lib.dots;
   const [px, py] = tf(X, I, D[d] ?? 0, D[d + 1] ?? 0);
@@ -257,6 +269,13 @@ export function expandDot(X: VectorInputs, i: number, outF: Float32Array, outU: 
 /** 3. Blob `i` as a `knots` sprite. */
 export function expandBlob(X: VectorInputs, i: number, outF: Float32Array, outU: Uint32Array) {
   const I = instOf(X, i, 20);
+  if (
+    I.drawing === INACTIVE ||
+    i - I.blobFirst >= (X.lib.table[I.drawing * DRAWING_WORDS + 5] ?? 0)
+  ) {
+    outF.fill(0, i * INSTANCE_WORDS, (i + 1) * INSTANCE_WORDS);
+    return;
+  }
   const b = ((X.lib.table[I.drawing * DRAWING_WORDS + 4] ?? 0) + i - I.blobFirst) * 8;
   const B = X.lib.blobs;
   const [px, py] = tf(X, I, B[b] ?? 0, B[b + 1] ?? 0);

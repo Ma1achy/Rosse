@@ -6,6 +6,16 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- M7, stars and artefacts:
+  - Drawn stars (`sstars`) through the vector-expand path as a dynamic set (`model/dynvec`), with the RSP breathing-room filter as a pure view filter (`compute/breathe.wgsl`); ring-knot and clump stars.
+  - `starSprites` on the GPU with its CPU twin (`model/stars`, `compute/star-marks.wgsl`, `fallback/kernels/star-marks.ts`): heart knots, power-law glare, spikes, faint rings with lattice noise, the bleed column, the drawn star at the core, fainter nearby stars, trails, ghost reflections and cosmic rays, on counter-RNG named streams, compacted deterministically.
+  - Overlays (a bright foreground star, an artefact) with an explicit home orientation, `SceneOptions.home` (ADR 0030, open question Q3 answered: a deliberate divergence; the page keeps its home).
+  - The sky (`model/sky`, `compute/sky.wgsl`, `render/sky.ts`): a catalogue of up to 6,000 galaxies in perspective with up to 150 dots and a drawing each, foreground stars, companions, per-view dispatch bounds, and a `weak_lens` hook for M9 (ADR 0032).
+  - Goldens: `tests/golden/m7-cases.json` (`Star`, `Artefact`, `Layered`, `Deep field` at seeds 7 and 4242, home, orbit and zoom, no overrides; variants `stars`, `layered`, `sky`), with v21's star and sky choices replayed from its own code (`compare/v21-stars.ts`, `v21-sky.ts`); the `starMix`, `field` and `fgstars` overrides of M2 to M6's cases are removed and those captures made again (ADR 0031, 0033).
+  - On the page (M11's pages): `Engine.capabilities.stars` on, so the star, artefact, in-the-field, deep-field, foreground-star and drawn-star controls and presets appear; the overlays' home orientation is `wanted.home`, passed through the CPU engine's worker and the GPU engine's model tier; engine-rendered thumbnails of the star, artefact, layered and deep-field presets.
+  - Golden calibration after the merge with M5 (ADR 0035, proposed): the dots' count tolerance from the engine's re-draw spread (`countsBy`, counts-only `--calibrate-counts`), `--families` reaching the calibration's shards, `--factor`, per-preset widening of the moment, extent and SSIM tolerances, the star, artefact, layered, deep-field, spiral and smooth families calibrated with the stars on (`Edge-on with dust` keeps M5's thresholds), engine goldens made again. Calibration factor 2 (the owner's choice). v21 drawn again for three cases and compared as the mean of its draws (ADR 0036, proposed; `capture:reference --redraws`, `tests/golden/v21-redraws.json`).
+
+
 - M11, the page and UI (docs/milestones/m11):
   - The page on the design language: Paper and Chalkboard, v21's recipe of cards generated from the schema (`src/ui/layout.ts`, `controls.ts`), hand-lettered tabs, a post-it pile, a taped print, preset cards with thumbnails drawn by this engine (`npm run thumbnails`), Surprise me, New stars, the seed, PNG export (`snapshot()` on both engines), and the "drawn on the CPU" note.
   - The merger and the simulated shells are drawn by the page, built inside the frame queue (`Engine.draw` is asynchronous), with the timeline (play, scrub, end up to 30, loop, speed); `mTime` runs to the horizon (schema range 0 to 30).

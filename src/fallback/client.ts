@@ -11,10 +11,11 @@ import type { SurfaceName } from '../render/surface';
 import type { DrawingsMeta } from '../model/variation';
 import { CpuEngineCore, type CpuDrawn, type CpuFrame, type CpuSize } from './core';
 import type { CpuReply, CpuRequest } from './protocol';
+import { cameraOf, orientationOf, type Orientation } from '../view/camera';
 
 export interface CpuBackend {
   readonly where: 'worker' | 'main thread';
-  draw(P: Params, zoom: number): Promise<CpuDrawn>;
+  draw(P: Params, zoom: number, home?: Orientation): Promise<CpuDrawn>;
   resize(size: CpuSize): Promise<void>;
   present(surface: SurfaceName, plates: Plates): Promise<CpuFrame>;
   /** The ink layers of the last draw, copied from the worker (the SVG export, M12). */
@@ -30,8 +31,8 @@ export class LocalCpu implements CpuBackend {
     this.core = new CpuEngineCore(atlases, paper, meta, size);
   }
 
-  draw(P: Params, zoom: number) {
-    return Promise.resolve(this.core.draw(P, zoom));
+  draw(P: Params, zoom: number, home: Orientation = orientationOf(cameraOf(P))) {
+    return Promise.resolve(this.core.draw(P, zoom, home));
   }
   resize(size: CpuSize) {
     this.core.resize(size);
@@ -88,8 +89,8 @@ export class WorkerCpu implements CpuBackend {
     });
   }
 
-  async draw(P: Params, zoom: number) {
-    const r = await this.request({ op: 'draw', P, zoom });
+  async draw(P: Params, zoom: number, home: Orientation = orientationOf(cameraOf(P))) {
+    const r = await this.request({ op: 'draw', P, zoom, home });
     if (r.op !== 'draw') throw new Error('unexpected reply');
     return { counts: r.counts, tiers: r.tiers };
   }

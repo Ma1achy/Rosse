@@ -4,10 +4,11 @@ import type { InkLayer } from '../render/layers';
 import type { Plates } from '../render/plates';
 import type { SurfaceName } from '../render/surface';
 import type { CpuDrawn, CpuSize } from './core';
+import type { Orientation } from '../view/camera';
 
 export type CpuRequest =
   | { id: number; op: 'init'; base: string; size: CpuSize }
-  | { id: number; op: 'draw'; P: Params; zoom: number }
+  | { id: number; op: 'draw'; P: Params; zoom: number; home: Orientation }
   | { id: number; op: 'resize'; size: CpuSize }
   | { id: number; op: 'present'; surface: SurfaceName; plates: Plates }
   | { id: number; op: 'layers' };

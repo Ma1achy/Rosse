@@ -6,7 +6,7 @@ import { CpuStipple } from '../../src/fallback/stipple';
 import { buildScene } from '../../src/model/scene';
 import { PALETTES } from '../../src/render/palette';
 import { SURFACES } from '../../src/render/surface';
-import { cameraOf } from '../../src/view/camera';
+import { cameraOf, orientationOf } from '../../src/view/camera';
 import { loadAtlases, loadVectors, metaOf } from '../golden/compare/engine-cpu';
 
 const ROOT = new URL('../..', import.meta.url).pathname;
@@ -38,8 +38,13 @@ describe('CpuEngineCore (what the worker runs)', () => {
   it('runs the view tier only for a camera move, and nothing for a surface change', () => {
     const P = presetParams('Smooth, round', 7);
     const core = new CpuEngineCore(atlases, paper, meta, size);
-    expect(core.draw(P, 1).tiers).toEqual({ model: 1, view: 1 });
-    expect(core.draw({ ...P, az: (P.az + 20) % 360 }, 1).tiers).toEqual({ model: 1, view: 2 });
+    // the overlays' home is the camera the page placed the scene at: it does not move with a drag
+    const home = orientationOf(cameraOf(P));
+    expect(core.draw(P, 1, home).tiers).toEqual({ model: 1, view: 1 });
+    expect(core.draw({ ...P, az: (P.az + 20) % 360 }, 1, home).tiers).toEqual({
+      model: 1,
+      view: 2,
+    });
     const paperFrame = core.present('paper', 'ink');
     const chalkFrame = core.present('chalk', 'ink');
     expect(chalkFrame.pixels).not.toEqual(paperFrame.pixels);
