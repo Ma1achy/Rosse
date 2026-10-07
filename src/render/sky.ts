@@ -375,7 +375,8 @@ export class GpuSky {
         source: {
           buffer: m.dots,
           offset: 0,
-          size: Math.max(16, m.bound * SKY_DOTS_PER_GALAXY * ib),
+          // the capacity, not this view's bound: the binding must not move with the camera (ADR 0070)
+          size: Math.max(16, S.visCap * SKY_DOTS_PER_GALAXY * ib),
           indirect: m.dotArgs,
           indirectOffset: 0,
         },

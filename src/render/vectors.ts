@@ -378,6 +378,8 @@ export class GpuVectors {
         gain: 1,
         indirect: m.caps.args,
       });
+    // the binding covers the set's capacity, not this view's live count (the indirect arguments hold
+    // that): a size that moved with the view would make a new batch for every camera move (ADR 0070)
     const sprites = (atlas: 'dots' | 'knots', buffer: GPUBuffer, n: number, args: GPUBuffer) =>
       out.push({
         kind: 'gpu-sprites',
@@ -391,8 +393,8 @@ export class GpuVectors {
           indirectOffset: 0,
         },
       });
-    if (D.nDots) sprites('dots', b[11] as GPUBuffer, m.live.dots, m.dotArgs);
-    if (D.nBlobs) sprites('knots', b[12] as GPUBuffer, m.live.blobs, m.blobArgs);
+    if (D.nDots) sprites('dots', b[11] as GPUBuffer, D.nDots, m.dotArgs);
+    if (D.nBlobs) sprites('knots', b[12] as GPUBuffer, D.nBlobs, m.blobArgs);
     return out;
   }
 
