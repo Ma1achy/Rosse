@@ -10,7 +10,8 @@
  * CPU twin: src/fallback/kernels/ribbons.ts.
  */
 import ribbonsWgsl from '../shaders/compute/ribbons.wgsl';
-import { bufferWithData, packStruct } from '../gpu/buffers';
+import { packStruct } from '../gpu/buffers';
+import type { GpuResources } from '../gpu/pool';
 import { INSTANCE_LAYOUT } from '../marks/instance';
 import {
   CAPSULE_LAYOUT,
@@ -64,9 +65,10 @@ export class GpuRibbons {
   private constructor(
     readonly device: GPUDevice,
     private readonly pipes: Record<Entry, GPUComputePipeline>,
+    private readonly res: GpuResources,
   ) {}
 
-  static create(device: GPUDevice): GpuRibbons {
+  static create(device: GPUDevice, res: GpuResources): GpuRibbons {
     const module = device.createShaderModule({ label: 'ribbons.wgsl', code: ribbonsWgsl });
     const pipes = Object.fromEntries(
       ENTRIES.map((e) => [
@@ -78,7 +80,7 @@ export class GpuRibbons {
         }),
       ]),
     ) as Record<Entry, GPUComputePipeline>;
-    return new GpuRibbons(device, pipes);
+    return new GpuRibbons(device, pipes, res);
   }
 
   get desc(): RibbonDesc | null {
@@ -108,10 +110,10 @@ export class GpuRibbons {
   ): void {
     this.destroy();
     const d = this.device;
-    const buf = (bytes: number, usage: number, label: string) =>
-      d.createBuffer({ label, size: Math.max(16, bytes), usage });
+    const res = this.res;
+    const buf = (bytes: number, usage: number, label: string) => res.scratch(bytes, usage, label);
     const data = (x: ArrayBuffer | ArrayBufferView<ArrayBuffer>, label: string, usage = STORAGE) =>
-      bufferWithData(d, x, usage, label);
+      res.data(x, usage, label);
     const src = STORAGE | GPUBufferUsage.COPY_SRC;
     const own: GPUBuffer[] = [];
     const keep = (b: GPUBuffer) => {
@@ -129,11 +131,12 @@ export class GpuRibbons {
       7: keep(data(R.pieces, 'stroke pieces')),
       8: keep(buf(Math.max(1, R.nSegs) * RIBBON_SEG_LAYOUT.size, src, 'ribbon segments')),
       9: keep(buf(Math.max(1, R.pieceCap) * INSTANCE_LAYOUT.size, src, 'pieces')),
+      // written by the GPU (the pieces' count): its own buffer, never a shared upload
       10: keep(
-        data(
+        res.init(
           new Uint32Array([4, 0, 0, 0]),
-          'pieces draw args',
           STORAGE | GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC,
+          'pieces draw args',
         ),
       ),
       11: keep(data(R.hatchBuf, 'hatches')),
@@ -327,7 +330,7 @@ export class GpuRibbons {
 
   destroy(): void {
     this.model?.own.forEach((b) => {
-      b.destroy();
+      this.res.release(b);
     });
     this.model = null;
   }

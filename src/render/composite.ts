@@ -132,6 +132,7 @@ export class CompositePass {
     plateCss: number,
     dpr: number,
     plates: Plates = 'ink',
+    timestampWrites?: GPURenderPassTimestampWrites,
   ): void {
     const key = `${String(plateCss)}|${String(dpr)}|${plates}`;
     let perSurface = this.bindings.get(surface);
@@ -166,6 +167,7 @@ export class CompositePass {
     }
     const pass = encoder.beginRenderPass({
       label: 'composite',
+      ...(timestampWrites ? { timestampWrites } : {}),
       colorAttachments: [
         { view: output, loadOp: 'clear', storeOp: 'store', clearValue: [0, 0, 0, 1] },
       ],

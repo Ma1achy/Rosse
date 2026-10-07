@@ -24,6 +24,7 @@
     "prepare-assets": "node tools/pack-atlas/pack.mjs",
     "screenshots": "node tools/gpu-test/screenshot.mjs",
     "golden": "node tests/golden/compare/compare.mjs",
+    "perf": "node tools/perf/perf.mjs",
     "capture:reference": "node tools/capture-reference/capture.mjs",
     "profile:reference": "node tools/profile-reference/profile.mjs",
     "spike": "node spikes/vector-lines/run.mjs",

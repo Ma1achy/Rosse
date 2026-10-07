@@ -11,11 +11,29 @@ import { createServer } from 'vite';
 
 export const ROOT = resolve(import.meta.dirname, '../..');
 
-export const CHROMIUM_ARGS = [
-  '--enable-unsafe-webgpu',
-  '--use-webgpu-adapter=swiftshader',
-  '--enable-features=Vulkan',
-];
+/**
+ * Which WebGPU adapter Chromium uses, from `ROSSE_WEBGPU_ADAPTER` (M10):
+ *
+ * - unset or `swiftshader`: SwiftShader, the software adapter of CI and of every checked-in golden;
+ * - `hardware` (or `default`): whatever Chromium picks, a real GPU on a machine that has one (no
+ *   adapter flag; Vulkan is enabled and, on a headless Linux box, the GPU sandbox flag is left to
+ *   the caller's `ROSSE_CHROMIUM_ARGS`);
+ * - anything else is passed to `--use-webgpu-adapter=` (for example `d3d12`, `metal`, `vulkan`).
+ *
+ * `ROSSE_CHROMIUM_ARGS` adds extra space-separated flags. The label is what reports print.
+ */
+export const ADAPTER_CHOICE =
+  (process.env.ROSSE_WEBGPU_ADAPTER ?? 'swiftshader').trim() || 'swiftshader';
+
+/** @param {string} choice */
+export function chromiumArgs(choice = ADAPTER_CHOICE) {
+  const extra = (process.env.ROSSE_CHROMIUM_ARGS ?? '').split(/\s+/).filter(Boolean);
+  const adapter =
+    choice === 'hardware' || choice === 'default' ? [] : [`--use-webgpu-adapter=${choice}`];
+  return ['--enable-unsafe-webgpu', ...adapter, '--enable-features=Vulkan', ...extra];
+}
+
+export const CHROMIUM_ARGS = chromiumArgs();
 
 /** Packs the atlases if needed (they are served from assets-built/). */
 export function prepareAssets() {
