@@ -9,6 +9,9 @@ import { join } from 'node:path';
 import type { Params } from '../../../src/core/params';
 import { CpuRenderer } from '../../../src/fallback';
 import { CpuStipple } from '../../../src/fallback/stipple';
+import { CpuMerger } from '../../../src/fallback/merger';
+import { CpuShellScene } from '../../../src/fallback/shells';
+import { buildShellScene } from '../../../src/model/shells';
 import {
   atlasFromBytes,
   type AtlasData,
@@ -104,7 +107,38 @@ export class CpuGolden {
   /** `zoom`: the reference's ZOOM at capture (1, or 2 for the zoom camera). */
   render(P: Params, opts: SceneOptions = {}, zoom = 1): RenderResult {
     const t0 = performance.now();
-    const view = new CpuStipple(buildScene(P, this.meta, opts)).view(cameraOf(P, zoom));
+    if (P.merger) {
+      const { merger: mopts, placementKey, shells, dotScale } = opts;
+      const m = new CpuMerger(P, this.meta, {
+        ...mopts,
+        ...(dotScale !== undefined ? { dotScale } : {}),
+        ...(shells ? { shells } : {}),
+        ...(placementKey !== undefined ? { placementKey } : {}),
+      });
+      const mv = m.view(zoom);
+      this.renderer.setLayers(mv.layers);
+      this.renderer.drawInk({ plates: P.plates as Plates, palette: PALETTES.light });
+      const mink = this.renderer.ink;
+      return {
+        alpha: alphaOf(mink.width, mink.height, mink.data),
+        counts: mv.counts,
+        ms: performance.now() - t0,
+      };
+    }
+    const scene = buildScene(P, this.meta, opts);
+    const view = new CpuStipple(scene).view(cameraOf(P, zoom));
+    if (P.shellsOn) {
+      // the simulated shells (M8): the satellite's dots and the arcs, which ignore the camera
+      const sh = new CpuShellScene(
+        buildShellScene(P, this.meta, scene.variation, {
+          ...opts.shells,
+          ...(opts.placementKey !== undefined ? { placementKey: opts.placementKey } : {}),
+        }),
+      );
+      const v = sh.view(zoom);
+      view.layers.push(...v.layers);
+      view.counts.dots += v.dots;
+    }
     this.renderer.setLayers(view.layers);
     this.renderer.drawInk({ plates: P.plates as Plates, palette: PALETTES.light });
     const ink = this.renderer.ink;

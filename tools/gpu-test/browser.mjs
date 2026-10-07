@@ -11,9 +11,17 @@ import { createServer } from 'vite';
 
 export const ROOT = resolve(import.meta.dirname, '../..');
 
+/**
+ * SwiftShader by default. `ROSSE_WEBGPU_ADAPTER=default` leaves the choice to Chromium, which uses
+ * the machine's own GPU (the test-star drift across adapters of M8 is measured that way, on a
+ * machine with one); any other value is passed to `--use-webgpu-adapter` (`swiftshader`, `discrete`,
+ * `integrated`).
+ */
+const ADAPTER = process.env.ROSSE_WEBGPU_ADAPTER ?? 'swiftshader';
+
 export const CHROMIUM_ARGS = [
   '--enable-unsafe-webgpu',
-  '--use-webgpu-adapter=swiftshader',
+  ...(ADAPTER === 'default' ? [] : [`--use-webgpu-adapter=${ADAPTER}`]),
   '--enable-features=Vulkan',
 ];
 
