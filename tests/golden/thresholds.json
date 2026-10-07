@@ -41,58 +41,94 @@
         "Grand design": {
           "q": 0.036,
           "qInner": 0.039,
-          "paEps0": 0.044
+          "paEps0": 0.044,
+          "countsBy": {
+            "dots": 0.06
+          }
         },
         "Barred spiral": {
           "q": 0.034,
           "qInner": 0.027,
-          "paEps0": 0.037
+          "paEps0": 0.037,
+          "countsBy": {
+            "dots": 0.173
+          }
         },
         "Flocculent": {
           "q": 0.039,
           "qInner": 0.031,
-          "paEps0": 0.049
+          "paEps0": 0.049,
+          "countsBy": {
+            "dots": 0.046
+          }
         },
         "Tightly wound": {
           "q": 0.02,
           "qInner": 0.041,
-          "paEps0": 0.022
+          "paEps0": 0.022,
+          "countsBy": {
+            "dots": 0.111
+          }
         },
         "Ringed": {
           "q": 0.029,
           "qInner": 0.026,
-          "paEps0": 0.035
+          "paEps0": 0.035,
+          "countsBy": {
+            "dots": 0.155
+          }
         },
         "Disc, no arms": {
           "q": 0.021,
           "qInner": 0.04,
-          "paEps0": 0.025
+          "paEps0": 0.025,
+          "countsBy": {
+            "dots": 0.108
+          }
         },
         "Dusty spiral": {
           "q": 0.044,
           "qInner": 0.047,
-          "paEps0": 0.052
+          "paEps0": 0.052,
+          "countsBy": {
+            "dots": 0.084
+          }
         },
         "Loose, open arms": {
           "q": 0.024,
           "qInner": 0.027,
-          "paEps0": 0.03
+          "paEps0": 0.03,
+          "countsBy": {
+            "dots": 0.032
+          }
         },
         "Edge-on with dust": {
           "q": 0.03,
           "qInner": 0.042,
-          "paEps0": 0.038
+          "paEps0": 0.038,
+          "countsBy": {
+            "dots": 0.16
+          }
         },
         "Hand-drawn arms": {
           "q": 0.028,
           "qInner": 0.032,
-          "paEps0": 0.031
+          "paEps0": 0.031,
+          "countsBy": {
+            "dots": 0.131
+          }
         },
         "Hand wobble": {
           "q": 0.023,
           "qInner": 0.044,
-          "paEps0": 0.027
+          "paEps0": 0.027,
+          "countsBy": {
+            "dots": 0.111
+          }
         }
+      },
+      "countsBy": {
+        "dots": 0.133
       }
     },
     "smooth": {
@@ -116,28 +152,46 @@
         "Cigar-shaped": {
           "q": 0.046,
           "qInner": 0.034,
-          "paEps0": 0.06
+          "paEps0": 0.06,
+          "countsBy": {
+            "dots": 0.16
+          }
         },
         "Radio jet": {
           "q": 0.038,
           "qInner": 0.035,
-          "paEps0": 0.042
+          "paEps0": 0.042,
+          "countsBy": {
+            "dots": 0.121
+          }
         },
         "Smooth, round": {
           "q": 0.047,
           "qInner": 0.026,
-          "paEps0": 0.049
+          "paEps0": 0.049,
+          "countsBy": {
+            "dots": 0.143
+          }
         },
         "Shell galaxy": {
           "q": 0.042,
           "qInner": 0.037,
-          "paEps0": 0.046
+          "paEps0": 0.046,
+          "countsBy": {
+            "dots": 0.131
+          }
         },
         "Stellar streams": {
           "q": 0.042,
           "qInner": 0.045,
-          "paEps0": 0.046
+          "paEps0": 0.046,
+          "countsBy": {
+            "dots": 0.152
+          }
         }
+      },
+      "countsBy": {
+        "dots": 0.137
       }
     },
     "merger": {
@@ -237,38 +291,62 @@
         "Grand design": {
           "q": 0.037,
           "qInner": 0.034,
-          "paEps0": 0.041
+          "paEps0": 0.041,
+          "countsBy": {
+            "dots": 0.049
+          }
         },
         "Flocculent": {
           "q": 0.057,
           "qInner": 0.027,
-          "paEps0": 0.06
+          "paEps0": 0.06,
+          "countsBy": {
+            "dots": 0.032
+          }
         },
         "Ringed": {
           "q": 0.033,
           "qInner": 0.03,
-          "paEps0": 0.036
+          "paEps0": 0.036,
+          "countsBy": {
+            "dots": 0.112
+          }
         },
         "Barred spiral": {
           "q": 0.055,
           "qInner": 0.027,
-          "paEps0": 0.056
+          "paEps0": 0.056,
+          "countsBy": {
+            "dots": 0.156
+          }
         },
         "Disc, no arms": {
           "q": 0.04,
           "qInner": 0.045,
-          "paEps0": 0.045
+          "paEps0": 0.045,
+          "countsBy": {
+            "dots": 0.091
+          }
         },
         "Edge-on with dust": {
           "q": 0.03,
           "qInner": 0.04,
-          "paEps0": 0.033
+          "paEps0": 0.033,
+          "countsBy": {
+            "dots": 0.117
+          }
         },
         "Tightly wound": {
           "q": 0.034,
           "qInner": 0.016,
-          "paEps0": 0.036
+          "paEps0": 0.036,
+          "countsBy": {
+            "dots": 0.078
+          }
         }
+      },
+      "countsBy": {
+        "dots": 0.117
       }
     },
     "smooth@zoom": {
@@ -292,23 +370,38 @@
         "Smooth, round": {
           "q": 0.031,
           "qInner": 0.046,
-          "paEps0": 0.032
+          "paEps0": 0.032,
+          "countsBy": {
+            "dots": 0.119
+          }
         },
         "Cigar-shaped": {
           "q": 0.038,
           "qInner": 0.039,
-          "paEps0": 0.049
+          "paEps0": 0.049,
+          "countsBy": {
+            "dots": 0.148
+          }
         },
         "Shell galaxy": {
           "q": 0.035,
           "qInner": 0.038,
-          "paEps0": 0.038
+          "paEps0": 0.038,
+          "countsBy": {
+            "dots": 0.098
+          }
         },
         "Radio jet": {
           "q": 0.023,
           "qInner": 0.03,
-          "paEps0": 0.026
+          "paEps0": 0.026,
+          "countsBy": {
+            "dots": 0.086
+          }
         }
+      },
+      "countsBy": {
+        "dots": 0.126
       }
     },
     "lines": {

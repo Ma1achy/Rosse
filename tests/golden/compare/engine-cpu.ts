@@ -108,6 +108,11 @@ export class CpuGolden {
     for (const a of this.atlases) this.renderer.addAtlas(a);
   }
 
+  /** The mark counts of a draw alone, without the raster (ADR 0035). */
+  counts(P: Params, opts: SceneOptions = {}, zoom = 1): MarkCounts {
+    return new CpuStipple(buildScene(P, this.meta, opts)).view(cameraOf(P, zoom)).counts;
+  }
+
   /** `zoom`: the reference's ZOOM at capture (1, or 2 for the zoom camera). */
   render(P: Params, opts: SceneOptions = {}, zoom = 1): RenderResult {
     const t0 = performance.now();

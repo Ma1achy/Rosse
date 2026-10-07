@@ -38,6 +38,12 @@ export interface Thresholds {
   paEps0: number;
   /** |Δ count| / reference per class, at most (classes of 100 marks or more) */
   counts: number;
+  /**
+   * Per class, in place of `counts`, where the engine's own re-draws spread wider than that (ADR
+   * 0035): the dots a drawn star clears round it, whose number follows where the few large stars
+   * fall, differ between two draws by several per cent in a scene with many of them.
+   */
+  countsBy?: Record<string, number>;
   /** the same for classes under 100 marks */
   countsSmall: number;
   /**
@@ -114,9 +120,11 @@ export function countAllowance(
   render: number,
   t: Thresholds,
   impossible = false,
+  cls?: string,
 ): number {
   if (impossible) return 0;
-  const relative = (ref < 100 ? t.countsSmall : t.counts) * ref;
+  const perClass = cls ? t.countsBy?.[cls] : undefined;
+  const relative = (ref < 100 ? t.countsSmall : (perClass ?? t.counts)) * ref;
   const poisson = ref < t.poissonBelow ? t.poisson * Math.sqrt(ref + render) : 0;
   return Math.max(relative, poisson);
 }
@@ -151,7 +159,7 @@ export function evaluate(
     const ref = refCounts[k] ?? 0;
     const render = renderCounts[k] ?? 0;
     const rel = ref === 0 ? (render === 0 ? 0 : Infinity) : (render - ref) / ref;
-    const allowed = countAllowance(ref, render, t, impossible.has(k));
+    const allowed = countAllowance(ref, render, t, impossible.has(k), k);
     counts[k] = { ref, render, rel, allowed };
     if (Math.abs(render - ref) > allowed)
       failures.push(`${k} ${String(render)} vs ${String(ref)} (±${allowed.toFixed(1)})`);

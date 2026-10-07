@@ -1893,7 +1893,17 @@
           ]
         }
       },
-      "v21Reroll": null
+      "v21Reroll": null,
+      "countSpread": {
+        "dots": {
+          "n": 264,
+          "min": 0,
+          "p5": 0.0028,
+          "median": 0.029,
+          "p95": 0.0884,
+          "max": 0.1148
+        }
+      }
     },
     "smooth": {
       "engineRekey": {
@@ -3440,7 +3450,17 @@
           ]
         }
       },
-      "v21Reroll": null
+      "v21Reroll": null,
+      "countSpread": {
+        "dots": {
+          "n": 132,
+          "min": 0,
+          "p5": 0.0007,
+          "median": 0.0513,
+          "p95": 0.0908,
+          "max": 0.1061
+        }
+      }
     },
     "merger": {
       "v21Reroll": null
@@ -4914,7 +4934,17 @@
           ]
         }
       },
-      "v21Reroll": null
+      "v21Reroll": null,
+      "countSpread": {
+        "dots": {
+          "n": 120,
+          "min": 0.0005,
+          "p5": 0.0014,
+          "median": 0.0258,
+          "p95": 0.078,
+          "max": 0.104
+        }
+      }
     },
     "smooth@zoom": {
       "engineRekey": {
@@ -6169,7 +6199,17 @@
           ]
         }
       },
-      "v21Reroll": null
+      "v21Reroll": null,
+      "countSpread": {
+        "dots": {
+          "n": 54,
+          "min": 0.0018,
+          "p5": 0.0029,
+          "median": 0.0363,
+          "p95": 0.0837,
+          "max": 0.0984
+        }
+      }
     },
     "lines": {
       "engineRekey": {

@@ -240,21 +240,27 @@ export class GoldenNode {
     /** which parts to measure: the re-draw pairs, the negative controls (a resumed run may need one) */
     parts: { pairs: boolean; controls: boolean } = { pairs: true, controls: true },
   ) {
-    const pairs: Record<string, { preset: string; config: string; cs: Comparison[] }[]> = {};
+    const pairs: Record<string, CalibrationPair[]> = {};
     const controls: Record<string, Record<string, { config: string; cs: Comparison[] }[]>> = {};
     const heldOut: Record<string, { preset: string; config: string; cs: Comparison[] }[]> = {};
     for (const c of cases) {
       const zoom = c.zoom ?? 1;
       const opts = this.referenceOptions(c.params, zoom, c.base);
-      const draw = (P: Params, o: SceneOptions, k: number) =>
-        measure(this.cpu.render(P, keyed(o, P.seed, k), zoom).alpha);
+      const drawBoth = (P: Params, o: SceneOptions, k: number) => {
+        const r = this.cpu.render(P, keyed(o, P.seed, k), zoom);
+        return { m: measure(r.alpha), counts: engineCounts(r.counts) };
+      };
+      const draw = (P: Params, o: SceneOptions, k: number) => drawBoth(P, o, k).m;
       // the controls compare with the first stand-in only
-      const stand = Array.from({ length: parts.pairs ? standIns : 1 }, (_, r) =>
-        draw(c.params, opts, STAND_IN_KEY + r),
+      const standBoth = Array.from({ length: parts.pairs ? standIns : 1 }, (_, r) =>
+        drawBoth(c.params, opts, STAND_IN_KEY + r),
       );
-      const drawn = parts.pairs
-        ? Array.from({ length: keys }, (_, k) => draw(c.params, opts, k))
+      const stand = standBoth.map((s) => s.m);
+      const drawnBoth = parts.pairs
+        ? Array.from({ length: keys }, (_, k) => drawBoth(c.params, opts, k))
         : [];
+      const drawn = drawnBoth.map((d) => d.m);
+      const drawnCounts = drawnBoth.map((d) => d.counts);
       const config = configLabel(c);
       // a held-out v21 capture (ADR 0018): v21 against the same K draws, for the renderers' own
       // differences, which re-draws of line-work drawn the same at every key cannot show
@@ -267,12 +273,15 @@ export class GoldenNode {
         });
       }
       if (parts.pairs)
-        for (const ref of stand)
-          // tagged with the preset, for the per-preset axis-ratio tolerances
+        for (const [i, ref] of stand.entries())
+          // tagged with the preset, for the per-preset axis-ratio tolerances; the mark counts of
+          // the stand-in and of each key go with them (ADR 0035)
           (pairs[c.family] ??= []).push({
             preset: c.base,
             config,
             cs: drawn.map((m) => compareMeasures(ref, m)),
+            ref: standBoth[i]?.counts ?? {},
+            keys: drawnCounts,
           });
       const ref = stand[0];
       if (!ref || !parts.controls) {
@@ -291,6 +300,32 @@ export class GoldenNode {
       log(`  ${config}`);
     }
     return { pairs, controls, heldOut };
+  }
+
+  /**
+   * The counts of the calibration's re-draw pairs alone (ADR 0035): per configuration, each of
+   * `standIns` draws stands in for v21 and `keys` draws are the engine's, as `calibrateEngine`
+   * draws them, with no rasterising. Where the counts are all that a calibration is to measure
+   * (a family whose other thresholds stand).
+   */
+  calibrateCounts(cases: CalibrationCase[], keys: number, standIns: number) {
+    const pairs: Record<string, CalibrationPair[]> = {};
+    for (const c of cases) {
+      const zoom = c.zoom ?? 1;
+      const opts = this.referenceOptions(c.params, zoom, c.base);
+      const draw = (k: number) =>
+        engineCounts(this.cpu.counts(c.params, keyed(opts, c.params.seed, k), zoom));
+      const drawn = Array.from({ length: keys }, (_, k) => draw(k));
+      for (let r = 0; r < standIns; r++)
+        (pairs[c.family] ??= []).push({
+          preset: c.base,
+          config: configLabel(c),
+          cs: [],
+          ref: draw(STAND_IN_KEY + r),
+          keys: drawn,
+        });
+    }
+    return pairs;
   }
 
   /**
@@ -413,6 +448,29 @@ export function meanCounts(list: Record<string, number>[]): Record<string, numbe
   const out: Record<string, number> = {};
   for (const c of list) for (const [k, v] of Object.entries(c)) out[k] = (out[k] ?? 0) + v;
   for (const k of Object.keys(out)) out[k] = (out[k] ?? 0) / list.length;
+  return out;
+}
+
+/** One re-draw pair of the calibration: the K comparisons, and the mark counts they compared. */
+export interface CalibrationPair {
+  preset: string;
+  config: string;
+  cs: Comparison[];
+  /** the stand-in's counts per class */
+  ref: Record<string, number>;
+  /** each key's counts per class, in key order */
+  keys: Record<string, number>[];
+}
+
+/**
+ * The relative difference of each class's count between a stand-in for v21 and the mean over the
+ * first K keys, for the classes the stand-in holds `minCount` marks or more of (ADR 0035).
+ */
+export function countSpread(p: CalibrationPair, K: number, minCount = 100): Record<string, number> {
+  const mean = meanCounts(p.keys.slice(0, K));
+  const out: Record<string, number> = {};
+  for (const [k, ref] of Object.entries(p.ref))
+    if (ref >= minCount) out[k] = Math.abs((mean[k] ?? 0) - ref) / ref;
   return out;
 }
 
