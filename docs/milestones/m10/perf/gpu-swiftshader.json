@@ -1,0 +1,817 @@
+{
+  "kind": "gpu",
+  "label": "webgpu: swiftshader",
+  "adapterChoice": "swiftshader",
+  "adapter": { "description": "", "vendor": "google", "architecture": "swiftshader", "device": "" },
+  "features": [
+    "depth32float-stencil8",
+    "rg11b10ufloat-renderable",
+    "bgra8unorm-storage",
+    "texture-compression-bc",
+    "core-features-and-limits",
+    "chromium-experimental-timestamp-query-inside-passes",
+    "float32-filterable",
+    "indirect-first-instance",
+    "texture-compression-astc-sliced-3d",
+    "float32-blendable",
+    "texture-compression-astc",
+    "texture-compression-etc2",
+    "depth-clip-control",
+    "texture-compression-bc-sliced-3d",
+    "timestamp-query",
+    "chromium-experimental-unorm16-texture-formats",
+    "clip-distances",
+    "texture-component-swizzle",
+    "subgroups"
+  ],
+  "timestamps": true,
+  "browser": "141.0.7390.37",
+  "date": "2026-10-07",
+  "machine": {
+    "platform": "linux 6.18.44-fc-v77",
+    "node": "v22.22.0",
+    "cpu": "4 × Intel(R) Xeon(R) Processor @ 2.80GHz",
+    "loadBefore": [6.53, 9.97, 11.27],
+    "loadAfter": [4.65, 7.23, 9.82]
+  },
+  "config": { "orbitFrames": 12, "modelRuns": 4, "plateCss": 800, "dpr": 1 },
+  "errors": [],
+  "results": [
+    {
+      "name": "Grand design",
+      "preset": "Grand design",
+      "counts": {
+        "dots": 9122,
+        "knots": 94,
+        "stars": 19,
+        "rstars": 1551,
+        "old": 2422,
+        "disc": 4697,
+        "young": 2003,
+        "curves": 3,
+        "pieces": 27,
+        "ribbonSegments": 190,
+        "hatches": 26,
+        "drawings": 1,
+        "vectorCaps": 36,
+        "vectorDots": 0,
+        "vectorBlobs": 0,
+        "streamDots": 0,
+        "streamKnots": 0
+      },
+      "model": {
+        "sceneMs": {
+          "median": 2.3000000044703484,
+          "p95": 3.7999999970197678,
+          "min": 1.3999999985098839,
+          "max": 3.7999999970197678,
+          "n": 4
+        },
+        "uploadMs": {
+          "median": 3.7000000029802322,
+          "p95": 8.699999995529652,
+          "min": 3.5,
+          "max": 8.699999995529652,
+          "n": 4
+        },
+        "firstFrameMs": {
+          "median": 757.1999999955297,
+          "p95": 799,
+          "min": 699.7000000029802,
+          "max": 799,
+          "n": 4
+        },
+        "gpuMs": {
+          "median": 744.1717460000001,
+          "p95": 776.429403,
+          "min": 678.7894060000001,
+          "max": 776.429403,
+          "n": 4
+        },
+        "alloc": {
+          "createBuffer": 28.5,
+          "createBindGroup": 37.3,
+          "createTexture": 0,
+          "writeBuffer": 8,
+          "bufferBytes": 102126,
+          "writeBytes": 416
+        }
+      },
+      "orbit": {
+        "latencyMs": {
+          "median": 606.9000000059605,
+          "p95": 763.6999999955297,
+          "min": 524.3999999985099,
+          "max": 763.6999999955297,
+          "n": 12
+        },
+        "cpuSideMs": { "median": 1, "p95": 1.5, "min": 0.5999999940395355, "max": 1.5, "n": 12 },
+        "pipelinedMs": 587.9,
+        "gpuMs": {
+          "median": 600.675968,
+          "p95": 747.374311,
+          "min": 518.217966,
+          "max": 747.374311,
+          "n": 12
+        },
+        "gpuByPass": {
+          "view: project, scan, expand": 34.200078,
+          "present: ink": 469.01443,
+          "present: composite": 100.043727
+        },
+        "alloc": {
+          "createBuffer": 2,
+          "createBindGroup": 1,
+          "createTexture": 0,
+          "writeBuffer": 6,
+          "bufferBytes": 96,
+          "writeBytes": 336
+        },
+        "modelRuns": 0
+      },
+      "memory": { "buffers": 4633644, "textures": 16806789, "ink": 5120000 }
+    },
+    {
+      "name": "Smooth, round",
+      "preset": "Smooth, round",
+      "counts": {
+        "dots": 10322,
+        "knots": 0,
+        "stars": 0,
+        "rstars": 774,
+        "old": 10322,
+        "disc": 0,
+        "young": 0,
+        "curves": 0,
+        "pieces": 0,
+        "ribbonSegments": 0,
+        "hatches": 0,
+        "drawings": 0,
+        "vectorCaps": 0,
+        "vectorDots": 0,
+        "vectorBlobs": 0,
+        "streamDots": 0,
+        "streamKnots": 0
+      },
+      "model": {
+        "sceneMs": {
+          "median": 1.2000000029802322,
+          "p95": 1.6000000014901161,
+          "min": 1.1000000014901161,
+          "max": 1.6000000014901161,
+          "n": 4
+        },
+        "uploadMs": {
+          "median": 3.2000000029802322,
+          "p95": 7.399999998509884,
+          "min": 3,
+          "max": 7.399999998509884,
+          "n": 4
+        },
+        "firstFrameMs": {
+          "median": 727.3000000044703,
+          "p95": 750.1000000014901,
+          "min": 684,
+          "max": 750.1000000014901,
+          "n": 4
+        },
+        "gpuMs": {
+          "median": 715.584827,
+          "p95": 742.644271,
+          "min": 672.886132,
+          "max": 742.644271,
+          "n": 4
+        },
+        "alloc": {
+          "createBuffer": 3,
+          "createBindGroup": 23,
+          "createTexture": 0,
+          "writeBuffer": 7,
+          "bufferBytes": 910,
+          "writeBytes": 272
+        }
+      },
+      "orbit": {
+        "latencyMs": {
+          "median": 654.8999999985099,
+          "p95": 736.2999999970198,
+          "min": 500.29999999701977,
+          "max": 736.2999999970198,
+          "n": 12
+        },
+        "cpuSideMs": {
+          "median": 0.5,
+          "p95": 3.2999999970197678,
+          "min": 0.29999999701976776,
+          "max": 3.2999999970197678,
+          "n": 12
+        },
+        "pipelinedMs": 600.839999999851,
+        "gpuMs": {
+          "median": 653.145346,
+          "p95": 734.553104,
+          "min": 498.413705,
+          "max": 734.553104,
+          "n": 12
+        },
+        "gpuByPass": {
+          "view: project, scan, expand": 35.279933,
+          "present: ink": 493.910276,
+          "present: composite": 114.304216
+        },
+        "alloc": {
+          "createBuffer": 0,
+          "createBindGroup": 0,
+          "createTexture": 0,
+          "writeBuffer": 5,
+          "bufferBytes": 0,
+          "writeBytes": 240
+        },
+        "modelRuns": 0
+      },
+      "memory": { "buffers": 4151340, "textures": 14246789, "ink": 5120000 }
+    },
+    {
+      "name": "Barred spiral",
+      "preset": "Barred spiral",
+      "counts": {
+        "dots": 9188,
+        "knots": 107,
+        "stars": 8,
+        "rstars": 1670,
+        "old": 2201,
+        "disc": 5770,
+        "young": 1217,
+        "curves": 3,
+        "pieces": 27,
+        "ribbonSegments": 190,
+        "hatches": 89,
+        "drawings": 3,
+        "vectorCaps": 173,
+        "vectorDots": 3,
+        "vectorBlobs": 2,
+        "streamDots": 0,
+        "streamKnots": 0
+      },
+      "model": {
+        "sceneMs": {
+          "median": 2.1999999955296516,
+          "p95": 3.2999999970197678,
+          "min": 2,
+          "max": 3.2999999970197678,
+          "n": 4
+        },
+        "uploadMs": {
+          "median": 2.399999998509884,
+          "p95": 5.100000001490116,
+          "min": 2.2000000029802322,
+          "max": 5.100000001490116,
+          "n": 4
+        },
+        "firstFrameMs": {
+          "median": 744.7999999970198,
+          "p95": 866,
+          "min": 684.6999999955297,
+          "max": 866,
+          "n": 4
+        },
+        "gpuMs": {
+          "median": 713.346626,
+          "p95": 829.8293819999999,
+          "min": 652.181725,
+          "max": 829.8293819999999,
+          "n": 4
+        },
+        "alloc": {
+          "createBuffer": 30.5,
+          "createBindGroup": 38.5,
+          "createTexture": 0,
+          "writeBuffer": 8,
+          "bufferBytes": 140262,
+          "writeBytes": 608
+        }
+      },
+      "orbit": {
+        "latencyMs": {
+          "median": 659.0999999940395,
+          "p95": 750.2999999970198,
+          "min": 613.8999999985099,
+          "max": 750.2999999970198,
+          "n": 12
+        },
+        "cpuSideMs": {
+          "median": 1.6999999955296516,
+          "p95": 2.399999998509884,
+          "min": 0.6000000014901161,
+          "max": 2.399999998509884,
+          "n": 12
+        },
+        "pipelinedMs": 614.7,
+        "gpuMs": {
+          "median": 643.0130859999999,
+          "p95": 731.938471,
+          "min": 600.123417,
+          "max": 731.938471,
+          "n": 12
+        },
+        "gpuByPass": {
+          "view: project, scan, expand": 43.899215,
+          "present: ink": 487.37392900000003,
+          "present: composite": 98.360187
+        },
+        "alloc": {
+          "createBuffer": 2,
+          "createBindGroup": 1,
+          "createTexture": 0,
+          "writeBuffer": 6,
+          "bufferBytes": 96,
+          "writeBytes": 528
+        },
+        "modelRuns": 0
+      },
+      "memory": { "buffers": 4930124, "textures": 16806789, "ink": 5120000 }
+    },
+    {
+      "name": "Hand-drawn arms",
+      "preset": "Hand-drawn arms",
+      "counts": {
+        "dots": 9182,
+        "knots": 91,
+        "stars": 20,
+        "rstars": 1555,
+        "old": 2422,
+        "disc": 4568,
+        "young": 2192,
+        "curves": 0,
+        "pieces": 0,
+        "ribbonSegments": 0,
+        "hatches": 34,
+        "drawings": 4,
+        "vectorCaps": 248,
+        "vectorDots": 6,
+        "vectorBlobs": 10,
+        "streamDots": 0,
+        "streamKnots": 0
+      },
+      "model": {
+        "sceneMs": {
+          "median": 1.7000000029802322,
+          "p95": 2.5999999940395355,
+          "min": 1.4000000059604645,
+          "max": 2.5999999940395355,
+          "n": 4
+        },
+        "uploadMs": {
+          "median": 3,
+          "p95": 11.299999997019768,
+          "min": 1.2999999970197678,
+          "max": 11.299999997019768,
+          "n": 4
+        },
+        "firstFrameMs": {
+          "median": 925.5,
+          "p95": 986.5999999940395,
+          "min": 892.3999999985099,
+          "max": 986.5999999940395,
+          "n": 4
+        },
+        "gpuMs": {
+          "median": 896.1079149999999,
+          "p95": 943.9810370000001,
+          "min": 867.863869,
+          "max": 943.9810370000001,
+          "n": 4
+        },
+        "alloc": {
+          "createBuffer": 29.3,
+          "createBindGroup": 38.5,
+          "createTexture": 0,
+          "writeBuffer": 8,
+          "bufferBytes": 145166,
+          "writeBytes": 704
+        }
+      },
+      "orbit": {
+        "latencyMs": {
+          "median": 620.2000000029802,
+          "p95": 725.2999999970198,
+          "min": 538.5999999940395,
+          "max": 725.2999999970198,
+          "n": 12
+        },
+        "cpuSideMs": { "median": 0.8999999985098839, "p95": 4, "min": 0.5, "max": 4, "n": 12 },
+        "pipelinedMs": 549.9,
+        "gpuMs": {
+          "median": 601.387047,
+          "p95": 702.0121670000001,
+          "min": 529.866937,
+          "max": 702.0121670000001,
+          "n": 12
+        },
+        "gpuByPass": {
+          "view: project, scan, expand": 44.190914,
+          "present: ink": 464.084247,
+          "present: composite": 93.993889
+        },
+        "alloc": {
+          "createBuffer": 2,
+          "createBindGroup": 1,
+          "createTexture": 0,
+          "writeBuffer": 6,
+          "bufferBytes": 96,
+          "writeBytes": 624
+        },
+        "modelRuns": 0
+      },
+      "memory": { "buffers": 4804460, "textures": 16806789, "ink": 5120000 }
+    },
+    {
+      "name": "Edge-on with dust",
+      "preset": "Edge-on with dust",
+      "counts": {
+        "dots": 3630,
+        "knots": 43,
+        "stars": 4,
+        "rstars": 294,
+        "old": 1742,
+        "disc": 1466,
+        "young": 422,
+        "curves": 4,
+        "pieces": 0,
+        "ribbonSegments": 352,
+        "hatches": 88,
+        "drawings": 1,
+        "vectorCaps": 36,
+        "vectorDots": 0,
+        "vectorBlobs": 0,
+        "streamDots": 0,
+        "streamKnots": 0
+      },
+      "model": {
+        "sceneMs": {
+          "median": 1.7999999970197678,
+          "p95": 3.399999998509884,
+          "min": 1.7999999970197678,
+          "max": 3.399999998509884,
+          "n": 4
+        },
+        "uploadMs": {
+          "median": 2.600000001490116,
+          "p95": 2.8000000044703484,
+          "min": 2.5,
+          "max": 2.8000000044703484,
+          "n": 4
+        },
+        "firstFrameMs": {
+          "median": 272.1000000014901,
+          "p95": 344.29999999701977,
+          "min": 241.20000000298023,
+          "max": 344.29999999701977,
+          "n": 4
+        },
+        "gpuMs": {
+          "median": 256.721869,
+          "p95": 322.33872600000007,
+          "min": 226.181005,
+          "max": 322.33872600000007,
+          "n": 4
+        },
+        "alloc": {
+          "createBuffer": 24.5,
+          "createBindGroup": 36.3,
+          "createTexture": 0,
+          "writeBuffer": 8,
+          "bufferBytes": 133706,
+          "writeBytes": 416
+        }
+      },
+      "orbit": {
+        "latencyMs": {
+          "median": 261.80000000447035,
+          "p95": 394.1000000014901,
+          "min": 213.19999999552965,
+          "max": 394.1000000014901,
+          "n": 12
+        },
+        "cpuSideMs": {
+          "median": 0.5,
+          "p95": 1.2999999970197678,
+          "min": 0.29999999701976776,
+          "max": 1.2999999970197678,
+          "n": 12
+        },
+        "pipelinedMs": 326.860000000149,
+        "gpuMs": {
+          "median": 252.874101,
+          "p95": 380.86134100000004,
+          "min": 201.915054,
+          "max": 380.86134100000004,
+          "n": 12
+        },
+        "gpuByPass": {
+          "view: project, scan, expand": 31.831967,
+          "present: ink": 152.79001,
+          "present: composite": 62.435165
+        },
+        "alloc": {
+          "createBuffer": 0,
+          "createBindGroup": 0,
+          "createTexture": 0,
+          "writeBuffer": 6,
+          "bufferBytes": 0,
+          "writeBytes": 336
+        },
+        "modelRuns": 0
+      },
+      "memory": { "buffers": 4889324, "textures": 16806789, "ink": 5120000 }
+    },
+    {
+      "name": "Stellar streams",
+      "preset": "Stellar streams",
+      "counts": {
+        "dots": 7840,
+        "knots": 0,
+        "stars": 0,
+        "rstars": 336,
+        "old": 7840,
+        "disc": 0,
+        "young": 0,
+        "curves": 0,
+        "pieces": 0,
+        "ribbonSegments": 0,
+        "hatches": 0,
+        "drawings": 0,
+        "vectorCaps": 0,
+        "vectorDots": 0,
+        "vectorBlobs": 0,
+        "streamDots": 428,
+        "streamKnots": 19
+      },
+      "model": {
+        "sceneMs": {
+          "median": 0.8999999985098839,
+          "p95": 1.5999999940395355,
+          "min": 0.7000000029802322,
+          "max": 1.5999999940395355,
+          "n": 4
+        },
+        "uploadMs": {
+          "median": 1.4000000059604645,
+          "p95": 2,
+          "min": 1.3999999985098839,
+          "max": 2,
+          "n": 4
+        },
+        "firstFrameMs": {
+          "median": 456,
+          "p95": 535.1000000014901,
+          "min": 412.09999999403954,
+          "max": 535.1000000014901,
+          "n": 4
+        },
+        "gpuMs": {
+          "median": 449.437532,
+          "p95": 522.219439,
+          "min": 404.13176999999996,
+          "max": 522.219439,
+          "n": 4
+        },
+        "alloc": {
+          "createBuffer": 9.8,
+          "createBindGroup": 26,
+          "createTexture": 0,
+          "writeBuffer": 8,
+          "bufferBytes": 558158,
+          "writeBytes": 1224
+        }
+      },
+      "orbit": {
+        "latencyMs": {
+          "median": 416.5,
+          "p95": 528.1000000014901,
+          "min": 312.5,
+          "max": 528.1000000014901,
+          "n": 12
+        },
+        "cpuSideMs": {
+          "median": 0.5,
+          "p95": 0.7000000029802322,
+          "min": 0.30000000447034836,
+          "max": 0.7000000029802322,
+          "n": 12
+        },
+        "pipelinedMs": 427.339999999851,
+        "gpuMs": {
+          "median": 414.36075600000004,
+          "p95": 526.3661010000001,
+          "min": 310.85299000000003,
+          "max": 526.3661010000001,
+          "n": 12
+        },
+        "gpuByPass": {
+          "view: project, scan, expand": 20.425244,
+          "present: ink": 315.20393,
+          "present: composite": 72.391093
+        },
+        "alloc": {
+          "createBuffer": 0,
+          "createBindGroup": 0,
+          "createTexture": 0,
+          "writeBuffer": 6,
+          "bufferBytes": 0,
+          "writeBytes": 1072
+        },
+        "modelRuns": 0
+      },
+      "memory": { "buffers": 5869740, "textures": 14246789, "ink": 5120000 }
+    },
+    {
+      "name": "Merger: the Mice",
+      "preset": "Merger: the Mice",
+      "counts": {
+        "dots": 7850,
+        "knots": 551,
+        "stars": 40,
+        "rstars": 1205,
+        "old": 1225,
+        "disc": 4252,
+        "young": 2373,
+        "curves": 6,
+        "pieces": 9,
+        "ribbonSegments": 540,
+        "hatches": 38,
+        "drawings": 41,
+        "vectorCaps": 9619,
+        "vectorDots": 16,
+        "vectorBlobs": 10,
+        "streamDots": 0,
+        "streamKnots": 0
+      },
+      "model": {
+        "sceneMs": { "median": 0, "p95": 0, "min": 0, "max": 0, "n": 1 },
+        "uploadMs": { "median": 0, "p95": 0, "min": 0, "max": 0, "n": 1 },
+        "firstFrameMs": {
+          "median": 1618.3000000044703,
+          "p95": 1647.1000000014901,
+          "min": 1609.5,
+          "max": 1647.1000000014901,
+          "n": 4
+        },
+        "gpuMs": null,
+        "alloc": {
+          "createBuffer": 114,
+          "createBindGroup": 126,
+          "createTexture": 0,
+          "writeBuffer": 46.5,
+          "bufferBytes": 23246762,
+          "writeBytes": 6800
+        }
+      },
+      "orbit": {
+        "latencyMs": {
+          "median": 769.2000000029802,
+          "p95": 963.3999999985099,
+          "min": 660,
+          "max": 963.3999999985099,
+          "n": 12
+        },
+        "cpuSideMs": {
+          "median": 1.6000000014901161,
+          "p95": 2.899999998509884,
+          "min": 1.1999999955296516,
+          "max": 2.899999998509884,
+          "n": 12
+        },
+        "pipelinedMs": 802.980000000447,
+        "gpuMs": {
+          "median": 492.19817,
+          "p95": 704.3188439999999,
+          "min": 431.744913,
+          "max": 704.3188439999999,
+          "n": 12
+        },
+        "gpuByPass": { "present: ink": 421.908158, "present: composite": 65.693931 },
+        "alloc": {
+          "createBuffer": 0,
+          "createBindGroup": 0,
+          "createTexture": 0,
+          "writeBuffer": 28,
+          "bufferBytes": 0,
+          "writeBytes": 5168
+        },
+        "modelRuns": 0
+      },
+      "merger": {
+        "chunks": 6,
+        "chunkMs": {
+          "median": 90,
+          "p95": 134.5,
+          "min": 7.700000002980232,
+          "max": 155.89999999850988,
+          "n": 24
+        },
+        "buildMs": {
+          "median": 541.8999999985099,
+          "p95": 590.1000000014901,
+          "min": 473.6000000014901,
+          "max": 590.1000000014901,
+          "n": 4
+        },
+        "longTasks": 0,
+        "longTaskMs": 0
+      },
+      "memory": { "buffers": 31368328, "textures": 16806789, "ink": 5120000 }
+    },
+    {
+      "name": "Merger: the Mice, horizon 30",
+      "preset": "Merger: the Mice",
+      "counts": {
+        "dots": 7850,
+        "knots": 555,
+        "stars": 40,
+        "rstars": 1207,
+        "old": 1225,
+        "disc": 4252,
+        "young": 2373,
+        "curves": 6,
+        "pieces": 18,
+        "ribbonSegments": 540,
+        "hatches": 38,
+        "drawings": 41,
+        "vectorCaps": 8767,
+        "vectorDots": 16,
+        "vectorBlobs": 10,
+        "streamDots": 0,
+        "streamKnots": 0
+      },
+      "model": {
+        "sceneMs": { "median": 0, "p95": 0, "min": 0, "max": 0, "n": 1 },
+        "uploadMs": { "median": 0, "p95": 0, "min": 0, "max": 0, "n": 1 },
+        "firstFrameMs": {
+          "median": 5977.29999999702,
+          "p95": 6797.70000000298,
+          "min": 5577.69999999553,
+          "max": 6797.70000000298,
+          "n": 4
+        },
+        "gpuMs": null,
+        "alloc": {
+          "createBuffer": 114,
+          "createBindGroup": 126,
+          "createTexture": 0,
+          "writeBuffer": 104.5,
+          "bufferBytes": 49415618,
+          "writeBytes": 8656
+        }
+      },
+      "orbit": {
+        "latencyMs": {
+          "median": 735.8999999985099,
+          "p95": 813.2999999970198,
+          "min": 562.2999999970198,
+          "max": 813.2999999970198,
+          "n": 12
+        },
+        "cpuSideMs": { "median": 1.5, "p95": 2, "min": 1, "max": 2, "n": 12 },
+        "pipelinedMs": 644.820000000298,
+        "gpuMs": {
+          "median": 444.276696,
+          "p95": 654.593595,
+          "min": 358.43809400000004,
+          "max": 654.593595,
+          "n": 12
+        },
+        "gpuByPass": { "present: ink": 392.856602, "present: composite": 50.705501 },
+        "alloc": {
+          "createBuffer": 0,
+          "createBindGroup": 0,
+          "createTexture": 0,
+          "writeBuffer": 28,
+          "bufferBytes": 0,
+          "writeBytes": 5168
+        },
+        "modelRuns": 0
+      },
+      "merger": {
+        "chunks": 64,
+        "chunkMs": {
+          "median": 75.69999999552965,
+          "p95": 114.20000000298023,
+          "min": 8.100000001490116,
+          "max": 173.69999999552965,
+          "n": 256
+        },
+        "buildMs": {
+          "median": 5066.79999999702,
+          "p95": 5801.4000000059605,
+          "min": 4714,
+          "max": 5801.4000000059605,
+          "n": 4
+        },
+        "longTasks": 0,
+        "longTaskMs": 0
+      },
+      "memory": { "buffers": 57537488, "textures": 16806789, "ink": 5120000 }
+    }
+  ]
+}

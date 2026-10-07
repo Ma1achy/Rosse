@@ -201,10 +201,19 @@ export interface CompositeParams {
 export function composite(ink: InkBuffer, p: CompositeParams, out: Uint8ClampedArray): void {
   const { width: W, height: H, data } = ink;
   const key = compositeInk(p.plates ?? 'ink', p.surface.palette).map(f);
-  const bg = surfaceBackground(W, H, p);
+  const { bg, bytes } = surfaceBackground(W, H, p);
   for (let i = 0, n = W * H; i < n; i++) {
     const o = i * 4;
-    const ka = f(1 - (data[o + 3] ?? 0));
+    const a = data[o + 3] ?? 0;
+    // no ink here: the frame is the surface, as it was rounded once (v = surface × 1 + 0 × ink)
+    if (a === 0 && data[o] === 0 && data[o + 1] === 0 && data[o + 2] === 0) {
+      out[o] = bytes[o] ?? 0;
+      out[o + 1] = bytes[o + 1] ?? 0;
+      out[o + 2] = bytes[o + 2] ?? 0;
+      out[o + 3] = 255;
+      continue;
+    }
+    const ka = f(1 - a);
     for (let c = 0; c < 3; c++) {
       const v = f(f((bg[i * 3 + c] ?? 0) * ka) + f((data[o + c] ?? 0) * (key[c] ?? 0)));
       out[o + c] = Math.round(Math.min(Math.max(v, 0), 1) * 255);
@@ -217,7 +226,12 @@ export function composite(ink: InkBuffer, p: CompositeParams, out: Uint8ClampedA
 const BACKGROUNDS_KEPT = 2;
 const backgrounds = new Map<
   string,
-  { surface: CompositeParams['surface']; paper: Uint8Array; bg: Float32Array }
+  {
+    surface: CompositeParams['surface'];
+    paper: Uint8Array;
+    bg: Float32Array;
+    bytes: Uint8ClampedArray;
+  }
 >();
 
 /**
@@ -226,14 +240,18 @@ const backgrounds = new Map<
  * so an orbit frame computes it once and reuses it (M10). The values are f32 results of exactly
  * the arithmetic the composite shader does, so the frame is the one the per-pixel code gave.
  */
-function surfaceBackground(W: number, H: number, p: CompositeParams): Float32Array {
+function surfaceBackground(
+  W: number,
+  H: number,
+  p: CompositeParams,
+): { bg: Float32Array; bytes: Uint8ClampedArray } {
   const id = `${p.surface.name}|${String(W)}|${String(H)}|${String(p.dpr)}|${String(p.plateCss)}`;
   const kept = backgrounds.get(id);
   if (kept && kept.surface === p.surface && kept.paper === p.paper.data) {
     // most recently used last
     backgrounds.delete(id);
     backgrounds.set(id, kept);
-    return kept.bg;
+    return kept;
   }
   const { width: pw, height: ph, data: pd } = p.paper;
   const k = texelPerPx(pw, p.dpr);
@@ -284,13 +302,21 @@ function surfaceBackground(W: number, H: number, p: CompositeParams): Float32Arr
       for (let c = 0; c < 3; c++) bg[o + c] = surf[c] ?? 0;
     }
   }
-  backgrounds.set(id, { surface: p.surface, paper: p.paper.data, bg });
+  // the surface alone, rounded as the composite rounds it where there is no ink
+  const bytes = new Uint8ClampedArray(W * H * 4);
+  for (let i = 0; i < W * H; i++) {
+    for (let c = 0; c < 3; c++)
+      bytes[i * 4 + c] = Math.round(Math.min(Math.max(bg[i * 3 + c] ?? 0, 0), 1) * 255);
+    bytes[i * 4 + 3] = 255;
+  }
+  const entry = { surface: p.surface, paper: p.paper.data, bg, bytes };
+  backgrounds.set(id, entry);
   while (backgrounds.size > BACKGROUNDS_KEPT) {
     const oldest = backgrounds.keys().next();
     if (oldest.done) break;
     backgrounds.delete(oldest.value);
   }
-  return bg;
+  return entry;
 }
 
 const edgeFn = (ax: number, ay: number, bx: number, by: number, cx: number, cy: number) =>
