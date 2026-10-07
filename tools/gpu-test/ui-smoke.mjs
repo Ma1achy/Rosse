@@ -193,6 +193,39 @@ export async function uiSmokeCheck(browser, url) {
       fail(`${label}: the PNG is called ${download.suggestedFilename()}`);
     if (bytes.length < 5000) fail(`${label}: the PNG is only ${String(bytes.length)} bytes`);
 
+    // the merger's controls and timeline, previewed: they exist, the scrub moves mTime
+    if (backend === 'cpu') {
+      await page.goto(
+        `${url}/?backend=cpu&features=merger&preset=${encodeURIComponent('Merger: the Mice')}`,
+      );
+      await page.waitForFunction(() => (window.__rosse?.frames ?? 0) >= 1, undefined, {
+        timeout: 180_000,
+      });
+      if (!(await page.locator('#timeline').isVisible()))
+        fail(`${label}: no timeline for a merger`);
+      if (!(await page.locator('#tab-merger').isVisible())) fail(`${label}: no Merger tab`);
+      await page.locator('#tl-scrub').fill('0.5');
+      await page.waitForFunction(() => location.search.includes('mTime=0.5'), undefined, {
+        timeout: 5000,
+      });
+      await page.click('#tl-play');
+      await page.waitForFunction(
+        () => Number(new URLSearchParams(location.search).get('mTime')) > 0.55,
+        undefined,
+        { timeout: 20_000 },
+      );
+      await page.click('#tl-play');
+      await page.click('#tab-merger');
+      if (!(await page.locator('#c-mRatio').isVisible())) fail(`${label}: no mass ratio slider`);
+      // and without the preview, a merger is not offered
+      await page.goto(`${url}/?backend=cpu&preset=${encodeURIComponent('Merger: the Mice')}`);
+      await page.waitForFunction(() => (window.__rosse?.frames ?? 0) >= 1, undefined, {
+        timeout: 180_000,
+      });
+      if (await page.locator('#tab-merger').count())
+        fail(`${label}: a Merger tab for a merger that is not drawn`);
+    }
+
     // accessible names
     const unnamed = await page.evaluate(() => {
       /** @type {string[]} */

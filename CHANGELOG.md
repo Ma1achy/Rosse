@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- M11, the page and UI (docs/milestones/m11):
+  - The page on the design language: Paper and Chalkboard, a tabbed panel whose controls are generated from the schema (`src/ui/layout.ts`, `controls.ts`), preset cards, Surprise me, New stars, the seed, PNG export (`snapshot()` on both engines), a link that holds the preset, edits, camera and surface (`src/ui/urlstate.ts`), the merger timeline, and the "drawn on the CPU" note.
+  - Controls for the sky (M7), the merger (M8) and the lens (M9) appear when their flag in `FEATURES` is switched on; `?features=` previews them.
+  - `tools/gpu-test/ui-smoke.mjs` (`npm run test:ui`, part of `npm run test:gpu`), contrast and layout unit tests; the plates page check drives the Ink tab.
+
 - M8, mergers:
   - `sim/merger`: the core track in f64 (v21's `coreTrack` bit for bit, `tests/vectors/merger.json`), the timeline plan, the snapshots as f16 positions relative to the nearer core with a 64 MiB budget, `mTime` and the horizon (ADR 0040); the test stars on the GPU (`compute/merger.wgsl`, KDK at dt 0.012, in chunks) with a CPU twin and the model tier's one 12 kB read-back for `frameOf`.
   - A merging galaxy built as a single galaxy and carried by the tidal map (`compute/tide.wgsl`, `tide-apply.wgsl`, twin `fallback/kernels/tide.ts`): the 4-nearest-star warp grid, `post` warps on the vector kernels, tearing at v21's 22 px and 1.8× (ADR 0041); `mWarp`'s whole drawings torn through the tidal map itself.

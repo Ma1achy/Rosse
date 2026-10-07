@@ -43,6 +43,7 @@ import { GpuStipple } from './render/stipple';
 import { SURFACES, type SurfaceName } from './render/surface';
 import { attachOrbit, type OrbitState } from './ui/orbit';
 import type { Pixels } from './ui/export';
+import { FEATURES, type FeatureName } from './ui/layout';
 import { mountPage } from './ui/page';
 import { initialSurface } from './ui/theme';
 import { parseUrlState } from './ui/urlstate';
@@ -113,6 +114,19 @@ function vectorsOnly(preset: string): Partial<Params> {
     field: 0,
     fgstars: 0,
     ...(preset === 'Shell galaxy' ? { shellsOn: 0, shells: 1 } : {}),
+  };
+}
+
+/**
+ * The features the page offers controls for: those the engine draws (src/ui/layout.ts), and, for a
+ * preview of the controls only, any named in `?features=merger,lens,stars`.
+ */
+function previewFeatures(params: URLSearchParams): Record<FeatureName, boolean> {
+  const on = new Set((params.get('features') ?? '').split(','));
+  return {
+    stars: FEATURES.stars || on.has('stars'),
+    merger: FEATURES.merger || on.has('merger'),
+    lens: FEATURES.lens || on.has('lens'),
   };
 }
 
@@ -603,6 +617,7 @@ async function start(): Promise<void> {
   const page = mountPage({
     initial: { P: wanted.P, preset, zoom: wanted.zoom, surface },
     makeParams,
+    features: previewFeatures(params),
     onChange(s, kind) {
       if (kind === 'surface') {
         // the toggle works from the start: a click before the first frame sets the surface it shows
