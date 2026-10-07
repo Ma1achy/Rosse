@@ -79,7 +79,11 @@ export function spriteLod(
 
 const mix = (a: number, b: number, t: number) => f(f(a * f(1 - t)) + f(b * t));
 
-/** Bilinear sample of one level of one layer, coordinates in [0, 1]. */
+/**
+ * Bilinear sample of one level of one layer, coordinates in [0, 1]. The hot loop of the
+ * rasteriser, so it allocates nothing: the four taps are computed inline (M10; the arithmetic is
+ * the same f32 sequence as the clamping closures it replaced).
+ */
 function sampleBilinear(atlas: AtlasData, level: number, layer: number, u: number, v: number) {
   const l = atlas.levels[level];
   if (!l) return 0;
@@ -91,10 +95,24 @@ function sampleBilinear(atlas: AtlasData, level: number, layer: number, u: numbe
   const y0 = Math.floor(ty);
   const wx = f(tx - x0);
   const wy = f(ty - y0);
-  const cx = (x: number) => (atlas.repeatU ? ((x % w) + w) % w : Math.min(Math.max(x, 0), w - 1));
-  const cy = (y: number) => Math.min(Math.max(y, 0), h - 1);
-  const at = (x: number, y: number) => f((data[base + cy(y) * w + cx(x)] ?? 0) / 255);
-  return mix(mix(at(x0, y0), at(x0 + 1, y0), wx), mix(at(x0, y0 + 1), at(x0 + 1, y0 + 1), wx), wy);
+  let xa: number;
+  let xb: number;
+  if (atlas.repeatU) {
+    xa = ((x0 % w) + w) % w;
+    xb = (((x0 + 1) % w) + w) % w;
+  } else {
+    xa = x0 < 0 ? 0 : x0 > w - 1 ? w - 1 : x0;
+    xb = x0 + 1 < 0 ? 0 : x0 + 1 > w - 1 ? w - 1 : x0 + 1;
+  }
+  const ya = y0 < 0 ? 0 : y0 > h - 1 ? h - 1 : y0;
+  const yb = y0 + 1 < 0 ? 0 : y0 + 1 > h - 1 ? h - 1 : y0 + 1;
+  const ra = base + ya * w;
+  const rb = base + yb * w;
+  const a = f((data[ra + xa] ?? 0) / 255);
+  const b = f((data[ra + xb] ?? 0) / 255);
+  const c = f((data[rb + xa] ?? 0) / 255);
+  const d = f((data[rb + xb] ?? 0) / 255);
+  return mix(mix(a, b, wx), mix(c, d, wx), wy);
 }
 
 /** Trilinear sample at an explicit level of detail (textureSampleLevel with a linear sampler). */
@@ -182,10 +200,62 @@ export interface CompositeParams {
  */
 export function composite(ink: InkBuffer, p: CompositeParams, out: Uint8ClampedArray): void {
   const { width: W, height: H, data } = ink;
+  const key = compositeInk(p.plates ?? 'ink', p.surface.palette).map(f);
+  const { bg, bytes } = surfaceBackground(W, H, p);
+  for (let i = 0, n = W * H; i < n; i++) {
+    const o = i * 4;
+    const a = data[o + 3] ?? 0;
+    // no ink here: the frame is the surface, as it was rounded once (v = surface × 1 + 0 × ink)
+    if (a === 0 && data[o] === 0 && data[o + 1] === 0 && data[o + 2] === 0) {
+      out[o] = bytes[o] ?? 0;
+      out[o + 1] = bytes[o + 1] ?? 0;
+      out[o + 2] = bytes[o + 2] ?? 0;
+      out[o + 3] = 255;
+      continue;
+    }
+    const ka = f(1 - a);
+    for (let c = 0; c < 3; c++) {
+      const v = f(f((bg[i * 3 + c] ?? 0) * ka) + f((data[o + c] ?? 0) * (key[c] ?? 0)));
+      out[o + c] = Math.round(Math.min(Math.max(v, 0), 1) * 255);
+    }
+    out[o + 3] = 255;
+  }
+}
+
+/** Surfaces already computed: at most this many (paper and chalk, at a size or two). */
+const BACKGROUNDS_KEPT = 2;
+const backgrounds = new Map<
+  string,
+  {
+    surface: CompositeParams['surface'];
+    paper: Uint8Array;
+    bg: Float32Array;
+    bytes: Uint8ClampedArray;
+  }
+>();
+
+/**
+ * The surface under the ink, per pixel (the paper's tiles blended with the surface's field, then
+ * its inset shadows): it depends on the surface, the paper, the size and the DPR, not on the ink,
+ * so an orbit frame computes it once and reuses it (M10). The values are f32 results of exactly
+ * the arithmetic the composite shader does, so the frame is the one the per-pixel code gave.
+ */
+function surfaceBackground(
+  W: number,
+  H: number,
+  p: CompositeParams,
+): { bg: Float32Array; bytes: Uint8ClampedArray } {
+  const id = `${p.surface.name}|${String(W)}|${String(H)}|${String(p.dpr)}|${String(p.plateCss)}`;
+  const kept = backgrounds.get(id);
+  if (kept && kept.surface === p.surface && kept.paper === p.paper.data) {
+    // most recently used last
+    backgrounds.delete(id);
+    backgrounds.set(id, kept);
+    return kept;
+  }
   const { width: pw, height: ph, data: pd } = p.paper;
   const k = texelPerPx(pw, p.dpr);
   const field = p.surface.field.map(f);
-  const key = compositeInk(p.plates ?? 'ink', p.surface.palette).map(f);
   const blend = p.surface.blend === 'multiply' ? blendMultiply : blendSoftLight;
   const wrap = (i: number, n: number) => ((i % n) + n) % n;
   const tex = (x: number, y: number, c: number) => f((pd[(y * pw + x) * 4 + c] ?? 0) / 255);
@@ -209,6 +279,7 @@ export function composite(ink: InkBuffer, p: CompositeParams, out: Uint8ClampedA
       Float32Array.from({ length: n }, (_, i) => holeAxis(i, dpr, size, spread, sigma));
     return { rgb: sh.rgba.slice(0, 3).map(f), alpha: f(sh.rgba[3]), hx: axis(W), hy: axis(H) };
   });
+  const bg = new Float32Array(W * H * 3);
   const surf = [0, 0, 0];
   for (let y = 0; y < H; y++) {
     const { i0: y0, i1: y1, w: wy } = ty[y] ?? { i0: 0, i1: 0, w: 0 };
@@ -227,15 +298,25 @@ export function composite(ink: InkBuffer, p: CompositeParams, out: Uint8ClampedA
         const ka = f(1 - a);
         for (let c = 0; c < 3; c++) surf[c] = f(f((surf[c] ?? 0) * ka) + f((sh.rgb[c] ?? 0) * a));
       }
-      const o = (y * W + x) * 4;
-      const ka = f(1 - (data[o + 3] ?? 0));
-      for (let c = 0; c < 3; c++) {
-        const v = f(f((surf[c] ?? 0) * ka) + f((data[o + c] ?? 0) * (key[c] ?? 0)));
-        out[o + c] = Math.round(Math.min(Math.max(v, 0), 1) * 255);
-      }
-      out[o + 3] = 255;
+      const o = (y * W + x) * 3;
+      for (let c = 0; c < 3; c++) bg[o + c] = surf[c] ?? 0;
     }
   }
+  // the surface alone, rounded as the composite rounds it where there is no ink
+  const bytes = new Uint8ClampedArray(W * H * 4);
+  for (let i = 0; i < W * H; i++) {
+    for (let c = 0; c < 3; c++)
+      bytes[i * 4 + c] = Math.round(Math.min(Math.max(bg[i * 3 + c] ?? 0, 0), 1) * 255);
+    bytes[i * 4 + 3] = 255;
+  }
+  const entry = { surface: p.surface, paper: p.paper.data, bg, bytes };
+  backgrounds.set(id, entry);
+  while (backgrounds.size > BACKGROUNDS_KEPT) {
+    const oldest = backgrounds.keys().next();
+    if (oldest.done) break;
+    backgrounds.delete(oldest.value);
+  }
+  return entry;
 }
 
 const edgeFn = (ax: number, ay: number, bx: number, by: number, cx: number, cy: number) =>

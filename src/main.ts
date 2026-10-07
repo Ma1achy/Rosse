@@ -24,20 +24,17 @@
  * URL parameters: `preset`, `seed`, `variant=stipple` (the M2 golden overrides: no lines, knots,
  * envelope, drawn stars, deep field or foreground stars), `variant=ribbons` (the M4 overrides),
  * `variant=vectors` (the M5 overrides), `az`, `incl`, `pa`, `zoom`, `backend=cpu|webgpu`,
- * `present=copy`.
+ * `present=copy`, `cpuworker=off` (the CPU engine on the main thread, for profiling).
  */
 import type { Params } from './core/params';
 import { presetParams } from './core/presets';
 import { buildShellScene } from './model/shells';
-import { CpuMerger } from './fallback/merger';
-import { CpuShellScene } from './fallback/shells';
+import { LocalCpu, WorkerCpu, type CpuBackend } from './fallback/client';
 import { GpuMerger } from './render/merger';
 import { GpuShells } from './render/shells';
 import { CAPABILITIES, type Capabilities } from './render/capabilities';
 import type { InkLayer } from './render/layers';
 import { pageModelKey } from './render/page-key';
-import { CpuRenderer } from './fallback';
-import { CpuStippleTiers } from './fallback/stipple';
 import { Gpu, awaitLoss, detectBackend, type Backend } from './gpu/device';
 import { readTexture } from './gpu/readback';
 import { BuiltAssets, type AtlasData, type AtlasName, type ImageData8 } from './marks/atlas';
@@ -45,8 +42,8 @@ import { VECTOR_ATLASES, type VectorLibrary } from './marks/vector';
 import { drawingsMeta, markCounts, type MarkCounts } from './model/scene';
 import type { DrawingsMeta } from './model/variation';
 import { GpuRenderer, type FrameSize } from './render/frame';
-import { PALETTES } from './render/palette';
-import type { InkLook, Plates } from './render/plates';
+import { inkKey, inkLook } from './render/ink-look';
+import type { Plates } from './render/plates';
 import { GpuStipple } from './render/stipple';
 import { SURFACES, type SurfaceName } from './render/surface';
 import { attachOrbit, type OrbitState } from './ui/orbit';
@@ -187,18 +184,6 @@ interface Engine {
   destroy(): void;
 }
 
-/**
- * What the ink target is printed with for a plates mode on a surface. Only the coloured plates
- * depend on the surface's palette; the `ink` plate is the same on both (the composite colours it).
- */
-function inkLook(plates: Plates, surface: SurfaceName): InkLook {
-  return { plates, palette: surface === 'chalk' ? PALETTES.dark : PALETTES.light };
-}
-
-/** A key that changes when the printed ink target must be redone. */
-const inkKey = (look: InkLook) =>
-  look.plates === 'ink' ? 'ink' : `${look.plates}|${look.palette.ink.join()}`;
-
 function plateCanvas(): HTMLCanvasElement {
   const c = document.getElementById('plate');
   if (!(c instanceof HTMLCanvasElement)) throw new Error('#plate is missing');
@@ -227,124 +212,86 @@ function freshCanvas(): HTMLCanvasElement {
   return c;
 }
 
-function cpuEngine(scene: Scene, size: FrameSize): Engine {
+/**
+ * The CPU engine's backend: a worker (ADR 0071), so that no frame, and above all no merger or
+ * shell integration, blocks the page, or the page's own thread where a worker cannot be made or
+ * `?cpuworker=off` is given.
+ */
+async function cpuBackend(scene: Scene, size: FrameSize): Promise<CpuBackend> {
+  const off = new URLSearchParams(location.search).get('cpuworker') === 'off';
+  if (!off && typeof Worker !== 'undefined') {
+    try {
+      return await WorkerCpu.create(import.meta.env.BASE_URL, size);
+    } catch (e) {
+      console.warn('The CPU worker failed, drawing on the main thread:', e);
+    }
+  }
+  return new LocalCpu(scene.atlases, scene.paper, scene.meta, size);
+}
+
+async function cpuEngine(scene: Scene, size: FrameSize): Promise<Engine> {
+  const backend = await cpuBackend(scene, size);
   const canvas = freshCanvas();
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('no 2D canvas');
-  const r = new CpuRenderer(size, scene.paper);
-  scene.atlases.forEach((a) => {
-    r.addAtlas(a);
-  });
-  /** the key of the look the ink buffer holds; null when it is stale */
-  let inked: string | null = null;
-  const ink = (look: InkLook) => {
-    const key = inkKey(look);
-    if (key === inked) return;
-    r.drawInk(look);
-    inked = key;
-  };
+  let current = size;
+  /** a resize in flight (the backend handles requests in order; this surfaces its failure) */
+  let pending: Promise<unknown> = Promise.resolve();
   let counts: MarkCounts = markCounts([]);
-  let layers: readonly InkLayer[] = [];
-  const stipple = new CpuStippleTiers(scene.meta);
-  /** the merger (or the shells) built for these parameters, and what they were keyed on */
-  let merger: { key: string; m: CpuMerger } | null = null;
-  let shells: { key: string; s: CpuShellScene } | null = null;
-  /** tier runs of the merger and the shells (the stipple's are `stipple.tiers`) */
-  const pageRuns = { model: 0, view: 0 };
-  /** what the ink layers are now: the stipple's, the stipple's with shells, or the merger's */
-  let mode: 'stipple' | 'shells' | 'merger' = 'stipple';
+  let tiers = { model: 0, view: 0 };
+  /** the key of the merger or shells the backend holds; null for a single galaxy */
+  let builtKey: string | null = null;
+  document.documentElement.dataset.cpuWhere = backend.where;
   return {
     backend: 'cpu',
     capabilities: CAPABILITIES,
-    size: () => r.size,
+    size: () => current,
     stale: () => false,
     async draw(P, zoom, _home, busy) {
-      if (P.merger) {
-        const key = pageModelKey(P);
-        if (merger?.key !== key) {
-          // the integration runs on this thread: let the page say so before it starts
-          busy(true);
-          await new Promise((res) => setTimeout(res, 0));
-          try {
-            merger = { key, m: new CpuMerger({ ...P }, scene.meta) };
-          } finally {
-            busy(false);
-          }
-          pageRuns.model++;
-        }
-        const m = merger.m;
-        // the camera and the moment are the view tier's: they are set on the built scene
-        Object.assign(m.scene.P, { az: P.az, incl: P.incl, pa: P.pa, winding: P.winding });
-        const v = m.view(zoom, P.mTime);
-        pageRuns.view++;
-        r.setLayers(v.layers);
-        layers = v.layers;
-        counts = v.counts;
-        mode = 'merger';
-      } else {
-        const { view, work } = stipple.frame(P, zoom);
-        let shellsView: { layers: InkLayer[]; dots: number } | null = null;
-        if (P.shellsOn && stipple.stipple) {
-          const key = pageModelKey(P);
-          if (shells?.key !== key) {
-            busy(true);
-            await new Promise((res) => setTimeout(res, 0));
-            try {
-              shells = {
-                key,
-                s: new CpuShellScene(
-                  buildShellScene(P, scene.meta, stipple.stipple.scene.variation),
-                ),
-              };
-            } finally {
-              busy(false);
-            }
-            pageRuns.model++;
-          }
-          shellsView = shells.s.view(zoom);
-          pageRuns.view++;
-        }
-        if (work.view || shellsView || mode !== 'stipple') {
-          layers = shellsView ? [...view.layers, ...shellsView.layers] : view.layers;
-          r.setLayers(layers);
-        }
-        counts = shellsView
-          ? { ...view.counts, dots: view.counts.dots + shellsView.dots }
-          : view.counts;
-        mode = shellsView ? 'shells' : 'stipple';
+      await pending;
+      // a merger's integration, or the shells' simulation, is this frame's model tier: say so
+      const key = P.merger || P.shellsOn ? pageModelKey(P) : null;
+      const building = key !== null && key !== builtKey;
+      if (building) busy(true);
+      try {
+        const d = await backend.draw(P, zoom);
+        counts = d.counts;
+        tiers = d.tiers;
+        builtKey = key;
+      } finally {
+        if (building) busy(false);
       }
-      inked = null;
     },
-    tierRuns: () => ({
-      model: stipple.tiers.runs.model + pageRuns.model,
-      view: stipple.tiers.runs.view + pageRuns.view,
-    }),
+    tierRuns: () => ({ ...tiers }),
     counts: () => Promise.resolve(counts),
-    present(surface, plates) {
-      ink(inkLook(plates, surface));
-      const out = r.present(SURFACES[surface]);
+    async present(surface, plates) {
+      await pending;
+      const f = await backend.present(surface, plates);
       // a canvas is cleared when it is resized, so only when the size changed
-      if (canvas.width !== r.width) canvas.width = canvas.height = r.width;
-      ctx.putImageData(new ImageData(out, r.width, r.height), 0, 0);
-      return Promise.resolve();
+      if (canvas.width !== f.width || canvas.height !== f.height) {
+        canvas.width = f.width;
+        canvas.height = f.height;
+      }
+      ctx.putImageData(new ImageData(f.pixels, f.width, f.height), 0, 0);
     },
-    snapshot(surface, plates) {
+    async snapshot(surface, plates) {
       // the visible canvas is not touched
-      ink(inkLook(plates, surface));
-      return Promise.resolve({
-        px: r.present(SURFACES[surface]),
-        width: r.width,
-        height: r.height,
-      });
+      await pending;
+      const f = await backend.present(surface, plates);
+      return { px: f.pixels, width: f.width, height: f.height };
     },
     resize(s) {
-      r.resize(s);
-      inked = null;
+      current = s;
+      pending = backend.resize(s);
+      pending.catch(() => undefined);
     },
-    layers: () => layers,
+    // the layers live in the worker: M12's SVG export asks `CpuBackend.layers()` (asynchronous)
+    layers: () => [],
     device: () => null,
     recovering: () => Promise.resolve(false),
-    destroy: () => undefined,
+    destroy: () => {
+      backend.destroy();
+    },
   };
 }
 
@@ -685,9 +632,12 @@ async function start(): Promise<void> {
   const toCpu = (why: unknown) => {
     console.warn('Switching to the CPU engine:', why);
     engine?.destroy();
-    engine = cpuEngine(scene, wantedSize);
-    bindOrbit();
-    schedule();
+    engine = undefined;
+    cpuEngine(scene, wantedSize).then((e) => {
+      engine = e;
+      bindOrbit();
+      schedule();
+    }, report);
   };
   const busy = (on: boolean) => {
     building = on;
@@ -831,7 +781,7 @@ async function start(): Promise<void> {
           console.warn('WebGPU failed, using the CPU engine:', e);
           return cpuEngine(scene, wantedSize);
         })
-      : cpuEngine(scene, wantedSize);
+      : await cpuEngine(scene, wantedSize);
 
   // What the engine draws decides what the page offers, what a link may ask for and which presets
   // there are. Both engines draw the same set, so a switch to the CPU engine keeps the page.

@@ -12,6 +12,7 @@
  */
 import vectorWgsl from '../shaders/compute/vector-expand.wgsl';
 import { bufferWithData, packStruct } from '../gpu/buffers';
+import { GpuResources } from '../gpu/pool';
 import { INSTANCE_LAYOUT } from '../marks/instance';
 import type { PackedVectors } from '../marks/vector';
 import { CAPSULE_LAYOUT } from '../model/ribbons';
@@ -96,9 +97,10 @@ export class GpuVectors {
   private constructor(
     readonly device: GPUDevice,
     private readonly pipes: Record<Entry, GPUComputePipeline>,
+    private readonly res: GpuResources,
   ) {}
 
-  static create(device: GPUDevice): GpuVectors {
+  static create(device: GPUDevice, res: GpuResources = new GpuResources(device)): GpuVectors {
     const module = device.createShaderModule({ label: 'vector-expand.wgsl', code: vectorWgsl });
     const pipes = Object.fromEntries(
       ENTRIES.map((e) => [
@@ -110,7 +112,7 @@ export class GpuVectors {
         }),
       ]),
     ) as Record<Entry, GPUComputePipeline>;
-    return new GpuVectors(device, pipes);
+    return new GpuVectors(device, pipes, res);
   }
 
   get desc(): VectorDesc | null {
@@ -153,8 +155,9 @@ export class GpuVectors {
       own.push(b);
       return b;
     };
+    const res = this.res;
     const buf = (bytes: number, usage: number, label: string) =>
-      keep(d.createBuffer({ label, size: Math.max(256, bytes), usage }));
+      keep(res.scratch(Math.max(256, bytes), usage, label));
     const src = STORAGE | GPUBufferUsage.COPY_SRC;
     const [table, segs, dens, dots, blobs] = this.library(D.lib) as [
       GPUBuffer,
@@ -209,10 +212,10 @@ export class GpuVectors {
       31: tide ?? buf(16, STORAGE, 'no tides'),
     };
     const dotArgs = keep(
-      bufferWithData(d, new Uint32Array([4, D.nDots, 0, 0]), GPUBufferUsage.INDIRECT, 'dots args'),
+      res.data(new Uint32Array([4, D.nDots, 0, 0]), GPUBufferUsage.INDIRECT, 'dots args'),
     );
     const blobArgs = keep(
-      bufferWithData(d, new Uint32Array([4, D.nBlobs, 0, 0]), GPUBufferUsage.INDIRECT, 'blob args'),
+      res.data(new Uint32Array([4, D.nBlobs, 0, 0]), GPUBufferUsage.INDIRECT, 'blob args'),
     );
     const withJob = (J: Job): Record<number, GPUBuffer> => ({
       ...buffers,
@@ -452,7 +455,7 @@ export class GpuVectors {
   /** Frees the model tier's buffers (the library's tables stay for the next load). */
   unload(): void {
     this.model?.own.forEach((b) => {
-      b.destroy();
+      this.res.release(b);
     });
     this.model = null;
   }

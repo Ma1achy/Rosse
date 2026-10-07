@@ -152,4 +152,15 @@ npx prettier --write tests/golden/thresholds.json tests/golden/calibration.json
 
 If a case then fails, or a negative control that was caught is missed, the thresholds or the ADR are revisited.
 
+**M10 adds to the same visit** (docs/milestones/m10/README.md): the budget table and the L1 report need a real adapter, and the harnesses exist now:
+
+```
+ROSSE_WEBGPU_ADAPTER=hardware npm run perf -- --gpu     # perf/gpu-hardware.json: GPU timestamps per pass, wall clock, allocations
+ROSSE_WEBGPU_ADAPTER=hardware npm run l1                # the adapter against the CPU engine at the strict thresholds
+npm run perf:report                                     # rewrites docs/milestones/m10/perf-report.md
+npx prettier --write docs/milestones/m10
+```
+
+Commit the changed files under `docs/milestones/m10/`. Check the first line each prints names an adapter other than SwiftShader (Chromium may need `ROSSE_CHROMIUM_ARGS`). Until then no budget of docs/architecture.md is claimed on real hardware; the integrated, discrete and mobile measurements are the M10 acceptance this environment could not do.
+
 **Recommendation:** do it with M10's real-hardware pass (it is on that row's acceptance in docs/roadmap.md), or earlier if convenient.

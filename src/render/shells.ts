@@ -9,6 +9,7 @@
  */
 import shellsWgsl from '../shaders/compute/shells.wgsl';
 import { bufferWithData, packStruct } from '../gpu/buffers';
+import { GpuResources } from '../gpu/pool';
 import { readBuffer } from '../gpu/readback';
 import { INSTANCE_LAYOUT } from '../marks/instance';
 import { SSIM_LAYOUT, ssimUniform } from '../fallback/kernels/shells';
@@ -45,11 +46,12 @@ export class GpuShells {
   private constructor(
     readonly device: GPUDevice,
     private readonly pipes: Record<Entry, GPUComputePipeline>,
+    res: GpuResources,
   ) {
-    this.ribbons = GpuRibbons.create(device);
+    this.ribbons = GpuRibbons.create(device, res);
   }
 
-  static create(device: GPUDevice): GpuShells {
+  static create(device: GPUDevice, res: GpuResources = new GpuResources(device)): GpuShells {
     const module = device.createShaderModule({ label: 'shells.wgsl', code: shellsWgsl });
     const pipes = Object.fromEntries(
       ENTRIES.map((e) => [
@@ -61,7 +63,7 @@ export class GpuShells {
         }),
       ]),
     ) as Record<Entry, GPUComputePipeline>;
-    return new GpuShells(device, pipes);
+    return new GpuShells(device, pipes, res);
   }
 
   /** Dots made (the satellite's stars): all of them are drawn. */

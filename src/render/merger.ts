@@ -17,6 +17,7 @@
 import mergerSpritesWgsl from '../shaders/compute/merger-sprites.wgsl';
 import scanWgsl from '../shaders/compute/scan.wgsl';
 import { bufferWithData } from '../gpu/buffers';
+import { GpuResources } from '../gpu/pool';
 import { readBuffer } from '../gpu/readback';
 import { INSTANCE_LAYOUT } from '../marks/instance';
 import { MVIEW_LAYOUT } from '../fallback/kernels/merger-sprites';
@@ -92,12 +93,16 @@ export class GpuMerger {
   private poolBuffers: { pool: GPUBuffer; dotBase: GPUBuffer; noise: GPUBuffer } | null = null;
   private mwarpOn = false;
 
+  /** the buffers of the warp's vector pass and the shells (each galaxy has its own, M10) */
+  private readonly res: GpuResources;
+
   private constructor(readonly device: GPUDevice) {
+    this.res = new GpuResources(device);
     this.stars = GpuMergerStars.create(device);
     this.tideMap = GpuTideMap.create(device);
     this.galaxies = [GpuStipple.create(device), GpuStipple.create(device)];
-    this.mwarp = GpuVectors.create(device);
-    this.shells = GpuShells.create(device);
+    this.mwarp = GpuVectors.create(device, this.res);
+    this.shells = GpuShells.create(device, this.res);
     const mod = (code: string, label: string) => device.createShaderModule({ label, code });
     const sprites = mod(mergerSpritesWgsl, 'merger-sprites.wgsl');
     const scan = mod(scanWgsl, 'scan.wgsl');
@@ -407,5 +412,6 @@ export class GpuMerger {
     });
     this.mwarp.destroy();
     this.shells.destroy();
+    this.res.destroy();
   }
 }

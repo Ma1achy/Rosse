@@ -41,6 +41,8 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0042](adr/0042-the-debris-of-a-merger-as-marks.md) | _Proposed:_ the debris of a merger as marks: classified on the counter RNG, thinned as v21 thins it, and what v21 builds and never draws is not built |
 | [0043](adr/0043-shells-on-the-gpu-detected-by-atomics-and-bisection.md) | _Proposed:_ shell galaxies: the satellite on the GPU, the shells found by integer atomics and a bisection, the arcs through a face-on camera |
 | [0044](adr/0044-m8-acceptance-overrides-and-the-merger-and-shell-thresholds.md) | _Proposed:_ the M8 goldens' overrides, and the thresholds of the merger and shell families |
+| [0070](adr/0070-pooled-scratch-shared-uploads-and-kept-batches.md) | _Proposed:_ pooled scratch buffers (cleared on reuse), content-addressed shared uploads and kept ink batches, so a model rebuild and an orbit frame create almost no resources. Output unchanged. |
+| [0071](adr/0071-the-cpu-engine-runs-in-a-worker.md) | _Proposed:_ the CPU engine runs in a worker behind messages (`fallback/core.ts`, `worker.ts`, `client.ts`), so a CPU frame never blocks the page. |
 
 ## Modules
 
@@ -107,6 +109,8 @@ These are targets on a mid-range laptop GPU, measured in M10.
 | parameter change (model tier), single galaxy | < 30 ms to first frame |
 | merger parameter change | < 100 ms to first frame at the default horizon |
 | CPU fallback orbit frame | < 100 ms on one core |
+
+M10 built the harness that measures these (`npm run perf`, `npm run l1`) and checked in what SwiftShader and the CPU engine show, each labelled with its adapter: [docs/milestones/m10](milestones/m10/README.md). The rows on a real GPU are not measured yet (open question Q14).
 
 v21 today, on SwiftShader: 50 ms (deep field) to 1.6 s (cluster lens) per render, with every orbit frame a full render (reference notes, sizes and costs).
 
