@@ -210,6 +210,7 @@ export class GpuRenderer {
       a.destroy();
     });
     this.composite.destroy();
+    this.ribbons.destroy();
     this.ink.destroy();
   }
 }

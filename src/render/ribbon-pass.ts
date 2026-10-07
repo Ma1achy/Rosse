@@ -44,12 +44,44 @@ const MAX: GPUBlendState = {
 };
 
 export class RibbonPipeline {
+  /**
+   * The pen lines' coverage target for a plate of this size, shared by every pen-line layer (they
+   * run one after another in one command stream, and each clears it first) and kept across layer
+   * rebuilds, which happen on every camera move: only a new plate size makes a new texture.
+   */
+  penMaskTarget(width: number, height: number): GPUTextureView {
+    const w = Math.max(1, width);
+    const h = Math.max(1, height);
+    if (this.mask?.width !== w || this.mask.height !== h) {
+      this.mask?.texture.destroy();
+      const texture = this.device.createTexture({
+        label: 'pen-line coverage',
+        size: [w, h],
+        format: PEN_MASK_FORMAT,
+        usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
+      });
+      this.mask = { texture, view: texture.createView(), width: w, height: h };
+    }
+    return this.mask.view;
+  }
+
+  destroy(): void {
+    this.mask?.texture.destroy();
+    this.mask = null;
+  }
+
   readonly ribbon: GPURenderPipeline;
   readonly penMask: GPURenderPipeline;
   readonly penResolve: GPURenderPipeline;
   readonly ribbonLayout: GPUBindGroupLayout;
   readonly capsuleLayout: GPUBindGroupLayout;
   readonly resolveLayout: GPUBindGroupLayout;
+  private mask: {
+    texture: GPUTexture;
+    view: GPUTextureView;
+    width: number;
+    height: number;
+  } | null = null;
   readonly sampler: GPUSampler;
 
   constructor(readonly device: GPUDevice) {
@@ -236,15 +268,14 @@ export class RibbonBatch {
 }
 
 /**
- * One layer of pen lines (ADR 0019): `prepass` unions its quads per sample into the layer's own
- * coverage target, outside the ink pass; `encode` resolves that coverage over the ink. It draws
- * `count` quads, or, with `indirect`, as many as its draw arguments [6·n, 1, 0, 0] say (a
- * compaction's output, `count` being the buffer's capacity). Each pass of the plates has its own
- * uniforms (ink, gain, offset), made on first use; the coverage target is shared, because the
- * prepass and the resolve of one pass run one after the other.
+ * One layer of pen lines (ADR 0019): `prepass` unions its quads per sample into the pipeline's
+ * coverage target (shared, and kept across rebuilds), outside the ink pass; `encode` resolves that
+ * coverage over the ink. It draws each source's `count` quads, or, with `indirect`, as many as its
+ * draw arguments [6·n, 1, 0, 0] say (a compaction's output, `count` being the buffer's capacity).
+ * Each pass of the plates has its own uniforms (ink, gain, offset), made on first use; the target
+ * is shared, because the prepass and the resolve of one pass run one after the other.
  */
 export class CapsuleBatch {
-  private readonly mask: GPUTexture;
   private readonly maskView: GPUTextureView;
   private readonly groups: PassGroups<{ sources: GPUBindGroup[]; resolve: GPUBindGroup }>;
   private readonly sources: { count: number; indirect?: GPUBuffer }[];
@@ -261,13 +292,7 @@ export class CapsuleBatch {
       ...(s.indirect ? { indirect: s.indirect } : {}),
     }));
     this.count = sources.reduce((n, s) => n + s.count, 0);
-    this.mask = d.createTexture({
-      label: 'pen-line coverage',
-      size: [Math.max(1, opts.targetWidth), Math.max(1, opts.targetHeight)],
-      format: PEN_MASK_FORMAT,
-      usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING,
-    });
-    this.maskView = this.mask.createView();
+    this.maskView = pipe.penMaskTarget(opts.targetWidth, opts.targetHeight);
     this.groups = new PassGroups(opts, (o) => {
       const uniforms = drawUniforms(d, o, null, 'pen-line uniforms');
       return {
@@ -336,6 +361,5 @@ export class CapsuleBatch {
 
   destroy(): void {
     this.groups.destroy();
-    this.mask.destroy();
   }
 }

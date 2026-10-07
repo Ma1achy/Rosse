@@ -70,6 +70,7 @@ npm run golden -- --all              # also every preset capture, for informatio
 npm run golden -- --report-all       # an HTML report for every case, not only failing ones
 npm run golden -- --calibrate        # re-measure (4 processes; --jobs n) and rewrite thresholds.json, calibration.json (hours; --resume after a stop)
 npm run golden -- --calibrate --reuse-shards --keys 4   # re-aggregate the last calibration for another K
+npm run golden -- --calibrate --controls-every 2   # the negative controls on every other configuration (default: all); --resume adds them later
 npm run golden -- --update-engine    # rewrite engine-hashes.json, the engine's own goldens (test e)
 npm run capture:reference -- --extra tests/golden/extra-cases.json   # the variant captures
 npm run capture:reference -- --extra tests/golden/extra-cases.json --cameras zoom   # only the zoom camera

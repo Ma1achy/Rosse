@@ -27,6 +27,29 @@ The M4 captures (`tests/golden/extra-cases.json`) set, after the preset and the 
 
 The ring knots' and clumps' drawn stars stay in both (v21 draws a ring knot's star whatever `starMix`): they are classified and counted on both sides, and not drawn until M5 and M7.
 
+## Evidence that the line-work is tested
+
+With the stipple in, the metric hardly sees changes of the line-work at the home and orbit cameras (QA D3). The `lines` captures were added for that. The seven source breaks of QA's table (a stroke width ×1.5, arm phase +45°, taper off, no re-spaced pieces, a lane cull radius of 0, no hatching, no clumps), each run through the CPU golden at the final thresholds, fail this many of the 14 cases per family and camera (`docs/data/m4-breaks.json`, written by `tools/m4-summary.mjs breaks`; the unbroken source fails none):
+
+| break | `lines` home | `lines` orbit | `ribbons` home | `ribbons` orbit | `ribbons` zoom |
+| --- | --- | --- | --- | --- | --- |
+| stroke width ×1.5 | 13 | 14 | 1 | 0 | 6 |
+| phase +45° | 14 | 14 | 2 | 1 | 11 |
+| taper off | 7 | 6 | 0 | 0 | 1 |
+| no re-spaced pieces | 12 | 11 | 0 | 0 | 5 |
+| lane cull radius 0 | 0 | 0 | 5 | 8 | 6 |
+| no hatching | 14 | 14 | 0 | 1 | 4 |
+| no clumps | 14 | 14 | 14 | 14 | 14 |
+
+Two breaks are missed by the `ribbons` cases at home and orbit, and what catches them is stated here and not left to be found:
+
+- **No re-spaced pieces** changes little ink under the stipple (0 of 14 at home and orbit), and is caught by the `lines` cases (12 and 11 of 14) and, partly, at zoom (5 of 14).
+- **The lane cull** thins about half a per cent of the marks (61 of about 11,000 for `Dusty spiral` seed 7), which the `lines` cases, with no stipple, cannot see (0 of 14), and the ink gates see in 5 to 8 of the 14 `ribbons` cases. It is guarded by a unit test of the cull itself (`tests/unit/lines.test.ts`, "the lane cull thins the stipple near the lanes"), which fails for a radius of 0.
+
+Taper off is the weakest of the rest (6 to 7 of 14 on `lines`, 0 to 1 on `ribbons` at home and orbit): a taper changes the width of the last part of each arm, a few per cent of its ink.
+
+The `lines` family has no negative controls of the kind the stipple families have (a change of parameter, re-keyed); these breaks are its controls.
+
 ## Consequences
 
 - The M4 goldens test what M4 builds; the overridden marks are tested when their milestones land, with these overrides removed one by one.
