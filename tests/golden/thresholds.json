@@ -25,104 +25,104 @@
       "countsSmall": 0.1,
       "poisson": 3,
       "poissonBelow": 2000,
-      "ink": 0.069,
-      "ssimCoarse": 0.88,
+      "ink": 0.05,
+      "ssimCoarse": 0.89,
       "median": 0.1,
-      "p90": 0.106,
-      "r25": 0.052,
-      "r50": 0.055,
-      "r90": 0.104,
-      "outer": 0.026,
-      "q": 0.058,
-      "qInner": 0.069,
-      "paA": 1.527,
-      "paEps0": 0.074,
+      "p90": 0.1,
+      "r25": 0.035,
+      "r50": 0.037,
+      "r90": 0.069,
+      "outer": 0.018,
+      "q": 0.039,
+      "qInner": 0.046,
+      "paA": 1.034,
+      "paEps0": 0.05,
       "countsBy": {
-        "dots": 0.266
+        "dots": 0.177
       },
       "byPreset": {
         "Grand design": {
-          "ssimCoarse": 0.88,
-          "r25": 0.052,
-          "r50": 0.055,
-          "r90": 0.136,
-          "outer": 0.029,
-          "paA": 1.527,
-          "q": 0.08,
-          "qInner": 0.057,
-          "paEps0": 0.091,
+          "ssimCoarse": 0.89,
+          "r25": 0.035,
+          "r50": 0.037,
+          "r90": 0.091,
+          "outer": 0.019,
+          "paA": 1.288,
+          "q": 0.053,
+          "qInner": 0.038,
+          "paEps0": 0.061,
           "countsBy": {
-            "dots": 0.12
+            "dots": 0.08
           }
         },
         "Barred spiral": {
-          "ssimCoarse": 0.88,
-          "r25": 0.052,
-          "r50": 0.055,
-          "r90": 0.104,
-          "outer": 0.033,
-          "paA": 1.527,
-          "q": 0.041,
-          "qInner": 0.073,
-          "paEps0": 0.052,
+          "ssimCoarse": 0.89,
+          "r25": 0.035,
+          "r50": 0.037,
+          "r90": 0.069,
+          "outer": 0.022,
+          "paA": 1.034,
+          "q": 0.027,
+          "qInner": 0.049,
+          "paEps0": 0.035,
           "countsBy": {
-            "dots": 0.345
+            "dots": 0.23
           }
         },
         "Flocculent": {
-          "ssimCoarse": 0.84,
-          "r25": 0.052,
-          "r50": 0.055,
-          "r90": 0.104,
-          "outer": 0.026,
-          "paA": 1.749,
-          "q": 0.079,
-          "qInner": 0.055,
-          "paEps0": 0.099,
+          "ssimCoarse": 0.86,
+          "r25": 0.035,
+          "r50": 0.037,
+          "r90": 0.069,
+          "outer": 0.018,
+          "paA": 1.323,
+          "q": 0.053,
+          "qInner": 0.037,
+          "paEps0": 0.066,
           "countsBy": {
-            "dots": 0.092
+            "dots": 0.061
           }
         },
         "Tightly wound": {
-          "ssimCoarse": 0.88,
-          "r25": 0.052,
-          "r50": 0.055,
-          "r90": 0.104,
-          "outer": 0.026,
-          "paA": 1.527,
-          "q": 0.056,
-          "qInner": 0.061,
-          "paEps0": 0.067,
+          "ssimCoarse": 0.89,
+          "r25": 0.035,
+          "r50": 0.037,
+          "r90": 0.069,
+          "outer": 0.018,
+          "paA": 1.034,
+          "q": 0.037,
+          "qInner": 0.041,
+          "paEps0": 0.045,
           "countsBy": {
-            "dots": 0.221
+            "dots": 0.147
           }
         },
         "Ringed": {
-          "ssimCoarse": 0.88,
-          "r25": 0.052,
-          "r50": 0.055,
-          "r90": 0.104,
-          "outer": 0.026,
-          "paA": 1.527,
-          "q": 0.071,
-          "qInner": 0.055,
-          "paEps0": 0.086,
+          "ssimCoarse": 0.89,
+          "r25": 0.035,
+          "r50": 0.037,
+          "r90": 0.069,
+          "outer": 0.018,
+          "paA": 1.034,
+          "q": 0.047,
+          "qInner": 0.037,
+          "paEps0": 0.058,
           "countsBy": {
-            "dots": 0.309
+            "dots": 0.206
           }
         },
         "Disc, no arms": {
-          "ssimCoarse": 0.88,
-          "r25": 0.052,
-          "r50": 0.056,
-          "r90": 0.104,
-          "outer": 0.026,
-          "paA": 1.835,
-          "q": 0.038,
-          "qInner": 0.075,
-          "paEps0": 0.048,
+          "ssimCoarse": 0.89,
+          "r25": 0.035,
+          "r50": 0.038,
+          "r90": 0.069,
+          "outer": 0.018,
+          "paA": 1.349,
+          "q": 0.026,
+          "qInner": 0.05,
+          "paEps0": 0.032,
           "countsBy": {
-            "dots": 0.215
+            "dots": 0.144
           }
         },
         "Edge-on with dust": {
@@ -139,63 +139,63 @@
           "paA": 0.854,
           "paEps0": 0.038,
           "countsBy": {
-            "dots": 0.32
+            "dots": 0.214
           }
         },
         "Dusty spiral": {
-          "ssimCoarse": 0.88,
-          "r25": 0.07,
-          "r50": 0.055,
-          "r90": 0.129,
-          "outer": 0.034,
-          "paA": 1.527,
-          "q": 0.076,
-          "qInner": 0.078,
-          "paEps0": 0.089,
+          "ssimCoarse": 0.89,
+          "r25": 0.047,
+          "r50": 0.037,
+          "r90": 0.086,
+          "outer": 0.023,
+          "paA": 1.034,
+          "q": 0.051,
+          "qInner": 0.052,
+          "paEps0": 0.059,
           "countsBy": {
-            "dots": 0.168
+            "dots": 0.112
           }
         },
         "Hand-drawn arms": {
-          "ssimCoarse": 0.88,
-          "r25": 0.052,
-          "r50": 0.055,
-          "r90": 0.104,
-          "outer": 0.026,
-          "paA": 1.527,
-          "q": 0.068,
-          "qInner": 0.077,
-          "paEps0": 0.074,
+          "ssimCoarse": 0.89,
+          "r25": 0.035,
+          "r50": 0.037,
+          "r90": 0.069,
+          "outer": 0.018,
+          "paA": 1.034,
+          "q": 0.045,
+          "qInner": 0.051,
+          "paEps0": 0.05,
           "countsBy": {
-            "dots": 0.261
+            "dots": 0.174
           }
         },
         "Loose, open arms": {
-          "ssimCoarse": 0.88,
-          "r25": 0.052,
-          "r50": 0.055,
-          "r90": 0.12,
-          "outer": 0.027,
-          "paA": 1.527,
-          "q": 0.08,
-          "qInner": 0.066,
-          "paEps0": 0.098,
+          "ssimCoarse": 0.89,
+          "r25": 0.035,
+          "r50": 0.037,
+          "r90": 0.08,
+          "outer": 0.018,
+          "paA": 1.034,
+          "q": 0.054,
+          "qInner": 0.044,
+          "paEps0": 0.065,
           "countsBy": {
-            "dots": 0.064
+            "dots": 0.043
           }
         },
         "Hand wobble": {
-          "ssimCoarse": 0.88,
-          "r25": 0.063,
-          "r50": 0.055,
-          "r90": 0.123,
-          "outer": 0.026,
-          "paA": 1.527,
-          "q": 0.036,
-          "qInner": 0.106,
-          "paEps0": 0.04,
+          "ssimCoarse": 0.89,
+          "r25": 0.042,
+          "r50": 0.037,
+          "r90": 0.082,
+          "outer": 0.018,
+          "paA": 1.034,
+          "q": 0.024,
+          "qInner": 0.07,
+          "paEps0": 0.027,
           "countsBy": {
-            "dots": 0.222
+            "dots": 0.148
           }
         }
       }
@@ -205,90 +205,90 @@
       "countsSmall": 0.1,
       "poisson": 3,
       "poissonBelow": 2000,
-      "ink": 0.073,
+      "ink": 0.05,
       "ssimCoarse": 0.91,
       "median": 0.1,
-      "p90": 0.109,
-      "r25": 0.052,
-      "r50": 0.07,
-      "r90": 0.082,
-      "outer": 0.023,
-      "q": 0.099,
-      "qInner": 0.059,
-      "paA": 1.57,
-      "paEps0": 0.115,
+      "p90": 0.1,
+      "r25": 0.035,
+      "r50": 0.047,
+      "r90": 0.055,
+      "outer": 0.016,
+      "q": 0.066,
+      "qInner": 0.039,
+      "paA": 1.323,
+      "paEps0": 0.077,
       "countsBy": {
-        "dots": 0.273
+        "dots": 0.182
       },
       "byPreset": {
         "Smooth, round": {
           "ssimCoarse": 0.91,
-          "r25": 0.058,
-          "r50": 0.121,
-          "r90": 0.126,
-          "outer": 0.023,
-          "paA": 1.57,
-          "q": 0.142,
-          "qInner": 0.052,
-          "paEps0": 0.148,
+          "r25": 0.039,
+          "r50": 0.081,
+          "r90": 0.084,
+          "outer": 0.016,
+          "paA": 1.323,
+          "q": 0.095,
+          "qInner": 0.034,
+          "paEps0": 0.099,
           "countsBy": {
-            "dots": 0.285
+            "dots": 0.19
           }
         },
         "Cigar-shaped": {
           "ssimCoarse": 0.91,
-          "r25": 0.058,
-          "r50": 0.08,
-          "r90": 0.11,
-          "outer": 0.03,
-          "paA": 1.8,
-          "q": 0.116,
-          "qInner": 0.059,
-          "paEps0": 0.149,
+          "r25": 0.039,
+          "r50": 0.053,
+          "r90": 0.074,
+          "outer": 0.02,
+          "paA": 1.411,
+          "q": 0.077,
+          "qInner": 0.039,
+          "paEps0": 0.1,
           "countsBy": {
-            "dots": 0.319
+            "dots": 0.213
           }
         },
         "Radio jet": {
           "ssimCoarse": 0.91,
-          "r25": 0.053,
-          "r50": 0.07,
-          "r90": 0.082,
-          "outer": 0.023,
-          "paA": 1.57,
-          "q": 0.091,
-          "qInner": 0.05,
-          "paEps0": 0.098,
+          "r25": 0.035,
+          "r50": 0.047,
+          "r90": 0.055,
+          "outer": 0.016,
+          "paA": 1.323,
+          "q": 0.061,
+          "qInner": 0.033,
+          "paEps0": 0.066,
           "countsBy": {
-            "dots": 0.241
+            "dots": 0.161
           }
         },
         "Shell galaxy": {
           "ssimCoarse": 0.91,
-          "r25": 0.052,
-          "r50": 0.07,
-          "r90": 0.082,
-          "outer": 0.024,
-          "paA": 1.62,
-          "q": 0.096,
-          "qInner": 0.057,
-          "paEps0": 0.112,
+          "r25": 0.035,
+          "r50": 0.047,
+          "r90": 0.055,
+          "outer": 0.016,
+          "paA": 1.41,
+          "q": 0.064,
+          "qInner": 0.038,
+          "paEps0": 0.075,
           "countsBy": {
-            "dots": 0.261
+            "dots": 0.174
           }
         },
         "Stellar streams": {
           "ssimCoarse": 0.91,
-          "r25": 0.052,
-          "r50": 0.07,
-          "r90": 0.111,
-          "outer": 0.025,
-          "paA": 2.094,
-          "q": 0.064,
-          "qInner": 0.098,
-          "paEps0": 0.073,
+          "r25": 0.035,
+          "r50": 0.047,
+          "r90": 0.074,
+          "outer": 0.017,
+          "paA": 1.832,
+          "q": 0.043,
+          "qInner": 0.066,
+          "paEps0": 0.049,
           "countsBy": {
-            "dots": 0.304
+            "dots": 0.203
           }
         }
       }
@@ -336,40 +336,40 @@
       "countsSmall": 0.1,
       "poisson": 3,
       "poissonBelow": 2000,
-      "ink": 0.057,
-      "ssimCoarse": 0.92,
+      "ink": 0.05,
+      "ssimCoarse": 0.93,
       "median": 0.1,
-      "p90": 0.16,
-      "r25": 0.065,
-      "r50": 0.041,
-      "r90": 0.087,
-      "outer": 0.014,
-      "q": 0.083,
-      "qInner": 0.032,
-      "paA": 0.709,
-      "paEps0": 0.09,
+      "p90": 0.107,
+      "r25": 0.043,
+      "r50": 0.027,
+      "r90": 0.058,
+      "outer": 0.009,
+      "q": 0.055,
+      "qInner": 0.021,
+      "paA": 0.669,
+      "paEps0": 0.06,
       "byPreset": {
         "Star: faint": {
-          "ssimCoarse": 0.92,
-          "r25": 0.081,
-          "r50": 0.041,
-          "r90": 0.087,
-          "outer": 0.014,
-          "paA": 1.208,
-          "q": 0.034,
-          "qInner": 0.031,
-          "paEps0": 0.039
+          "ssimCoarse": 0.93,
+          "r25": 0.054,
+          "r50": 0.027,
+          "r90": 0.058,
+          "outer": 0.009,
+          "paA": 0.89,
+          "q": 0.023,
+          "qInner": 0.021,
+          "paEps0": 0.026
         },
         "Star: bright, with spikes": {
-          "ssimCoarse": 0.92,
-          "r25": 0.065,
-          "r50": 0.053,
-          "r90": 0.103,
-          "outer": 0.016,
-          "paA": 0.709,
-          "q": 0.088,
-          "qInner": 0.054,
-          "paEps0": 0.093
+          "ssimCoarse": 0.93,
+          "r25": 0.043,
+          "r50": 0.035,
+          "r90": 0.069,
+          "outer": 0.011,
+          "paA": 0.669,
+          "q": 0.059,
+          "qInner": 0.036,
+          "paEps0": 0.062
         }
       }
     },
@@ -378,60 +378,57 @@
       "countsSmall": 0.1,
       "poisson": 3,
       "poissonBelow": 2000,
-      "ink": 0.065,
-      "ssimCoarse": 0.92,
-      "median": 0.182,
-      "p90": 0.134,
-      "r25": 0.074,
-      "r50": 0.109,
-      "r90": 0.056,
-      "outer": 0.013,
-      "q": 0.039,
-      "qInner": 0.111,
-      "paA": 2.17,
-      "paEps0": 0.048,
+      "ink": 0.05,
+      "ssimCoarse": 0.93,
+      "median": 0.122,
+      "p90": 0.1,
+      "r25": 0.05,
+      "r50": 0.073,
+      "r90": 0.038,
+      "outer": 0.009,
+      "q": 0.026,
+      "qInner": 0.074,
+      "paA": 1.56,
+      "paEps0": 0.032,
       "countsBy": {
-        "dots": 0.048
+        "dots": 0.032
       },
       "byPreset": {
         "Artefact: ghost reflection": {
-          "ssimCoarse": 0.92,
-          "r25": 0.074,
-          "r50": 0.109,
-          "r90": 0.093,
-          "outer": 0.015,
-          "paA": 2.313,
-          "q": 0.039,
-          "qInner": 0.051,
-          "paEps0": 0.049,
+          "ssimCoarse": 0.93,
+          "r25": 0.05,
+          "r50": 0.073,
+          "r90": 0.062,
+          "outer": 0.01,
+          "paA": 1.618,
+          "q": 0.026,
+          "qInner": 0.034,
+          "paEps0": 0.033,
           "countsBy": {
-            "dots": 0.048
+            "dots": 0.032
           }
         },
         "Artefact: cosmic rays": {
-          "ssimCoarse": 0.92,
-          "r25": 0.084,
-          "r50": 0.129,
-          "r90": 0.056,
-          "outer": 0.013,
-          "paA": 2.17,
-          "q": 0.047,
-          "qInner": 0.111,
-          "paEps0": 0.048
+          "ssimCoarse": 0.93,
+          "r25": 0.056,
+          "r50": 0.086,
+          "r90": 0.038,
+          "outer": 0.009,
+          "paA": 1.56,
+          "q": 0.031,
+          "qInner": 0.074,
+          "paEps0": 0.032
         },
         "Artefact: satellite trail": {
-          "ssimCoarse": 0.92,
-          "r25": 0.074,
-          "r50": 0.109,
-          "r90": 0.056,
-          "outer": 0.013,
-          "paA": 2.202,
-          "q": 0.037,
-          "qInner": 0.064,
-          "paEps0": 0.045,
-          "countsBy": {
-            "dots": 0.043
-          }
+          "ssimCoarse": 0.93,
+          "r25": 0.05,
+          "r50": 0.073,
+          "r90": 0.038,
+          "outer": 0.009,
+          "paA": 1.574,
+          "q": 0.025,
+          "qInner": 0.043,
+          "paEps0": 0.03
         }
       }
     },
@@ -440,62 +437,62 @@
       "countsSmall": 0.1,
       "poisson": 3,
       "poissonBelow": 2000,
-      "ink": 0.075,
-      "ssimCoarse": 0.74,
+      "ink": 0.05,
+      "ssimCoarse": 0.78,
       "median": 0.1,
       "p90": 0.1,
-      "r25": 0.084,
-      "r50": 0.067,
-      "r90": 0.053,
-      "outer": 0.024,
-      "q": 0.084,
-      "qInner": 0.075,
-      "paA": 1.008,
-      "paEps0": 0.092,
+      "r25": 0.056,
+      "r50": 0.045,
+      "r90": 0.035,
+      "outer": 0.016,
+      "q": 0.056,
+      "qInner": 0.05,
+      "paA": 0.669,
+      "paEps0": 0.062,
       "countsBy": {
-        "dots": 0.234
+        "dots": 0.156
       },
       "byPreset": {
         "Grand design": {
-          "ssimCoarse": 0.74,
-          "r25": 0.084,
-          "r50": 0.067,
-          "r90": 0.053,
-          "outer": 0.024,
-          "paA": 1.008,
-          "q": 0.098,
-          "qInner": 0.057,
-          "paEps0": 0.113,
+          "ssimCoarse": 0.78,
+          "r25": 0.056,
+          "r50": 0.045,
+          "r90": 0.035,
+          "outer": 0.016,
+          "paA": 0.669,
+          "q": 0.065,
+          "qInner": 0.038,
+          "paEps0": 0.075,
           "countsBy": {
-            "dots": 0.097
+            "dots": 0.065
           }
         },
         "Flocculent": {
-          "ssimCoarse": 0.74,
-          "r25": 0.084,
-          "r50": 0.067,
-          "r90": 0.053,
-          "outer": 0.024,
-          "paA": 1.008,
-          "q": 0.069,
-          "qInner": 0.074,
-          "paEps0": 0.075,
+          "ssimCoarse": 0.78,
+          "r25": 0.056,
+          "r50": 0.045,
+          "r90": 0.035,
+          "outer": 0.016,
+          "paA": 0.736,
+          "q": 0.046,
+          "qInner": 0.049,
+          "paEps0": 0.05,
           "countsBy": {
-            "dots": 0.063
+            "dots": 0.042
           }
         },
         "Ringed": {
-          "ssimCoarse": 0.74,
-          "r25": 0.084,
-          "r50": 0.067,
-          "r90": 0.11,
-          "outer": 0.033,
-          "paA": 1.008,
-          "q": 0.032,
-          "qInner": 0.051,
-          "paEps0": 0.035,
+          "ssimCoarse": 0.78,
+          "r25": 0.056,
+          "r50": 0.045,
+          "r90": 0.074,
+          "outer": 0.022,
+          "paA": 0.669,
+          "q": 0.022,
+          "qInner": 0.034,
+          "paEps0": 0.024,
           "countsBy": {
-            "dots": 0.223
+            "dots": 0.149
           }
         },
         "Edge-on with dust": {
@@ -512,49 +509,49 @@
           "paA": 0.915,
           "paEps0": 0.033,
           "countsBy": {
-            "dots": 0.234
+            "dots": 0.156
           }
         },
         "Barred spiral": {
-          "ssimCoarse": 0.74,
-          "r25": 0.119,
-          "r50": 0.067,
-          "r90": 0.053,
-          "outer": 0.024,
-          "paA": 1.008,
-          "q": 0.099,
-          "qInner": 0.073,
-          "paEps0": 0.108,
+          "ssimCoarse": 0.78,
+          "r25": 0.079,
+          "r50": 0.045,
+          "r90": 0.035,
+          "outer": 0.016,
+          "paA": 0.669,
+          "q": 0.066,
+          "qInner": 0.049,
+          "paEps0": 0.072,
           "countsBy": {
-            "dots": 0.312
+            "dots": 0.208
           }
         },
         "Disc, no arms": {
-          "ssimCoarse": 0.74,
-          "r25": 0.084,
-          "r50": 0.067,
-          "r90": 0.053,
-          "outer": 0.024,
-          "paA": 1.008,
-          "q": 0.029,
-          "qInner": 0.092,
-          "paEps0": 0.033,
+          "ssimCoarse": 0.78,
+          "r25": 0.056,
+          "r50": 0.045,
+          "r90": 0.035,
+          "outer": 0.016,
+          "paA": 0.712,
+          "q": 0.019,
+          "qInner": 0.061,
+          "paEps0": 0.022,
           "countsBy": {
-            "dots": 0.182
+            "dots": 0.122
           }
         },
         "Tightly wound": {
-          "ssimCoarse": 0.74,
-          "r25": 0.084,
-          "r50": 0.067,
-          "r90": 0.053,
-          "outer": 0.024,
-          "paA": 1.008,
-          "q": 0.066,
-          "qInner": 0.062,
-          "paEps0": 0.07,
+          "ssimCoarse": 0.78,
+          "r25": 0.056,
+          "r50": 0.045,
+          "r90": 0.035,
+          "outer": 0.016,
+          "paA": 0.669,
+          "q": 0.044,
+          "qInner": 0.042,
+          "paEps0": 0.047,
           "countsBy": {
-            "dots": 0.156
+            "dots": 0.104
           }
         }
       }
@@ -564,76 +561,76 @@
       "countsSmall": 0.1,
       "poisson": 3,
       "poissonBelow": 2000,
-      "ink": 0.075,
-      "ssimCoarse": 0.85,
+      "ink": 0.05,
+      "ssimCoarse": 0.86,
       "median": 0.1,
       "p90": 0.1,
-      "r25": 0.081,
-      "r50": 0.09,
-      "r90": 0.104,
-      "outer": 0.03,
-      "q": 0.069,
-      "qInner": 0.08,
-      "paA": 1.018,
-      "paEps0": 0.074,
+      "r25": 0.054,
+      "r50": 0.06,
+      "r90": 0.07,
+      "outer": 0.02,
+      "q": 0.046,
+      "qInner": 0.053,
+      "paA": 1.043,
+      "paEps0": 0.049,
       "countsBy": {
-        "dots": 0.252
+        "dots": 0.168
       },
       "byPreset": {
         "Cigar-shaped": {
-          "ssimCoarse": 0.85,
-          "r25": 0.081,
-          "r50": 0.091,
-          "r90": 0.116,
-          "outer": 0.03,
-          "paA": 2.264,
-          "q": 0.057,
-          "qInner": 0.069,
-          "paEps0": 0.074,
+          "ssimCoarse": 0.86,
+          "r25": 0.054,
+          "r50": 0.061,
+          "r90": 0.078,
+          "outer": 0.02,
+          "paA": 1.588,
+          "q": 0.038,
+          "qInner": 0.046,
+          "paEps0": 0.049,
           "countsBy": {
-            "dots": 0.296
+            "dots": 0.197
           }
         },
         "Shell galaxy": {
-          "ssimCoarse": 0.85,
-          "r25": 0.081,
-          "r50": 0.09,
-          "r90": 0.104,
-          "outer": 0.03,
-          "paA": 1.018,
-          "q": 0.078,
-          "qInner": 0.08,
-          "paEps0": 0.091,
+          "ssimCoarse": 0.86,
+          "r25": 0.054,
+          "r50": 0.06,
+          "r90": 0.07,
+          "outer": 0.02,
+          "paA": 1.043,
+          "q": 0.052,
+          "qInner": 0.053,
+          "paEps0": 0.061,
           "countsBy": {
-            "dots": 0.196
+            "dots": 0.131
           }
         },
         "Radio jet": {
-          "ssimCoarse": 0.85,
-          "r25": 0.081,
-          "r50": 0.09,
-          "r90": 0.104,
-          "outer": 0.03,
-          "paA": 1.018,
-          "q": 0.032,
-          "qInner": 0.054,
-          "paEps0": 0.034,
+          "ssimCoarse": 0.86,
+          "r25": 0.054,
+          "r50": 0.06,
+          "r90": 0.07,
+          "outer": 0.02,
+          "paA": 1.043,
+          "q": 0.021,
+          "qInner": 0.036,
+          "paEps0": 0.023,
           "countsBy": {
-            "dots": 0.171
+            "dots": 0.114
           }
         },
         "Smooth, round": {
-          "ssimCoarse": 0.85,
-          "r25": 0.081,
-          "r50": 0.09,
-          "r90": 0.104,
-          "outer": 0.031,
-          "paA": 1.018,
-          "q": 0.069,
-          "qInner": 0.062,
-          "paEps0": 0.071,
+          "ssimCoarse": 0.86,
+          "r25": 0.054,
+          "r50": 0.06,
+          "r90": 0.07,
+          "outer": 0.021,
+          "paA": 1.082,
+          "q": 0.046,
+          "qInner": 0.041,
+          "paEps0": 0.047,
           "countsBy": {
-            "dots": 0.238
+            "dots": 0.159
           }
         }
       }
@@ -663,76 +660,76 @@
       "countsSmall": 0.1,
       "poisson": 3,
       "poissonBelow": 2000,
-      "ink": 0.052,
-      "ssimCoarse": 0.9,
+      "ink": 0.05,
+      "ssimCoarse": 0.91,
       "median": 0.1,
-      "p90": 0.118,
-      "r25": 0.039,
-      "r50": 0.061,
-      "r90": 0.116,
-      "outer": 0.027,
-      "q": 0.054,
-      "qInner": 0.063,
-      "paA": 1.55,
-      "paEps0": 0.066,
+      "p90": 0.1,
+      "r25": 0.026,
+      "r50": 0.041,
+      "r90": 0.077,
+      "outer": 0.018,
+      "q": 0.036,
+      "qInner": 0.042,
+      "paA": 1.102,
+      "paEps0": 0.044,
       "countsBy": {
-        "dots": 0.282
+        "dots": 0.188
       },
       "byPreset": {
         "Layered: edge-on, star on top": {
-          "ssimCoarse": 0.9,
-          "r25": 0.064,
-          "r50": 0.061,
-          "r90": 0.149,
-          "outer": 0.041,
-          "paA": 1.645,
-          "q": 0.061,
-          "qInner": 0.074,
-          "paEps0": 0.079,
+          "ssimCoarse": 0.91,
+          "r25": 0.043,
+          "r50": 0.041,
+          "r90": 0.1,
+          "outer": 0.027,
+          "paA": 1.161,
+          "q": 0.041,
+          "qInner": 0.05,
+          "paEps0": 0.053,
           "countsBy": {
-            "dots": 0.096
+            "dots": 0.064
           }
         },
         "Layered: spiral beside a bright star": {
-          "ssimCoarse": 0.89,
-          "r25": 0.049,
-          "r50": 0.061,
-          "r90": 0.116,
-          "outer": 0.031,
-          "paA": 1.55,
-          "q": 0.041,
-          "qInner": 0.062,
-          "paEps0": 0.051,
+          "ssimCoarse": 0.9,
+          "r25": 0.033,
+          "r50": 0.041,
+          "r90": 0.077,
+          "outer": 0.021,
+          "paA": 1.102,
+          "q": 0.027,
+          "qInner": 0.041,
+          "paEps0": 0.034,
           "countsBy": {
-            "dots": 0.069
+            "dots": 0.046
           }
         },
         "Layered: barred spiral, satellite trail": {
-          "ssimCoarse": 0.9,
-          "r25": 0.039,
-          "r50": 0.084,
-          "r90": 0.121,
-          "outer": 0.027,
-          "paA": 1.55,
-          "q": 0.062,
-          "qInner": 0.073,
-          "paEps0": 0.075,
+          "ssimCoarse": 0.91,
+          "r25": 0.026,
+          "r50": 0.056,
+          "r90": 0.081,
+          "outer": 0.018,
+          "paA": 1.115,
+          "q": 0.041,
+          "qInner": 0.049,
+          "paEps0": 0.05,
           "countsBy": {
-            "dots": 0.343
+            "dots": 0.229
           }
         },
         "Layered: ringed galaxy, ghost reflection": {
-          "ssimCoarse": 0.9,
-          "r25": 0.039,
-          "r50": 0.061,
-          "r90": 0.116,
-          "outer": 0.027,
-          "paA": 1.55,
-          "q": 0.043,
-          "qInner": 0.043,
-          "paEps0": 0.05,
+          "ssimCoarse": 0.91,
+          "r25": 0.026,
+          "r50": 0.041,
+          "r90": 0.077,
+          "outer": 0.018,
+          "paA": 1.102,
+          "q": 0.029,
+          "qInner": 0.029,
+          "paEps0": 0.033,
           "countsBy": {
-            "dots": 0.057
+            "dots": 0.038
           }
         }
       }
@@ -742,34 +739,34 @@
       "countsSmall": 0.1,
       "poisson": 3,
       "poissonBelow": 2000,
-      "ink": 0.075,
-      "ssimCoarse": 0.91,
+      "ink": 0.05,
+      "ssimCoarse": 0.92,
       "median": 0.1,
       "p90": 0.1,
-      "r25": 0.045,
-      "r50": 0.074,
-      "r90": 0.042,
-      "outer": 0.022,
-      "q": 0.083,
-      "qInner": 0.071,
-      "paA": 0.676,
-      "paEps0": 0.094,
+      "r25": 0.03,
+      "r50": 0.049,
+      "r90": 0.028,
+      "outer": 0.015,
+      "q": 0.056,
+      "qInner": 0.047,
+      "paA": 0.686,
+      "paEps0": 0.063,
       "countsBy": {
-        "dots": 0.252
+        "dots": 0.168
       },
       "byPreset": {
         "Deep field": {
-          "ssimCoarse": 0.91,
-          "r25": 0.045,
-          "r50": 0.074,
-          "r90": 0.042,
-          "outer": 0.022,
-          "paA": 0.676,
-          "q": 0.083,
-          "qInner": 0.071,
-          "paEps0": 0.094,
+          "ssimCoarse": 0.92,
+          "r25": 0.03,
+          "r50": 0.049,
+          "r90": 0.028,
+          "outer": 0.015,
+          "paA": 0.686,
+          "q": 0.056,
+          "qInner": 0.047,
+          "paEps0": 0.063,
           "countsBy": {
-            "dots": 0.252
+            "dots": 0.168
           }
         }
       }
@@ -779,21 +776,18 @@
       "countsSmall": 0.1,
       "poisson": 3,
       "poissonBelow": 2000,
-      "ink": 0.056,
-      "ssimCoarse": 0.92,
+      "ink": 0.05,
+      "ssimCoarse": 0.93,
       "median": 0.1,
-      "p90": 0.176,
-      "r25": 0.049,
-      "r50": 0.027,
-      "r90": 0.065,
-      "outer": 0.032,
-      "q": 0.034,
-      "qInner": 0.063,
-      "paA": 2.465,
-      "paEps0": 0.043,
-      "countsBy": {
-        "dots": 0.043
-      },
+      "p90": 0.118,
+      "r25": 0.033,
+      "r50": 0.018,
+      "r90": 0.043,
+      "outer": 0.022,
+      "q": 0.023,
+      "qInner": 0.042,
+      "paA": 1.696,
+      "paEps0": 0.029,
       "byPreset": {}
     },
     "layered@zoom": {
@@ -802,19 +796,19 @@
       "poisson": 3,
       "poissonBelow": 2000,
       "ink": 0.05,
-      "ssimCoarse": 0.81,
+      "ssimCoarse": 0.83,
       "median": 0.1,
       "p90": 0.1,
-      "r25": 0.061,
-      "r50": 0.037,
-      "r90": 0.03,
-      "outer": 0.017,
-      "q": 0.057,
-      "qInner": 0.063,
-      "paA": 0.95,
-      "paEps0": 0.069,
+      "r25": 0.041,
+      "r50": 0.025,
+      "r90": 0.02,
+      "outer": 0.012,
+      "q": 0.038,
+      "qInner": 0.042,
+      "paA": 0.708,
+      "paEps0": 0.046,
       "countsBy": {
-        "dots": 0.254
+        "dots": 0.169
       },
       "byPreset": {}
     },
@@ -826,15 +820,15 @@
       "ink": 0.05,
       "ssimCoarse": 0.93,
       "median": 0.1,
-      "p90": 0.188,
-      "r25": 0.032,
-      "r50": 0.091,
-      "r90": 0.176,
-      "outer": 0.019,
-      "q": 0.06,
-      "qInner": 0.042,
-      "paA": 1.343,
-      "paEps0": 0.078,
+      "p90": 0.126,
+      "r25": 0.021,
+      "r50": 0.061,
+      "r90": 0.118,
+      "outer": 0.013,
+      "q": 0.04,
+      "qInner": 0.028,
+      "paA": 1.014,
+      "paEps0": 0.052,
       "byPreset": {}
     },
     "deepfield@zoom": {
@@ -842,18 +836,18 @@
       "countsSmall": 0.1,
       "poisson": 3,
       "poissonBelow": 2000,
-      "ink": 0.061,
+      "ink": 0.05,
       "ssimCoarse": 0.89,
       "median": 0.1,
       "p90": 0.1,
-      "r25": 0.064,
-      "r50": 0.037,
-      "r90": 0.074,
-      "outer": 0.028,
-      "q": 0.037,
-      "qInner": 0.083,
-      "paA": 0.825,
-      "paEps0": 0.042,
+      "r25": 0.043,
+      "r50": 0.025,
+      "r90": 0.049,
+      "outer": 0.019,
+      "q": 0.025,
+      "qInner": 0.056,
+      "paA": 0.61,
+      "paEps0": 0.028,
       "byPreset": {}
     }
   }
