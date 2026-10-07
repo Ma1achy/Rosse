@@ -17,6 +17,8 @@ Options:
 
 **Recommendation:** (b), with MIT for the code, the drawings all rights reserved until you decide otherwise, and a `NOTICE` listing third-party terms. Galaxy Zoo 2 is CC BY 4.0 (it needs attribution), and SDSS imagery needs its acknowledgement.
 
+**Owner's decision of 2026-10-07 (the fonts only):** the Threshold fonts (Grain, Mark, Patina, Signs; loaded as "Principia Hand") are the owner's own handwriting and are unrestricted. The other fonts get their licences listed, as the pack gives them, in [assets/LICENCES.md](../assets/LICENCES.md): IBM Plex Mono is under the SIL OFL 1.1 (the pack includes the text); the pack includes no licence file for Heros, whose files name TeX Gyre Heros under the GUST Font License (not yet checked against that licence's conditions). The project's own licence, the photographed objects and the data are still undecided or unrecorded.
+
 ### Q2. Orbiting: keep v21's re-roll, or keep the marks?
 
 In v21, with dust lanes on (the default), turning the camera even 0.3° re-draws every dot (reference notes, flagged item 1).

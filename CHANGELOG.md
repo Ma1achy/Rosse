@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- M11, the page and UI (docs/milestones/m11):
+  - The page on the design language: Paper and Chalkboard, v21's recipe of cards generated from the schema (`src/ui/layout.ts`, `controls.ts`), hand-lettered tabs, a post-it pile, a taped print, preset cards with thumbnails drawn by this engine (`npm run thumbnails`), Surprise me, New stars, the seed, PNG export (`snapshot()` on both engines), and the "drawn on the CPU" note.
+  - The merger and the simulated shells are drawn by the page, built inside the frame queue (`Engine.draw` is asynchronous), with the timeline (play, scrub, end up to 30, loop, speed); `mTime` runs to the horizon (schema range 0 to 30).
+  - `Engine.capabilities` (`src/render/capabilities.ts`): the page builds its controls, presets and links from what the engine draws; M7 and M9 switch theirs on. A link holds the preset, edits, camera, surface and `mTime`, and cannot ask for what is not drawn.
+  - Change kinds (`params`, `preset`, `camera`, `surface`): the overlays' home orientation is set again for a preset or seed only.
+  - Interfaces for M12: `ExportSource`, `Page.addExport`, `Page.timeline`, `PageState.from`.
+  - `assets/LICENCES.md` records the fonts' terms as the pack gives them.
+  - `tools/gpu-test/ui-smoke.mjs` (`npm run test:ui`, part of `npm run test:gpu`) checks the page on pixels on both engines; contrast, layout and link unit tests.
+
 - M8, mergers:
   - `sim/merger`: the core track in f64 (v21's `coreTrack` bit for bit, `tests/vectors/merger.json`), the timeline plan, the snapshots as f16 positions relative to the nearer core with a 64 MiB budget, `mTime` and the horizon (ADR 0040); the test stars on the GPU (`compute/merger.wgsl`, KDK at dt 0.012, in chunks) with a CPU twin and the model tier's one 12 kB read-back for `frameOf`.
   - A merging galaxy built as a single galaxy and carried by the tidal map (`compute/tide.wgsl`, `tide-apply.wgsl`, twin `fallback/kernels/tide.ts`): the 4-nearest-star warp grid, `post` warps on the vector kernels, tearing at v21's 22 px and 1.8× (ADR 0041); `mWarp`'s whole drawings torn through the tidal map itself.
@@ -14,6 +23,7 @@ All notable changes to this project are documented here. The format follows [Kee
   - `ROSSE_WEBGPU_ADAPTER` (`default`, `discrete`, `integrated`, `swiftshader`) for the GPU tests, so the test stars' drift can be measured on a real GPU.
   - Goldens: v21 captures of the eight `Merger: …` presets, `Sketches, torn apart` and the lensed merger (lens off) at seeds 7 and 4242, home, orbit and zoom, the Mice at two other moments of the timeline, `Shell galaxy` with its simulated shells and 12 held-out captures of it (ADR 0044, proposed). The merger and shell families are calibrated (K = 6); the comparison draws with v21's galaxy-level draws, `mWarp`'s drawings and the shells v21 found.
 - M9, lensing:
+  - On the page: `capabilities.lens` is on, so the lens controls, the six `Lens: …` presets, `A sketch, lensed` and `Layered: lensed merger` appear, with thumbnails drawn by the engine; the lens's home is `wanted.home`; a lensed quasar's flare runs on the timeline (`mTime`), and the smoke test (`npm run test:ui`) checks it on both engines.
   - `sim/lens`: the lens as scene description. Halos are cored NIEs (Keeton), a single one or a cluster of 7–11 members, with shear; sources come as planes (a galaxy, a quasar, 6–9 cluster sources each at its own depth, a double source plane at 1.42). The source galaxy is described by the engine's own scene description for its own camera, with no global swapping. `weakLensing` is the hook for the deep field that M7 brings.
   - `lens-grid.wgsl`, `lens-bin.wgsl` (the (G+1)² grid at G = 210 or 250, bounding boxes by ordered-u32 atomics, bins skipped above 400, count, deterministic scan, scatter, sorted ids) and `lens-query.wgsl` (up to 8 images with J, μ and parity, canonical de-duplication; fixed-point κ reduction; emission ⌊κ·min(30,|μ|)+u⌋ from the counter RNG; curve-branch tracking with v21's greedy matcher; warped vector drawings through M5's `post` hook under the |μ| > 40, 22 px and 1.8× rules, hatches included). `fallback/kernels/lens.ts` and `fallback/lens.ts` are the CPU twins; `render/lens.ts` is the GPU tier.
   - The quasar with time-delay flares (ψ), the cluster with its member galaxies, the double ring.
