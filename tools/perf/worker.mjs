@@ -26,72 +26,91 @@ const browser = await launch();
 /** @type {Record<string, any>} */
 const rows = {};
 try {
-  for (const mode of ['worker', 'main thread']) {
-    const page = await browser.newPage({ viewport: { width: 900, height: 1000 } });
-    await page.addInitScript(() => {
-      const j = { maxGap: 0, longTasks: 0, longMs: 0, rafs: 0 };
-      /** @type {any} */ (window).__jank = j;
-      let last = performance.now();
-      const tick = () => {
-        const now = performance.now();
-        j.maxGap = Math.max(j.maxGap, now - last);
-        last = now;
-        j.rafs++;
+  for (const [scn, pre, drag] of /** @type {[string, string, boolean][]} */ ([
+    ['drag', preset, true],
+    ['merger build', 'Merger: the Mice', false],
+  ]))
+    for (const mode of ['worker', 'main thread']) {
+      const page = await browser.newPage({ viewport: { width: 900, height: 1000 } });
+      await page.addInitScript(() => {
+        const j = { maxGap: 0, longTasks: 0, longMs: 0, rafs: 0 };
+        /** @type {any} */ (window).__jank = j;
+        let last = performance.now();
+        const tick = () => {
+          const now = performance.now();
+          j.maxGap = Math.max(j.maxGap, now - last);
+          last = now;
+          j.rafs++;
+          requestAnimationFrame(tick);
+        };
         requestAnimationFrame(tick);
+        new PerformanceObserver((l) => {
+          for (const e of l.getEntries()) {
+            j.longTasks++;
+            j.longMs += e.duration;
+          }
+        }).observe({ entryTypes: ['longtask'] });
+      });
+      const q = `preset=${encodeURIComponent(pre)}&seed=7&backend=cpu${mode === 'worker' ? '' : '&cpuworker=off'}`;
+      await page.goto(`${server.url}/?${q}`);
+      await page.waitForFunction(() => (window.__rosse?.frames ?? 0) >= 1, undefined, {
+        timeout: 600_000,
+      });
+      const where = await page.evaluate(() => document.documentElement.dataset.cpuWhere);
+      if (!drag) {
+        // the first frame of a merger is its integration: what the page saw from load to it
+        const t = await page.evaluate(() => /** @type {any} */ (window).__jank);
+        rows[`${scn}: ${mode}`] = {
+          where,
+          framesDrawn: 1,
+          maxFrameGapMs: Math.round(t.maxGap),
+          longTasks: t.longTasks,
+          longTaskMs: Math.round(t.longMs),
+          animationFrames: t.rafs,
+        };
+        console.log(`${scn}: ${mode}`.padEnd(28), JSON.stringify(rows[`${scn}: ${mode}`]));
+        await page.close();
+        continue;
+      }
+      // let the first frames settle, then reset the monitor
+      await page.waitForTimeout(1500);
+      await page.evaluate(() => {
+        const j = /** @type {any} */ (window).__jank;
+        j.maxGap = 0;
+        j.longTasks = 0;
+        j.longMs = 0;
+        j.rafs = 0;
+      });
+      const f0 = await page.evaluate(() => window.__rosse?.frames ?? 0);
+      const box = await page.locator('#plate').boundingBox();
+      if (!box) throw new Error('no plate');
+      const cx = Math.round(box.x + box.width / 2);
+      const cy = Math.round(box.y + box.height / 2);
+      await page.mouse.move(cx, cy);
+      await page.mouse.down();
+      const t0 = Date.now();
+      for (let k = 1; k <= MOVES; k++) {
+        await page.mouse.move(cx + 4 * k, cy + (k % 5));
+        await page.waitForTimeout(16);
+      }
+      await page.mouse.up();
+      const driveMs = Date.now() - t0;
+      await page.waitForTimeout(1500);
+      const j = await page.evaluate(() => /** @type {any} */ (window).__jank);
+      const f1 = await page.evaluate(() => window.__rosse?.frames ?? 0);
+      rows[`${scn}: ${mode}`] = {
+        where,
+        moves: MOVES,
+        driveMs,
+        framesDrawn: f1 - f0,
+        maxFrameGapMs: Math.round(j.maxGap),
+        longTasks: j.longTasks,
+        longTaskMs: Math.round(j.longMs),
+        animationFrames: j.rafs,
       };
-      requestAnimationFrame(tick);
-      new PerformanceObserver((l) => {
-        for (const e of l.getEntries()) {
-          j.longTasks++;
-          j.longMs += e.duration;
-        }
-      }).observe({ entryTypes: ['longtask'] });
-    });
-    const q = `preset=${encodeURIComponent(preset)}&seed=7&backend=cpu${mode === 'worker' ? '' : '&cpuworker=off'}`;
-    await page.goto(`${server.url}/?${q}`);
-    await page.waitForFunction(() => (window.__rosse?.frames ?? 0) >= 1, undefined, {
-      timeout: 120_000,
-    });
-    const where = await page.evaluate(() => document.documentElement.dataset.cpuWhere);
-    // let the first frames settle, then reset the monitor
-    await page.waitForTimeout(1500);
-    await page.evaluate(() => {
-      const j = /** @type {any} */ (window).__jank;
-      j.maxGap = 0;
-      j.longTasks = 0;
-      j.longMs = 0;
-      j.rafs = 0;
-    });
-    const f0 = await page.evaluate(() => window.__rosse?.frames ?? 0);
-    const box = await page.locator('#plate').boundingBox();
-    if (!box) throw new Error('no plate');
-    const cx = Math.round(box.x + box.width / 2);
-    const cy = Math.round(box.y + box.height / 2);
-    await page.mouse.move(cx, cy);
-    await page.mouse.down();
-    const t0 = Date.now();
-    for (let k = 1; k <= MOVES; k++) {
-      await page.mouse.move(cx + 4 * k, cy + (k % 5));
-      await page.waitForTimeout(16);
+      console.log(`${scn}: ${mode}`.padEnd(28), JSON.stringify(rows[`${scn}: ${mode}`]));
+      await page.close();
     }
-    await page.mouse.up();
-    const driveMs = Date.now() - t0;
-    await page.waitForTimeout(1500);
-    const j = await page.evaluate(() => /** @type {any} */ (window).__jank);
-    const f1 = await page.evaluate(() => window.__rosse?.frames ?? 0);
-    rows[mode] = {
-      where,
-      moves: MOVES,
-      driveMs,
-      framesDrawn: f1 - f0,
-      maxFrameGapMs: Math.round(j.maxGap),
-      longTasks: j.longTasks,
-      longTaskMs: Math.round(j.longMs),
-      animationFrames: j.rafs,
-    };
-    console.log(mode.padEnd(12), JSON.stringify(rows[mode]));
-    await page.close();
-  }
 } finally {
   await browser.close();
   await server.close();

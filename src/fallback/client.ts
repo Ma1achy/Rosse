@@ -5,6 +5,7 @@
  */
 import type { Params } from '../core/params';
 import type { AtlasData, ImageData8 } from '../marks/atlas';
+import type { InkLayer } from '../render/layers';
 import type { Plates } from '../render/plates';
 import type { SurfaceName } from '../render/surface';
 import type { DrawingsMeta } from '../model/variation';
@@ -16,6 +17,8 @@ export interface CpuBackend {
   draw(P: Params, zoom: number): Promise<CpuDrawn>;
   resize(size: CpuSize): Promise<void>;
   present(surface: SurfaceName, plates: Plates): Promise<CpuFrame>;
+  /** The ink layers of the last draw, copied from the worker (the SVG export, M12). */
+  layers(): Promise<readonly InkLayer[]>;
   destroy(): void;
 }
 
@@ -36,6 +39,9 @@ export class LocalCpu implements CpuBackend {
   }
   present(surface: SurfaceName, plates: Plates) {
     return Promise.resolve(this.core.present(surface, plates));
+  }
+  layers() {
+    return Promise.resolve(this.core.inkLayers);
   }
   destroy(): void {
     // nothing is held outside the object
@@ -94,6 +100,11 @@ export class WorkerCpu implements CpuBackend {
     const r = await this.request({ op: 'present', surface, plates });
     if (r.op !== 'present') throw new Error('unexpected reply');
     return { pixels: r.pixels, width: r.width, height: r.height };
+  }
+  async layers() {
+    const r = await this.request({ op: 'layers' });
+    if (r.op !== 'layers') throw new Error('unexpected reply');
+    return r.layers;
   }
   destroy(): void {
     this.worker.terminate();
