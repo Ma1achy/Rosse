@@ -19,12 +19,12 @@ export class CpuShellScene {
   constructor(readonly scene: ShellScene) {
     this.sim = new CpuShells(scene.p, scene.key);
     this.sim.run();
-    const R = shellRibbons(scene, this.sim.arcs);
+    const R = shellRibbons(scene, this.arcs);
     this.lines = R ? ribbonModel(R, scene.pool, scene.dotBase) : null;
   }
 
   get arcs() {
-    return this.sim.arcs;
+    return this.scene.opts.arcs ?? this.sim.arcs;
   }
 
   /** The arcs' ribbons, then the dots, for a zoom. */

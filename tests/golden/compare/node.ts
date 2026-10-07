@@ -38,6 +38,8 @@ import {
 } from './thresholds';
 import { mulberry32, v21Variation } from './v21';
 import { v21MergerPicks } from './v21-merger';
+import { v21ShellsRun } from './v21-shells';
+import type { ShellArc } from '../../../src/sim/shells';
 import { mergerGalaxyParams } from '../../../src/sim/merger';
 import { strokeIndex, strokePools } from '../../../src/marks/strokes';
 import { mwarpPool } from '../../../src/model/merger';
@@ -61,10 +63,14 @@ export interface CaptureRecord {
 
 /**
  * The golden family of a capture (thresholds.json `parity` keys): its preset's, except the
- * line-work-only captures (variant `lines`, M4's review), which have their own (ADR 0018).
+ * line-work-only captures (variant `lines`, M4's review), which have their own (ADR 0018), and the
+ * simulated shells (variant `shells`, M8, ADR 0044).
  */
 export function goldenFamily(preset: string, variant?: string): string {
   if (variant === 'lines') return 'lines';
+  // the simulated shells (M8, ADR 0044): the satellite's stars are v21's own random draw, which the
+  // engine's re-draws do not carry, so the family is calibrated on held-out v21 captures too
+  if (variant === 'shells') return 'shells';
   const f = presetFamily(preset);
   if (f === 'merger' || f === 'lens' || f === 'star' || f === 'artefact') return f;
   if (preset === 'Layered: lensed merger') return 'merger';
@@ -195,11 +201,23 @@ export class GoldenNode {
    * v21's draws of the shells' arcs: the stroke row of each, from `mulberry32(seed · 5 + 17)` in
    * order (`shellArcs`, app23.js:L750). There are at most six arcs.
    */
-  shellOptions(P: Params): { strokes: number[] } {
+  shellOptions(P: Params): { strokes: number[]; arcs: ShellArc[] } {
     const kinds = this.cpu.meta.strokes?.kind ?? [];
     const pools = strokePools(kinds);
     const r = mulberry32(P.seed * 5 + 17);
-    return { strokes: Array.from({ length: 6 }, () => strokeIndex('faint', pools, r())) };
+    // which shells exist is v21's own (its satellite runs on its stream and the detection reads
+    // its final radii): replayed, as v21's other discrete choices are (ADR 0018), so that only the
+    // marks differ. The engine's integrator and detection are tested against v21's from the same
+    // start (tests/unit/shells.test.ts, tests/gpu/shells.ts)
+    const hand = {
+      dotPool: this.v21Variation(P).dotPool,
+      dotSizes: Array.from(this.cpu.meta.dots.size),
+      strokeKinds: [...kinds],
+    };
+    return {
+      strokes: Array.from({ length: 6 }, () => strokeIndex('faint', pools, r())),
+      arcs: v21ShellsRun(this.root, P, hand).arcs,
+    };
   }
 
   /** v21's own noise corners for a seed (./v21-noise.ts), as plain arrays (they cross to the page). */

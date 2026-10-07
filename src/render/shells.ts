@@ -137,6 +137,7 @@ export class GpuShells {
       1,
     );
     this.arcs = arcsOf(new Float32Array(await readBuffer(d, this.buffers[5] as GPUBuffer, 6 * 16)));
+    if (scene.opts.arcs) this.arcs = [...scene.opts.arcs];
 
     // the arcs as ribbons through a face-on camera
     const R = shellRibbons(scene, this.arcs);

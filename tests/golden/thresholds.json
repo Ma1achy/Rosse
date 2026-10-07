@@ -407,6 +407,46 @@
           "paEps0": 0.054
         }
       }
+    },
+    "shells": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.92,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.033,
+      "r50": 0.029,
+      "r90": 0.015,
+      "outer": 0.01,
+      "q": 0.03,
+      "qInner": 0.03,
+      "paA": 0.776,
+      "paEps0": 0.038,
+      "heldOut": 8,
+      "byPreset": {}
+    },
+    "shells@zoom": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.89,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.025,
+      "r50": 0.037,
+      "r90": 0.019,
+      "outer": 0.014,
+      "q": 0.024,
+      "qInner": 0.034,
+      "paA": 0.867,
+      "paEps0": 0.03,
+      "heldOut": 4,
+      "byPreset": {}
     }
   }
 }

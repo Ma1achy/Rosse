@@ -742,6 +742,21 @@ async function calibrate(G, node) {
       ]))
         t[k] = Math.max(t[k] ?? 0, ceil3(1.1 * (hs[m]?.max ?? 0)));
     }
+    // a merger's remnant is chaotic and its tails are heavy: the family's tolerances are no
+    // smaller than 1.1 × the largest of its own re-draw pairs (the rule above for held-out
+    // captures, ADR 0018 item 7; ADR 0044)
+    if (family.startsWith('merger')) {
+      const ms = stats(list);
+      for (const [k, m] of /** @type {const} */ ([
+        ['median', 'medianAbs'],
+        ['p90', 'p90Abs'],
+        ['r25', 'r25Abs'],
+        ['r50', 'r50Abs'],
+        ['r90', 'r90Abs'],
+        ['outer', 'outerAbs'],
+      ]))
+        t[k] = Math.max(t[k] ?? 0, ceil3(1.1 * (ms[m]?.max ?? 0)));
+    }
     parity[family] = { ...base, ...t, ...(held.length ? { heldOut: held.length } : {}) };
     // per-preset axis-ratio tolerances: near-round galaxies are noisier in q than flat ones, so
     // a family-wide value would be too wide for the flat ones (ADR 0015)

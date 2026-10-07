@@ -11433,13 +11433,329 @@
         "ms": 327
       },
       "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--shells__s101__home",
+      "preset": "Shell galaxy",
+      "variant": "shells",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 101,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "a0dc4d3ffaebaa3ed176328a1d6be8d970951c10a3e9a68f223c70eda9cda3ff",
+      "captured": "2026-10-07T06:16:51.307Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 15000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 4,
+        "used": 6,
+        "ms": 17
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--shells__s101__orbit",
+      "preset": "Shell galaxy",
+      "variant": "shells",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 101,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "0cc2eb1c2f1bb96241ec5c069ea981dc4f88cc78f36a0cdf50ee9278cc3aba35",
+      "captured": "2026-10-07T06:16:53.820Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 15000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 4,
+        "used": 6,
+        "ms": 29
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--shells__s101__zoom",
+      "preset": "Shell galaxy",
+      "variant": "shells",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 101,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "fa9dbbce77af89c7eb97bf4820813fc646744be323c2214a49beda0db2fe1747",
+      "captured": "2026-10-07T06:17:00.535Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 15000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 4,
+        "used": 6,
+        "ms": 12
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--shells__s11__home",
+      "preset": "Shell galaxy",
+      "variant": "shells",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 11,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "c7290b326e928b92a5b116e06db532915cbeecc1a8100402cd0c2e8c7d87816d",
+      "captured": "2026-10-07T06:16:21.995Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 15000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 4,
+        "used": 5,
+        "ms": 26
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--shells__s11__orbit",
+      "preset": "Shell galaxy",
+      "variant": "shells",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 11,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "65bbbe0d71f848b41b392f5c644a4b6ac5c8fe78e9c3242880c17548e449ef65",
+      "captured": "2026-10-07T06:16:26.779Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 15000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 4,
+        "used": 5,
+        "ms": 21
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--shells__s11__zoom",
+      "preset": "Shell galaxy",
+      "variant": "shells",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 11,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "1d183b9a430f6a1ee59abc1e2ef6feb329966d2431ba64728cbf76dc6957be27",
+      "captured": "2026-10-07T06:16:39.826Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 15000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 4,
+        "used": 5,
+        "ms": 11
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--shells__s23__home",
+      "preset": "Shell galaxy",
+      "variant": "shells",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 23,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "efcb304338e3989790a3a71be08a0dfe192551795f52b37ae3b06cbae2a6627c",
+      "captured": "2026-10-07T06:16:51.080Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 15000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 5,
+        "used": 6,
+        "ms": 21
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--shells__s23__orbit",
+      "preset": "Shell galaxy",
+      "variant": "shells",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 23,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "09295ef04eadc97eba6d27313ef5d07f16d105e84ae3bc6f4e2bb7ea10802a71",
+      "captured": "2026-10-07T06:16:53.327Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 15000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 5,
+        "used": 6,
+        "ms": 18
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--shells__s23__zoom",
+      "preset": "Shell galaxy",
+      "variant": "shells",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 23,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "5cb65d50310fe4c4e1e18a95e917af5c689c05941f1ad31602fb7cd474b9daa5",
+      "captured": "2026-10-07T06:16:59.757Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 15000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 5,
+        "used": 6,
+        "ms": 12
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--shells__s3__home",
+      "preset": "Shell galaxy",
+      "variant": "shells",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 3,
+      "camera": "home",
+      "surface": "paper",
+      "inkPixelSha256": "31d78f8d1538047191a6a1d83b78f6df24cb2ba87639d70ba6e177ae606974d1",
+      "captured": "2026-10-07T06:16:21.718Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 15000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 5,
+        "used": 7,
+        "ms": 22
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--shells__s3__orbit",
+      "preset": "Shell galaxy",
+      "variant": "shells",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 3,
+      "camera": "orbit",
+      "surface": "paper",
+      "inkPixelSha256": "b23ba8e3dd4a857e3320d215bba46c25c0baab3f36989f4cb6d7d13ad78a4848",
+      "captured": "2026-10-07T06:16:26.192Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 15000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 5,
+        "used": 7,
+        "ms": 64
+      },
+      "pageErrors": 0
+    },
+    {
+      "name": "shell-galaxy--shells__s3__zoom",
+      "preset": "Shell galaxy",
+      "variant": "shells",
+      "overrides": {
+        "starMix": 0,
+        "field": 0,
+        "fgstars": 0
+      },
+      "calibration": true,
+      "seed": 3,
+      "camera": "zoom",
+      "zoom": 2,
+      "surface": "paper",
+      "inkPixelSha256": "02b231ed40b46eba97bb886de7749c3c00199a29770d2001bb1c80310869eeb4",
+      "captured": "2026-10-07T06:16:39.223Z",
+      "stats": {
+        "rstars": 0,
+        "dots": 15000,
+        "knots": 0,
+        "stars": 0,
+        "curves": 5,
+        "used": 7,
+        "ms": 17
+      },
+      "pageErrors": 0
     }
   ],
   "extra": {
     "file": "tests/golden/extra-cases.json",
     "cameras": {
       "home": "the preset's own incl, az, pa",
-      "orbit": "az + 35°, incl + 20° (clamped), from home",
+      "orbit": "az + 35\u00b0, incl + 20\u00b0 (clamped), from home",
       "zoom": "home at zoom 2 (__GEN.zoom)"
     },
     "runs": {

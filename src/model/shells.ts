@@ -16,6 +16,11 @@ export interface ShellSceneOptions {
   strokes?: number[];
   /** re-key the satellite's stars (the calibration of ADR 0015) */
   placementKey?: number;
+  /**
+   * The shells v21 found for the seed, in place of the detection's (the golden comparison draws
+   * with v21's discrete choices, ADR 0018; which shells exist is structure, not marks)
+   */
+  arcs?: ShellArc[];
 }
 
 export interface ShellScene extends HandArrays {
