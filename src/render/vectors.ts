@@ -391,6 +391,7 @@ export class GpuVectors {
       kind: 'gpu-sprites',
       atlas,
       gain: 1,
+      pop: 'old' as const,
       source: {
         buffer: m.buffers[21] as GPUBuffer,
         offset: c * bytes,

@@ -48,6 +48,54 @@ const SETS = {
     ],
     ['flocculent-s7-orbit', 'flocculent--ribbons__s7__orbit', 'Flocculent', 7, 'ribbons'],
   ],
+  // M6: the single-galaxy presets as the page draws them, plates and all (golden variant `single`,
+  // or `vectors` where M5 captured the same overrides)
+  m6: [
+    ['plates-slipped-s7', 'plates-slipped--single__s7__home', 'Plates slipped', 7, 'single'],
+    [
+      'stellar-populations-s4242-orbit',
+      'stellar-populations--single__s4242__orbit',
+      'Stellar populations',
+      4242,
+      'single',
+    ],
+    [
+      'grand-design-s7-chalkboard',
+      'grand-design--single__s7__home__chalk',
+      'Grand design',
+      7,
+      'single',
+    ],
+  ],
+  // every single-galaxy preset at seed 7, home (a check by eye; `node … --set m6all`)
+  m6all: [
+    ...[
+      ['Grand design', 'single'],
+      ['Barred spiral', 'vectors'],
+      ['Flocculent', 'single'],
+      ['Hand-drawn arms', 'vectors'],
+      ['Tightly wound', 'single'],
+      ['Loose, open arms', 'single'],
+      ['Ringed', 'vectors'],
+      ['Disc, no arms', 'vectors'],
+      ['Smooth, round', 'single'],
+      ['Cigar-shaped', 'single'],
+      ['Edge-on with dust', 'vectors'],
+      ['Dusty spiral', 'single'],
+      ['Hand wobble', 'single'],
+      ['Radio jet', 'vectors'],
+      ['Stellar streams', 'vectors'],
+      ['Shell galaxy', 'vectors'],
+      ['Plates slipped', 'single'],
+      ['Stellar populations', 'single'],
+    ].map(([preset, variant]) => {
+      const slug = String(preset)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+      return [`${slug}-s7`, `${slug}--${variant}__s7__home`, preset, 7, variant];
+    }),
+  ],
   m5: [
     ['hand-drawn-arms-s7', 'hand-drawn-arms--vectors__s7__home', 'Hand-drawn arms', 7, 'vectors'],
     [
@@ -77,7 +125,7 @@ const SETS = {
     ['deep-field-s7', 'deep-field--sky__s7__home', 'Deep field', 7, 'sky'],
   ],
 };
-const CASES = SETS[/** @type {'m2' | 'm3' | 'm4' | 'm5' | 'm7'} */ (set)];
+const CASES = SETS[/** @type {'m2' | 'm3' | 'm4' | 'm5' | 'm6' | 'm6all' | 'm7'} */ (set)];
 if (!CASES) throw new Error(`unknown set ${set}`);
 
 prepareAssets();
@@ -97,7 +145,37 @@ try {
     );
     let ours;
     let label = 'new engine (WebGPU)';
-    if (['ribbons', 'vectors', 'stars', 'layered', 'sky'].includes(String(variant))) {
+    if (variant === 'single') {
+      // M6: the plates as the page shows them, on the capture's surface (v21's variation, stroke
+      // choices, noise and part picks, as the comparison draws)
+      const opts = node.referenceOptions(rec.params, rec.zoom ?? 1, rec.preset);
+      await page.goto(`${server.url}/tests/golden/render.html`);
+      await page.waitForFunction(() => window.__golden !== undefined, undefined, {
+        timeout: 120_000,
+      });
+      const r = await page.evaluate(({ P, o, z, s }) => window.__golden?.plate(P, o, z, s), {
+        P: rec.params,
+        o: opts,
+        z: rec.zoom ?? 1,
+        s: rec.surface === 'chalkboard' ? 'chalk' : 'paper',
+      });
+      if (!r) throw new Error('golden plate failed');
+      const png = await page.evaluate(
+        ({ a, w, h }) => {
+          const bytes = Uint8ClampedArray.from(atob(a), (c) => c.charCodeAt(0));
+          const c = document.createElement('canvas');
+          c.width = w;
+          c.height = h;
+          const ctx = c.getContext('2d');
+          if (!ctx) throw new Error('no 2d');
+          ctx.putImageData(new ImageData(bytes, w, h), 0, 0);
+          return c.toDataURL('image/png').split(',')[1] ?? '';
+        },
+        { a: r.rgba, w: r.width, h: r.height },
+      );
+      ours = Buffer.from(png, 'base64');
+      label = "new engine (WebGPU), with v21's variation, strokes, noise and part picks";
+    } else if (['ribbons', 'vectors', 'stars', 'layered', 'sky'].includes(String(variant))) {
       // M4, M5: the golden runner's draw, with v21's variation, stroke choices, noise and part
       // picks (as the comparison draws), the ink alpha shown over the plate's field colour
       const opts = node.referenceOptions(rec.params, rec.zoom ?? 1, rec.preset);

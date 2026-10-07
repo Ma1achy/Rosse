@@ -126,18 +126,15 @@
           }
         },
         "Edge-on with dust": {
-          "ink": 0.05,
           "ssimCoarse": 0.89,
-          "median": 0.1,
-          "p90": 0.1,
-          "r25": 0.03,
-          "r50": 0.03,
-          "r90": 0.054,
-          "outer": 0.016,
-          "q": 0.03,
-          "qInner": 0.042,
-          "paA": 0.854,
-          "paEps0": 0.038,
+          "r25": 0.064,
+          "r50": 0.065,
+          "r90": 0.124,
+          "outer": 0.029,
+          "paA": 1.105,
+          "q": 0.039,
+          "qInner": 0.045,
+          "paEps0": 0.05,
           "countsBy": {
             "dots": 0.214
           }
@@ -496,18 +493,15 @@
           }
         },
         "Edge-on with dust": {
-          "ink": 0.05,
-          "ssimCoarse": 0.85,
-          "median": 0.1,
-          "p90": 0.1,
-          "r25": 0.047,
-          "r50": 0.039,
-          "r90": 0.03,
-          "outer": 0.012,
-          "q": 0.03,
-          "qInner": 0.04,
-          "paA": 0.915,
-          "paEps0": 0.033,
+          "ssimCoarse": 0.78,
+          "r25": 0.056,
+          "r50": 0.058,
+          "r90": 0.035,
+          "outer": 0.017,
+          "paA": 0.669,
+          "q": 0.039,
+          "qInner": 0.044,
+          "paEps0": 0.046,
           "countsBy": {
             "dots": 0.156
           }
@@ -810,7 +804,9 @@
       "countsBy": {
         "dots": 0.169
       },
-      "byPreset": {}
+      "byPreset": {
+        "Layered: barred spiral, satellite trail": {}
+      }
     },
     "star@zoom": {
       "counts": 0.03,
@@ -849,6 +845,56 @@
       "paA": 0.61,
       "paEps0": 0.028,
       "byPreset": {}
+    },
+    "slip": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.81,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.023,
+      "r50": 0.024,
+      "r90": 0.049,
+      "outer": 0.017,
+      "q": 0.034,
+      "qInner": 0.026,
+      "paA": 0.962,
+      "paEps0": 0.04,
+      "byPreset": {
+        "Plates slipped": {
+          "q": 0.034,
+          "qInner": 0.026,
+          "paEps0": 0.04
+        }
+      }
+    },
+    "slip@zoom": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.77,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.041,
+      "r50": 0.035,
+      "r90": 0.022,
+      "outer": 0.013,
+      "q": 0.03,
+      "qInner": 0.033,
+      "paA": 0.779,
+      "paEps0": 0.034,
+      "byPreset": {
+        "Plates slipped": {
+          "q": 0.03,
+          "qInner": 0.033,
+          "paEps0": 0.034
+        }
+      }
     }
   }
 }

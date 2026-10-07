@@ -19,6 +19,7 @@
  *             seed), named <preset-slug>--<variant>__s<seed>__<camera>, at its seeds (7 and 4242
  *             by default) and the file's cameras (home and orbit by default), plus the "zoom"
  *             camera (home at zoom 2, through __GEN.zoom) for the seeds a case lists in `zoom`.
+ *             A case with `chalk: true` is captured on the Chalkboard (theme dark; name suffix __chalk).
  *             They are added to (or replaced in) the existing manifest, which records the file.
  *   --only    presets, comma-separated, or separated by | when a name holds a comma
  *             (--only "Grand design|Loose, open arms").
@@ -304,7 +305,7 @@ async function main() {
     /**
      * @type {{ cameras?: string[], cases: { preset: string, variant: string,
      *   overrides: Record<string, unknown>, seeds?: number[], zoom?: number[],
-     *   calibration?: boolean }[] }}
+     *   calibration?: boolean, chalk?: boolean }[] }}
      */
     const extra = JSON.parse(readFileSync(resolve(ROOT, extraFile), 'utf8'));
     const fileCams = extra.cameras ?? [...CAMERAS];
@@ -328,9 +329,9 @@ async function main() {
       .filter((c) => !variants || variants.includes(c.variant))
       .flatMap((c) => {
         if (!presets[c.preset]) throw new Error(`unknown preset ${c.preset}`);
-        const { seeds, zoom, ...rest } = c;
+        const { seeds, zoom, chalk, ...rest } = c;
         return (seeds ?? SEEDS)
-          .map((seed) => ({ ...rest, seed, chalk: false, cameras: camsFor(zoom, seed) }))
+          .map((seed) => ({ ...rest, seed, chalk: !!chalk, cameras: camsFor(zoom, seed) }))
           .filter((j) => j.cameras.length);
       });
   } else if (reroll) {

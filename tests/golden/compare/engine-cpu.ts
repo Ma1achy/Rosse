@@ -23,6 +23,8 @@ import {
 } from '../../../src/model/scene';
 import { VECTOR_ATLASES, type VectorLibrary, type VectorSheet } from '../../../src/marks/vector';
 import { cameraOf } from '../../../src/view/camera';
+import { PALETTES } from '../../../src/render/palette';
+import type { Plates } from '../../../src/render/plates';
 import { grey, type Grey } from './metrics';
 
 export const ATLASES: AtlasName[] = [
@@ -118,7 +120,7 @@ export class CpuGolden {
     const t0 = performance.now();
     const view = new CpuStipple(buildScene(P, this.meta, opts)).view(cameraOf(P, zoom));
     this.renderer.setLayers(view.layers);
-    this.renderer.drawInk();
+    this.renderer.drawInk({ plates: P.plates as Plates, palette: PALETTES.light });
     const ink = this.renderer.ink;
     return {
       alpha: alphaOf(ink.width, ink.height, ink.data),

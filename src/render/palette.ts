@@ -1,8 +1,9 @@
 /**
  * Inks for Paper and Chalkboard, from the reference's PALETTES (app23.js:L1143–1146): ink on cream
- * paper, or cream ink on the chalkboard. The colour plates' population inks (disc, old, young,
- * HII) come in with the plates (M6). Values are sRGB-encoded, in [0, 1], used as the reference
- * uses them (straight into a premultiplied canvas).
+ * paper, or cream ink on the chalkboard; and the process inks of the slipped plates (CYAN, MAG and
+ * YEL, the Principia palette, L1141). The colour plates' population inks (disc, old, young, HII)
+ * are the palette's own: lighter and warmer on the chalkboard. Values are sRGB-encoded, in [0, 1],
+ * used as the reference uses them (straight into a premultiplied canvas).
  */
 
 export type Rgb = readonly [number, number, number];
@@ -31,3 +32,10 @@ export const PALETTES: { light: Palette; dark: Palette } = {
     hii: [0.92, 0.56, 0.71],
   },
 };
+
+/** The three process inks of the slipped plates (app23.js:L1141). The same on either surface. */
+export const PROCESS_INKS = {
+  cyan: [0.0, 0.55, 0.69],
+  magenta: [0.81, 0.06, 0.4],
+  yellow: [0.89, 0.77, 0.0],
+} as const satisfies Record<string, Rgb>;

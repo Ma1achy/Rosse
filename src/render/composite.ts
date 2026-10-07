@@ -7,6 +7,7 @@ import compositeWgsl from '../shaders/render/composite.wgsl';
 import { packStruct } from '../gpu/buffers';
 import type { ImageData8 } from '../marks/atlas';
 import type { StructLayout } from '../marks/instance';
+import { compositeInk, type Plates } from './plates';
 import { texelPerPx, type Surface } from './surface';
 
 /** The `Composite` uniform of composite.wgsl. */
@@ -34,12 +35,14 @@ export function compositeUniforms(
   paper: { width: number; height: number },
   plateCss: number,
   dpr: number,
+  plates: Plates = 'ink',
 ): ArrayBuffer {
   if (surface.shadows.length > 2) throw new Error('at most two inset shadows');
   const [s0, s1] = surface.shadows;
   return packStruct(COMPOSITE_UNIFORMS_LAYOUT, {
     field: [...surface.field, 1],
-    ink: [...surface.palette.ink, 1],
+    // the key ink on the `ink` plate; white on the coloured plates, whose target holds the colours
+    ink: [...compositeInk(plates, surface.palette), 1],
     shadow0: s0 ? s0.rgba : [0, 0, 0, 0],
     shadow1: s1 ? s1.rgba : [0, 0, 0, 0],
     shadow_geom: [s0?.spread ?? 0, (s0?.blur ?? 0) / 2, s1?.spread ?? 0, (s1?.blur ?? 0) / 2],
@@ -128,8 +131,9 @@ export class CompositePass {
     surface: Surface,
     plateCss: number,
     dpr: number,
+    plates: Plates = 'ink',
   ): void {
-    const key = `${String(plateCss)}|${String(dpr)}`;
+    const key = `${String(plateCss)}|${String(dpr)}|${plates}`;
     let perSurface = this.bindings.get(surface);
     if (!perSurface) {
       perSurface = new Map();
@@ -137,7 +141,7 @@ export class CompositePass {
     }
     let entry = perSurface.get(key);
     if (!entry) {
-      const data = compositeUniforms(surface, this.paper, plateCss, dpr);
+      const data = compositeUniforms(surface, this.paper, plateCss, dpr, plates);
       const uniforms = this.device.createBuffer({
         label: `composite uniforms ${surface.name} ${key}`,
         size: data.byteLength,

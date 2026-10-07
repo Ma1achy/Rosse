@@ -44,6 +44,8 @@
  *     --controls-every n  the negative controls on every n-th configuration only (default 1)
  *     --reuse-shards  only aggregate the last calibration's measurements (test-results/
  *                     calibration-shard-*.json, made with at least K keys) for this K
+ *     --only-family f  calibrate the families named f (and f@zoom) alone and merge them into the
+ *                     two files, leaving every other family as it is (M6: `slip`)
  *   --jobs n          parallel processes for the re-draws and the calibration (default 4)
  *   --reuse-redraws   with the comparison, the last run's re-draws as they are (a run stopped after
  *                     them); only while the engine and the cases are unchanged
@@ -558,7 +560,8 @@ function calibrationCases(G, node) {
   ];
   /** @type {import('./node.ts').CalibrationCase[]} */
   const cases = [];
-  for (const preset of presets)
+  const onlyFamily = opt('--only-family');
+  for (const preset of onlyFamily ? [] : presets)
     for (const seed of [7, 4242])
       for (const camera of ['home', 'orbit']) {
         const rec = node.record(`${manifestSlug(preset)}__s${seed}__${camera}`);
@@ -574,7 +577,22 @@ function calibrationCases(G, node) {
             zoom: 2,
           });
       }
+  if (onlyFamily) {
+    // held-out configurations of the family's presets: other seeds, home, an orbit, and zoom 2, as
+    // the captures are (they need no v21 capture: the pairs are the engine's own re-draws)
+    for (const preset of onlyFamilyPresets(onlyFamily))
+      for (const seed of [3, 11, 5, 19, 1, 2, 9, 13, 17, 21]) {
+        const P = G.presetCase(preset, seed, { starMix: 0, field: 0, fgstars: 0 });
+        const orbit = { ...P, az: P.az + 35, incl: Math.min(180, P.incl + 20) };
+        const family = G.goldenFamily(preset);
+        cases.push({ preset, base: preset, family, params: P });
+        cases.push({ preset, base: preset, family, params: orbit });
+        cases.push({ preset, base: preset, family: `${family}@zoom`, params: P, zoom: 2 });
+      }
+  }
   for (const c of manifest.captures.filter((/** @type {any} */ x) => x.variant)) {
+    if (onlyFamily && G.goldenFamily(node.record(c.name).preset) !== onlyFamily) continue;
+    if (c.name.endsWith('__chalk')) continue; // the same parameters as the paper capture
     const rec = node.record(c.name);
     const zoom = rec.zoom ?? 1;
     // the zoom camera is calibrated on its own (`<family>@zoom`), the line-work alone too
@@ -608,6 +626,7 @@ async function calibrate(G, node) {
   /** ADR 0018: the K of the mean, and the stand-ins for v21 per configuration */
   const K = Number(opt('--keys') ?? 6);
   const R = 3;
+  const onlyFamily = opt('--only-family');
   const onlyFamilies = opt('--families')?.split(',');
   const cases = calibrationCases(G, node);
   console.log(
@@ -694,6 +713,7 @@ async function calibrate(G, node) {
         String(controlsEvery),
         ...(flag('--resume') ? ['--resume'] : []),
         ...(onlyFamilies ? ['--families', onlyFamilies.join(',')] : []),
+        ...(onlyFamily ? ['--only-family', onlyFamily] : []),
       ],
       jobs,
     );
@@ -779,7 +799,9 @@ async function calibrate(G, node) {
   const numbers = {};
   const families = onlyFamilies
     ? [...onlyFamilies]
-    : ['spiral', 'smooth', 'merger', 'lens', 'star', 'artefact'];
+    : onlyFamily
+      ? []
+      : ['spiral', 'smooth', 'merger', 'lens', 'star', 'artefact'];
   for (const f of Object.keys(eng.pairs)) if (!families.includes(f)) families.push(f);
   for (const family of families) {
     const list = eng.pairs[family] ?? [];
@@ -870,7 +892,9 @@ async function calibrate(G, node) {
     // (none where held-out captures set the family's tolerances: re-draws alone would be tighter)
     for (const preset of held.length ? [] : [...new Set(list.map((c) => c.preset))]) {
       const mine = list.filter((c) => c.preset === preset);
-      if (mine.length < 8) continue;
+      const few = mine.length < 8;
+      // fewer than eight pairs (a zoom family has six): only a listed widening, from the pairs there are
+      if (few && !widenOnly(family, preset)) continue;
       const ps = stats(mine);
       const pa = positionAngle(mine);
       const fam = /** @type {Record<string, number>} */ (parity[family]);
@@ -886,18 +910,42 @@ async function calibrate(G, node) {
         outer: Math.max(spread(ps, 'outerAbs', 0.003), fam.outer ?? 0),
         paA: Math.max(pa.paA, fam.paA ?? 0),
       };
-      byPreset[preset] = {
-        ...wider,
-        q: spread(ps, 'qAbs', 0.005),
-        qInner: spread(ps, 'qInnerAbs', 0.005),
-        // the preset's own noise floor of the ellipticity (a smooth Sérsic profile is far quieter
-        // than a galaxy with a sparse halo); the family's paA
-        paEps0: Math.max(0.01, pa.paEps0),
-        // ADR 0035, where this preset's own count spread is wider than the ADR's tolerance
-        ...(Object.values(counted.byPreset[preset] ?? {}).some((w) => w > ADR.counts)
-          ? { countsBy: counted.byPreset[preset] }
-          : {}),
-      };
+      byPreset[preset] = few
+        ? {}
+        : {
+            ...wider,
+            q: spread(ps, 'qAbs', 0.005),
+            qInner: spread(ps, 'qInnerAbs', 0.005),
+            // the preset's own noise floor of the ellipticity (a smooth Sérsic profile is far quieter
+            // than a galaxy with a sparse halo); the family's paA
+            paEps0: Math.max(0.01, pa.paEps0),
+            // ADR 0035, where this preset's own count spread is wider than the ADR's tolerance
+            ...(Object.values(counted.byPreset[preset] ?? {}).some((w) => w > ADR.counts)
+              ? { countsBy: counted.byPreset[preset] }
+              : {}),
+          };
+      // ADR 0026 and ADR 0036 (widen-only): where the owner approved it (WIDEN_ONLY), the band for
+      // a measure is the larger of the band that applies to the preset now (the family's, or the
+      // preset's own, set above) and 1.5 × the preset's own largest re-draw spread. Only a preset
+      // whose own spread exceeds that band gets a change, so none gets narrower, and nothing
+      // else is widened.
+      const own = /** @type {Record<string, number>} */ (byPreset[preset]);
+      for (const [k, m] of /** @type {const} */ ([
+        ['r25', 'r25Abs'],
+        ['r50', 'r50Abs'],
+        ['r90', 'r90Abs'],
+        ['q', 'qAbs'],
+        ['qInner', 'qInnerAbs'],
+      ])) {
+        if (!widenOnly(family, preset, k)) continue;
+        const wide = ceil3(1.5 * (ps[m]?.max ?? 0));
+        if (wide > (own[k] ?? fam[k] ?? 0)) own[k] = wide;
+      }
+      if (widenOnly(family, preset, 'paA')) {
+        const eps0 = /** @type {number} */ (own.paEps0);
+        const paWide = positionAngle(mine, { eps0, largest: true }).paA;
+        if (paWide > (own.paA ?? fam.paA ?? 0)) own.paA = paWide;
+      }
     }
     parity[family].byPreset = byPreset;
     // the negative controls against these thresholds
@@ -932,6 +980,25 @@ async function calibrate(G, node) {
       negativeControls: ctl,
       v21Reroll: v21.pairs[family]?.length ? stats(v21.pairs[family]) : null,
     };
+  }
+  if (onlyFamily) {
+    // merge: the other families' thresholds and numbers stay as they are
+    const tPath = join(ROOT, 'tests/golden/thresholds.json');
+    const cPath = join(ROOT, 'tests/golden/calibration.json');
+    const t = JSON.parse(readFileSync(tPath, 'utf8'));
+    const c = JSON.parse(readFileSync(cPath, 'utf8'));
+    Object.assign(t.parity, parity);
+    Object.assign(c.families, numbers);
+    c.configurations = [
+      ...new Set([
+        ...c.configurations,
+        ...cases.map((x) => `${x.preset} s${x.params.seed} incl ${x.params.incl}`),
+      ]),
+    ].sort();
+    writeFileSync(tPath, JSON.stringify(t, null, 2) + '\n');
+    writeFileSync(cPath, JSON.stringify(c, null, 2) + '\n');
+    console.log(JSON.stringify(parity, null, 1));
+    return;
   }
   const file = {
     about:
@@ -1001,21 +1068,56 @@ async function calibrate(G, node) {
 }
 
 /**
+ * The presets of a calibration family that --only-family adds held-out configurations for.
+ *
+ * @param {string} family
+ */
+function onlyFamilyPresets(family) {
+  if (family === 'slip') return ['Plates slipped'];
+  throw new Error(`no held-out presets for family ${family}`);
+}
+
+/**
+ * The per-preset bands the owner approved to widen (ADR 0026, 2026-10-07: `Edge-on with dust`; ADR
+ * 0036, 2026-10-07: three cases of M7): family, preset and measure. A preset with fewer than eight
+ * pairs (a zoom family has six) is allowed its own band where it is listed.
+ *
+ * @param {string} family
+ * @param {string} preset
+ * @param {string} [measure]
+ */
+function widenOnly(family, preset, measure) {
+  /** @type {Record<string, string[] | undefined>} */
+  const listed = {
+    'spiral|Edge-on with dust': ['r25', 'r50', 'r90', 'q', 'paA'],
+    'spiral@zoom|Edge-on with dust': ['r25', 'r50', 'r90', 'q', 'paA'],
+    'smooth|Cigar-shaped': ['paA'],
+    'spiral@zoom|Ringed': ['qInner'],
+    'layered@zoom|Layered: barred spiral, satellite trail': ['r50'],
+  };
+  const m = listed[`${family}|${preset}`];
+  return m ? measure === undefined || m.includes(measure) : false;
+}
+
+/**
  * The position-angle tolerance's parameters (thresholds.ts `paTolerance`), fitted from re-draws:
  * paEps0 is 1.5 × the 95th percentile of the change of ellipticity ε = (1 − q²)/(1 + q²) between
  * re-draws (below it the axis is noise), and paA 1.5 × the 95th percentile of |Δpa| · (ε − paEps0)
  * over the pairs above it, so that |Δpa| ≤ paA / (ε − paEps0).
  *
  * @param {any[]} list
+ * @param {{ eps0?: number, largest?: boolean }} [own] eps0: use this noise floor instead of the
+ *   fitted one; largest: the largest spread instead of the 95th percentile (ADR 0026)
  */
-function positionAngle(list) {
+function positionAngle(list, own = {}) {
   const eps = (/** @type {number} */ q) => (1 - q * q) / (1 + q * q);
   const p95 = (/** @type {number[]} */ xs) => {
     const s = xs.slice().sort((a, b) => a - b);
-    return s[Math.max(0, Math.ceil(0.95 * s.length) - 1)] ?? 0;
+    return s[own.largest ? s.length - 1 : Math.max(0, Math.ceil(0.95 * s.length) - 1)] ?? 0;
   };
   const ceil3 = (/** @type {number} */ x) => Math.ceil(x * 1000) / 1000;
-  const paEps0 = ceil3(FAC * p95(list.map((c) => Math.abs(eps(c.render.q) - eps(c.ref.q)))));
+  const paEps0 =
+    own.eps0 ?? ceil3(FAC * p95(list.map((c) => Math.abs(eps(c.render.q) - eps(c.ref.q)))));
   const above = list.filter((c) => eps(c.ref.q) > paEps0);
   const paA = ceil3(
     Math.max(0.5, FAC * p95(above.map((c) => Math.abs(c.paDiff) * (eps(c.ref.q) - paEps0)))),

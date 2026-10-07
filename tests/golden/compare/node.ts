@@ -73,6 +73,9 @@ export function goldenFamily(preset: string, variant?: string): string {
   // M7: a galaxy with a star or an artefact laid over it, and the deep field, have their own
   if (f === 'layered') return 'layered';
   if (preset === 'Deep field') return 'deepfield';
+  // the slipped plates print each mark four times, offset: the same galaxy's alpha, a noisier image
+  // for the density measures (docs/adr/0025-the-slipped-plates-are-their-own-golden-family.md)
+  if (preset === 'Plates slipped') return 'slip';
   const smooth = ['Smooth, round', 'Cigar-shaped', 'Radio jet', 'Stellar streams', 'Shell galaxy'];
   return smooth.includes(preset) ? 'smooth' : 'spiral';
 }
