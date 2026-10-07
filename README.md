@@ -162,7 +162,7 @@ Not yet proven: all parity numbers are measured on SwiftShader; real GPUs are me
 | [docs/reference-notes.md](docs/reference-notes.md) | how v21 works, stage by stage |
 | [docs/open-questions.md](docs/open-questions.md) | decisions waiting for the owner |
 | [assets/README.md](assets/README.md) | the asset pack: drawings, objects, fonts, data, and the reference page and source |
-| [assets/reference/design-language/](assets/reference/design-language/DESIGN-LANGUAGE.md) | the design language this page borrows (Swiss grid, hairlines, cream paper, one magenta) |
+| [assets/reference/design-language/](assets/reference/design-language/DESIGN-LANGUAGE.md) | the design language this page borrows (Swiss grid, hairlines, cream paper) |
 | [CONTRIBUTING.md](CONTRIBUTING.md), [CHANGELOG.md](CHANGELOG.md) | how to contribute; what changed |
 
 <br>

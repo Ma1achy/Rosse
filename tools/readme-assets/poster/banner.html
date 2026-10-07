@@ -37,7 +37,6 @@
         --ink: #1d1b19;
         --ink2: #6f6a5f;
         --hair: #c9c2b2;
-        --mag: #b80f5e;
         --field: #e6dece;
         --chalk: #262b28;
         --on-chalk: #efe9dc;
@@ -49,7 +48,6 @@
         --ink: #efe9dc;
         --ink2: #a9a597;
         --hair: #4d524e;
-        --mag: #e86aa0;
         --field: #2d332f;
         --paper-img: none;
         --chalk-img: block;
@@ -79,7 +77,7 @@
         pointer-events: none;
         opacity: 0.55;
         mix-blend-mode: multiply;
-        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .40  0 0 0 0 .30  0 0 0 .28 0'/></filter><rect width='300' height='300' filter='url(%23n)'/></svg>");
+        background-image: url('data:image/svg+xml;utf8,');
         z-index: 9;
       }
       :root[data-theme='dark'] body::after {
@@ -188,9 +186,6 @@
       .cap {
         color: var(--ink2);
       }
-      .mag {
-        color: var(--mag);
-      }
       /* the right block: whichever surface the left plate is not */
       .block {
         position: absolute;
@@ -252,34 +247,6 @@
       style="left: 440px; top: 364px; font-size: 9.5px; letter-spacing: 0.1em"
     >
       Fig. 1 · Barred spiral · seed 11
-    </div>
-
-    <svg
-      class="abs"
-      style="left: 0; top: 0; z-index: 5"
-      width="1100"
-      height="380"
-      fill="none"
-      stroke="var(--mag)"
-      stroke-width="1"
-    >
-      <circle cx="590" cy="190" r="30" />
-      <path d="M612 211 L640 250 L650 250" />
-    </svg>
-    <div
-      class="abs mono mag"
-      style="
-        left: 650px;
-        top: 244px;
-        z-index: 5;
-        letter-spacing: 0.05em;
-        font-size: 10px;
-        background: var(--ground);
-        padding: 0 3px;
-        margin-left: -3px;
-      "
-    >
-      Bar, hand-drawn
     </div>
     <div
       class="abs mono cap"
