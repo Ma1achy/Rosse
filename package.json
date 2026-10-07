@@ -27,6 +27,7 @@
     "prepare-assets": "node tools/pack-atlas/pack.mjs",
     "screenshots": "node tools/gpu-test/screenshot.mjs",
     "readme:assets": "node tools/readme-assets/build.mjs",
+    "readme:check": "node tools/readme-assets/check.mjs",
     "golden": "node tests/golden/compare/compare.mjs",
     "perf": "node tools/perf/perf.mjs",
     "perf:report": "node tools/perf/report.mjs",
