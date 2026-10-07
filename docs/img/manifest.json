@@ -1,0 +1,340 @@
+{
+  "figures": {
+    "stars": {
+      "file": "docs/img/figures/stars.jpg",
+      "bytes": 507586
+    },
+    "star-zoom": {
+      "file": "docs/img/figures/star-zoom.jpg",
+      "bytes": 354024
+    },
+    "artefacts": {
+      "file": "docs/img/figures/artefacts.jpg",
+      "bytes": 474371
+    },
+    "layered": {
+      "file": "docs/img/figures/layered.jpg",
+      "bytes": 652722
+    },
+    "sky": {
+      "file": "docs/img/figures/sky.jpg",
+      "bytes": 486192
+    },
+    "foreground": {
+      "file": "docs/img/figures/foreground.jpg",
+      "bytes": 313794
+    },
+    "arms": {
+      "file": "docs/img/figures/arms.jpg",
+      "bytes": 835915
+    },
+    "kinds": {
+      "file": "docs/img/figures/kinds.jpg",
+      "bytes": 687029
+    },
+    "hand": {
+      "file": "docs/img/figures/hand.jpg",
+      "bytes": 673273
+    },
+    "lenses": {
+      "file": "docs/img/figures/lenses.jpg",
+      "bytes": 663234
+    },
+    "lens-offset": {
+      "file": "docs/img/figures/lens-offset.jpg",
+      "bytes": 345728
+    },
+    "mergers": {
+      "file": "docs/img/figures/mergers.jpg",
+      "bytes": 792321
+    },
+    "merger-sequence": {
+      "file": "docs/img/figures/merger-sequence.jpg",
+      "bytes": 451937
+    },
+    "shells": {
+      "file": "docs/img/figures/shells.jpg",
+      "bytes": 394545
+    },
+    "pen": {
+      "file": "docs/img/figures/pen.jpg",
+      "bytes": 431761
+    },
+    "presets": {
+      "file": "docs/img/figures/presets.jpg",
+      "bytes": 1305147
+    }
+  },
+  "gifs": {},
+  "gz2": {
+    "smooth": {
+      "objid": "587739608639209641",
+      "ra": 215.87721919281597,
+      "dec": 28.34569921169873,
+      "score": 1,
+      "seed": 658,
+      "matches": 39506,
+      "cutout": null,
+      "file": "docs/img/gz2/smooth.jpg",
+      "bytes": 349865
+    },
+    "spiral": {
+      "objid": "587722981742084144",
+      "ra": 184.53564790103718,
+      "dec": -1.0641128459043898,
+      "score": 1,
+      "seed": 4678,
+      "matches": 90360,
+      "cutout": null,
+      "file": "docs/img/gz2/spiral.jpg",
+      "bytes": 421565
+    },
+    "barred": {
+      "objid": "587722981750014126",
+      "ra": 202.7357889852398,
+      "dec": -1.1525399179780322,
+      "score": 1,
+      "seed": 6125,
+      "matches": 30581,
+      "cutout": null,
+      "file": "docs/img/gz2/barred.jpg",
+      "bytes": 384840
+    },
+    "edge-on": {
+      "objid": "587732771579953183",
+      "ra": 153.675737004026,
+      "dec": 8.601077711646425,
+      "score": 1,
+      "seed": 7090,
+      "matches": 16653,
+      "cutout": null,
+      "file": "docs/img/gz2/edge-on.jpg",
+      "bytes": 336355
+    },
+    "merger": {
+      "objid": "587731514215432360",
+      "ra": 16.583155189940644,
+      "dec": 1.1393219911647918,
+      "score": 1,
+      "seed": 1074,
+      "matches": 1215,
+      "cutout": null,
+      "file": "docs/img/gz2/merger.jpg",
+      "bytes": 336636
+    },
+    "ring": {
+      "objid": "587722982285312179",
+      "ra": 199.11403412306512,
+      "dec": -0.6791085409586799,
+      "score": 1,
+      "seed": 3403,
+      "matches": 6513,
+      "cutout": null,
+      "file": "docs/img/gz2/ring.jpg",
+      "bytes": 406370
+    },
+    "irregular": {
+      "objid": "587732048403497138",
+      "ra": 130.07650197008263,
+      "dec": 40.796460556772985,
+      "score": 0.9333333333333333,
+      "seed": 8381,
+      "matches": 901,
+      "cutout": null,
+      "file": "docs/img/gz2/irregular.jpg",
+      "bytes": 475500
+    },
+    "many-arms": {
+      "objid": "587729653428191602",
+      "ra": 258.2822596002972,
+      "dec": 29.501827925552604,
+      "score": 1,
+      "seed": 2897,
+      "matches": 5622,
+      "cutout": null,
+      "file": "docs/img/gz2/many-arms.jpg",
+      "bytes": 498619
+    },
+    "tight-arms": {
+      "objid": "587725575886274642",
+      "ra": 256.76093201404404,
+      "dec": 64.32599033868254,
+      "score": 1,
+      "seed": 6994,
+      "matches": 33584,
+      "cutout": null,
+      "file": "docs/img/gz2/tight-arms.jpg",
+      "bytes": 483109
+    },
+    "loose-arms": {
+      "objid": "587724648183234759",
+      "ra": 179.93437170591187,
+      "dec": -3.399018847883866,
+      "score": 1,
+      "seed": 7637,
+      "matches": 7811,
+      "cutout": null,
+      "file": "docs/img/gz2/loose-arms.jpg",
+      "bytes": 382818
+    },
+    "overview": {
+      "file": "docs/img/gz2/overview.jpg",
+      "bytes": 552120
+    }
+  },
+  "real": {
+    "0": {
+      "objid": "588017703489241360",
+      "category": "smooth",
+      "seed": 2009
+    },
+    "3": {
+      "objid": "588011101569941749",
+      "category": "smooth",
+      "seed": 4288
+    },
+    "6": {
+      "objid": "587736977421828344",
+      "category": "edge-on",
+      "seed": 586
+    },
+    "8": {
+      "objid": "587739646748328038",
+      "category": "ring",
+      "seed": 8903
+    },
+    "10": {
+      "objid": "587731870172446752",
+      "category": "ring",
+      "seed": 7941,
+      "file": "docs/img/real/10.jpg",
+      "bytes": 271983
+    },
+    "12": {
+      "objid": "587741821066215489",
+      "category": "spiral",
+      "seed": 6057,
+      "file": "docs/img/real/12.jpg",
+      "bytes": 285327
+    },
+    "15": {
+      "objid": "587741386738827731",
+      "category": "barred",
+      "seed": 9946,
+      "file": "docs/img/real/15.jpg",
+      "bytes": 249349
+    },
+    "19": {
+      "objid": "587733079742021829",
+      "category": "barred",
+      "seed": 1884,
+      "file": "docs/img/real/19.jpg",
+      "bytes": 273744
+    },
+    "23": {
+      "objid": "587738409796108477",
+      "category": "spiral",
+      "seed": 8748,
+      "file": "docs/img/real/23.jpg",
+      "bytes": 244324
+    },
+    "26": {
+      "objid": "587729409148256445",
+      "category": "barred",
+      "seed": 7121,
+      "file": "docs/img/real/26.jpg",
+      "bytes": 275019
+    },
+    "27": {
+      "objid": "587732702326685867",
+      "category": "many arms",
+      "seed": 7704,
+      "file": "docs/img/real/27.jpg",
+      "bytes": 271199
+    },
+    "34": {
+      "objid": "588017109683732600",
+      "category": "merger",
+      "seed": 4572,
+      "file": "docs/img/real/34.jpg",
+      "bytes": 230434
+    },
+    "37": {
+      "objid": "587735662619263234",
+      "category": "irregular",
+      "seed": 3937,
+      "file": "docs/img/real/37.jpg",
+      "bytes": 279332
+    },
+    "41": {
+      "objid": "588017991777714325",
+      "category": "edge-on",
+      "seed": 6243,
+      "file": "docs/img/real/41.jpg",
+      "bytes": 229633
+    },
+    "00": {
+      "file": "docs/img/real/00.jpg",
+      "bytes": 284990
+    },
+    "03": {
+      "file": "docs/img/real/03.jpg",
+      "bytes": 222023
+    },
+    "06": {
+      "file": "docs/img/real/06.jpg",
+      "bytes": 238077
+    },
+    "08": {
+      "file": "docs/img/real/08.jpg",
+      "bytes": 265728
+    }
+  },
+  "presets": [
+    "Grand design",
+    "Barred spiral",
+    "Flocculent",
+    "Hand-drawn arms",
+    "Tightly wound",
+    "Loose, open arms",
+    "Ringed",
+    "Disc, no arms",
+    "Smooth, round",
+    "Cigar-shaped",
+    "Edge-on with dust",
+    "Merger: the Mice",
+    "Merger: long tails",
+    "Merger: minor, a stream",
+    "Merger: spiral meets elliptical",
+    "Merger: dry (two ellipticals)",
+    "Merger: polar collision",
+    "Merger: three-armed pair",
+    "Layered: spiral beside a bright star",
+    "Layered: barred spiral, satellite trail",
+    "Layered: edge-on, star on top",
+    "Layered: lensed merger",
+    "Layered: ringed galaxy, ghost reflection",
+    "Star: bright, with spikes",
+    "Star: faint",
+    "Artefact: satellite trail",
+    "Artefact: ghost reflection",
+    "Artefact: cosmic rays",
+    "Merger: coalescing",
+    "Lens: Einstein ring",
+    "Lens: Einstein cross (quasar)",
+    "Lens: galaxy cluster",
+    "Lens: double Einstein ring",
+    "Lens: giant arc",
+    "Lens: a quad",
+    "Deep field",
+    "A sketch, lensed",
+    "Sketches, torn apart",
+    "Radio jet",
+    "Stellar streams",
+    "Dusty spiral",
+    "Hand wobble",
+    "Shell galaxy",
+    "Plates slipped",
+    "Stellar populations"
+  ]
+}

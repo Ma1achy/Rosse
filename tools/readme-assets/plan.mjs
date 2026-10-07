@@ -162,7 +162,7 @@ export const FIGURES = [
       { ...S('Artefact: satellite trail', 7), label: 'Artefact: satellite trail', sub: 'a streak across the exposure' },
       { ...S('Artefact: ghost reflection', 7), label: 'Artefact: ghost reflection', sub: 'a star and its reflection' },
       { ...S('Artefact: cosmic rays', 7), label: 'Artefact: cosmic rays', sub: 'hits on the detector' },
-      { ...S('Deep field', 7, { arrow: 1, field: 0.9 }, { zoom: 0.8 }), label: 'a stray arrow', sub: 'arrow 1, in the deep field' },
+      { ...S('Artefact: cosmic rays', 11, { starBright: 0.8 }), label: 'cosmic rays, other seed', sub: 'seed 11' },
       { ...S('Artefact: satellite trail', 21, { starBright: 0.9, spikes: 0.9 }), label: 'trail, other seed', sub: 'seed 21' },
       { ...S('Artefact: ghost reflection', 5, { starBright: 0.95, bleed: 0.8 }), label: 'ghost, other seed', sub: 'seed 5' },
     ],
@@ -197,9 +197,9 @@ export const FIGURES = [
     kind: 'strip',
     cols: 3,
     cells: [
-      { ...S('Grand design', 12, { ...HERO, incl: 15, fgstars: 0, field: 0 }, { zoom: 1.2 }), label: 'fgstars 0', sub: 'no foreground' },
-      { ...S('Grand design', 12, { ...HERO, incl: 15, fgstars: 0.6, field: 0.3 }, { zoom: 1.2 }), label: 'fgstars 0.6, field 0.3', sub: 'stars in front of it' },
-      { ...S('Grand design', 12, { ...HERO, incl: 15, fgstars: 1, field: 0.6, companions: 1 }, { zoom: 1.2 }), label: 'fgstars 1, companions 1', sub: 'and small neighbours' },
+      { ...S('Grand design', 12, { ...HERO, incl: 15, fgstars: 0, field: 0 }, { zoom: 0.7 }), label: 'fgstars 0', sub: 'no foreground' },
+      { ...S('Grand design', 12, { ...HERO, incl: 15, fgstars: 0.6, field: 0.3 }, { zoom: 0.7 }), label: 'fgstars 0.6, field 0.3', sub: 'stars in front of it' },
+      { ...S('Grand design', 12, { ...HERO, incl: 15, fgstars: 1, field: 0.7, companions: 1 }, { zoom: 0.7 }), label: 'fgstars 1, companions 1', sub: 'and small neighbours' },
     ],
   },
   {
@@ -301,7 +301,7 @@ export const FIGURES = [
     cells: [0.08, 0.28, 0.45, 0.62, 0.8, 1].map((t, i) => ({
       ...S('Merger: the Mice', 7, {}, { mTime: t, zoom: 1 }),
       label: `mTime ${t}`,
-      sub: ['approach', 'first pass', 'tails grow', 'return', 'close', 'settled'][i],
+      sub: ['approach', 'first pass', 'tails grow', 'return', 'second pass', 'settled'][i],
     })),
   },
   {
@@ -313,7 +313,7 @@ export const FIGURES = [
     cells: [20, 45, 80].map((t) => ({
       ...S('Shell galaxy', 7, { shellTime: t }, { zoom: 1.3 }),
       label: `shellTime ${t}`,
-      sub: t === 20 ? 'young: the shells are tight' : t === 45 ? 'they spread outwards' : 'old: wide and faint',
+      sub: t === 20 ? 'early: a sharp edge' : t === 45 ? 'the shells spread outwards' : 'late: wide and faint',
     })),
   },
 ];
