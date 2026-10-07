@@ -21312,7 +21312,17 @@
           ]
         }
       },
-      "v21Reroll": null
+      "v21Reroll": null,
+      "countSpread": {
+        "dots": {
+          "n": 120,
+          "min": 0.0002,
+          "p5": 0.0026,
+          "median": 0.02,
+          "p95": 0.0609,
+          "max": 0.0961
+        }
+      }
     }
   },
   "controlsByFamily": {

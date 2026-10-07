@@ -1010,111 +1010,61 @@
       "preset": "Real galaxy 0",
       "variant": "real",
       "real": 0,
-      "seeds": [2009],
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      }
+      "seeds": [2009]
     },
     {
       "preset": "Real galaxy 3",
       "variant": "real",
       "real": 3,
-      "seeds": [4288],
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      }
+      "seeds": [4288]
     },
     {
       "preset": "Real galaxy 6",
       "variant": "real",
       "real": 6,
-      "seeds": [586],
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      }
+      "seeds": [586]
     },
     {
       "preset": "Real galaxy 10",
       "variant": "real",
       "real": 10,
-      "seeds": [7941],
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      }
+      "seeds": [7941]
     },
     {
       "preset": "Real galaxy 12",
       "variant": "real",
       "real": 12,
-      "seeds": [6057],
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      }
+      "seeds": [6057]
     },
     {
       "preset": "Real galaxy 15",
       "variant": "real",
       "real": 15,
-      "seeds": [9946],
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      }
+      "seeds": [9946]
     },
     {
       "preset": "Real galaxy 19",
       "variant": "real",
       "real": 19,
-      "seeds": [1884],
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      }
+      "seeds": [1884]
     },
     {
       "preset": "Real galaxy 23",
       "variant": "real",
       "real": 23,
-      "seeds": [8748],
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      }
+      "seeds": [8748]
     },
     {
       "preset": "Real galaxy 26",
       "variant": "real",
       "real": 26,
-      "seeds": [7121],
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      }
+      "seeds": [7121]
     },
     {
       "preset": "Real galaxy 37",
       "variant": "real",
       "real": 37,
-      "seeds": [3937],
-      "overrides": {
-        "starMix": 0,
-        "field": 0,
-        "fgstars": 0
-      }
+      "seeds": [3937]
     }
   ]
 }

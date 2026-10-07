@@ -341,6 +341,7 @@ export class CpuStipple {
           kind: 'sprites',
           atlas: 'dots',
           gain: 1,
+          svgLayer: 'background',
           instances: instanceList(skyOut.dots, skyOut.dotsU, skyOut.nDots),
         });
       bgLayers.push(
@@ -348,13 +349,14 @@ export class CpuStipple {
           skyVec,
           skyOut.nRows * sky.spec.strideDots,
           skyOut.nRows * sky.spec.strideBlobs,
-        ),
+        ).map((l): InkLayer => ({ ...l, svgLayer: 'background' })),
       );
       if (skyOut.nFg)
         fgLayers.push({
           kind: 'sprites',
           atlas: 'fgstars',
           gain: 1,
+          svgLayer: 'background',
           instances: instanceList(skyOut.fg, skyOut.fgU, skyOut.nFg),
         });
     }

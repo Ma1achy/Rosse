@@ -220,9 +220,12 @@ export function buildSvg(layers: readonly ExportLayer[], opts: SvgOptions): SvgR
   for (const l of layers) {
     if (l.kind === 'ribbons')
       addPaths(
-        'arms',
+        l.svgLayer ?? 'arms',
         ribbonPaths(l, opts.strokes).map((p) => ({ ...p, w: Math.max(0.8, p.w) })),
       );
+    else if (l.kind === 'capsules' && l.svgLayer)
+      // a layer that names its layer (the sky's drawings): all of it goes there
+      addPaths(l.svgLayer, capsulePaths(l.caps, 0, l.count).map(minWidth));
     else if (l.kind === 'capsules') {
       const h = Math.min(l.hatch, l.count);
       addPaths('dust', capsulePaths(l.caps, 0, h).map(minWidth));
@@ -299,7 +302,7 @@ export function cpuExportLayers(layers: readonly InkLayer[], hatchCaps: number):
   const out: ExportLayer[] = [];
   for (const l of layers) {
     if (l.kind === 'sprites' || l.kind === 'ribbons') out.push(l);
-    else if (l.kind === 'capsules') out.push({ ...l, hatch: hatchCaps });
+    else if (l.kind === 'capsules') out.push({ ...l, hatch: l.svgLayer ? 0 : hatchCaps });
     else throw new Error('the CPU export reads CPU layers; read GPU buffers with readInkLayers');
   }
   return out;

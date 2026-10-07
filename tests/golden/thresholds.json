@@ -1033,31 +1033,46 @@
         "Real galaxy 0": {
           "q": 0.038,
           "qInner": 0.028,
-          "paEps0": 0.039
+          "paEps0": 0.039,
+          "countsBy": {
+            "dots": 0.077
+          }
         },
         "Real galaxy 10": {
           "q": 0.025,
           "qInner": 0.025,
-          "paEps0": 0.032
+          "paEps0": 0.032,
+          "countsBy": {
+            "dots": 0.158
+          }
         },
         "Real galaxy 15": {
           "q": 0.019,
           "qInner": 0.03,
           "paEps0": 0.022,
-          "r25": 0.044
+          "r25": 0.044,
+          "countsBy": {
+            "dots": 0.193
+          }
         },
         "Real galaxy 19": {
           "q": 0.04,
           "qInner": 0.032,
           "paEps0": 0.045,
-          "paA": 1.024
+          "paA": 1.024,
+          "countsBy": {
+            "dots": 0.117
+          }
         },
         "Real galaxy 26": {
           "q": 0.042,
           "qInner": 0.036,
           "paEps0": 0.048,
           "r25": 0.057,
-          "r90": 0.057
+          "r90": 0.057,
+          "countsBy": {
+            "dots": 0.123
+          }
         },
         "Real galaxy 3": {
           "q": 0.027,
@@ -1066,7 +1081,10 @@
           "r25": 0.037,
           "r50": 0.063,
           "r90": 0.086,
-          "paA": 1.232
+          "paA": 1.232,
+          "countsBy": {
+            "dots": 0.134
+          }
         },
         "Real galaxy 6": {
           "q": 0.042,
@@ -1074,27 +1092,42 @@
           "paEps0": 0.05,
           "r25": 0.035,
           "r50": 0.039,
-          "paA": 1.007
+          "paA": 1.007,
+          "countsBy": {
+            "dots": 0.089
+          }
         },
         "Real galaxy 12": {
           "q": 0.024,
           "qInner": 0.03,
           "paEps0": 0.028,
           "r90": 0.054,
-          "paA": 0.918
+          "paA": 0.918,
+          "countsBy": {
+            "dots": 0.058
+          }
         },
         "Real galaxy 23": {
           "q": 0.025,
           "qInner": 0.029,
           "paEps0": 0.03,
           "r25": 0.039,
-          "r90": 0.062
+          "r90": 0.062,
+          "countsBy": {
+            "dots": 0.112
+          }
         },
         "Real galaxy 37": {
           "q": 0.02,
           "qInner": 0.031,
-          "paEps0": 0.025
+          "paEps0": 0.025,
+          "countsBy": {
+            "dots": 0.071
+          }
         }
+      },
+      "countsBy": {
+        "dots": 0.122
       }
     }
   }

@@ -167,4 +167,12 @@ Commit the changed files under `docs/milestones/m10/`. Check the first line each
 
 Also re-check then, from M7 (ADRs 0035 and 0036, proposed): the calibration factor 2 and the dots' count tolerance, and the three cases compared with the mean of v21's draws (`cigar-shaped--stipple` s4242 orbit, `ringed--vectors` s7 zoom, `layered-barred-spiral-satellite-trail--layered` s7 zoom; `tests/golden/v21-redraws.json`). If they pass against v21's single capture on real hardware, remove them from that list; if more cases fail by v21's single draw, add them with `npm run capture:reference -- --redraws tests/golden/v21-redraws.json`.
 
+**The integration (pull request #15) adds to the same visit**, everything on SwiftShader until then:
+
+- `npm run golden -- --calibrate` re-measures every family; the `real` family's count tolerance (ADR 0061: 12.2%, from `--calibrate-counts --families real --only-family real --factor 2`) and the whole-family calibration of ADR 0060 are included, and `--calibrate-counts` is the quick way to re-check the dots' tolerance of any family.
+- The five cases compared with the mean of v21's 8 draws (`tests/golden/v21-redraws.json`: `cigar-shaped--stipple` s4242 orbit, `ringed--vectors` s7 zoom, `layered-barred-spiral-satellite-trail--layered` s7 zoom, `real-galaxy-6--real__s586__home`, `barred-spiral--knob-ring-lines` s7 home): drop a name if its case passes against v21's single capture, add one with `npm run capture:reference -- --redraws tests/golden/v21-redraws.json`.
+- The engine's own goldens (`tests/golden/engine-hashes.json`, 440 cases) are SwiftShader's; on a real GPU `npm run golden -- --update-engine` writes that adapter's, and test (e) then compares like with like.
+- `npm run test:gpu` (the page's UI and extras smoke tests included) and the GIF and SVG exports on the real adapter; the catalogue's load and memory on a phone (docs/milestones/m12/README.md); the lens kernels' L1 on the real adapter (M9).
+- The SDSS acknowledgement wording (`src/extras/attribution.ts`) and the licence (Q1) are decisions, not measurements, but the page shows both.
+
 **Recommendation:** do it with M10's real-hardware pass (it is on that row's acceptance in docs/roadmap.md), or earlier if convenient.

@@ -678,12 +678,12 @@ export class GpuStipple {
         inst: d.createBuffer({
           label: 'merging core',
           size: 2 * INSTANCE.size,
-          usage: STORAGE | GPUBufferUsage.COPY_DST,
+          usage: STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC,
         }),
         args: d.createBuffer({
           label: 'merging core args',
           size: 16,
-          usage: GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_DST,
+          usage: GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC,
         }),
         count: 0,
       };

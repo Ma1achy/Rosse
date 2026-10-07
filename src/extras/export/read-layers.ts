@@ -53,7 +53,7 @@ function common(l: InkLayer) {
   return {
     gain: l.gain,
     ...(l.pop ? { pop: l.pop } : {}),
-    ...(l.kind.endsWith('sprites') && l.svgLayer ? { svgLayer: l.svgLayer } : {}),
+    ...(l.svgLayer ? { svgLayer: l.svgLayer } : {}),
   };
 }
 

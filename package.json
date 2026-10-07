@@ -16,7 +16,7 @@
     "test:watch": "vitest",
     "test:gpu": "node tools/gpu-test/run.mjs",
     "thumbnails": "node tools/thumbnails/make.mjs",
-    "test:ui": "node tools/gpu-test/ui-smoke.mjs",
+    "test:ui": "node tools/gpu-test/ui-smoke.mjs && node tools/gpu-test/extras-smoke.mjs",
     "vectors": "node tools/rng-vectors.mjs",
     "vectors:camera": "node tools/camera-vectors.mjs",
     "vectors:merger": "node tools/merger-vectors.mjs",

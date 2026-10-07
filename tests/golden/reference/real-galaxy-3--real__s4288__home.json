@@ -5,16 +5,10 @@
   "camera": "home",
   "surface": "paper",
   "variant": "real",
-  "overrides": {
-    "starMix": 0,
-    "field": 0,
-    "fgstars": 0
-  },
   "real": 3,
   "sequence": [
     "load page (theme light)",
-    "__GEN.real(3)",
-    "__GEN.set({\"starMix\":0,\"field\":0,\"fgstars\":0})"
+    "__GEN.real(3)"
   ],
   "zoom": 1,
   "canvas": [
@@ -22,13 +16,13 @@
     800
   ],
   "stats": {
-    "rstars": 0,
-    "dots": 5480,
+    "rstars": 255,
+    "dots": 4956,
     "knots": 0,
     "stars": 0,
     "curves": 0,
-    "used": 2,
-    "ms": 20
+    "used": 49,
+    "ms": 90
   },
   "hand": [
     0,
@@ -127,7 +121,7 @@
     "lens": 0,
     "shells": 0,
     "tail": 0,
-    "fgstars": 0,
+    "fgstars": 0.2699900513514876,
     "trails": 0,
     "arrow": 0,
     "plates": "ink",
@@ -166,9 +160,9 @@
     "ovArtefact": "none",
     "mTime": 1,
     "az": 0,
-    "starMix": 0,
+    "starMix": 0.6,
     "dustScribble": 0.5,
-    "field": 0,
+    "field": 0.24150800033239647,
     "dustLines": 0,
     "bubbles": 0.5,
     "streams": 0,
@@ -202,6 +196,6 @@
     "shellStars": 6000
   },
   "pageErrors": [],
-  "inkPixelSha256": "0246a4df4ac7de8d69e774b23f8fb9eaa668f8ddcecb818a4164af4ef17519b0",
-  "captured": "2026-10-07T11:26:38.844Z"
+  "inkPixelSha256": "4496b3e96d5b174195b3ac0ead1b68df37f7df5ba23ba17d7c85dce539cb501d",
+  "captured": "2026-10-07T18:21:12.092Z"
 }

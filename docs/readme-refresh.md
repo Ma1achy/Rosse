@@ -27,6 +27,6 @@ Every galaxy, seed, parameter and camera path is in `tools/readme-assets/plan.mj
 ## TODO when the owner decides
 
 - [ ] **Licence.** When Q1 is decided (docs/open-questions.md), replace "undecided" in the README's credits and add a badge only if it is real.
-- [ ] **Milestone table.** Mark each milestone merged as it lands and drop the pull-request numbers.
+- [ ] **Milestone table.** The README's status table follows the integration branch (M0 to M12 built; what is open is listed under it); update it when pull request #15 reaches `main`.
 - [ ] **Real-GPU numbers.** The pictures were drawn on SwiftShader; when M10's real-hardware numbers are in, update "Not yet proven" in the status section.
-- [ ] **Counts.** "582 captures of v21" and "156 whole galaxies" are read from `tests/golden/reference/` and `assets/README.md`; update them if the reference set grows.
+- [ ] **Counts.** "582 captures of v21" and "156 whole galaxies" are read from `tests/golden/reference/` and `assets/README.md`; the reference set is now 834 captures (with the 28 draws of v21's stipple that ADR 0036 and 0061 add). Update the README's number if it says so.
