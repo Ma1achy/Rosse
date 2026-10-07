@@ -826,6 +826,10 @@ export function memberRows(L: LensScene, cam: Camera): VectorRow[] {
  * for each of its `bg` drawings and applies the result as a `post` warp about the drawing's own
  * centre (`c + S (q − c)`, the hook of src/model/vectors.ts); until the deep field exists nothing
  * calls it. `X, Y` is the drawing's plate position.
+ *
+ * v21 parity: a cluster's deep field is sheared twice (open question Q13). `bgsprites` already
+ * applies the field's own shear at app23.js:L902, and this warp (L1273–1278) follows on top of it.
+ * The M7 deep field draws both, in that order; this function is only the second.
  */
 export function weakLensing(
   M: LensModel,

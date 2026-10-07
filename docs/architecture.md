@@ -33,6 +33,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0050](adr/0050-the-lens-marks-slots-and-explicit-home.md) | _Proposed:_ the lens's marks, slots and explicit home: 8 slots per mark, mark classes, the fixed-point κ, the saved source orientation (open question Q3, option b) that the orbit never re-rolls. |
 | [0051](adr/0051-goldens-drawn-with-v21s-lens-picks.md) | _Proposed:_ the goldens draw the lens with v21's lens picks, replayed from v21's own streams and checked against v21's solver; the engine's own picks are tested by their distributions. Extends 0015 item 5 and 0021. |
 | [0052](adr/0052-m9-acceptance-overrides.md) | _Proposed:_ the overrides of the M9 acceptance captures (the deep field, drawn stars and foreground stars; `Layered: lensed merger` after M8). |
+| [0053](adr/0053-lens-family-calibration-and-count-gate.md) | _Proposed:_ the `lens` family's calibration (28 configurations, `--family lens`), and its count gate at `poisson` 4.5 (lensed knots are over-dispersed: 1.27 against 0.82). |
 
 ## Modules
 

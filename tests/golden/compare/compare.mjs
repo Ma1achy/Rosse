@@ -532,7 +532,8 @@ async function calibrate(G, node) {
         (s) => console.log(`[${shard}] ${s}`),
         // every n-th of each shard's own configurations, so the shards stay balanced; the
         // line-work alone has its own breaks instead (docs/milestones/m4/README.md)
-        c.family !== 'lines' && Math.floor(i / n) % controlsEvery === 0,
+        // (a held-out v21 capture is there for v21's spread, not for the controls)
+        !c.heldOut && c.family !== 'lines' && Math.floor(i / n) % controlsEvery === 0,
       );
       for (const [f, list] of Object.entries(one.pairs)) (part.pairs[f] ??= []).push(...list);
       for (const [f, list] of Object.entries(one.heldOut)) (part.heldOut[f] ??= []).push(...list);
@@ -592,6 +593,8 @@ async function calibrate(G, node) {
   console.log(`  ${v21.used} v21 pairs whose stipple re-rolled`);
 
   const ADR = { ink: 0.05, median: 0.1, p90: 0.1, counts: 0.03, countsSmall: 0.1, poisson: 3 };
+  /** the lens family's count gate, in standard deviations of two Poisson draws (ADR 0053) */
+  const LENS_POISSON = 4.5;
   const KEYS = /** @type {const} */ ([
     ['ssim', (/** @type {any} */ c) => c.ssim],
     ['ssimCoarse', (/** @type {any} */ c) => c.ssimCoarse],
@@ -629,7 +632,9 @@ async function calibrate(G, node) {
     const base = {
       counts: ADR.counts,
       countsSmall: ADR.countsSmall,
-      poisson: ADR.poisson,
+      // the lensed knots and drawn stars of a source are clustered (its arms' knots, the images
+      // of one knot) and so more variable than Poisson draws: ADR 0053 (proposed)
+      poisson: family === 'lens' ? LENS_POISSON : ADR.poisson,
       // the drawn stars of a disc galaxy (about 1,000–1,100 of ~11,000 proposals) are a binomial
       // draw too: ±3% there is under one standard deviation of the difference of two draws
       poissonBelow: 2000,
