@@ -3337,9 +3337,6 @@
       },
       "v21Reroll": null
     },
-    "merger": {
-      "v21Reroll": null
-    },
     "lens": {
       "v21Reroll": null
     },
@@ -6214,6 +6211,10 @@
       },
       "negativeControls": {},
       "v21Reroll": null
+    },
+    "merger": {
+      "v21Reroll": null
     }
-  }
+  },
+  "merged": ["merger"]
 }

@@ -115,25 +115,6 @@
         }
       }
     },
-    "merger": {
-      "counts": 0.03,
-      "countsSmall": 0.1,
-      "poisson": 3,
-      "poissonBelow": 2000,
-      "ink": 0.05,
-      "ssimCoarse": 0.85,
-      "median": 0.1,
-      "p90": 0.1,
-      "r25": 0.1,
-      "r50": 0.1,
-      "r90": 0.1,
-      "outer": 0.03,
-      "q": 0.05,
-      "qInner": 0.05,
-      "paA": 2,
-      "paEps0": 0.05,
-      "provisional": true
-    },
     "lens": {
       "counts": 0.03,
       "countsSmall": 0.1,
@@ -269,6 +250,25 @@
       "paEps0": 0.045,
       "heldOut": 43,
       "byPreset": {}
+    },
+    "merger": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.85,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.1,
+      "r50": 0.1,
+      "r90": 0.1,
+      "outer": 0.03,
+      "q": 0.05,
+      "qInner": 0.05,
+      "paA": 2,
+      "paEps0": 0.05,
+      "provisional": true
     }
   }
 }
