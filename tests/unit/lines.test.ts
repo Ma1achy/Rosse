@@ -277,7 +277,7 @@ describe('ring knots and clumps (app23.js:L282–297)', () => {
   it("v21's clusters (ADR 0018) are placed as given; the placement key re-draws the engine's", () => {
     const P = presetParams('Barred spiral', 7, M4);
     const V = v21Variation(P, M);
-    const picks = v21RingKnots(ROOT, P, V, KINDS);
+    const picks = v21RingKnots(ROOT, P, V);
     expect(picks).toHaveLength(Math.round(6 + 10 * P.ring));
     const g = markGroups(P, V, P.seed, picks).filter((x) => x.kind === 0);
     g.forEach((x, i) => {
@@ -287,6 +287,10 @@ describe('ring knots and clumps (app23.js:L282–297)', () => {
       expect(x.c[0]).toBeCloseTo(p.R * Math.cos(p.t), 12);
       expect(x.c[1]).toBeCloseTo(p.R * Math.sin(p.t), 12);
     });
+    // the replay is v21's own block, not a port of it: its centres are where v21's block puts its
+    // stars, one per cluster (the capture's `rstars` counts them: 9 for Barred spiral)
+    expect(picks).toHaveLength(9);
+    expect(picks.every((c) => c.count >= 5 && c.count <= 12)).toBe(true);
     const own = markGroups(P, V).filter((x) => x.kind === 0);
     const again = markGroups(P, V, P.seed + 7_919_000).filter((x) => x.kind === 0);
     expect(again.map((x) => x.c)).not.toEqual(own.map((x) => x.c));
@@ -455,5 +459,24 @@ describe('pen lines are unioned per sample (ADR 0019, QA D2)', () => {
     for (let x = 10; x < 50; x++) pieces.push([x + 0.2, 20.5, x + 1.2, 20.5, w]);
     const whole = ink([[10.2, 20.5, 50.2, 20.5, w]]);
     expect(Math.abs(ink(pieces) / whole - 1)).toBeLessThan(0.03);
+  });
+});
+
+describe('the lane cull thins the stipple near the lanes (QA D3: the metric sees this only in part)', () => {
+  it('a lane radius of 0 keeps every disc sample the cull would have removed', () => {
+    const P = presetParams('Dusty spiral', 7, M4);
+    const scene = buildScene(P, M);
+    expect(scene.ribbons.laneR).toBeGreaterThan(3);
+    const cam = cameraOf(P);
+    const count = (laneR: number) => {
+      const st = new CpuStipple({ ...scene, ribbons: { ...scene.ribbons, laneR } });
+      return st.view(cam).perClass.reduce((a, b) => a + b, 0);
+    };
+    const full = count(scene.ribbons.laneR);
+    const none = count(0);
+    // p = 0.7 of the disc samples within about 4 px of a lane point: 61 of about 11,000 marks
+    // here, half a per cent, far below any ink gate; this test is what guards the cull
+    expect(none - full).toBeGreaterThan(30);
+    expect(none - full).toBeLessThan(400);
   });
 });

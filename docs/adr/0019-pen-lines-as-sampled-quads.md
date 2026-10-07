@@ -4,7 +4,7 @@ Date: 2026-10-06
 
 ## Status
 
-Accepted. Amends [0006](0006-drawing-storage-on-the-gpu.md) for pen lines (the dust hatching), which stays as written for everything else: its "parity mode" for the reference's overlap quads is what this ADR turns on.
+Proposed, awaiting the owner's sign-off. Amends [0006](0006-drawing-storage-on-the-gpu.md) for pen lines (the dust hatching), which stays as written for everything else: its "parity mode" for the reference's overlap quads is what this ADR turns on.
 
 ## Context
 
@@ -20,6 +20,8 @@ The cause is how overlapping segments add up, not the width or the coverage of o
 
 On the same segments, a simulation of v21's per-sample union gives a mean alpha of 0.64–0.68 over hatched pixels, which is what the v21 captures show, and the engine's capsules give 1.21–1.25 times its ink, which is the excess QA measured. A per-pixel maximum instead of the over-composite gives 0.89–0.91 times, which is too light.
 
+Measured how: v21 captures (`tools/capture-reference`, `--extra`) of each preset with the stipple, lines, knots and sparkle stars off, once with the hatching (variant `hatch`) and once with `dustScribble: 0` (variant `nohatch`); the ink the hatching adds is Σα of one minus the other, on v21's side and on the CPU engine's drawn with v21's choices (ADR 0018). The data is `docs/data/m4-hatch-ink.json`, with the method in its `about` and the numbers before the change; `tools/m4-summary.mjs hatch` writes it.
+
 ## Decision
 
 Pen lines (the `capsules` layer: the dust hatching) are drawn as v21 draws them, and unioned per sample:
@@ -33,7 +35,7 @@ The capsule model of 0006 stays for other vector drawings until their milestones
 
 ## Consequences
 
-- Hatch ink matches v21's per unit of length and at the joins (docs/milestones/m4/README.md has the ratios).
+- Hatch ink matches v21's: engine over v21 is 0.98–1.05 (mean 1.007) on 22 captures at pens 1.2, 2.4 and 4.8 (half widths 0.23, 0.46 and 0.91 px, three to ten presets and two seeds each), against 1.17–1.24 (mean 1.20) before, on the ten pen 2.4 cases. The ratio does not depend on the pen scale over the range the controls allow (1 to 5, v21's default is 2.4; 1.2 and 4.8 are near its ends). The vector-lines spike measured the shape of one path as a round-cap stroke would draw it and found capsules closer (IoU 0.92–0.97 against 0.89–0.90 for v21's quads with 4× MSAA); it did not measure a dense polyline of short segments, where the joins decide the ink, so its finding stands for single strokes, and ADR 0006 keeps capsules for them.
 - A pen-line layer costs a second render target (rgba8unorm, the plate's size) and two more passes: the coverage pass, and a full-plate resolve. Only scenes with hatches pay it.
 - Coverage is quantised to quarters, as v21's is. The ink edge of a pen line is as v21's: aliased to four levels, which is the reference's look.
 - The GPU and the CPU decide each sample from the same f32 arithmetic (the quad's frame at the sample), so they agree sample for sample on SwiftShader; on other adapters, fused multiply-adds can move a sample that lies on a quad's edge (ADR 0004's L1).

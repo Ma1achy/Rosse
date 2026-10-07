@@ -1,0 +1,5381 @@
+{
+  "about": "M4 required golden cases, parity against v21 as the mean of K engine draws (ADR 0018). Per case: the mean measures, the limit use of the worst measure (|value| / limit; 1 is at the limit), the coarse SSIM headroom over its floor, and the strict CPU = WebGPU comparison. Written by tools/m4-summary.mjs results from test-results/golden.json (npm run golden).",
+  "keys": 6,
+  "cases": 104,
+  "passing": 104,
+  "adapter": "google / swiftshader",
+  "worstCases": [
+    {
+      "case": "tightly-wound--ribbons__s4242__home",
+      "worstMeasure": "q",
+      "use": 0.9437
+    },
+    {
+      "case": "loose-open-arms--ribbons__s4242__zoom",
+      "worstMeasure": "outer ink",
+      "use": 0.9369
+    },
+    {
+      "case": "smooth-round--stipple__s4242__home",
+      "worstMeasure": "inner q",
+      "use": 0.9315
+    },
+    {
+      "case": "hand-wobble--lines__s4242__home",
+      "worstMeasure": "inner q",
+      "use": 0.9263
+    },
+    {
+      "case": "loose-open-arms--ribbons__s7__orbit",
+      "worstMeasure": "position angle",
+      "use": 0.9234
+    },
+    {
+      "case": "loose-open-arms--ribbons__s7__home",
+      "worstMeasure": "position angle",
+      "use": 0.9154
+    },
+    {
+      "case": "flocculent--ribbons__s7__zoom",
+      "worstMeasure": "inner q",
+      "use": 0.9019
+    },
+    {
+      "case": "dusty-spiral--ribbons__s7__home",
+      "worstMeasure": "r25",
+      "use": 0.8169
+    },
+    {
+      "case": "flocculent--ribbons__s7__home",
+      "worstMeasure": "inner q",
+      "use": 0.814
+    },
+    {
+      "case": "dusty-spiral--ribbons__s4242__orbit",
+      "worstMeasure": "r50",
+      "use": 0.7689
+    },
+    {
+      "case": "disc-no-arms--stipple__s7__zoom",
+      "worstMeasure": "r50",
+      "use": 0.7672
+    },
+    {
+      "case": "dusty-spiral--ribbons__s4242__zoom",
+      "worstMeasure": "inner q",
+      "use": 0.7614
+    }
+  ],
+  "strictWorst": {
+    "ink": 0,
+    "coarseSsimMin": 1
+  },
+  "l0Identical": 104,
+  "engineHashesIdentical": 104,
+  "results": [
+    {
+      "case": "barred-spiral--lines__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0063,
+        "coarseSsim": 0.9945,
+        "medianWidth": 0.0166,
+        "p90Width": -0.0098,
+        "r25": -0.0119,
+        "r50": -0.0011,
+        "r90": -0.0081,
+        "outer": -0.0021,
+        "q": -0.0052,
+        "qInner": -0.0196,
+        "paDeg": 0.5888
+      },
+      "coarseSsimHeadroom": 0.0345,
+      "worstMeasure": "inner q",
+      "worstUse": 0.3695,
+      "oneDraw": {
+        "r50": -0.0005,
+        "qInner": -0.0121
+      },
+      "counts": {
+        "dots": {
+          "engine": 260.5,
+          "v21": 272
+        },
+        "knots": {
+          "engine": 107.5,
+          "v21": 96
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 9,
+          "v21": 9
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 341,
+      "gpuMs": 506
+    },
+    {
+      "case": "barred-spiral--lines__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": -0.0076,
+        "coarseSsim": 0.9953,
+        "medianWidth": -0.0469,
+        "p90Width": -0.0273,
+        "r25": -0.0201,
+        "r50": -0.0043,
+        "r90": 0.0004,
+        "outer": 0.0008,
+        "q": 0.0038,
+        "qInner": -0.0063,
+        "paDeg": -0.9248
+      },
+      "coarseSsimHeadroom": 0.0353,
+      "worstMeasure": "median width",
+      "worstUse": 0.4689,
+      "oneDraw": {
+        "r50": -0.0009,
+        "qInner": -0.0009
+      },
+      "counts": {
+        "dots": {
+          "engine": 260.5,
+          "v21": 272
+        },
+        "knots": {
+          "engine": 107.5,
+          "v21": 96
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 9,
+          "v21": 9
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 128,
+      "gpuMs": 261
+    },
+    {
+      "case": "barred-spiral--lines__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0132,
+        "coarseSsim": 0.9906,
+        "medianWidth": 0.0041,
+        "p90Width": -0.0042,
+        "r25": -0.0119,
+        "r50": -0.0027,
+        "r90": -0.0046,
+        "outer": -0.0018,
+        "q": -0.009,
+        "qInner": -0.0025,
+        "paDeg": -0.6471
+      },
+      "coarseSsimHeadroom": 0.0306,
+      "worstMeasure": "ink",
+      "worstUse": 0.2649,
+      "oneDraw": {
+        "r50": -0.0008,
+        "qInner": -0.0184
+      },
+      "counts": {
+        "dots": {
+          "engine": 359.1667,
+          "v21": 359
+        },
+        "knots": {
+          "engine": 145.8333,
+          "v21": 146
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 9,
+          "v21": 9
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 159,
+      "gpuMs": 247
+    },
+    {
+      "case": "barred-spiral--lines__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": -0.0095,
+        "coarseSsim": 0.9913,
+        "medianWidth": 0.0108,
+        "p90Width": 0.0064,
+        "r25": -0.0139,
+        "r50": -0.0043,
+        "r90": -0.0043,
+        "outer": -0.0011,
+        "q": -0.0197,
+        "qInner": 0.0186,
+        "paDeg": -1.377
+      },
+      "coarseSsimHeadroom": 0.0313,
+      "worstMeasure": "q",
+      "worstUse": 0.4808,
+      "oneDraw": {
+        "r50": -0.0021,
+        "qInner": 0.0041
+      },
+      "counts": {
+        "dots": {
+          "engine": 359.1667,
+          "v21": 359
+        },
+        "knots": {
+          "engine": 145.8333,
+          "v21": 146
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 9,
+          "v21": 9
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 84,
+      "gpuMs": 219
+    },
+    {
+      "case": "barred-spiral--ribbons__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0085,
+        "coarseSsim": 0.947,
+        "medianWidth": -0.0046,
+        "p90Width": 0.0278,
+        "r25": 0.0038,
+        "r50": 0.0025,
+        "r90": 0.0033,
+        "outer": 0.0006,
+        "q": -0.0074,
+        "qInner": 0.004,
+        "paDeg": -3.3831
+      },
+      "coarseSsimHeadroom": 0.057,
+      "worstMeasure": "position angle",
+      "worstUse": 0.3776,
+      "oneDraw": {
+        "r50": 0.0147,
+        "qInner": -0.0007
+      },
+      "counts": {
+        "dots": {
+          "engine": 9340.5,
+          "v21": 9373
+        },
+        "knots": {
+          "engine": 143.1667,
+          "v21": 128
+        },
+        "stars": {
+          "engine": 12.6667,
+          "v21": 12
+        },
+        "rstars": {
+          "engine": 9,
+          "v21": 9
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 517,
+      "gpuMs": 930
+    },
+    {
+      "case": "barred-spiral--ribbons__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0089,
+        "coarseSsim": 0.949,
+        "medianWidth": -0.0066,
+        "p90Width": -0.0007,
+        "r25": 0.0167,
+        "r50": 0.0043,
+        "r90": 0.0093,
+        "outer": 0.0037,
+        "q": -0.0095,
+        "qInner": -0.0076,
+        "paDeg": -1.2625
+      },
+      "coarseSsimHeadroom": 0.059,
+      "worstMeasure": "r25",
+      "worstUse": 0.5951,
+      "oneDraw": {
+        "r50": 0.0188,
+        "qInner": 0.0109
+      },
+      "counts": {
+        "dots": {
+          "engine": 9287.6667,
+          "v21": 9309
+        },
+        "knots": {
+          "engine": 140.8333,
+          "v21": 132
+        },
+        "stars": {
+          "engine": 12.5,
+          "v21": 11
+        },
+        "rstars": {
+          "engine": 9,
+          "v21": 9
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 400,
+      "gpuMs": 885
+    },
+    {
+      "case": "barred-spiral--ribbons__s4242__zoom",
+      "pass": true,
+      "measures": {
+        "ink": 0.0058,
+        "coarseSsim": 0.935,
+        "medianWidth": 0.003,
+        "p90Width": -0.0127,
+        "r25": 0.0154,
+        "r50": 0.0022,
+        "r90": 0.0078,
+        "outer": 0.0035,
+        "q": 0.0123,
+        "qInner": 0.0075,
+        "paDeg": -15.8177
+      },
+      "coarseSsimHeadroom": 0.085,
+      "worstMeasure": "r25",
+      "worstUse": 0.3212,
+      "oneDraw": {
+        "r50": 0.0088,
+        "qInner": -0.0052
+      },
+      "counts": {
+        "dots": {
+          "engine": 9340.5,
+          "v21": 9373
+        },
+        "knots": {
+          "engine": 143.1667,
+          "v21": 128
+        },
+        "stars": {
+          "engine": 12.6667,
+          "v21": 12
+        },
+        "rstars": {
+          "engine": 9,
+          "v21": 9
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 403,
+      "gpuMs": 838
+    },
+    {
+      "case": "barred-spiral--ribbons__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0018,
+        "coarseSsim": 0.931,
+        "medianWidth": 0.0021,
+        "p90Width": 0.0155,
+        "r25": 0.0124,
+        "r50": 0.0084,
+        "r90": -0.0012,
+        "outer": -0.0005,
+        "q": -0.0033,
+        "qInner": -0.0081,
+        "paDeg": 8.962
+      },
+      "coarseSsimHeadroom": 0.041,
+      "worstMeasure": "position angle",
+      "worstUse": 0.5097,
+      "oneDraw": {
+        "r50": 0.0133,
+        "qInner": -0.0015
+      },
+      "counts": {
+        "dots": {
+          "engine": 9550.5,
+          "v21": 9564
+        },
+        "knots": {
+          "engine": 180.1667,
+          "v21": 177
+        },
+        "stars": {
+          "engine": 11.1667,
+          "v21": 9
+        },
+        "rstars": {
+          "engine": 9,
+          "v21": 9
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 398,
+      "gpuMs": 862
+    },
+    {
+      "case": "barred-spiral--ribbons__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0045,
+        "coarseSsim": 0.9336,
+        "medianWidth": 0.0061,
+        "p90Width": 0.0003,
+        "r25": 0.0101,
+        "r50": 0.0043,
+        "r90": -0.0239,
+        "outer": -0.0101,
+        "q": 0.0196,
+        "qInner": -0.0043,
+        "paDeg": 0.3953
+      },
+      "coarseSsimHeadroom": 0.0436,
+      "worstMeasure": "outer ink",
+      "worstUse": 0.6308,
+      "oneDraw": {
+        "r50": 0.0019,
+        "qInner": 0.018
+      },
+      "counts": {
+        "dots": {
+          "engine": 9515.1667,
+          "v21": 9535
+        },
+        "knots": {
+          "engine": 179.3333,
+          "v21": 167
+        },
+        "stars": {
+          "engine": 10.8333,
+          "v21": 9
+        },
+        "rstars": {
+          "engine": 9,
+          "v21": 9
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 415,
+      "gpuMs": 826
+    },
+    {
+      "case": "barred-spiral--ribbons__s7__zoom",
+      "pass": true,
+      "measures": {
+        "ink": -0.0004,
+        "coarseSsim": 0.916,
+        "medianWidth": 0.0027,
+        "p90Width": 0.0132,
+        "r25": 0.0238,
+        "r50": 0.0073,
+        "r90": -0.004,
+        "outer": -0.0024,
+        "q": -0.0025,
+        "qInner": 0.0018,
+        "paDeg": 2.5562
+      },
+      "coarseSsimHeadroom": 0.066,
+      "worstMeasure": "r25",
+      "worstUse": 0.4958,
+      "oneDraw": {
+        "r50": 0.0126,
+        "qInner": 0.0178
+      },
+      "counts": {
+        "dots": {
+          "engine": 9550.5,
+          "v21": 9564
+        },
+        "knots": {
+          "engine": 180.1667,
+          "v21": 177
+        },
+        "stars": {
+          "engine": 11.1667,
+          "v21": 9
+        },
+        "rstars": {
+          "engine": 9,
+          "v21": 9
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 621,
+      "gpuMs": 879
+    },
+    {
+      "case": "cigar-shaped--stipple__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.005,
+        "coarseSsim": 0.9565,
+        "medianWidth": -0.0009,
+        "p90Width": -0.0004,
+        "r25": 0.0011,
+        "r50": 0.0128,
+        "r90": 0.0021,
+        "outer": 0.0009,
+        "q": 0.0008,
+        "qInner": 0.0189,
+        "paDeg": 1.0181
+      },
+      "coarseSsimHeadroom": 0.0465,
+      "worstMeasure": "inner q",
+      "worstUse": 0.5566,
+      "oneDraw": {
+        "r50": 0.0035,
+        "qInner": 0.0188
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 246,
+      "gpuMs": 659
+    },
+    {
+      "case": "cigar-shaped--stipple__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": -0.0083,
+        "coarseSsim": 0.9499,
+        "medianWidth": -0.0011,
+        "p90Width": 0.0241,
+        "r25": 0.0017,
+        "r50": -0.019,
+        "r90": 0.016,
+        "outer": 0.0034,
+        "q": 0.0168,
+        "qInner": 0.0072,
+        "paDeg": 1.3805
+      },
+      "coarseSsimHeadroom": 0.0399,
+      "worstMeasure": "position angle",
+      "worstUse": 0.5689,
+      "oneDraw": {
+        "r50": -0.0072,
+        "qInner": 0.0077
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 239,
+      "gpuMs": 619
+    },
+    {
+      "case": "cigar-shaped--stipple__s4242__zoom",
+      "pass": true,
+      "measures": {
+        "ink": -0.0026,
+        "coarseSsim": 0.9537,
+        "medianWidth": 0.0002,
+        "p90Width": 0.0059,
+        "r25": -0.0003,
+        "r50": 0.0008,
+        "r90": 0.0038,
+        "outer": 0.0011,
+        "q": -0.0015,
+        "qInner": 0.001,
+        "paDeg": -0.3275
+      },
+      "coarseSsimHeadroom": 0.0537,
+      "worstMeasure": "position angle",
+      "worstUse": 0.1892,
+      "oneDraw": {
+        "r50": -0.0075,
+        "qInner": -0.0017
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 472,
+      "gpuMs": 657
+    },
+    {
+      "case": "cigar-shaped--stipple__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0142,
+        "coarseSsim": 0.9605,
+        "medianWidth": 0.0054,
+        "p90Width": -0.0024,
+        "r25": 0.0072,
+        "r50": 0.0166,
+        "r90": -0.0188,
+        "outer": -0.0028,
+        "q": -0.005,
+        "qInner": 0.008,
+        "paDeg": -1.0629
+      },
+      "coarseSsimHeadroom": 0.0505,
+      "worstMeasure": "position angle",
+      "worstUse": 0.523,
+      "oneDraw": {
+        "r50": -0.0163,
+        "qInner": 0.0014
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 207,
+      "gpuMs": 578
+    },
+    {
+      "case": "cigar-shaped--stipple__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0055,
+        "coarseSsim": 0.956,
+        "medianWidth": 0.0032,
+        "p90Width": 0.0052,
+        "r25": 0.0068,
+        "r50": 0.007,
+        "r90": -0.0024,
+        "outer": -0.0013,
+        "q": 0.0002,
+        "qInner": -0.0064,
+        "paDeg": 1.16
+      },
+      "coarseSsimHeadroom": 0.046,
+      "worstMeasure": "position angle",
+      "worstUse": 0.4584,
+      "oneDraw": {
+        "r50": -0.0026,
+        "qInner": -0.0213
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 420,
+      "gpuMs": 639
+    },
+    {
+      "case": "cigar-shaped--stipple__s7__zoom",
+      "pass": true,
+      "measures": {
+        "ink": 0.0171,
+        "coarseSsim": 0.9528,
+        "medianWidth": 0.0011,
+        "p90Width": -0.0278,
+        "r25": 0.0149,
+        "r50": 0.0204,
+        "r90": 0.0215,
+        "outer": 0.0058,
+        "q": 0.0125,
+        "qInner": 0.0201,
+        "paDeg": 0.6016
+      },
+      "coarseSsimHeadroom": 0.0528,
+      "worstMeasure": "inner q",
+      "worstUse": 0.5142,
+      "oneDraw": {
+        "r50": 0.005,
+        "qInner": 0.0133
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 216,
+      "gpuMs": 655
+    },
+    {
+      "case": "disc-no-arms--stipple__s11__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.005,
+        "coarseSsim": 0.9376,
+        "medianWidth": 0.0015,
+        "p90Width": 0.0062,
+        "r25": -0.011,
+        "r50": 0.0004,
+        "r90": -0.002,
+        "outer": -0.0009,
+        "q": -0.0032,
+        "qInner": -0.0029,
+        "paDeg": 2.4608
+      },
+      "coarseSsimHeadroom": 0.0476,
+      "worstMeasure": "position angle",
+      "worstUse": 0.4394,
+      "oneDraw": {
+        "r50": 0.0173,
+        "qInner": 0.0153
+      },
+      "counts": {
+        "dots": {
+          "engine": 9499.1667,
+          "v21": 9498
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0.8333,
+          "v21": 2
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 391,
+      "gpuMs": 738
+    },
+    {
+      "case": "disc-no-arms--stipple__s11__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0033,
+        "coarseSsim": 0.9504,
+        "medianWidth": -0.0007,
+        "p90Width": 0.0131,
+        "r25": 0.0029,
+        "r50": -0.0113,
+        "r90": -0.012,
+        "outer": -0.0033,
+        "q": 0.0148,
+        "qInner": 0.017,
+        "paDeg": -0.0391
+      },
+      "coarseSsimHeadroom": 0.0604,
+      "worstMeasure": "q",
+      "worstUse": 0.5683,
+      "oneDraw": {
+        "r50": 0.0013,
+        "qInner": 0.0237
+      },
+      "counts": {
+        "dots": {
+          "engine": 9499.1667,
+          "v21": 9498
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0.8333,
+          "v21": 2
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 359,
+      "gpuMs": 628
+    },
+    {
+      "case": "disc-no-arms--stipple__s3__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.016,
+        "coarseSsim": 0.9311,
+        "medianWidth": 0.0144,
+        "p90Width": 0.011,
+        "r25": 0.0109,
+        "r50": -0.0136,
+        "r90": -0.0193,
+        "outer": -0.007,
+        "q": -0.003,
+        "qInner": 0.0136,
+        "paDeg": 0.914
+      },
+      "coarseSsimHeadroom": 0.0411,
+      "worstMeasure": "r50",
+      "worstUse": 0.4696,
+      "oneDraw": {
+        "r50": -0.0134,
+        "qInner": 0.0207
+      },
+      "counts": {
+        "dots": {
+          "engine": 9455.3333,
+          "v21": 9457
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0.1667,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 250,
+      "gpuMs": 616
+    },
+    {
+      "case": "disc-no-arms--stipple__s3__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0168,
+        "coarseSsim": 0.9548,
+        "medianWidth": 0.0175,
+        "p90Width": 0.0065,
+        "r25": 0.0101,
+        "r50": -0.0091,
+        "r90": -0.0188,
+        "outer": -0.0061,
+        "q": 0.0075,
+        "qInner": -0.0082,
+        "paDeg": -0.2533
+      },
+      "coarseSsimHeadroom": 0.0648,
+      "worstMeasure": "outer ink",
+      "worstUse": 0.3843,
+      "oneDraw": {
+        "r50": -0.0091,
+        "qInner": -0.0082
+      },
+      "counts": {
+        "dots": {
+          "engine": 9455.3333,
+          "v21": 9457
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0.1667,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 482,
+      "gpuMs": 719
+    },
+    {
+      "case": "disc-no-arms--stipple__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0024,
+        "coarseSsim": 0.9252,
+        "medianWidth": 0.0133,
+        "p90Width": 0.0055,
+        "r25": -0.0106,
+        "r50": 0.0086,
+        "r90": 0.0071,
+        "outer": 0.0026,
+        "q": -0.0049,
+        "qInner": -0.021,
+        "paDeg": 0.9956
+      },
+      "coarseSsimHeadroom": 0.0352,
+      "worstMeasure": "inner q",
+      "worstUse": 0.512,
+      "oneDraw": {
+        "r50": 0.0242,
+        "qInner": -0.0086
+      },
+      "counts": {
+        "dots": {
+          "engine": 9470.1667,
+          "v21": 9469
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0.1667,
+          "v21": 3
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 299,
+      "gpuMs": 779
+    },
+    {
+      "case": "disc-no-arms--stipple__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0036,
+        "coarseSsim": 0.9513,
+        "medianWidth": 0.0081,
+        "p90Width": -0.002,
+        "r25": 0.0109,
+        "r50": -0.0021,
+        "r90": 0.0119,
+        "outer": 0.0032,
+        "q": 0.0133,
+        "qInner": 0.0134,
+        "paDeg": 0.3576
+      },
+      "coarseSsimHeadroom": 0.0613,
+      "worstMeasure": "q",
+      "worstUse": 0.5127,
+      "oneDraw": {
+        "r50": 0.0011,
+        "qInner": 0.0189
+      },
+      "counts": {
+        "dots": {
+          "engine": 9470.1667,
+          "v21": 9469
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0.1667,
+          "v21": 3
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 241,
+      "gpuMs": 1010
+    },
+    {
+      "case": "disc-no-arms--stipple__s4242__zoom",
+      "pass": true,
+      "measures": {
+        "ink": -0.0045,
+        "coarseSsim": 0.9005,
+        "medianWidth": 0.0104,
+        "p90Width": 0.0038,
+        "r25": -0.0182,
+        "r50": -0.0132,
+        "r90": -0.0155,
+        "outer": -0.008,
+        "q": -0.0055,
+        "qInner": -0.0284,
+        "paDeg": -1.3831
+      },
+      "coarseSsimHeadroom": 0.0505,
+      "worstMeasure": "outer ink",
+      "worstUse": 0.6701,
+      "oneDraw": {
+        "r50": -0.0125,
+        "qInner": -0.0263
+      },
+      "counts": {
+        "dots": {
+          "engine": 9470.1667,
+          "v21": 9469
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0.1667,
+          "v21": 3
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 248,
+      "gpuMs": 613
+    },
+    {
+      "case": "disc-no-arms--stipple__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0157,
+        "coarseSsim": 0.9171,
+        "medianWidth": 0.0062,
+        "p90Width": 0.0115,
+        "r25": -0.0116,
+        "r50": -0.0197,
+        "r90": -0.0032,
+        "outer": -0.0012,
+        "q": 0.0028,
+        "qInner": -0.0134,
+        "paDeg": 3.348
+      },
+      "coarseSsimHeadroom": 0.0271,
+      "worstMeasure": "r50",
+      "worstUse": 0.6796,
+      "oneDraw": {
+        "r50": 0,
+        "qInner": -0.0112
+      },
+      "counts": {
+        "dots": {
+          "engine": 9448.1667,
+          "v21": 9442
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0.5,
+          "v21": 1
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 224,
+      "gpuMs": 787
+    },
+    {
+      "case": "disc-no-arms--stipple__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": -0.0133,
+        "coarseSsim": 0.9378,
+        "medianWidth": 0.0003,
+        "p90Width": 0.0092,
+        "r25": -0.0074,
+        "r50": -0.0189,
+        "r90": 0.0042,
+        "outer": 0.0012,
+        "q": 0.0027,
+        "qInner": 0.0004,
+        "paDeg": -1.3108
+      },
+      "coarseSsimHeadroom": 0.0478,
+      "worstMeasure": "position angle",
+      "worstUse": 0.7014,
+      "oneDraw": {
+        "r50": -0.0045,
+        "qInner": -0.011
+      },
+      "counts": {
+        "dots": {
+          "engine": 9448.1667,
+          "v21": 9442
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0.5,
+          "v21": 1
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 273,
+      "gpuMs": 609
+    },
+    {
+      "case": "disc-no-arms--stipple__s7__zoom",
+      "pass": true,
+      "measures": {
+        "ink": -0.0074,
+        "coarseSsim": 0.899,
+        "medianWidth": 0.0009,
+        "p90Width": 0.0057,
+        "r25": -0.0083,
+        "r50": -0.0253,
+        "r90": -0.0112,
+        "outer": -0.0057,
+        "q": -0.001,
+        "qInner": 0.0093,
+        "paDeg": 2.211
+      },
+      "coarseSsimHeadroom": 0.049,
+      "worstMeasure": "r50",
+      "worstUse": 0.7672,
+      "oneDraw": {
+        "r50": -0.0199,
+        "qInner": 0.0134
+      },
+      "counts": {
+        "dots": {
+          "engine": 9448.1667,
+          "v21": 9442
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0.5,
+          "v21": 1
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 204,
+      "gpuMs": 621
+    },
+    {
+      "case": "dusty-spiral--lines__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0245,
+        "coarseSsim": 0.993,
+        "medianWidth": -0.0174,
+        "p90Width": -0.0058,
+        "r25": -0.0421,
+        "r50": -0.0326,
+        "r90": -0.0019,
+        "outer": -0.0018,
+        "q": 0.0142,
+        "qInner": 0.0078,
+        "paDeg": 0.8279
+      },
+      "coarseSsimHeadroom": 0.033,
+      "worstMeasure": "r50",
+      "worstUse": 0.5093,
+      "oneDraw": {
+        "r50": -0.0302,
+        "qInner": 0.0087
+      },
+      "counts": {
+        "dots": {
+          "engine": 229.3333,
+          "v21": 230
+        },
+        "knots": {
+          "engine": 73.6667,
+          "v21": 73
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 74,
+      "gpuMs": 137
+    },
+    {
+      "case": "dusty-spiral--lines__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": -0.0236,
+        "coarseSsim": 0.9937,
+        "medianWidth": -0.0115,
+        "p90Width": 0.0432,
+        "r25": -0.0313,
+        "r50": -0.0336,
+        "r90": -0.003,
+        "outer": -0.0037,
+        "q": 0.0042,
+        "qInner": 0.0142,
+        "paDeg": -0.0546
+      },
+      "coarseSsimHeadroom": 0.0337,
+      "worstMeasure": "r50",
+      "worstUse": 0.5243,
+      "oneDraw": {
+        "r50": -0.0486,
+        "qInner": 0.017
+      },
+      "counts": {
+        "dots": {
+          "engine": 229.3333,
+          "v21": 230
+        },
+        "knots": {
+          "engine": 73.6667,
+          "v21": 73
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 62,
+      "gpuMs": 118
+    },
+    {
+      "case": "dusty-spiral--lines__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0125,
+        "coarseSsim": 0.9931,
+        "medianWidth": -0.0312,
+        "p90Width": 0.0112,
+        "r25": 0.005,
+        "r50": 0.0056,
+        "r90": -0.0517,
+        "outer": -0.0094,
+        "q": -0.0139,
+        "qInner": 0.0177,
+        "paDeg": 0.7403
+      },
+      "coarseSsimHeadroom": 0.0331,
+      "worstMeasure": "outer ink",
+      "worstUse": 0.4689,
+      "oneDraw": {
+        "r50": 0.0171,
+        "qInner": 0.0362
+      },
+      "counts": {
+        "dots": {
+          "engine": 326.1667,
+          "v21": 337
+        },
+        "knots": {
+          "engine": 110.8333,
+          "v21": 100
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 202,
+      "gpuMs": 220
+    },
+    {
+      "case": "dusty-spiral--lines__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0103,
+        "coarseSsim": 0.9929,
+        "medianWidth": 0.0269,
+        "p90Width": -0.0002,
+        "r25": 0.0111,
+        "r50": 0.0052,
+        "r90": -0.0184,
+        "outer": -0.012,
+        "q": -0.0098,
+        "qInner": -0.0151,
+        "paDeg": -0.6185
+      },
+      "coarseSsimHeadroom": 0.0329,
+      "worstMeasure": "outer ink",
+      "worstUse": 0.5993,
+      "oneDraw": {
+        "r50": 0.0255,
+        "qInner": -0.0104
+      },
+      "counts": {
+        "dots": {
+          "engine": 326.1667,
+          "v21": 337
+        },
+        "knots": {
+          "engine": 110.8333,
+          "v21": 100
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 110,
+      "gpuMs": 176
+    },
+    {
+      "case": "dusty-spiral--ribbons__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0131,
+        "coarseSsim": 0.9321,
+        "medianWidth": -0.0031,
+        "p90Width": 0.0087,
+        "r25": -0.0129,
+        "r50": -0.013,
+        "r90": 0.0087,
+        "outer": 0.0028,
+        "q": -0.0129,
+        "qInner": 0.0086,
+        "paDeg": 0.8657
+      },
+      "coarseSsimHeadroom": 0.0421,
+      "worstMeasure": "r25",
+      "worstUse": 0.4591,
+      "oneDraw": {
+        "r50": -0.0055,
+        "qInner": -0.005
+      },
+      "counts": {
+        "dots": {
+          "engine": 7943.6667,
+          "v21": 8005
+        },
+        "knots": {
+          "engine": 140.6667,
+          "v21": 147
+        },
+        "stars": {
+          "engine": 15.8333,
+          "v21": 20
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 456,
+      "gpuMs": 761
+    },
+    {
+      "case": "dusty-spiral--ribbons__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0034,
+        "coarseSsim": 0.9435,
+        "medianWidth": 0.0003,
+        "p90Width": 0.0026,
+        "r25": 0.0022,
+        "r50": -0.0223,
+        "r90": 0.0196,
+        "outer": 0.0062,
+        "q": 0.0111,
+        "qInner": -0.0166,
+        "paDeg": 0.6836
+      },
+      "coarseSsimHeadroom": 0.0535,
+      "worstMeasure": "r50",
+      "worstUse": 0.7689,
+      "oneDraw": {
+        "r50": -0.012,
+        "qInner": -0.0201
+      },
+      "counts": {
+        "dots": {
+          "engine": 7713.5,
+          "v21": 7704
+        },
+        "knots": {
+          "engine": 139.8333,
+          "v21": 137
+        },
+        "stars": {
+          "engine": 15,
+          "v21": 14
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 413,
+      "gpuMs": 705
+    },
+    {
+      "case": "dusty-spiral--ribbons__s4242__zoom",
+      "pass": true,
+      "measures": {
+        "ink": -0.0064,
+        "coarseSsim": 0.9056,
+        "medianWidth": 0,
+        "p90Width": -0.0042,
+        "r25": -0.0051,
+        "r50": -0.0177,
+        "r90": -0.0093,
+        "outer": -0.0046,
+        "q": -0.0005,
+        "qInner": 0.0236,
+        "paDeg": 2.978
+      },
+      "coarseSsimHeadroom": 0.0556,
+      "worstMeasure": "inner q",
+      "worstUse": 0.7614,
+      "oneDraw": {
+        "r50": -0.0072,
+        "qInner": 0.0291
+      },
+      "counts": {
+        "dots": {
+          "engine": 8558.6667,
+          "v21": 8568
+        },
+        "knots": {
+          "engine": 165.5,
+          "v21": 173
+        },
+        "stars": {
+          "engine": 19.5,
+          "v21": 25
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 308,
+      "gpuMs": 702
+    },
+    {
+      "case": "dusty-spiral--ribbons__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0031,
+        "coarseSsim": 0.9312,
+        "medianWidth": -0.0024,
+        "p90Width": 0.0013,
+        "r25": 0.0229,
+        "r50": 0.0032,
+        "r90": -0.0041,
+        "outer": -0.0016,
+        "q": -0.0015,
+        "qInner": -0.0101,
+        "paDeg": -0.7324
+      },
+      "coarseSsimHeadroom": 0.0412,
+      "worstMeasure": "r25",
+      "worstUse": 0.8169,
+      "oneDraw": {
+        "r50": -0.0075,
+        "qInner": 0.0033
+      },
+      "counts": {
+        "dots": {
+          "engine": 8195.6667,
+          "v21": 8270
+        },
+        "knots": {
+          "engine": 163.1667,
+          "v21": 168
+        },
+        "stars": {
+          "engine": 12.6667,
+          "v21": 14
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 541,
+      "gpuMs": 662
+    },
+    {
+      "case": "dusty-spiral--ribbons__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.002,
+        "coarseSsim": 0.9403,
+        "medianWidth": 0.0079,
+        "p90Width": -0.0034,
+        "r25": 0.0056,
+        "r50": -0.0032,
+        "r90": 0.0065,
+        "outer": 0.0022,
+        "q": -0.01,
+        "qInner": -0.0213,
+        "paDeg": -0.2228
+      },
+      "coarseSsimHeadroom": 0.0503,
+      "worstMeasure": "inner q",
+      "worstUse": 0.4538,
+      "oneDraw": {
+        "r50": -0.0095,
+        "qInner": -0.0196
+      },
+      "counts": {
+        "dots": {
+          "engine": 8004.3333,
+          "v21": 8047
+        },
+        "knots": {
+          "engine": 160.6667,
+          "v21": 156
+        },
+        "stars": {
+          "engine": 12.6667,
+          "v21": 14
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 381,
+      "gpuMs": 794
+    },
+    {
+      "case": "dusty-spiral--ribbons__s7__zoom",
+      "pass": true,
+      "measures": {
+        "ink": -0.0002,
+        "coarseSsim": 0.8911,
+        "medianWidth": -0.0024,
+        "p90Width": 0.0024,
+        "r25": -0.0185,
+        "r50": 0.0046,
+        "r90": 0.0121,
+        "outer": 0.0073,
+        "q": 0.0137,
+        "qInner": 0.0108,
+        "paDeg": 8.1187
+      },
+      "coarseSsimHeadroom": 0.0411,
+      "worstMeasure": "outer ink",
+      "worstUse": 0.612,
+      "oneDraw": {
+        "r50": 0.0061,
+        "qInner": 0.0229
+      },
+      "counts": {
+        "dots": {
+          "engine": 8829.3333,
+          "v21": 8861
+        },
+        "knots": {
+          "engine": 186.8333,
+          "v21": 169
+        },
+        "stars": {
+          "engine": 14.6667,
+          "v21": 18
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 351,
+      "gpuMs": 718
+    },
+    {
+      "case": "flocculent--lines__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0095,
+        "coarseSsim": 0.9949,
+        "medianWidth": -0.0381,
+        "p90Width": -0.0151,
+        "r25": -0.0061,
+        "r50": 0.0029,
+        "r90": 0.0029,
+        "outer": 0.0028,
+        "q": 0.0044,
+        "qInner": 0.0043,
+        "paDeg": 1.3506
+      },
+      "coarseSsimHeadroom": 0.0349,
+      "worstMeasure": "median width",
+      "worstUse": 0.3807,
+      "oneDraw": {
+        "r50": 0.0054,
+        "qInner": 0.0229
+      },
+      "counts": {
+        "dots": {
+          "engine": 310.6667,
+          "v21": 313
+        },
+        "knots": {
+          "engine": 101.3333,
+          "v21": 99
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 85,
+      "gpuMs": 181
+    },
+    {
+      "case": "flocculent--lines__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0185,
+        "coarseSsim": 0.9953,
+        "medianWidth": 0.0032,
+        "p90Width": 0.0024,
+        "r25": 0.004,
+        "r50": 0.0036,
+        "r90": -0.0026,
+        "outer": -0.0023,
+        "q": -0.0065,
+        "qInner": 0.0089,
+        "paDeg": 0.3292
+      },
+      "coarseSsimHeadroom": 0.0353,
+      "worstMeasure": "ink",
+      "worstUse": 0.3702,
+      "oneDraw": {
+        "r50": 0.0058,
+        "qInner": 0.0217
+      },
+      "counts": {
+        "dots": {
+          "engine": 310.6667,
+          "v21": 313
+        },
+        "knots": {
+          "engine": 101.3333,
+          "v21": 99
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 59,
+      "gpuMs": 199
+    },
+    {
+      "case": "flocculent--lines__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0118,
+        "coarseSsim": 0.997,
+        "medianWidth": 0.0048,
+        "p90Width": -0.0285,
+        "r25": 0.0027,
+        "r50": 0.0017,
+        "r90": 0.0002,
+        "outer": 0.0003,
+        "q": 0.0037,
+        "qInner": 0.0006,
+        "paDeg": 0.0489
+      },
+      "coarseSsimHeadroom": 0.037,
+      "worstMeasure": "ink",
+      "worstUse": 0.236,
+      "oneDraw": {
+        "r50": 0.0054,
+        "qInner": 0.0006
+      },
+      "counts": {
+        "dots": {
+          "engine": 146.3333,
+          "v21": 157
+        },
+        "knots": {
+          "engine": 48.6667,
+          "v21": 38
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 53,
+      "gpuMs": 185
+    },
+    {
+      "case": "flocculent--lines__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0131,
+        "coarseSsim": 0.997,
+        "medianWidth": 0.0231,
+        "p90Width": 0.0085,
+        "r25": 0.0088,
+        "r50": 0.0034,
+        "r90": 0.0002,
+        "outer": 0.0002,
+        "q": 0.0002,
+        "qInner": -0.0007,
+        "paDeg": -0.4927
+      },
+      "coarseSsimHeadroom": 0.037,
+      "worstMeasure": "ink",
+      "worstUse": 0.2619,
+      "oneDraw": {
+        "r50": 0.0046,
+        "qInner": -0.0007
+      },
+      "counts": {
+        "dots": {
+          "engine": 146.3333,
+          "v21": 157
+        },
+        "knots": {
+          "engine": 48.6667,
+          "v21": 38
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 65,
+      "gpuMs": 206
+    },
+    {
+      "case": "flocculent--ribbons__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0169,
+        "coarseSsim": 0.9102,
+        "medianWidth": 0.0199,
+        "p90Width": 0.0063,
+        "r25": 0.0008,
+        "r50": 0.0181,
+        "r90": 0.0063,
+        "outer": 0.0022,
+        "q": -0.0264,
+        "qInner": 0.0091,
+        "paDeg": 1.3545
+      },
+      "coarseSsimHeadroom": 0.0202,
+      "worstMeasure": "q",
+      "worstUse": 0.6762,
+      "oneDraw": {
+        "r50": 0.0165,
+        "qInner": 0.0041
+      },
+      "counts": {
+        "dots": {
+          "engine": 9237.3333,
+          "v21": 9239
+        },
+        "knots": {
+          "engine": 139.8333,
+          "v21": 153
+        },
+        "stars": {
+          "engine": 18,
+          "v21": 21
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 538,
+      "gpuMs": 916
+    },
+    {
+      "case": "flocculent--ribbons__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0165,
+        "coarseSsim": 0.9264,
+        "medianWidth": 0.0141,
+        "p90Width": 0.0135,
+        "r25": 0.0095,
+        "r50": 0.0092,
+        "r90": 0.012,
+        "outer": 0.004,
+        "q": -0.0085,
+        "qInner": -0.0087,
+        "paDeg": -0.5037
+      },
+      "coarseSsimHeadroom": 0.0364,
+      "worstMeasure": "r25",
+      "worstUse": 0.3399,
+      "oneDraw": {
+        "r50": 0.012,
+        "qInner": -0.0145
+      },
+      "counts": {
+        "dots": {
+          "engine": 9142,
+          "v21": 9137
+        },
+        "knots": {
+          "engine": 141.3333,
+          "v21": 156
+        },
+        "stars": {
+          "engine": 17,
+          "v21": 21
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 371,
+      "gpuMs": 651
+    },
+    {
+      "case": "flocculent--ribbons__s4242__zoom",
+      "pass": true,
+      "measures": {
+        "ink": 0.0158,
+        "coarseSsim": 0.8761,
+        "medianWidth": 0.0053,
+        "p90Width": 0.0132,
+        "r25": 0.0117,
+        "r50": 0.0055,
+        "r90": 0.0045,
+        "outer": 0.0033,
+        "q": -0.0313,
+        "qInner": -0.0031,
+        "paDeg": -7.2848
+      },
+      "coarseSsimHeadroom": 0.0261,
+      "worstMeasure": "q",
+      "worstUse": 0.579,
+      "oneDraw": {
+        "r50": 0.0076,
+        "qInner": -0.0016
+      },
+      "counts": {
+        "dots": {
+          "engine": 9237.3333,
+          "v21": 9239
+        },
+        "knots": {
+          "engine": 139.8333,
+          "v21": 153
+        },
+        "stars": {
+          "engine": 18,
+          "v21": 21
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 328,
+      "gpuMs": 746
+    },
+    {
+      "case": "flocculent--ribbons__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0155,
+        "coarseSsim": 0.9211,
+        "medianWidth": 0.012,
+        "p90Width": -0.0015,
+        "r25": 0.0014,
+        "r50": 0.0057,
+        "r90": 0.0101,
+        "outer": 0.0037,
+        "q": -0.0209,
+        "qInner": -0.0252,
+        "paDeg": 1.7054
+      },
+      "coarseSsimHeadroom": 0.0311,
+      "worstMeasure": "inner q",
+      "worstUse": 0.814,
+      "oneDraw": {
+        "r50": -0.0007,
+        "qInner": -0.0214
+      },
+      "counts": {
+        "dots": {
+          "engine": 9149.8333,
+          "v21": 9115
+        },
+        "knots": {
+          "engine": 57.5,
+          "v21": 62
+        },
+        "stars": {
+          "engine": 14.5,
+          "v21": 14
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 340,
+      "gpuMs": 972
+    },
+    {
+      "case": "flocculent--ribbons__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0194,
+        "coarseSsim": 0.9304,
+        "medianWidth": 0.0109,
+        "p90Width": 0.0116,
+        "r25": -0.0043,
+        "r50": -0.0028,
+        "r90": -0.003,
+        "outer": -0.0009,
+        "q": 0.0074,
+        "qInner": -0.0062,
+        "paDeg": 1.2572
+      },
+      "coarseSsimHeadroom": 0.0404,
+      "worstMeasure": "ink",
+      "worstUse": 0.3873,
+      "oneDraw": {
+        "r50": -0.0074,
+        "qInner": -0.0086
+      },
+      "counts": {
+        "dots": {
+          "engine": 9076.5,
+          "v21": 9014
+        },
+        "knots": {
+          "engine": 57.5,
+          "v21": 76
+        },
+        "stars": {
+          "engine": 14.3333,
+          "v21": 12
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 493,
+      "gpuMs": 800
+    },
+    {
+      "case": "flocculent--ribbons__s7__zoom",
+      "pass": true,
+      "measures": {
+        "ink": 0.0098,
+        "coarseSsim": 0.8876,
+        "medianWidth": 0.0024,
+        "p90Width": 0.0146,
+        "r25": 0.0101,
+        "r50": 0.0048,
+        "r90": 0.0055,
+        "outer": 0.0029,
+        "q": -0.0014,
+        "qInner": -0.0234,
+        "paDeg": -4.5807
+      },
+      "coarseSsimHeadroom": 0.0376,
+      "worstMeasure": "inner q",
+      "worstUse": 0.9019,
+      "oneDraw": {
+        "r50": 0.0121,
+        "qInner": 0.0024
+      },
+      "counts": {
+        "dots": {
+          "engine": 9149.8333,
+          "v21": 9115
+        },
+        "knots": {
+          "engine": 57.5,
+          "v21": 62
+        },
+        "stars": {
+          "engine": 14.5,
+          "v21": 14
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 327,
+      "gpuMs": 802
+    },
+    {
+      "case": "grand-design--lines__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0186,
+        "coarseSsim": 0.9938,
+        "medianWidth": 0.0035,
+        "p90Width": 0.0107,
+        "r25": -0.0356,
+        "r50": -0.018,
+        "r90": -0.0037,
+        "outer": -0.0027,
+        "q": -0.0067,
+        "qInner": -0.0037,
+        "paDeg": -0.5539
+      },
+      "coarseSsimHeadroom": 0.0338,
+      "worstMeasure": "ink",
+      "worstUse": 0.3729,
+      "oneDraw": {
+        "r50": -0.0238,
+        "qInner": -0.0079
+      },
+      "counts": {
+        "dots": {
+          "engine": 229.3333,
+          "v21": 230
+        },
+        "knots": {
+          "engine": 73.6667,
+          "v21": 73
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 53,
+      "gpuMs": 131
+    },
+    {
+      "case": "grand-design--lines__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": -0.0205,
+        "coarseSsim": 0.9938,
+        "medianWidth": 0.0028,
+        "p90Width": 0.022,
+        "r25": -0.0219,
+        "r50": -0.0055,
+        "r90": -0.0029,
+        "outer": -0.0057,
+        "q": -0.0006,
+        "qInner": -0.0247,
+        "paDeg": 0.4249
+      },
+      "coarseSsimHeadroom": 0.0338,
+      "worstMeasure": "inner q",
+      "worstUse": 0.4663,
+      "oneDraw": {
+        "r50": -0.0037,
+        "qInner": -0.0221
+      },
+      "counts": {
+        "dots": {
+          "engine": 229.3333,
+          "v21": 230
+        },
+        "knots": {
+          "engine": 73.6667,
+          "v21": 73
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 62,
+      "gpuMs": 152
+    },
+    {
+      "case": "grand-design--lines__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0123,
+        "coarseSsim": 0.9922,
+        "medianWidth": -0.0269,
+        "p90Width": 0.0148,
+        "r25": 0.0045,
+        "r50": 0.0151,
+        "r90": -0.0209,
+        "outer": -0.008,
+        "q": -0.016,
+        "qInner": 0.0042,
+        "paDeg": 0.0209
+      },
+      "coarseSsimHeadroom": 0.0322,
+      "worstMeasure": "outer ink",
+      "worstUse": 0.3976,
+      "oneDraw": {
+        "r50": 0.0206,
+        "qInner": 0.0228
+      },
+      "counts": {
+        "dots": {
+          "engine": 326.1667,
+          "v21": 337
+        },
+        "knots": {
+          "engine": 110.8333,
+          "v21": 100
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 68,
+      "gpuMs": 135
+    },
+    {
+      "case": "grand-design--lines__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0119,
+        "coarseSsim": 0.9922,
+        "medianWidth": -0.0375,
+        "p90Width": -0.0304,
+        "r25": 0.0078,
+        "r50": 0.0064,
+        "r90": 0.009,
+        "outer": 0.0083,
+        "q": -0.022,
+        "qInner": -0.0068,
+        "paDeg": 3.044
+      },
+      "coarseSsimHeadroom": 0.0322,
+      "worstMeasure": "q",
+      "worstUse": 0.5373,
+      "oneDraw": {
+        "r50": 0.0248,
+        "qInner": -0.0029
+      },
+      "counts": {
+        "dots": {
+          "engine": 326.1667,
+          "v21": 337
+        },
+        "knots": {
+          "engine": 110.8333,
+          "v21": 100
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 158,
+      "gpuMs": 142
+    },
+    {
+      "case": "grand-design--ribbons__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0067,
+        "coarseSsim": 0.9359,
+        "medianWidth": 0.0022,
+        "p90Width": -0.0134,
+        "r25": 0.007,
+        "r50": -0.0144,
+        "r90": -0.0222,
+        "outer": -0.0058,
+        "q": -0.0003,
+        "qInner": -0.0015,
+        "paDeg": -2.4903
+      },
+      "coarseSsimHeadroom": 0.0459,
+      "worstMeasure": "r50",
+      "worstUse": 0.4957,
+      "oneDraw": {
+        "r50": 0.0007,
+        "qInner": -0.0098
+      },
+      "counts": {
+        "dots": {
+          "engine": 9279.5,
+          "v21": 9272
+        },
+        "knots": {
+          "engine": 143.8333,
+          "v21": 148
+        },
+        "stars": {
+          "engine": 25.1667,
+          "v21": 30
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 350,
+      "gpuMs": 812
+    },
+    {
+      "case": "grand-design--ribbons__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": -0.0004,
+        "coarseSsim": 0.9455,
+        "medianWidth": 0.0101,
+        "p90Width": 0.0009,
+        "r25": 0.0076,
+        "r50": -0.0124,
+        "r90": 0.0004,
+        "outer": 0.0001,
+        "q": -0.0152,
+        "qInner": -0.0192,
+        "paDeg": 0.6898
+      },
+      "coarseSsimHeadroom": 0.0555,
+      "worstMeasure": "inner q",
+      "worstUse": 0.4936,
+      "oneDraw": {
+        "r50": 0,
+        "qInner": -0.0155
+      },
+      "counts": {
+        "dots": {
+          "engine": 9222,
+          "v21": 9189
+        },
+        "knots": {
+          "engine": 141.3333,
+          "v21": 161
+        },
+        "stars": {
+          "engine": 24.5,
+          "v21": 28
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 403,
+      "gpuMs": 931
+    },
+    {
+      "case": "grand-design--ribbons__s4242__zoom",
+      "pass": true,
+      "measures": {
+        "ink": 0.004,
+        "coarseSsim": 0.912,
+        "medianWidth": 0,
+        "p90Width": -0.0022,
+        "r25": 0.0283,
+        "r50": -0.0018,
+        "r90": -0.0009,
+        "outer": -0.0003,
+        "q": 0.0085,
+        "qInner": 0.0187,
+        "paDeg": -0.3437
+      },
+      "coarseSsimHeadroom": 0.062,
+      "worstMeasure": "r25",
+      "worstUse": 0.5896,
+      "oneDraw": {
+        "r50": 0.0112,
+        "qInner": 0.012
+      },
+      "counts": {
+        "dots": {
+          "engine": 9279.5,
+          "v21": 9272
+        },
+        "knots": {
+          "engine": 143.8333,
+          "v21": 148
+        },
+        "stars": {
+          "engine": 25.1667,
+          "v21": 30
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 305,
+      "gpuMs": 585
+    },
+    {
+      "case": "grand-design--ribbons__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0006,
+        "coarseSsim": 0.9252,
+        "medianWidth": 0.0158,
+        "p90Width": 0.0115,
+        "r25": -0.0037,
+        "r50": -0.0051,
+        "r90": -0.0022,
+        "outer": -0.0004,
+        "q": 0.009,
+        "qInner": 0.0053,
+        "paDeg": -1.0464
+      },
+      "coarseSsimHeadroom": 0.0352,
+      "worstMeasure": "q",
+      "worstUse": 0.2495,
+      "oneDraw": {
+        "r50": -0.0071,
+        "qInner": 0.0207
+      },
+      "counts": {
+        "dots": {
+          "engine": 9491.6667,
+          "v21": 9492
+        },
+        "knots": {
+          "engine": 175.8333,
+          "v21": 175
+        },
+        "stars": {
+          "engine": 21.3333,
+          "v21": 22
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 544,
+      "gpuMs": 886
+    },
+    {
+      "case": "grand-design--ribbons__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0016,
+        "coarseSsim": 0.9321,
+        "medianWidth": 0.0157,
+        "p90Width": 0.0465,
+        "r25": -0.0086,
+        "r50": -0.011,
+        "r90": -0.0357,
+        "outer": -0.0107,
+        "q": 0.0061,
+        "qInner": -0.0086,
+        "paDeg": -0.9536
+      },
+      "coarseSsimHeadroom": 0.0421,
+      "worstMeasure": "outer ink",
+      "worstUse": 0.669,
+      "oneDraw": {
+        "r50": -0.0179,
+        "qInner": 0
+      },
+      "counts": {
+        "dots": {
+          "engine": 9458.6667,
+          "v21": 9477
+        },
+        "knots": {
+          "engine": 176.6667,
+          "v21": 161
+        },
+        "stars": {
+          "engine": 21.1667,
+          "v21": 22
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 411,
+      "gpuMs": 977
+    },
+    {
+      "case": "grand-design--ribbons__s7__zoom",
+      "pass": true,
+      "measures": {
+        "ink": -0.0041,
+        "coarseSsim": 0.905,
+        "medianWidth": -0.0006,
+        "p90Width": 0.0186,
+        "r25": -0.0133,
+        "r50": 0.0008,
+        "r90": -0.0086,
+        "outer": -0.006,
+        "q": 0.0125,
+        "qInner": 0.008,
+        "paDeg": -5.6526
+      },
+      "coarseSsimHeadroom": 0.055,
+      "worstMeasure": "outer ink",
+      "worstUse": 0.4963,
+      "oneDraw": {
+        "r50": 0.0005,
+        "qInner": 0.0203
+      },
+      "counts": {
+        "dots": {
+          "engine": 9491.6667,
+          "v21": 9492
+        },
+        "knots": {
+          "engine": 175.8333,
+          "v21": 175
+        },
+        "stars": {
+          "engine": 21.3333,
+          "v21": 22
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 403,
+      "gpuMs": 871
+    },
+    {
+      "case": "grand-design--stipple-arms__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0021,
+        "coarseSsim": 0.9208,
+        "medianWidth": 0.0126,
+        "p90Width": 0.0164,
+        "r25": -0.0011,
+        "r50": -0.0092,
+        "r90": -0.0164,
+        "outer": -0.0044,
+        "q": -0.0126,
+        "qInner": -0.0049,
+        "paDeg": -0.9271
+      },
+      "coarseSsimHeadroom": 0.0308,
+      "worstMeasure": "q",
+      "worstUse": 0.3495,
+      "oneDraw": {
+        "r50": 0.0045,
+        "qInner": -0.0171
+      },
+      "counts": {
+        "dots": {
+          "engine": 9472.5,
+          "v21": 9470
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 27.5,
+          "v21": 30
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 458,
+      "gpuMs": 708
+    },
+    {
+      "case": "grand-design--stipple-arms__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0006,
+        "coarseSsim": 0.9334,
+        "medianWidth": 0.0072,
+        "p90Width": -0.0004,
+        "r25": -0.0017,
+        "r50": -0.0064,
+        "r90": -0.0072,
+        "outer": -0.0016,
+        "q": -0.0139,
+        "qInner": -0.0007,
+        "paDeg": 1.1444
+      },
+      "coarseSsimHeadroom": 0.0434,
+      "worstMeasure": "q",
+      "worstUse": 0.3859,
+      "oneDraw": {
+        "r50": 0.007,
+        "qInner": 0.0041
+      },
+      "counts": {
+        "dots": {
+          "engine": 9472.5,
+          "v21": 9470
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 27.5,
+          "v21": 30
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 513,
+      "gpuMs": 735
+    },
+    {
+      "case": "grand-design--stipple-arms__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0055,
+        "coarseSsim": 0.924,
+        "medianWidth": -0.0038,
+        "p90Width": 0.0109,
+        "r25": 0.0143,
+        "r50": -0.0014,
+        "r90": 0.0009,
+        "outer": 0.0005,
+        "q": 0.0047,
+        "qInner": -0.0183,
+        "paDeg": 1.3907
+      },
+      "coarseSsimHeadroom": 0.034,
+      "worstMeasure": "r25",
+      "worstUse": 0.5113,
+      "oneDraw": {
+        "r50": -0.0087,
+        "qInner": -0.014
+      },
+      "counts": {
+        "dots": {
+          "engine": 9475.5,
+          "v21": 9475
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 24.5,
+          "v21": 25
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 324,
+      "gpuMs": 799
+    },
+    {
+      "case": "grand-design--stipple-arms__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0093,
+        "coarseSsim": 0.9304,
+        "medianWidth": -0.0024,
+        "p90Width": -0.0233,
+        "r25": 0.0154,
+        "r50": 0.0016,
+        "r90": -0.0155,
+        "outer": -0.0047,
+        "q": 0.0058,
+        "qInner": -0.011,
+        "paDeg": 0.5663
+      },
+      "coarseSsimHeadroom": 0.0404,
+      "worstMeasure": "r25",
+      "worstUse": 0.5486,
+      "oneDraw": {
+        "r50": -0.0083,
+        "qInner": -0.0071
+      },
+      "counts": {
+        "dots": {
+          "engine": 9475.5,
+          "v21": 9475
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 24.5,
+          "v21": 25
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 427,
+      "gpuMs": 893
+    },
+    {
+      "case": "hand-wobble--lines__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0008,
+        "coarseSsim": 0.9931,
+        "medianWidth": -0.0086,
+        "p90Width": 0.0276,
+        "r25": -0.0087,
+        "r50": -0.0111,
+        "r90": -0.0027,
+        "outer": -0.003,
+        "q": 0.0025,
+        "qInner": -0.0491,
+        "paDeg": 0.4507
+      },
+      "coarseSsimHeadroom": 0.0331,
+      "worstMeasure": "inner q",
+      "worstUse": 0.9263,
+      "oneDraw": {
+        "r50": -0.0083,
+        "qInner": -0.0576
+      },
+      "counts": {
+        "dots": {
+          "engine": 305.6667,
+          "v21": 308
+        },
+        "knots": {
+          "engine": 99.3333,
+          "v21": 97
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 75,
+      "gpuMs": 145
+    },
+    {
+      "case": "hand-wobble--lines__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": -0.0002,
+        "coarseSsim": 0.994,
+        "medianWidth": 0.0174,
+        "p90Width": -0.0224,
+        "r25": -0.0025,
+        "r50": -0.0143,
+        "r90": -0.009,
+        "outer": -0.0054,
+        "q": -0.0032,
+        "qInner": -0.0135,
+        "paDeg": 0.4186
+      },
+      "coarseSsimHeadroom": 0.034,
+      "worstMeasure": "outer ink",
+      "worstUse": 0.2711,
+      "oneDraw": {
+        "r50": -0.0073,
+        "qInner": -0.0212
+      },
+      "counts": {
+        "dots": {
+          "engine": 305.6667,
+          "v21": 308
+        },
+        "knots": {
+          "engine": 99.3333,
+          "v21": 97
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 119,
+      "gpuMs": 196
+    },
+    {
+      "case": "hand-wobble--lines__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0097,
+        "coarseSsim": 0.9937,
+        "medianWidth": 0.0195,
+        "p90Width": -0.0223,
+        "r25": 0.0142,
+        "r50": 0.007,
+        "r90": -0.0002,
+        "outer": -0.0006,
+        "q": -0.0009,
+        "qInner": 0.0038,
+        "paDeg": -0.486
+      },
+      "coarseSsimHeadroom": 0.0337,
+      "worstMeasure": "median width",
+      "worstUse": 0.195,
+      "oneDraw": {
+        "r50": -0.0037,
+        "qInner": 0.0037
+      },
+      "counts": {
+        "dots": {
+          "engine": 170.6667,
+          "v21": 180
+        },
+        "knots": {
+          "engine": 55.3333,
+          "v21": 46
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 144,
+      "gpuMs": 210
+    },
+    {
+      "case": "hand-wobble--lines__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0092,
+        "coarseSsim": 0.9933,
+        "medianWidth": -0.0241,
+        "p90Width": -0.0093,
+        "r25": 0.0045,
+        "r50": 0.0075,
+        "r90": 0.0023,
+        "outer": 0.0015,
+        "q": -0.0234,
+        "qInner": 0.0018,
+        "paDeg": -0.3924
+      },
+      "coarseSsimHeadroom": 0.0333,
+      "worstMeasure": "q",
+      "worstUse": 0.5707,
+      "oneDraw": {
+        "r50": -0.0072,
+        "qInner": -0.0047
+      },
+      "counts": {
+        "dots": {
+          "engine": 170.6667,
+          "v21": 180
+        },
+        "knots": {
+          "engine": 55.3333,
+          "v21": 46
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 67,
+      "gpuMs": 147
+    },
+    {
+      "case": "hand-wobble--ribbons__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0015,
+        "coarseSsim": 0.9394,
+        "medianWidth": 0.0043,
+        "p90Width": 0.0039,
+        "r25": 0.003,
+        "r50": -0.0057,
+        "r90": -0.009,
+        "outer": -0.0025,
+        "q": -0.0139,
+        "qInner": -0.0025,
+        "paDeg": 2.3597
+      },
+      "coarseSsimHeadroom": 0.0494,
+      "worstMeasure": "q",
+      "worstUse": 0.6058,
+      "oneDraw": {
+        "r50": -0.0042,
+        "qInner": -0.0026
+      },
+      "counts": {
+        "dots": {
+          "engine": 9016.3333,
+          "v21": 9024
+        },
+        "knots": {
+          "engine": 171.8333,
+          "v21": 153
+        },
+        "stars": {
+          "engine": 22.5,
+          "v21": 24
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 461,
+      "gpuMs": 927
+    },
+    {
+      "case": "hand-wobble--ribbons__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0018,
+        "coarseSsim": 0.9446,
+        "medianWidth": 0.0023,
+        "p90Width": 0.0171,
+        "r25": 0.0029,
+        "r50": -0.007,
+        "r90": 0.0158,
+        "outer": 0.0039,
+        "q": 0.0008,
+        "qInner": -0.0048,
+        "paDeg": 1.1908
+      },
+      "coarseSsimHeadroom": 0.0546,
+      "worstMeasure": "position angle",
+      "worstUse": 0.4057,
+      "oneDraw": {
+        "r50": -0.0033,
+        "qInner": 0.0016
+      },
+      "counts": {
+        "dots": {
+          "engine": 8960.8333,
+          "v21": 8975
+        },
+        "knots": {
+          "engine": 171,
+          "v21": 149
+        },
+        "stars": {
+          "engine": 22.8333,
+          "v21": 27
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 401,
+      "gpuMs": 896
+    },
+    {
+      "case": "hand-wobble--ribbons__s4242__zoom",
+      "pass": true,
+      "measures": {
+        "ink": 0.0019,
+        "coarseSsim": 0.9216,
+        "medianWidth": 0.0043,
+        "p90Width": 0.0095,
+        "r25": 0.0126,
+        "r50": -0.0008,
+        "r90": 0.0012,
+        "outer": 0.001,
+        "q": -0.0066,
+        "qInner": 0.0187,
+        "paDeg": 1.1161
+      },
+      "coarseSsimHeadroom": 0.0716,
+      "worstMeasure": "inner q",
+      "worstUse": 0.6029,
+      "oneDraw": {
+        "r50": 0.0076,
+        "qInner": 0.0161
+      },
+      "counts": {
+        "dots": {
+          "engine": 9016.3333,
+          "v21": 9024
+        },
+        "knots": {
+          "engine": 171.8333,
+          "v21": 153
+        },
+        "stars": {
+          "engine": 22.5,
+          "v21": 24
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 398,
+      "gpuMs": 732
+    },
+    {
+      "case": "hand-wobble--ribbons__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0052,
+        "coarseSsim": 0.9304,
+        "medianWidth": -0.0101,
+        "p90Width": -0.0009,
+        "r25": -0.0051,
+        "r50": -0.0051,
+        "r90": -0.0061,
+        "outer": -0.002,
+        "q": -0.0036,
+        "qInner": 0.0261,
+        "paDeg": 2.0979
+      },
+      "coarseSsimHeadroom": 0.0404,
+      "worstMeasure": "inner q",
+      "worstUse": 0.5939,
+      "oneDraw": {
+        "r50": 0.004,
+        "qInner": 0.0222
+      },
+      "counts": {
+        "dots": {
+          "engine": 9207.1667,
+          "v21": 9228
+        },
+        "knots": {
+          "engine": 127.3333,
+          "v21": 128
+        },
+        "stars": {
+          "engine": 18.8333,
+          "v21": 21
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 516,
+      "gpuMs": 865
+    },
+    {
+      "case": "hand-wobble--ribbons__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": -0.0038,
+        "coarseSsim": 0.938,
+        "medianWidth": -0.0123,
+        "p90Width": -0.0009,
+        "r25": -0.0013,
+        "r50": -0.0097,
+        "r90": -0.0023,
+        "outer": -0.0009,
+        "q": 0.0034,
+        "qInner": -0.0067,
+        "paDeg": 0.6983
+      },
+      "coarseSsimHeadroom": 0.048,
+      "worstMeasure": "r50",
+      "worstUse": 0.3338,
+      "oneDraw": {
+        "r50": -0.0113,
+        "qInner": -0.0099
+      },
+      "counts": {
+        "dots": {
+          "engine": 9145.8333,
+          "v21": 9159
+        },
+        "knots": {
+          "engine": 126.1667,
+          "v21": 129
+        },
+        "stars": {
+          "engine": 18.5,
+          "v21": 24
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 466,
+      "gpuMs": 989
+    },
+    {
+      "case": "hand-wobble--ribbons__s7__zoom",
+      "pass": true,
+      "measures": {
+        "ink": -0.0051,
+        "coarseSsim": 0.8996,
+        "medianWidth": 0.0028,
+        "p90Width": 0.0187,
+        "r25": 0.0004,
+        "r50": -0.0058,
+        "r90": -0.0108,
+        "outer": -0.0066,
+        "q": -0.0068,
+        "qInner": 0.0188,
+        "paDeg": 0.5693
+      },
+      "coarseSsimHeadroom": 0.0496,
+      "worstMeasure": "inner q",
+      "worstUse": 0.6057,
+      "oneDraw": {
+        "r50": 0.0044,
+        "qInner": 0.0145
+      },
+      "counts": {
+        "dots": {
+          "engine": 9207.1667,
+          "v21": 9228
+        },
+        "knots": {
+          "engine": 127.3333,
+          "v21": 128
+        },
+        "stars": {
+          "engine": 18.8333,
+          "v21": 21
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 473,
+      "gpuMs": 865
+    },
+    {
+      "case": "loose-open-arms--lines__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0346,
+        "coarseSsim": 0.9917,
+        "medianWidth": -0.0257,
+        "p90Width": -0.057,
+        "r25": -0.0408,
+        "r50": -0.0285,
+        "r90": 0.0089,
+        "outer": 0.008,
+        "q": 0.0041,
+        "qInner": 0.0063,
+        "paDeg": -0.4513
+      },
+      "coarseSsimHeadroom": 0.0317,
+      "worstMeasure": "ink",
+      "worstUse": 0.6913,
+      "oneDraw": {
+        "r50": -0.0285,
+        "qInner": 0.0112
+      },
+      "counts": {
+        "dots": {
+          "engine": 229.3333,
+          "v21": 230
+        },
+        "knots": {
+          "engine": 73.6667,
+          "v21": 73
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 41,
+      "gpuMs": 202
+    },
+    {
+      "case": "loose-open-arms--lines__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": -0.0354,
+        "coarseSsim": 0.993,
+        "medianWidth": -0.0509,
+        "p90Width": -0.0048,
+        "r25": -0.0728,
+        "r50": -0.0347,
+        "r90": 0.0042,
+        "outer": 0.0052,
+        "q": 0.0081,
+        "qInner": 0.0094,
+        "paDeg": -0.0399
+      },
+      "coarseSsimHeadroom": 0.033,
+      "worstMeasure": "ink",
+      "worstUse": 0.7079,
+      "oneDraw": {
+        "r50": -0.0388,
+        "qInner": 0.0202
+      },
+      "counts": {
+        "dots": {
+          "engine": 229.3333,
+          "v21": 230
+        },
+        "knots": {
+          "engine": 73.6667,
+          "v21": 73
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 39,
+      "gpuMs": 170
+    },
+    {
+      "case": "loose-open-arms--lines__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.006,
+        "coarseSsim": 0.9929,
+        "medianWidth": -0.0182,
+        "p90Width": 0.0009,
+        "r25": 0.0052,
+        "r50": -0.0087,
+        "r90": -0.0003,
+        "outer": -0.0011,
+        "q": -0.0169,
+        "qInner": -0.0059,
+        "paDeg": -1.1776
+      },
+      "coarseSsimHeadroom": 0.0329,
+      "worstMeasure": "position angle",
+      "worstUse": 0.4181,
+      "oneDraw": {
+        "r50": -0.0203,
+        "qInner": -0.0228
+      },
+      "counts": {
+        "dots": {
+          "engine": 326.1667,
+          "v21": 337
+        },
+        "knots": {
+          "engine": 110.8333,
+          "v21": 100
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 69,
+      "gpuMs": 147
+    },
+    {
+      "case": "loose-open-arms--lines__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": -0.0019,
+        "coarseSsim": 0.9928,
+        "medianWidth": 0.0022,
+        "p90Width": -0.0536,
+        "r25": 0.0094,
+        "r50": -0.0091,
+        "r90": 0.0006,
+        "outer": 0.0011,
+        "q": -0.013,
+        "qInner": -0.0194,
+        "paDeg": -0.8653
+      },
+      "coarseSsimHeadroom": 0.0328,
+      "worstMeasure": "position angle",
+      "worstUse": 0.4036,
+      "oneDraw": {
+        "r50": -0.017,
+        "qInner": -0.0252
+      },
+      "counts": {
+        "dots": {
+          "engine": 326.1667,
+          "v21": 337
+        },
+        "knots": {
+          "engine": 110.8333,
+          "v21": 100
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 128,
+      "gpuMs": 216
+    },
+    {
+      "case": "loose-open-arms--ribbons__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0039,
+        "coarseSsim": 0.9394,
+        "medianWidth": -0.0092,
+        "p90Width": -0.0034,
+        "r25": 0.0006,
+        "r50": -0.0112,
+        "r90": 0.0225,
+        "outer": 0.0063,
+        "q": 0.0031,
+        "qInner": 0.0025,
+        "paDeg": -0.0356
+      },
+      "coarseSsimHeadroom": 0.0494,
+      "worstMeasure": "r90",
+      "worstUse": 0.4093,
+      "oneDraw": {
+        "r50": 0.0004,
+        "qInner": -0.0095
+      },
+      "counts": {
+        "dots": {
+          "engine": 9262.1667,
+          "v21": 9238
+        },
+        "knots": {
+          "engine": 198.5,
+          "v21": 208
+        },
+        "stars": {
+          "engine": 25.5,
+          "v21": 23
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 364,
+      "gpuMs": 619
+    },
+    {
+      "case": "loose-open-arms--ribbons__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": -0.0021,
+        "coarseSsim": 0.9429,
+        "medianWidth": 0.0059,
+        "p90Width": 0.0033,
+        "r25": 0.009,
+        "r50": -0.0026,
+        "r90": 0.0116,
+        "outer": 0.0041,
+        "q": 0.0012,
+        "qInner": -0.0031,
+        "paDeg": 0.0976
+      },
+      "coarseSsimHeadroom": 0.0529,
+      "worstMeasure": "r25",
+      "worstUse": 0.3198,
+      "oneDraw": {
+        "r50": 0.0089,
+        "qInner": -0.0101
+      },
+      "counts": {
+        "dots": {
+          "engine": 9204.3333,
+          "v21": 9210
+        },
+        "knots": {
+          "engine": 198,
+          "v21": 200
+        },
+        "stars": {
+          "engine": 25.5,
+          "v21": 20
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 540,
+      "gpuMs": 946
+    },
+    {
+      "case": "loose-open-arms--ribbons__s4242__zoom",
+      "pass": true,
+      "measures": {
+        "ink": 0.0061,
+        "coarseSsim": 0.9097,
+        "medianWidth": 0.0004,
+        "p90Width": 0.0086,
+        "r25": 0.0248,
+        "r50": -0.0015,
+        "r90": -0.0138,
+        "outer": -0.0112,
+        "q": -0.0099,
+        "qInner": -0.0177,
+        "paDeg": -0.7001
+      },
+      "coarseSsimHeadroom": 0.0597,
+      "worstMeasure": "outer ink",
+      "worstUse": 0.9369,
+      "oneDraw": {
+        "r50": 0.0122,
+        "qInner": -0.0185
+      },
+      "counts": {
+        "dots": {
+          "engine": 9262.1667,
+          "v21": 9238
+        },
+        "knots": {
+          "engine": 198.5,
+          "v21": 208
+        },
+        "stars": {
+          "engine": 25.5,
+          "v21": 23
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 614,
+      "gpuMs": 648
+    },
+    {
+      "case": "loose-open-arms--ribbons__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0044,
+        "coarseSsim": 0.9228,
+        "medianWidth": 0.0162,
+        "p90Width": 0.0266,
+        "r25": 0.0046,
+        "r50": -0.0161,
+        "r90": -0.0054,
+        "outer": -0.0015,
+        "q": 0.0074,
+        "qInner": 0.0212,
+        "paDeg": 4.5583
+      },
+      "coarseSsimHeadroom": 0.0328,
+      "worstMeasure": "position angle",
+      "worstUse": 0.9154,
+      "oneDraw": {
+        "r50": -0.0257,
+        "qInner": 0.0354
+      },
+      "counts": {
+        "dots": {
+          "engine": 9303.3333,
+          "v21": 9285
+        },
+        "knots": {
+          "engine": 209.6667,
+          "v21": 219
+        },
+        "stars": {
+          "engine": 22.8333,
+          "v21": 22
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 382,
+      "gpuMs": 1252
+    },
+    {
+      "case": "loose-open-arms--ribbons__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0056,
+        "coarseSsim": 0.9332,
+        "medianWidth": 0.0137,
+        "p90Width": 0.0204,
+        "r25": -0.0141,
+        "r50": -0.0112,
+        "r90": -0.0182,
+        "outer": -0.0068,
+        "q": 0.0069,
+        "qInner": 0.0024,
+        "paDeg": 2.0944
+      },
+      "coarseSsimHeadroom": 0.0432,
+      "worstMeasure": "position angle",
+      "worstUse": 0.9234,
+      "oneDraw": {
+        "r50": -0.0182,
+        "qInner": 0.0053
+      },
+      "counts": {
+        "dots": {
+          "engine": 9276.5,
+          "v21": 9257
+        },
+        "knots": {
+          "engine": 208.6667,
+          "v21": 213
+        },
+        "stars": {
+          "engine": 22.8333,
+          "v21": 23
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 446,
+      "gpuMs": 890
+    },
+    {
+      "case": "loose-open-arms--ribbons__s7__zoom",
+      "pass": true,
+      "measures": {
+        "ink": 0.0115,
+        "coarseSsim": 0.8811,
+        "medianWidth": 0.0006,
+        "p90Width": 0.0104,
+        "r25": 0.0049,
+        "r50": 0.007,
+        "r90": -0.0036,
+        "outer": -0.0027,
+        "q": 0.0044,
+        "qInner": 0.0093,
+        "paDeg": 0.974
+      },
+      "coarseSsimHeadroom": 0.0311,
+      "worstMeasure": "inner q",
+      "worstUse": 0.2991,
+      "oneDraw": {
+        "r50": 0.0099,
+        "qInner": 0.0085
+      },
+      "counts": {
+        "dots": {
+          "engine": 9303.3333,
+          "v21": 9285
+        },
+        "knots": {
+          "engine": 209.6667,
+          "v21": 219
+        },
+        "stars": {
+          "engine": 22.8333,
+          "v21": 22
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 421,
+      "gpuMs": 841
+    },
+    {
+      "case": "radio-jet--stipple__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0063,
+        "coarseSsim": 0.93,
+        "medianWidth": -0.0014,
+        "p90Width": -0.0032,
+        "r25": 0.0013,
+        "r50": 0.0001,
+        "r90": -0.0066,
+        "outer": -0.0017,
+        "q": -0.0041,
+        "qInner": 0.0011,
+        "paDeg": 6.1472
+      },
+      "coarseSsimHeadroom": 0.02,
+      "worstMeasure": "position angle",
+      "worstUse": 0.2423,
+      "oneDraw": {
+        "r50": -0.0053,
+        "qInner": 0.0001
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 321,
+      "gpuMs": 665
+    },
+    {
+      "case": "radio-jet--stipple__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0054,
+        "coarseSsim": 0.9309,
+        "medianWidth": 0.0011,
+        "p90Width": 0.0029,
+        "r25": 0.0017,
+        "r50": 0.0017,
+        "r90": -0.0089,
+        "outer": -0.0024,
+        "q": -0.0027,
+        "qInner": 0.0076,
+        "paDeg": 4.6955
+      },
+      "coarseSsimHeadroom": 0.0209,
+      "worstMeasure": "inner q",
+      "worstUse": 0.2221,
+      "oneDraw": {
+        "r50": -0.0034,
+        "qInner": 0.0059
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 294,
+      "gpuMs": 647
+    },
+    {
+      "case": "radio-jet--stipple__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0077,
+        "coarseSsim": 0.934,
+        "medianWidth": 0.0038,
+        "p90Width": 0.0075,
+        "r25": 0.0026,
+        "r50": -0.0116,
+        "r90": 0.0008,
+        "outer": 0.0007,
+        "q": 0.0095,
+        "qInner": 0.0034,
+        "paDeg": 8.9822
+      },
+      "coarseSsimHeadroom": 0.024,
+      "worstMeasure": "position angle",
+      "worstUse": 0.5385,
+      "oneDraw": {
+        "r50": -0.0124,
+        "qInner": 0.0144
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 409,
+      "gpuMs": 718
+    },
+    {
+      "case": "radio-jet--stipple__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0077,
+        "coarseSsim": 0.935,
+        "medianWidth": 0.0034,
+        "p90Width": 0.0122,
+        "r25": 0.0008,
+        "r50": -0.0133,
+        "r90": -0.0004,
+        "outer": 0.0003,
+        "q": 0.0052,
+        "qInner": 0.0059,
+        "paDeg": 8.631
+      },
+      "coarseSsimHeadroom": 0.025,
+      "worstMeasure": "position angle",
+      "worstUse": 0.4521,
+      "oneDraw": {
+        "r50": -0.0145,
+        "qInner": 0.0174
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 608,
+      "gpuMs": 719
+    },
+    {
+      "case": "smooth-round--stipple__s11__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.004,
+        "coarseSsim": 0.9547,
+        "medianWidth": -0.003,
+        "p90Width": -0.0007,
+        "r25": -0.0052,
+        "r50": 0.0009,
+        "r90": -0.0273,
+        "outer": -0.0062,
+        "q": 0.0116,
+        "qInner": 0.0134,
+        "paDeg": -20.1113
+      },
+      "coarseSsimHeadroom": 0.0447,
+      "worstMeasure": "inner q",
+      "worstUse": 0.5142,
+      "oneDraw": {
+        "r50": -0.0155,
+        "qInner": -0.0004
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 329,
+      "gpuMs": 657
+    },
+    {
+      "case": "smooth-round--stipple__s11__orbit",
+      "pass": true,
+      "measures": {
+        "ink": -0.0069,
+        "coarseSsim": 0.9582,
+        "medianWidth": -0.003,
+        "p90Width": 0.0029,
+        "r25": -0.0011,
+        "r50": -0.0021,
+        "r90": -0.0353,
+        "outer": -0.0079,
+        "q": 0.0192,
+        "qInner": 0.0012,
+        "paDeg": 47.0242
+      },
+      "coarseSsimHeadroom": 0.0482,
+      "worstMeasure": "outer ink",
+      "worstUse": 0.4633,
+      "oneDraw": {
+        "r50": -0.023,
+        "qInner": 0.004
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 330,
+      "gpuMs": 695
+    },
+    {
+      "case": "smooth-round--stipple__s3__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0136,
+        "coarseSsim": 0.9496,
+        "medianWidth": 0,
+        "p90Width": -0.002,
+        "r25": -0.0063,
+        "r50": 0.0078,
+        "r90": -0.0143,
+        "outer": -0.003,
+        "q": 0.0171,
+        "qInner": 0.005,
+        "paDeg": 84.5713
+      },
+      "coarseSsimHeadroom": 0.0396,
+      "worstMeasure": "q",
+      "worstUse": 0.3642,
+      "oneDraw": {
+        "r50": 0.0052,
+        "qInner": 0.0079
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 268,
+      "gpuMs": 670
+    },
+    {
+      "case": "smooth-round--stipple__s3__orbit",
+      "pass": true,
+      "measures": {
+        "ink": -0.0044,
+        "coarseSsim": 0.953,
+        "medianWidth": 0,
+        "p90Width": 0.0069,
+        "r25": 0.0005,
+        "r50": 0.0043,
+        "r90": -0.0313,
+        "outer": -0.0064,
+        "q": 0.0124,
+        "qInner": 0.0078,
+        "paDeg": -86.0476
+      },
+      "coarseSsimHeadroom": 0.043,
+      "worstMeasure": "r90",
+      "worstUse": 0.4063,
+      "oneDraw": {
+        "r50": 0.0018,
+        "qInner": 0.0074
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 322,
+      "gpuMs": 683
+    },
+    {
+      "case": "smooth-round--stipple__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0037,
+        "coarseSsim": 0.948,
+        "medianWidth": 0.0016,
+        "p90Width": 0.0151,
+        "r25": -0.0036,
+        "r50": -0.008,
+        "r90": -0.0243,
+        "outer": -0.0052,
+        "q": 0.0002,
+        "qInner": 0.0242,
+        "paDeg": 46.0782
+      },
+      "coarseSsimHeadroom": 0.038,
+      "worstMeasure": "inner q",
+      "worstUse": 0.9315,
+      "oneDraw": {
+        "r50": -0.0087,
+        "qInner": 0.0177
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 417,
+      "gpuMs": 676
+    },
+    {
+      "case": "smooth-round--stipple__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": -0.0022,
+        "coarseSsim": 0.9465,
+        "medianWidth": 0.001,
+        "p90Width": -0.0001,
+        "r25": -0.0039,
+        "r50": 0.0058,
+        "r90": -0.0034,
+        "outer": -0.001,
+        "q": 0.004,
+        "qInner": -0.0017,
+        "paDeg": 19.3897
+      },
+      "coarseSsimHeadroom": 0.0365,
+      "worstMeasure": "r50",
+      "worstUse": 0.1412,
+      "oneDraw": {
+        "r50": -0.0149,
+        "qInner": -0.0084
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 232,
+      "gpuMs": 619
+    },
+    {
+      "case": "smooth-round--stipple__s4242__zoom",
+      "pass": true,
+      "measures": {
+        "ink": -0.0019,
+        "coarseSsim": 0.9396,
+        "medianWidth": -0.0013,
+        "p90Width": -0.0122,
+        "r25": -0.0018,
+        "r50": 0.0093,
+        "r90": 0.0126,
+        "outer": 0.0034,
+        "q": -0.0024,
+        "qInner": -0.0027,
+        "paDeg": -76.3306
+      },
+      "coarseSsimHeadroom": 0.0396,
+      "worstMeasure": "r90",
+      "worstUse": 0.2868,
+      "oneDraw": {
+        "r50": 0.0215,
+        "qInner": -0.0101
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 283,
+      "gpuMs": 621
+    },
+    {
+      "case": "smooth-round--stipple__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0046,
+        "coarseSsim": 0.9486,
+        "medianWidth": 0.0065,
+        "p90Width": 0.0039,
+        "r25": 0.0045,
+        "r50": 0.0191,
+        "r90": -0.0058,
+        "outer": -0.0014,
+        "q": -0.0149,
+        "qInner": 0.0046,
+        "paDeg": -74.9094
+      },
+      "coarseSsimHeadroom": 0.0386,
+      "worstMeasure": "r50",
+      "worstUse": 0.4652,
+      "oneDraw": {
+        "r50": -0.0024,
+        "qInner": 0.0024
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 215,
+      "gpuMs": 701
+    },
+    {
+      "case": "smooth-round--stipple__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0129,
+        "coarseSsim": 0.9475,
+        "medianWidth": 0.0028,
+        "p90Width": 0.014,
+        "r25": 0.0051,
+        "r50": 0.0116,
+        "r90": 0,
+        "outer": -0.0002,
+        "q": 0.0069,
+        "qInner": -0.0146,
+        "paDeg": -24.5582
+      },
+      "coarseSsimHeadroom": 0.0375,
+      "worstMeasure": "inner q",
+      "worstUse": 0.5604,
+      "oneDraw": {
+        "r50": -0.0095,
+        "qInner": -0.0149
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 284,
+      "gpuMs": 720
+    },
+    {
+      "case": "smooth-round--stipple__s7__zoom",
+      "pass": true,
+      "measures": {
+        "ink": 0.0103,
+        "coarseSsim": 0.9413,
+        "medianWidth": 0.0011,
+        "p90Width": 0.0172,
+        "r25": -0.0139,
+        "r50": -0.0048,
+        "r90": 0.0065,
+        "outer": 0.0017,
+        "q": -0.0145,
+        "qInner": -0.0134,
+        "paDeg": 43.4992
+      },
+      "coarseSsimHeadroom": 0.0413,
+      "worstMeasure": "q",
+      "worstUse": 0.4667,
+      "oneDraw": {
+        "r50": -0.0027,
+        "qInner": -0.0057
+      },
+      "counts": {
+        "dots": {
+          "engine": 9500,
+          "v21": 9500
+        },
+        "knots": {
+          "engine": 0,
+          "v21": 0
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 302,
+      "gpuMs": 699
+    },
+    {
+      "case": "tightly-wound--lines__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0039,
+        "coarseSsim": 0.9953,
+        "medianWidth": 0.0013,
+        "p90Width": 0.0011,
+        "r25": -0.011,
+        "r50": -0.0065,
+        "r90": -0.0044,
+        "outer": -0.0032,
+        "q": 0.0051,
+        "qInner": 0.0144,
+        "paDeg": -2.5581
+      },
+      "coarseSsimHeadroom": 0.0353,
+      "worstMeasure": "inner q",
+      "worstUse": 0.2712,
+      "oneDraw": {
+        "r50": -0.0069,
+        "qInner": 0.0121
+      },
+      "counts": {
+        "dots": {
+          "engine": 305.6667,
+          "v21": 308
+        },
+        "knots": {
+          "engine": 99.3333,
+          "v21": 97
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 227,
+      "gpuMs": 141
+    },
+    {
+      "case": "tightly-wound--lines__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": -0.0041,
+        "coarseSsim": 0.9961,
+        "medianWidth": -0.0036,
+        "p90Width": 0.0048,
+        "r25": -0.0049,
+        "r50": -0.0009,
+        "r90": -0.0043,
+        "outer": -0.0034,
+        "q": 0.0038,
+        "qInner": -0.0134,
+        "paDeg": -0.6456
+      },
+      "coarseSsimHeadroom": 0.0361,
+      "worstMeasure": "inner q",
+      "worstUse": 0.2523,
+      "oneDraw": {
+        "r50": -0.0011,
+        "qInner": -0.0075
+      },
+      "counts": {
+        "dots": {
+          "engine": 305.6667,
+          "v21": 308
+        },
+        "knots": {
+          "engine": 99.3333,
+          "v21": 97
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 161,
+      "gpuMs": 134
+    },
+    {
+      "case": "tightly-wound--lines__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": 0.0054,
+        "coarseSsim": 0.9968,
+        "medianWidth": 0.0033,
+        "p90Width": -0.0115,
+        "r25": 0.0048,
+        "r50": 0.0025,
+        "r90": -0.0005,
+        "outer": -0.0004,
+        "q": -0.0005,
+        "qInner": -0.0012,
+        "paDeg": 0.0972
+      },
+      "coarseSsimHeadroom": 0.0368,
+      "worstMeasure": "ink",
+      "worstUse": 0.1081,
+      "oneDraw": {
+        "r50": 0.0009,
+        "qInner": 0.0001
+      },
+      "counts": {
+        "dots": {
+          "engine": 170.6667,
+          "v21": 180
+        },
+        "knots": {
+          "engine": 55.3333,
+          "v21": 46
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 210,
+      "gpuMs": 169
+    },
+    {
+      "case": "tightly-wound--lines__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0047,
+        "coarseSsim": 0.9975,
+        "medianWidth": 0.006,
+        "p90Width": -0.0144,
+        "r25": 0.0027,
+        "r50": -0.0012,
+        "r90": -0.0023,
+        "outer": -0.0007,
+        "q": -0.0016,
+        "qInner": -0.0009,
+        "paDeg": 0.3711
+      },
+      "coarseSsimHeadroom": 0.0375,
+      "worstMeasure": "p90 width",
+      "worstUse": 0.1046,
+      "oneDraw": {
+        "r50": -0.0017,
+        "qInner": -0.0001
+      },
+      "counts": {
+        "dots": {
+          "engine": 170.6667,
+          "v21": 180
+        },
+        "knots": {
+          "engine": 55.3333,
+          "v21": 46
+        },
+        "stars": {
+          "engine": 0,
+          "v21": 0
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 113,
+      "gpuMs": 133
+    },
+    {
+      "case": "tightly-wound--ribbons__s4242__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0036,
+        "coarseSsim": 0.9339,
+        "medianWidth": -0.0018,
+        "p90Width": 0.0226,
+        "r25": -0.0002,
+        "r50": 0.0081,
+        "r90": -0.0102,
+        "outer": -0.0026,
+        "q": -0.0189,
+        "qInner": 0.0051,
+        "paDeg": 2.1423
+      },
+      "coarseSsimHeadroom": 0.0439,
+      "worstMeasure": "q",
+      "worstUse": 0.9437,
+      "oneDraw": {
+        "r50": 0.0264,
+        "qInner": 0.0052
+      },
+      "counts": {
+        "dots": {
+          "engine": 9206.6667,
+          "v21": 9229
+        },
+        "knots": {
+          "engine": 166.1667,
+          "v21": 162
+        },
+        "stars": {
+          "engine": 19,
+          "v21": 22
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 452,
+      "gpuMs": 858
+    },
+    {
+      "case": "tightly-wound--ribbons__s4242__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.0009,
+        "coarseSsim": 0.9386,
+        "medianWidth": -0.0068,
+        "p90Width": -0.0155,
+        "r25": 0.0034,
+        "r50": 0.0026,
+        "r90": 0.0061,
+        "outer": 0.0014,
+        "q": 0.0047,
+        "qInner": -0.0007,
+        "paDeg": 0.9715
+      },
+      "coarseSsimHeadroom": 0.0486,
+      "worstMeasure": "position angle",
+      "worstUse": 0.2729,
+      "oneDraw": {
+        "r50": 0.0246,
+        "qInner": -0.0119
+      },
+      "counts": {
+        "dots": {
+          "engine": 9150.1667,
+          "v21": 9193
+        },
+        "knots": {
+          "engine": 165,
+          "v21": 161
+        },
+        "stars": {
+          "engine": 19,
+          "v21": 20
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 502,
+      "gpuMs": 766
+    },
+    {
+      "case": "tightly-wound--ribbons__s4242__zoom",
+      "pass": true,
+      "measures": {
+        "ink": -0.0061,
+        "coarseSsim": 0.923,
+        "medianWidth": -0.0109,
+        "p90Width": -0.0068,
+        "r25": 0.0076,
+        "r50": 0.0157,
+        "r90": 0.0043,
+        "outer": 0.0032,
+        "q": -0.0042,
+        "qInner": 0.015,
+        "paDeg": 6.9519
+      },
+      "coarseSsimHeadroom": 0.073,
+      "worstMeasure": "inner q",
+      "worstUse": 0.7513,
+      "oneDraw": {
+        "r50": 0.052,
+        "qInner": 0.0111
+      },
+      "counts": {
+        "dots": {
+          "engine": 9206.6667,
+          "v21": 9229
+        },
+        "knots": {
+          "engine": 166.1667,
+          "v21": 162
+        },
+        "stars": {
+          "engine": 19,
+          "v21": 22
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 401,
+      "gpuMs": 755
+    },
+    {
+      "case": "tightly-wound--ribbons__s7__home",
+      "pass": true,
+      "measures": {
+        "ink": -0.0034,
+        "coarseSsim": 0.9333,
+        "medianWidth": 0.0047,
+        "p90Width": 0.0241,
+        "r25": 0.0039,
+        "r50": -0.0042,
+        "r90": -0.0006,
+        "outer": -0.0001,
+        "q": -0.0079,
+        "qInner": -0.0147,
+        "paDeg": -0.0459
+      },
+      "coarseSsimHeadroom": 0.0433,
+      "worstMeasure": "q",
+      "worstUse": 0.3962,
+      "oneDraw": {
+        "r50": -0.0004,
+        "qInner": -0.0095
+      },
+      "counts": {
+        "dots": {
+          "engine": 9304.5,
+          "v21": 9306
+        },
+        "knots": {
+          "engine": 114.1667,
+          "v21": 101
+        },
+        "stars": {
+          "engine": 16.3333,
+          "v21": 15
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 439,
+      "gpuMs": 738
+    },
+    {
+      "case": "tightly-wound--ribbons__s7__orbit",
+      "pass": true,
+      "measures": {
+        "ink": 0.007,
+        "coarseSsim": 0.9428,
+        "medianWidth": 0.0152,
+        "p90Width": 0.0147,
+        "r25": -0.0043,
+        "r50": -0.0041,
+        "r90": -0.0087,
+        "outer": -0.0023,
+        "q": -0.0035,
+        "qInner": -0.0036,
+        "paDeg": 1.1378
+      },
+      "coarseSsimHeadroom": 0.0528,
+      "worstMeasure": "position angle",
+      "worstUse": 0.3104,
+      "oneDraw": {
+        "r50": -0.0033,
+        "qInner": 0.0017
+      },
+      "counts": {
+        "dots": {
+          "engine": 9250.1667,
+          "v21": 9281
+        },
+        "knots": {
+          "engine": 114.5,
+          "v21": 99
+        },
+        "stars": {
+          "engine": 16.5,
+          "v21": 14
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 490,
+      "gpuMs": 1020
+    },
+    {
+      "case": "tightly-wound--ribbons__s7__zoom",
+      "pass": true,
+      "measures": {
+        "ink": 0.0035,
+        "coarseSsim": 0.9264,
+        "medianWidth": 0.0021,
+        "p90Width": 0.0155,
+        "r25": 0.0047,
+        "r50": 0.0033,
+        "r90": -0.0022,
+        "outer": -0.0014,
+        "q": 0.0034,
+        "qInner": 0.0067,
+        "paDeg": -5.224
+      },
+      "coarseSsimHeadroom": 0.0764,
+      "worstMeasure": "inner q",
+      "worstUse": 0.3329,
+      "oneDraw": {
+        "r50": 0.0189,
+        "qInner": -0.0055
+      },
+      "counts": {
+        "dots": {
+          "engine": 9304.5,
+          "v21": 9306
+        },
+        "knots": {
+          "engine": 114.1667,
+          "v21": 101
+        },
+        "stars": {
+          "engine": 16.3333,
+          "v21": 15
+        },
+        "rstars": {
+          "engine": 0,
+          "v21": 0
+        }
+      },
+      "strictCpuVsGpu": {
+        "ink": 0,
+        "coarseSsim": 1,
+        "pass": true
+      },
+      "l0": true,
+      "engineHash": true,
+      "cpuMs": 542,
+      "gpuMs": 944
+    }
+  ]
+}

@@ -72,76 +72,76 @@ M2 and M4 draw with v21's replayed variation, strokes and noise. The runner now 
 
 `tests/unit/parts-distribution.test.ts` checks the engine's own picks against v21's over 2,000 seeds: a χ² test at 0.1% for every choice of drawing and every count, and 4 standard errors for every spin, size and place. The engine's own picks are printed as `own var.`.
 
-The thresholds were recalibrated with the M5 cases among the configurations (`npm run golden -- --calibrate`: 190 configurations × 3 re-keys plus the negative controls, against 142 in M4). The per-preset axis-ratio tolerances now cover `Hand-drawn arms` and `Stellar streams`, and at the zoom camera also `Ringed`, `Edge-on with dust`, `Radio jet` and `Shell galaxy`.
+The thresholds were recalibrated with the M5 cases among the configurations (`npm run golden -- --calibrate`: 274 configurations × 6 re-keys and 3 stand-ins plus the negative controls, against 142 in M4). The per-preset axis-ratio tolerances now cover `Hand-drawn arms` and `Stellar streams`, and at the zoom camera also `Ringed`, `Edge-on with dust`, `Radio jet` and `Shell galaxy`.
 
 ### Results (WebGPU against v21; the CPU engine gives the same numbers)
 
 | case | ink | coarse SSIM | median | p90 | r50 | dots | knots | stars | rstars | result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| barred-spiral s4242 home | 2.3% | 0.942 | 0.1% | 4.8% | 1.4% | 9368/9373 | 146/128 | 19/12 | 9/9 | pass |
-| barred-spiral s4242 orbit | 2.2% | 0.946 | 0.7% | 3.4% | 2.0% | 9302/9309 | 144/132 | 20/11 | 9/9 | pass |
-| barred-spiral s4242 zoom | 2.0% | 0.918 | 0.1% | 1.5% | 2.1% | 9368/9373 | 146/128 | 19/12 | 9/9 | pass |
-| barred-spiral s7 home | 0.8% | 0.936 | 0.9% | 0.5% | 1.3% | 9567/9564 | 180/177 | 10/9 | 9/9 | pass |
-| barred-spiral s7 orbit | 0.8% | 0.940 | 1.1% | 3.4% | -0.1% | 9517/9535 | 179/167 | 10/9 | 9/9 | pass |
-| barred-spiral s7 zoom | 1.1% | 0.906 | 1.5% | 4.2% | 1.0% | 9567/9564 | 180/177 | 10/9 | 9/9 | pass |
-| disc-no-arms s4242 home | 0.1% | 0.922 | 0.5% | 1.2% | 1.3% | 9472/9469 | 0/0 | 0/3 | 0/0 | pass |
-| disc-no-arms s4242 orbit | 0.0% | 0.956 | 0.5% | 0.4% | 0.3% | 9472/9469 | 0/0 | 0/3 | 0/0 | pass |
-| disc-no-arms s4242 zoom | -0.6% | 0.899 | 2.7% | 0.7% | -0.1% | 9472/9469 | 0/0 | 0/3 | 0/0 | FAIL axis ratio -0.0382 (±0.0370) |
-| disc-no-arms s7 home | -0.7% | 0.919 | 1.6% | 1.0% | -0.1% | 9459/9442 | 0/0 | 0/1 | 0/0 | pass |
-| disc-no-arms s7 orbit | -0.9% | 0.936 | 0.4% | 0.4% | -0.5% | 9459/9442 | 0/0 | 0/1 | 0/0 | pass |
-| disc-no-arms s7 zoom | -0.5% | 0.899 | 0.1% | 1.0% | -1.4% | 9459/9442 | 0/0 | 0/1 | 0/0 | pass |
-| edge-on-with-dust s4242 home | -1.0% | 0.963 | -0.9% | -5.1% | 2.1% | 3347/3377 | 71/87 | 3/1 | 0/0 | FAIL axis ratio 0.0278 (±0.0270) |
-| edge-on-with-dust s4242 orbit | 1.5% | 0.954 | -1.2% | -0.2% | 0.1% | 5657/5695 | 105/83 | 13/13 | 0/0 | FAIL position angle 2.21° (±1.98°) |
-| edge-on-with-dust s4242 zoom | -1.3% | 0.961 | -0.3% | -1.2% | 3.3% | 3347/3377 | 71/87 | 3/1 | 0/0 | pass |
-| edge-on-with-dust s7 home | -0.7% | 0.968 | 0.0% | 2.4% | -4.2% | 3492/3484 | 119/137 | 8/3 | 0/0 | pass |
-| edge-on-with-dust s7 orbit | 0.5% | 0.941 | 2.8% | 0.9% | 0.7% | 5922/5836 | 142/151 | 12/13 | 0/0 | FAIL axis ratio -0.0305 (±0.0270) |
-| edge-on-with-dust s7 zoom | 1.5% | 0.963 | 1.3% | 11.3% | -4.1% | 3492/3484 | 119/137 | 8/3 | 0/0 | FAIL p90 width 11.30% (±10.00%) |
-| hand-drawn-arms s4242 home | 0.3% | 0.936 | 0.4% | 1.5% | -0.1% | 9132/9133 | 152/187 | 19/23 | 0/0 | pass |
-| hand-drawn-arms s4242 orbit | 0.6% | 0.937 | 1.2% | 1.7% | 0.3% | 9073/9080 | 151/187 | 19/25 | 0/0 | pass |
-| hand-drawn-arms s4242 zoom | 0.5% | 0.922 | 0.1% | -0.7% | 2.7% | 9132/9133 | 152/187 | 19/23 | 0/0 | pass |
-| hand-drawn-arms s7 home | 0.1% | 0.932 | 0.2% | -1.9% | 0.6% | 9245/9216 | 91/115 | 24/20 | 0/0 | pass |
-| hand-drawn-arms s7 orbit | 0.2% | 0.939 | -0.4% | 1.4% | -2.3% | 9167/9135 | 91/114 | 25/17 | 0/0 | pass |
-| hand-drawn-arms s7 zoom | 0.2% | 0.913 | 0.3% | -0.2% | 1.2% | 9245/9216 | 91/115 | 24/20 | 0/0 | pass |
-| radio-jet s4242 home | 0.7% | 0.940 | -1.2% | 1.0% | -0.6% | 9500/9500 | 0/0 | 0/0 | 0/0 | pass |
-| radio-jet s4242 orbit | 0.7% | 0.940 | -1.1% | 2.2% | -0.4% | 9500/9500 | 0/0 | 0/0 | 0/0 | pass |
-| radio-jet s4242 zoom | 1.4% | 0.932 | -2.5% | 1.8% | -0.5% | 9500/9500 | 0/0 | 0/0 | 0/0 | pass |
-| radio-jet s7 home | 1.2% | 0.945 | -0.5% | -1.0% | -1.2% | 9500/9500 | 0/0 | 0/0 | 0/0 | pass |
-| radio-jet s7 orbit | 1.1% | 0.944 | -0.3% | -0.4% | -1.3% | 9500/9500 | 0/0 | 0/0 | 0/0 | pass |
-| radio-jet s7 zoom | 1.8% | 0.937 | -0.8% | 0.3% | 1.0% | 9500/9500 | 0/0 | 0/0 | 0/0 | pass |
-| ringed s4242 home | 1.3% | 0.921 | -1.8% | 1.1% | 0.9% | 9467/9460 | 69/47 | 13/5 | 15/15 | pass |
-| ringed s4242 orbit | 2.5% | 0.946 | -1.4% | -0.2% | 2.3% | 9455/9459 | 69/47 | 13/5 | 15/15 | pass |
-| ringed s4242 zoom | 0.7% | 0.916 | 4.3% | 3.8% | 1.4% | 9467/9460 | 69/47 | 13/5 | 15/15 | pass |
-| ringed s7 home | 1.1% | 0.926 | -0.2% | 4.9% | 0.1% | 9498/9479 | 74/57 | 7/4 | 15/15 | pass |
-| ringed s7 orbit | 1.8% | 0.934 | 0.3% | 1.7% | 1.4% | 9483/9463 | 74/57 | 7/4 | 15/15 | FAIL axis ratio -0.0332 (±0.0300) |
-| ringed s7 zoom | 1.5% | 0.912 | 0.5% | 1.3% | 0.4% | 9498/9479 | 74/57 | 7/4 | 15/15 | pass |
-| shell-galaxy s4242 home | 1.1% | 0.944 | -0.4% | 2.1% | -0.2% | 9000/9000 | 0/0 | 0/0 | 0/0 | pass |
-| shell-galaxy s4242 orbit | 1.1% | 0.945 | 0.1% | 2.5% | 0.2% | 9000/9000 | 0/0 | 0/0 | 0/0 | pass |
-| shell-galaxy s4242 zoom | 0.8% | 0.937 | 0.1% | 0.3% | 0.6% | 9000/9000 | 0/0 | 0/0 | 0/0 | pass |
-| shell-galaxy s7 home | 0.9% | 0.946 | 1.7% | 0.9% | 0.1% | 9000/9000 | 0/0 | 0/0 | 0/0 | pass |
-| shell-galaxy s7 orbit | 1.0% | 0.945 | 1.8% | 0.5% | -0.7% | 9000/9000 | 0/0 | 0/0 | 0/0 | pass |
-| shell-galaxy s7 zoom | 1.6% | 0.937 | 1.2% | 1.6% | 0.5% | 9000/9000 | 0/0 | 0/0 | 0/0 | pass |
-| stellar-streams s4242 home | 0.9% | 0.950 | -0.9% | -3.1% | 1.9% | 7000/7000 | 0/0 | 0/0 | 0/0 | pass |
-| stellar-streams s4242 orbit | 1.1% | 0.951 | -0.5% | -2.7% | 2.2% | 7000/7000 | 0/0 | 0/0 | 0/0 | pass |
-| stellar-streams s4242 zoom | -0.1% | 0.941 | -0.4% | -0.2% | 0.4% | 7000/7000 | 0/0 | 0/0 | 0/0 | pass |
-| stellar-streams s7 home | 0.9% | 0.952 | 1.9% | 3.1% | 1.6% | 7000/7000 | 0/0 | 0/0 | 0/0 | pass |
-| stellar-streams s7 orbit | 1.0% | 0.952 | 1.6% | 1.4% | 0.7% | 7000/7000 | 0/0 | 0/0 | 0/0 | pass |
-| stellar-streams s7 zoom | 1.5% | 0.943 | -0.0% | 1.0% | 1.5% | 7000/7000 | 0/0 | 0/0 | 0/0 | pass |
+| barred-spiral s4242 home | 1.0% | 0.948 | -0.7% | 2.7% | 0.2% | 9340/9373 | 143/128 | 13/12 | 9/9 | pass |
+| barred-spiral s4242 orbit | 0.8% | 0.950 | -0.3% | 0.4% | 0.6% | 9288/9309 | 141/132 | 12/11 | 9/9 | pass |
+| barred-spiral s4242 zoom | 0.6% | 0.937 | 0.0% | -1.4% | 0.2% | 9340/9373 | 143/128 | 13/12 | 9/9 | pass |
+| barred-spiral s7 home | 0.2% | 0.931 | 0.4% | 1.2% | 1.0% | 9550/9564 | 180/177 | 11/9 | 9/9 | pass |
+| barred-spiral s7 orbit | 0.4% | 0.934 | 0.6% | 0.5% | 0.4% | 9515/9535 | 179/167 | 11/9 | 9/9 | pass |
+| barred-spiral s7 zoom | -0.0% | 0.916 | 0.3% | 1.0% | 0.7% | 9550/9564 | 180/177 | 11/9 | 9/9 | pass |
+| disc-no-arms s4242 home | -0.2% | 0.929 | 0.5% | 0.3% | 0.3% | 9470/9469 | 0/0 | 0/3 | 0/0 | pass |
+| disc-no-arms s4242 orbit | 0.3% | 0.953 | 0.4% | -0.1% | -0.4% | 9470/9469 | 0/0 | 0/3 | 0/0 | pass |
+| disc-no-arms s4242 zoom | -0.6% | 0.909 | -0.6% | 0.5% | -1.0% | 9470/9469 | 0/0 | 0/3 | 0/0 | pass |
+| disc-no-arms s7 home | -1.5% | 0.919 | 0.6% | 1.3% | -1.9% | 9448/9442 | 0/0 | 0/1 | 0/0 | pass |
+| disc-no-arms s7 orbit | -1.2% | 0.939 | 0.0% | 0.5% | -2.0% | 9448/9442 | 0/0 | 0/1 | 0/0 | pass |
+| disc-no-arms s7 zoom | -0.6% | 0.906 | 0.5% | 0.7% | -1.9% | 9448/9442 | 0/0 | 0/1 | 0/0 | pass |
+| edge-on-with-dust s4242 home | 0.3% | 0.965 | -0.5% | -1.5% | 2.3% | 3372/3377 | 83/87 | 3/1 | 0/0 | FAIL r25 3.41% (±3.00%) |
+| edge-on-with-dust s4242 orbit | -0.4% | 0.952 | 0.2% | -0.5% | -1.5% | 5653/5695 | 108/83 | 10/13 | 0/0 | FAIL position angle 1.53° (±1.45°) |
+| edge-on-with-dust s4242 zoom | -1.0% | 0.963 | 0.1% | 0.1% | 2.6% | 3372/3377 | 83/87 | 3/1 | 0/0 | pass |
+| edge-on-with-dust s7 home | -0.5% | 0.962 | 0.1% | 4.6% | -1.1% | 3511/3484 | 119/137 | 4/3 | 0/0 | pass |
+| edge-on-with-dust s7 orbit | 0.3% | 0.941 | 1.5% | 0.4% | -0.1% | 5830/5836 | 141/151 | 10/13 | 0/0 | FAIL axis ratio -0.0308 (±0.0300) |
+| edge-on-with-dust s7 zoom | -0.9% | 0.962 | 0.5% | 3.0% | -2.5% | 3511/3484 | 119/137 | 4/3 | 0/0 | pass |
+| hand-drawn-arms s4242 home | -0.6% | 0.941 | 0.7% | 0.1% | -0.2% | 9118/9133 | 166/187 | 21/23 | 0/0 | pass |
+| hand-drawn-arms s4242 orbit | -0.7% | 0.943 | 0.9% | 0.7% | 0.3% | 9055/9080 | 165/187 | 20/25 | 0/0 | pass |
+| hand-drawn-arms s4242 zoom | -0.4% | 0.929 | -0.6% | -0.9% | 1.0% | 9118/9133 | 166/187 | 21/23 | 0/0 | pass |
+| hand-drawn-arms s7 home | -1.0% | 0.935 | -0.6% | -0.7% | -0.2% | 9217/9216 | 107/115 | 21/20 | 0/0 | pass |
+| hand-drawn-arms s7 orbit | -0.3% | 0.941 | -0.5% | 0.5% | -1.7% | 9148/9135 | 106/114 | 21/17 | 0/0 | pass |
+| hand-drawn-arms s7 zoom | -0.8% | 0.921 | -0.4% | -0.1% | 0.8% | 9217/9216 | 107/115 | 21/20 | 0/0 | pass |
+| radio-jet s4242 home | 0.6% | 0.935 | -1.5% | 0.9% | -0.4% | 9500/9500 | 0/0 | 0/0 | 0/0 | pass |
+| radio-jet s4242 orbit | 0.5% | 0.936 | -1.1% | 1.3% | -0.2% | 9500/9500 | 0/0 | 0/0 | 0/0 | pass |
+| radio-jet s4242 zoom | 1.0% | 0.937 | -2.8% | 1.7% | -0.4% | 9500/9500 | 0/0 | 0/0 | 0/0 | pass |
+| radio-jet s7 home | 0.8% | 0.939 | 2.3% | -1.3% | -1.0% | 9500/9500 | 0/0 | 0/0 | 0/0 | pass |
+| radio-jet s7 orbit | 0.8% | 0.940 | 2.6% | -0.9% | -1.2% | 9500/9500 | 0/0 | 0/0 | 0/0 | pass |
+| radio-jet s7 zoom | 0.8% | 0.936 | 2.5% | -0.8% | -0.0% | 9500/9500 | 0/0 | 0/0 | 0/0 | pass |
+| ringed s4242 home | 0.1% | 0.931 | 0.0% | 1.4% | 0.4% | 9463/9460 | 54/47 | 7/5 | 15/15 | pass |
+| ringed s4242 orbit | 1.0% | 0.943 | -1.4% | -2.8% | 1.1% | 9446/9459 | 54/47 | 7/5 | 15/15 | pass |
+| ringed s4242 zoom | -0.3% | 0.939 | -0.4% | 0.4% | 0.7% | 9463/9460 | 54/47 | 7/5 | 15/15 | pass |
+| ringed s7 home | 0.1% | 0.930 | -0.2% | 4.7% | 0.0% | 9476/9479 | 56/57 | 7/4 | 15/15 | pass |
+| ringed s7 orbit | 0.7% | 0.938 | 0.1% | 3.3% | 0.6% | 9467/9463 | 56/57 | 7/4 | 15/15 | pass |
+| ringed s7 zoom | -0.2% | 0.933 | -0.9% | -1.5% | -0.2% | 9476/9479 | 56/57 | 7/4 | 15/15 | pass |
+| shell-galaxy s4242 home | 1.2% | 0.941 | -0.5% | 1.5% | 0.4% | 9000/9000 | 0/0 | 0/0 | 0/0 | pass |
+| shell-galaxy s4242 orbit | 1.1% | 0.941 | -0.1% | 1.3% | 0.7% | 9000/9000 | 0/0 | 0/0 | 0/0 | pass |
+| shell-galaxy s4242 zoom | 0.7% | 0.935 | -1.1% | 0.1% | 1.0% | 9000/9000 | 0/0 | 0/0 | 0/0 | pass |
+| shell-galaxy s7 home | 0.8% | 0.946 | 1.6% | 0.1% | 1.1% | 9000/9000 | 0/0 | 0/0 | 0/0 | pass |
+| shell-galaxy s7 orbit | 1.0% | 0.946 | 1.5% | -0.3% | 0.3% | 9000/9000 | 0/0 | 0/0 | 0/0 | pass |
+| shell-galaxy s7 zoom | 0.6% | 0.934 | 1.4% | 0.7% | 0.1% | 9000/9000 | 0/0 | 0/0 | 0/0 | pass |
+| stellar-streams s4242 home | 1.4% | 0.946 | -0.3% | -1.2% | 2.3% | 7000/7000 | 0/0 | 0/0 | 0/0 | pass |
+| stellar-streams s4242 orbit | 1.5% | 0.947 | 0.2% | -1.0% | 2.4% | 7000/7000 | 0/0 | 0/0 | 0/0 | pass |
+| stellar-streams s4242 zoom | 0.1% | 0.935 | -0.0% | -0.2% | 1.2% | 7000/7000 | 0/0 | 0/0 | 0/0 | pass |
+| stellar-streams s7 home | 0.9% | 0.952 | 1.0% | 1.3% | 3.0% | 7000/7000 | 0/0 | 0/0 | 0/0 | pass |
+| stellar-streams s7 orbit | 1.1% | 0.953 | 1.1% | 0.5% | 2.2% | 7000/7000 | 0/0 | 0/0 | 0/0 | pass |
+| stellar-streams s7 zoom | 0.4% | 0.941 | 0.8% | 1.2% | 0.9% | 7000/7000 | 0/0 | 0/0 | 0/0 | pass |
 
-**42 of the 48 M5 cases pass, and 117 of the 124 required cases in all.** The M2, M3 and M4 cases are unchanged: all 76 engine hashes are identical (test e). The one M4 failure (`Tightly wound` s4242 zoom, r50) is as M4 reported it.
+**45 of the 48 M5 cases pass, and 149 of the 152 required cases in all** (each against the mean of 6 draws, ADR 0018; the CPU engine gives the same numbers). The M2, M3 and M4 cases pass at the thresholds recalibrated with the M5 set among the configurations; the engine hashes are rewritten for M4's final pen lines (test e).
 
-Each of the six M5 failures is one moment measure just past its band; every other measure of the case passes:
+The three failures are all `Edge-on with dust`, each one moment measure just past its band, every other measure of the case passing:
 
-| case | measure | v21 against the engine's draw | re-keyed (8 placement keys): mean, range | with the vector parts removed |
-| --- | --- | --- | --- | --- |
-| Disc, no arms s4242 zoom | axis ratio | −0.038 (±0.037) | −0.023, −0.045 to +0.001 | (the envelope is the only part) |
-| Edge-on with dust s4242 home | axis ratio | +0.028 (±0.027) | +0.024, +0.011 to +0.043 | identical (no part is drawn) |
-| Edge-on with dust s4242 orbit | position angle | 2.21° (±1.98°) | 1.56°, 0.39° to 2.63° | — |
-| Edge-on with dust s7 orbit | axis ratio | −0.031 (±0.027) | −0.028, −0.046 to −0.013 | identical (mean −0.028) |
-| Edge-on with dust s7 zoom | p90 width | +11.3% (±10%) | +8.2%, +4.6% to +12.3% | — |
-| Ringed s7 orbit | axis ratio | −0.033 (±0.030) | −0.023, −0.042 to −0.006 | worse (mean −0.025) |
+| case | measure | v21 against the mean of 6 draws | band |
+| --- | --- | --- | --- |
+| Edge-on with dust s4242 home | r25 | +3.41% | ±3.00% |
+| Edge-on with dust s4242 orbit | position angle | 1.53° | ±1.45° |
+| Edge-on with dust s7 orbit | axis ratio | −0.0308 | ±0.030 |
 
-- These failures come from the stipple's re-draw scatter, not from the vector marks. Removing the parts leaves the measures where they are, and in four of the six cases the seed's own placement key sits at the edge of its re-keys' range. M4's review fixes compare against the mean of the re-keys; against that mean, five of the six pass.
-- The one left is `Edge-on with dust` s7 orbit, which is about 0.001 past its band even as a mean. `Edge-on with dust` is new to the goldens: M2 and M4 never compared it. Its axis ratio within r90 is set by the edge-on stipple and the dust's optical depth, which M5 does not touch. It is reported as failing, not hidden by a looser band.
+Where they come from:
+
+- **Not from the vector marks or from the merge.** For `Edge-on with dust` s7 orbit the mean axis-ratio difference is −0.0308 with the parts drawn, with every vector part removed, and with M4's final engine alone (a checkout of the M4 branch, which draws no parts): identical to four places. Nor do the dust hatching (`dustScribble` 0 gives −0.0312) or the knots (−0.0306). The halo matters (`halo` 0 gives −0.044), and so do the dust lanes (`dust` 0 gives −0.045): the measure is the edge-on stipple's, carved by the dust.
+- **They sit in the re-draw spread, past the band's margin.** The engine's own re-draws of `Edge-on with dust` reach 0.021 in axis ratio, 3.8% in r25 and 1.15° in position angle, a flat galaxy's scatter, and the family's bands (1.5 × the 95th percentile over every spiral) are narrower than that for r25 (3.0%, against 4.8% for this preset's own 1.5 × p95). The preset's own axis-ratio band is 0.030, from its 24 pairs (8 configurations, the three stand-ins of each sharing one set of draws), and v21's single draw lands at 0.0308. Across the six cameras and seeds the signed axis-ratio differences are −0.011, −0.031, −0.002, +0.021, +0.018 and +0.017: no bias, a scatter.
+- **Not loosened.** The bands are the calibration's. Per-preset tolerances for the radii and the position angle, and a per-preset axis-ratio rule that does not rest on so few configurations, would make these cases pass; that changes how the thresholds are calibrated, so it is left to the owner (see the report of this change).
 
 ### CPU engine against WebGPU (L1)
 
@@ -168,25 +168,23 @@ Each of the six M5 failures is one moment measure just past its band; every othe
   | rewound whole drawing (warped), pen 2.4 | 2.500 px | 2.500 px | 2.500 px |
 
   The width is PEN.line at every zoom, within the measure's 1/4-px resolution: 2.500 is the grid value next to 2.4. At zoom 3 the rewound drawing keeps 131 of its 308 densified pieces, because v21 drops warped segments longer than 22 px (v21 parity).
-- **Ink per unit length against v21** (`tests/gpu/pen-ink.ts`). The same segments are drawn two ways on the same SwiftShader: as the engine's capsules (WebGPU), and as v21's own quads (0.9w overlap, alpha 1, WebGL2 with 4× MSAA, premultiplied). The measure is Σα per px of centreline:
+- **Ink per unit length against v21** (`tests/gpu/pen-ink.ts`). The same segments are drawn two ways on the same SwiftShader: as the engine's pen lines (WebGPU: v21's overlap quads, sampled at its four MSAA positions and unioned per sample, ADR 0019) and as v21's own quads (0.9w overlap, alpha 1, WebGL2 with 4× MSAA, premultiplied). The measure is Σα per px of centreline:
 
   | drawings | half width | engine | v21 | difference |
   | --- | --- | --- | --- | --- |
-  | whole drawings, 554 px, ps 1 | 1.2 px | 2.501 | 2.499 | +0.1% |
-  | drawn arms, 380 px, ps 1 | 1.2 px | 2.495 | 2.496 | −0.0% |
-  | whole drawings, 160 px, ps 1 | 1.2 px | 2.552 | 2.527 | +1.0% |
-  | bubbles, 30 px, ps 0.6 | 0.72 px | 1.637 | 1.503 | +8.9% |
-  | deep-field drawings, 60 px, ps 0.42 | 0.50 px | 1.184 | 1.069 | +10.8% |
-  | hatches, 15 × 4 px, ps 0.38 | 0.46 px | 1.053 | 0.910 | +15.8% |
+  | whole drawings, 554 px, ps 1 | 1.2 px | 2.506 | 2.499 | +0.3% |
+  | drawn arms, 380 px, ps 1 | 1.2 px | 2.480 | 2.496 | −0.6% |
+  | whole drawings, 160 px, ps 1 | 1.2 px | 2.528 | 2.527 | +0.0% |
+  | bubbles, 30 px, ps 0.6 | 0.72 px | 1.497 | 1.503 | −0.4% |
+  | deep-field drawings, 60 px, ps 0.42 | 0.50 px | 1.061 | 1.069 | −0.7% |
+  | hatches, 15 × 4 px, ps 0.38 | 0.46 px | 0.901 | 0.910 | −1.0% |
 
-  - The test gates at ±10% where the pen is at least about a pixel wide (ps ≥ 0.6). The parts at ps 1 carry almost all of M5's line ink, and match v21 within 1%.
-  - Below that width, the capsules' anti-aliased fringes add up over many short, overlapping segments, where v21's MSAA quads take only the union of the coverage. This is the excess M4's QA measured on the hatching: 18–41% in the lanes, where hatches also overlap each other.
-  - The coverage model is one function per engine, `fs_capsule` in render/ribbon.wgsl and `rasteriseCapsules` in src/fallback/raster.ts. The hatching and every placed drawing share it; `vector-expand` writes only each capsule's ends and half width. M4's fix for sub-pixel pens therefore applies to the parts unchanged, and the gate can then extend to every pen scale.
+  - The test gates at ±5% at every pen scale, the sub-pixel ones included: with M4's pen-line union the capsules' fringes no longer add up over short, overlapping segments.
+  - The hatching and every placed drawing are one union per sample (`CapsuleBatch` takes each layer's capsule buffers as sources of one coverage target), as v21 expands them into one line buffer.
 
 ## Not done, or left for later
 
-- **Six M5 cases fail by a hair** (above). One of them, `Edge-on with dust` s7 orbit, fails even against a re-key mean.
-- **Sub-pixel pen ink** (ps < 0.6: bubbles, the deep field's drawings, the hatching) is 9–16% heavier than v21's, pending M4's coverage decision.
+- **Three `Edge-on with dust` cases fail by a hair** (above), against the calibrated bands. They need the owner's decision on how a preset's own scatter sets its bands.
 - **Drawn stars and the sky are M7.** That covers the `sstars` sheet (the stipple's drawn stars, and the ring knots' and clumps' ones that are already counted) and the sky's parts (the deep field, foreground stars and companions).
 - **Warps.** The rewind is built. The `post` hook is built and tested in the kernels, but nothing places it yet: merger tides are M8, and lens Jacobians and weak lensing are M9. v21's `screen` warp (`mWarp`) is M8.
 - **The hatching keeps its M4 kernels** (`hatch_caps`, `hatch_dots` and `hatch_blobs` in ribbons.wgsl), whose frames come from projected anchor points on the GPU. It already shares the capsule pipeline, its coverage, and the dot and blob rules with `vector-expand`. Folding it into `vector-expand`'s instance table waits until M4's review fixes have landed, to keep this change additive.
@@ -199,8 +197,8 @@ Each of the six M5 failures is one moment measure just past its band; every othe
 | --- | --- |
 | `npm run lint` (ESLint and Prettier) | clean |
 | `npm run typecheck` | clean |
-| `npm test` | 20 files, 251 tests pass |
+| `npm test` | 21 files, 328 tests pass |
 | `npm run validate:wgsl` (naga) | 20 of 20 files valid |
-| `npm run build` | builds (241.9 kB, 73.3 kB gzipped) |
+| `npm run build` | builds (247.0 kB, 75.2 kB gzipped) |
 | `npm run test:gpu` | 9 of 9 pass (vector kernels, pen ink, line-work bit-exact, stipple parity, tiers, surface, orbit) |
-| `npm run golden` | 117 of 124 required cases pass (42 of 48 M5 cases); strict CPU = WebGPU on all 124; 12 of 12 drawn-star gates |
+| `npm run golden` | 149 of 152 required cases pass (45 of 48 M5 cases; the three failures above); strict CPU = WebGPU on all 152; 12 of 12 drawn-star gates |

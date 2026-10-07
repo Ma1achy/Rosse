@@ -147,7 +147,7 @@ export class GoldenNode {
       noise: this.v21Noise(P.seed),
       partPicks: v21PartPicks(P, variation, this.cpu.meta, zoom),
       dustPicks: v21DustPicks(this.root, P, variation, kinds, this.cpu.meta.penlines?.n ?? 0),
-      ringKnotPicks: v21RingKnots(this.root, P, variation, kinds),
+      ringKnotPicks: v21RingKnots(this.root, P, variation),
       ...(P.lensOn && !P.merger && preset ? { lens: this.lensOptions(P, preset) } : {}),
     };
   }
@@ -188,7 +188,7 @@ export class GoldenNode {
         this.cpu.meta.strokes?.kind ?? [],
         this.cpu.meta.penlines?.n ?? 0,
       ),
-      ringKnotPicks: v21RingKnots(this.root, Ps, variation, this.cpu.meta.strokes?.kind ?? []),
+      ringKnotPicks: v21RingKnots(this.root, Ps, variation),
     };
   }
 
@@ -261,7 +261,8 @@ export class GoldenNode {
     keys: number,
     standIns: number,
     log: (s: string) => void,
-    withControls = true,
+    /** which parts to measure: the re-draw pairs, the negative controls (a resumed run may need one) */
+    parts: { pairs: boolean; controls: boolean } = { pairs: true, controls: true },
   ) {
     const pairs: Record<string, { preset: string; config: string; cs: Comparison[] }[]> = {};
     const controls: Record<string, Record<string, { config: string; cs: Comparison[] }[]>> = {};
@@ -271,14 +272,17 @@ export class GoldenNode {
       const opts = this.referenceOptions(c.params, zoom, c.base);
       const draw = (P: Params, o: SceneOptions, k: number) =>
         measure(this.cpu.render(P, keyed(o, P.seed, k), zoom).alpha);
-      const stand = Array.from({ length: standIns }, (_, r) =>
+      // the controls compare with the first stand-in only
+      const stand = Array.from({ length: parts.pairs ? standIns : 1 }, (_, r) =>
         draw(c.params, opts, STAND_IN_KEY + r),
       );
-      const drawn = Array.from({ length: keys }, (_, k) => draw(c.params, opts, k));
+      const drawn = parts.pairs
+        ? Array.from({ length: keys }, (_, k) => draw(c.params, opts, k))
+        : [];
       const config = configLabel(c);
       // a held-out v21 capture (ADR 0018): v21 against the same K draws, for the renderers' own
       // differences, which re-draws of line-work drawn the same at every key cannot show
-      if (c.heldOut) {
+      if (parts.pairs && c.heldOut) {
         const v21 = measure(this.reference(c.heldOut));
         (heldOut[c.family] ??= []).push({
           preset: c.base,
@@ -286,15 +290,16 @@ export class GoldenNode {
           cs: drawn.map((m) => compareMeasures(v21, m)),
         });
       }
-      for (const ref of stand)
-        // tagged with the preset, for the per-preset axis-ratio tolerances
-        (pairs[c.family] ??= []).push({
-          preset: c.base,
-          config,
-          cs: drawn.map((m) => compareMeasures(ref, m)),
-        });
+      if (parts.pairs)
+        for (const ref of stand)
+          // tagged with the preset, for the per-preset axis-ratio tolerances
+          (pairs[c.family] ??= []).push({
+            preset: c.base,
+            config,
+            cs: drawn.map((m) => compareMeasures(ref, m)),
+          });
       const ref = stand[0];
-      if (!ref || !withControls) {
+      if (!ref || !parts.controls) {
         log(`  ${config}`);
         continue;
       }
