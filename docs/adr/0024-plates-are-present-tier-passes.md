@@ -4,7 +4,7 @@ Date: 2026-10-06
 
 ## Status
 
-Accepted. Implements the plates row of the tier table in [0010](0010-data-flow-and-cache-tiers.md) and the "ink target holds premultiplied ink, the composite colours it" split of [0007](0007-render-pipeline.md). It changes neither.
+Proposed, awaiting the owner's sign-off. Implements the plates row of the tier table in [0010](0010-data-flow-and-cache-tiers.md) and the "ink target holds premultiplied ink, the composite colours it" split of [0007](0007-render-pipeline.md). It changes neither.
 
 ## Context
 

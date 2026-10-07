@@ -4,72 +4,6 @@
   "standIns": 3,
   "controlsEvery": 6,
   "configurations": [
-    "Grand design s7 incl 30",
-    "Grand design (zoom 2) s7 incl 30",
-    "Grand design s7 incl 50",
-    "Grand design s4242 incl 30",
-    "Grand design (zoom 2) s4242 incl 30",
-    "Grand design s4242 incl 50",
-    "Barred spiral s7 incl 30",
-    "Barred spiral (zoom 2) s7 incl 30",
-    "Barred spiral s7 incl 50",
-    "Barred spiral s4242 incl 30",
-    "Barred spiral (zoom 2) s4242 incl 30",
-    "Barred spiral s4242 incl 50",
-    "Flocculent s7 incl 30",
-    "Flocculent (zoom 2) s7 incl 30",
-    "Flocculent s7 incl 50",
-    "Flocculent s4242 incl 30",
-    "Flocculent (zoom 2) s4242 incl 30",
-    "Flocculent s4242 incl 50",
-    "Tightly wound s7 incl 30",
-    "Tightly wound (zoom 2) s7 incl 30",
-    "Tightly wound s7 incl 50",
-    "Tightly wound s4242 incl 30",
-    "Tightly wound (zoom 2) s4242 incl 30",
-    "Tightly wound s4242 incl 50",
-    "Ringed s7 incl 30",
-    "Ringed (zoom 2) s7 incl 30",
-    "Ringed s7 incl 50",
-    "Ringed s4242 incl 30",
-    "Ringed (zoom 2) s4242 incl 30",
-    "Ringed s4242 incl 50",
-    "Disc, no arms s7 incl 45",
-    "Disc, no arms (zoom 2) s7 incl 45",
-    "Disc, no arms s7 incl 65",
-    "Disc, no arms s4242 incl 45",
-    "Disc, no arms (zoom 2) s4242 incl 45",
-    "Disc, no arms s4242 incl 65",
-    "Edge-on with dust s7 incl 88",
-    "Edge-on with dust (zoom 2) s7 incl 88",
-    "Edge-on with dust s7 incl 108",
-    "Edge-on with dust s4242 incl 88",
-    "Edge-on with dust (zoom 2) s4242 incl 88",
-    "Edge-on with dust s4242 incl 108",
-    "Smooth, round s7 incl 10",
-    "Smooth, round (zoom 2) s7 incl 10",
-    "Smooth, round s7 incl 30",
-    "Smooth, round s4242 incl 10",
-    "Smooth, round (zoom 2) s4242 incl 10",
-    "Smooth, round s4242 incl 30",
-    "Cigar-shaped s7 incl 88",
-    "Cigar-shaped (zoom 2) s7 incl 88",
-    "Cigar-shaped s7 incl 108",
-    "Cigar-shaped s4242 incl 88",
-    "Cigar-shaped (zoom 2) s4242 incl 88",
-    "Cigar-shaped s4242 incl 108",
-    "Radio jet s7 incl 88",
-    "Radio jet (zoom 2) s7 incl 88",
-    "Radio jet s7 incl 108",
-    "Radio jet s4242 incl 88",
-    "Radio jet (zoom 2) s4242 incl 88",
-    "Radio jet s4242 incl 108",
-    "Shell galaxy s7 incl 88",
-    "Shell galaxy (zoom 2) s7 incl 88",
-    "Shell galaxy s7 incl 108",
-    "Shell galaxy s4242 incl 88",
-    "Shell galaxy (zoom 2) s4242 incl 88",
-    "Shell galaxy s4242 incl 108",
     "Barred spiral (lines) s101 incl 30",
     "Barred spiral (lines) s101 incl 50",
     "Barred spiral (lines) s11 incl 30",
@@ -84,38 +18,46 @@
     "Barred spiral (lines) s7 incl 50",
     "Barred spiral (ribbons) s4242 incl 30",
     "Barred spiral (ribbons) s4242 incl 50",
-    "Barred spiral (ribbons) s4242 incl 30",
     "Barred spiral (ribbons) s7 incl 30",
     "Barred spiral (ribbons) s7 incl 50",
-    "Barred spiral (ribbons) s7 incl 30",
     "Barred spiral (vectors) s4242 incl 30",
     "Barred spiral (vectors) s4242 incl 50",
-    "Barred spiral (vectors) s4242 incl 30",
     "Barred spiral (vectors) s7 incl 30",
     "Barred spiral (vectors) s7 incl 50",
-    "Barred spiral (vectors) s7 incl 30",
-    "Cigar-shaped (stipple) s4242 incl 88",
+    "Barred spiral (zoom 2) s4242 incl 30",
+    "Barred spiral (zoom 2) s7 incl 30",
+    "Barred spiral s4242 incl 30",
+    "Barred spiral s4242 incl 50",
+    "Barred spiral s7 incl 30",
+    "Barred spiral s7 incl 50",
     "Cigar-shaped (stipple) s4242 incl 108",
     "Cigar-shaped (stipple) s4242 incl 88",
-    "Cigar-shaped (stipple) s7 incl 88",
     "Cigar-shaped (stipple) s7 incl 108",
     "Cigar-shaped (stipple) s7 incl 88",
+    "Cigar-shaped (zoom 2) s4242 incl 88",
+    "Cigar-shaped (zoom 2) s7 incl 88",
+    "Cigar-shaped s4242 incl 108",
+    "Cigar-shaped s4242 incl 88",
+    "Cigar-shaped s7 incl 108",
+    "Cigar-shaped s7 incl 88",
     "Disc, no arms (stipple) s11 incl 45",
     "Disc, no arms (stipple) s11 incl 65",
     "Disc, no arms (stipple) s3 incl 45",
     "Disc, no arms (stipple) s3 incl 65",
     "Disc, no arms (stipple) s4242 incl 45",
     "Disc, no arms (stipple) s4242 incl 65",
-    "Disc, no arms (stipple) s4242 incl 45",
     "Disc, no arms (stipple) s7 incl 45",
     "Disc, no arms (stipple) s7 incl 65",
-    "Disc, no arms (stipple) s7 incl 45",
     "Disc, no arms (vectors) s4242 incl 45",
     "Disc, no arms (vectors) s4242 incl 65",
-    "Disc, no arms (vectors) s4242 incl 45",
     "Disc, no arms (vectors) s7 incl 45",
     "Disc, no arms (vectors) s7 incl 65",
-    "Disc, no arms (vectors) s7 incl 45",
+    "Disc, no arms (zoom 2) s4242 incl 45",
+    "Disc, no arms (zoom 2) s7 incl 45",
+    "Disc, no arms s4242 incl 45",
+    "Disc, no arms s4242 incl 65",
+    "Disc, no arms s7 incl 45",
+    "Disc, no arms s7 incl 65",
     "Dusty spiral (lines) s101 incl 35",
     "Dusty spiral (lines) s101 incl 55",
     "Dusty spiral (lines) s11 incl 35",
@@ -130,16 +72,18 @@
     "Dusty spiral (lines) s7 incl 55",
     "Dusty spiral (ribbons) s4242 incl 35",
     "Dusty spiral (ribbons) s4242 incl 55",
-    "Dusty spiral (ribbons) s4242 incl 35",
     "Dusty spiral (ribbons) s7 incl 35",
     "Dusty spiral (ribbons) s7 incl 55",
-    "Dusty spiral (ribbons) s7 incl 35",
-    "Edge-on with dust (vectors) s4242 incl 88",
     "Edge-on with dust (vectors) s4242 incl 108",
     "Edge-on with dust (vectors) s4242 incl 88",
-    "Edge-on with dust (vectors) s7 incl 88",
     "Edge-on with dust (vectors) s7 incl 108",
     "Edge-on with dust (vectors) s7 incl 88",
+    "Edge-on with dust (zoom 2) s4242 incl 88",
+    "Edge-on with dust (zoom 2) s7 incl 88",
+    "Edge-on with dust s4242 incl 108",
+    "Edge-on with dust s4242 incl 88",
+    "Edge-on with dust s7 incl 108",
+    "Edge-on with dust s7 incl 88",
     "Flocculent (lines) s101 incl 30",
     "Flocculent (lines) s101 incl 50",
     "Flocculent (lines) s11 incl 30",
@@ -154,10 +98,14 @@
     "Flocculent (lines) s7 incl 50",
     "Flocculent (ribbons) s4242 incl 30",
     "Flocculent (ribbons) s4242 incl 50",
-    "Flocculent (ribbons) s4242 incl 30",
     "Flocculent (ribbons) s7 incl 30",
     "Flocculent (ribbons) s7 incl 50",
-    "Flocculent (ribbons) s7 incl 30",
+    "Flocculent (zoom 2) s4242 incl 30",
+    "Flocculent (zoom 2) s7 incl 30",
+    "Flocculent s4242 incl 30",
+    "Flocculent s4242 incl 50",
+    "Flocculent s7 incl 30",
+    "Flocculent s7 incl 50",
     "Grand design (lines) s101 incl 30",
     "Grand design (lines) s101 incl 50",
     "Grand design (lines) s11 incl 30",
@@ -172,20 +120,18 @@
     "Grand design (lines) s7 incl 50",
     "Grand design (ribbons) s4242 incl 30",
     "Grand design (ribbons) s4242 incl 50",
-    "Grand design (ribbons) s4242 incl 30",
     "Grand design (ribbons) s7 incl 30",
     "Grand design (ribbons) s7 incl 50",
-    "Grand design (ribbons) s7 incl 30",
     "Grand design (stipple-arms) s4242 incl 30",
     "Grand design (stipple-arms) s4242 incl 50",
     "Grand design (stipple-arms) s7 incl 30",
     "Grand design (stipple-arms) s7 incl 50",
-    "Hand-drawn arms (vectors) s4242 incl 30",
-    "Hand-drawn arms (vectors) s4242 incl 50",
-    "Hand-drawn arms (vectors) s4242 incl 30",
-    "Hand-drawn arms (vectors) s7 incl 30",
-    "Hand-drawn arms (vectors) s7 incl 50",
-    "Hand-drawn arms (vectors) s7 incl 30",
+    "Grand design (zoom 2) s4242 incl 30",
+    "Grand design (zoom 2) s7 incl 30",
+    "Grand design s4242 incl 30",
+    "Grand design s4242 incl 50",
+    "Grand design s7 incl 30",
+    "Grand design s7 incl 50",
     "Hand wobble (lines) s101 incl 30",
     "Hand wobble (lines) s101 incl 50",
     "Hand wobble (lines) s11 incl 30",
@@ -200,10 +146,12 @@
     "Hand wobble (lines) s7 incl 50",
     "Hand wobble (ribbons) s4242 incl 30",
     "Hand wobble (ribbons) s4242 incl 50",
-    "Hand wobble (ribbons) s4242 incl 30",
     "Hand wobble (ribbons) s7 incl 30",
     "Hand wobble (ribbons) s7 incl 50",
-    "Hand wobble (ribbons) s7 incl 30",
+    "Hand-drawn arms (vectors) s4242 incl 30",
+    "Hand-drawn arms (vectors) s4242 incl 50",
+    "Hand-drawn arms (vectors) s7 incl 30",
+    "Hand-drawn arms (vectors) s7 incl 50",
     "Loose, open arms (lines) s101 incl 30",
     "Loose, open arms (lines) s101 incl 50",
     "Loose, open arms (lines) s11 incl 30",
@@ -218,46 +166,82 @@
     "Loose, open arms (lines) s7 incl 50",
     "Loose, open arms (ribbons) s4242 incl 30",
     "Loose, open arms (ribbons) s4242 incl 50",
-    "Loose, open arms (ribbons) s4242 incl 30",
     "Loose, open arms (ribbons) s7 incl 30",
     "Loose, open arms (ribbons) s7 incl 50",
-    "Loose, open arms (ribbons) s7 incl 30",
-    "Radio jet (stipple) s4242 incl 88",
+    "Plates slipped (single) s4242 incl 30",
+    "Plates slipped (single) s4242 incl 50",
+    "Plates slipped (single) s7 incl 30",
+    "Plates slipped (single) s7 incl 50",
+    "Plates slipped s1 incl 30",
+    "Plates slipped s1 incl 50",
+    "Plates slipped s11 incl 30",
+    "Plates slipped s11 incl 50",
+    "Plates slipped s13 incl 30",
+    "Plates slipped s13 incl 50",
+    "Plates slipped s17 incl 30",
+    "Plates slipped s17 incl 50",
+    "Plates slipped s19 incl 30",
+    "Plates slipped s19 incl 50",
+    "Plates slipped s2 incl 30",
+    "Plates slipped s2 incl 50",
+    "Plates slipped s21 incl 30",
+    "Plates slipped s21 incl 50",
+    "Plates slipped s3 incl 30",
+    "Plates slipped s3 incl 50",
+    "Plates slipped s5 incl 30",
+    "Plates slipped s5 incl 50",
+    "Plates slipped s9 incl 30",
+    "Plates slipped s9 incl 50",
     "Radio jet (stipple) s4242 incl 108",
-    "Radio jet (stipple) s7 incl 88",
+    "Radio jet (stipple) s4242 incl 88",
     "Radio jet (stipple) s7 incl 108",
-    "Radio jet (vectors) s4242 incl 88",
+    "Radio jet (stipple) s7 incl 88",
     "Radio jet (vectors) s4242 incl 108",
     "Radio jet (vectors) s4242 incl 88",
-    "Radio jet (vectors) s7 incl 88",
     "Radio jet (vectors) s7 incl 108",
     "Radio jet (vectors) s7 incl 88",
+    "Radio jet (zoom 2) s4242 incl 88",
+    "Radio jet (zoom 2) s7 incl 88",
+    "Radio jet s4242 incl 108",
+    "Radio jet s4242 incl 88",
+    "Radio jet s7 incl 108",
+    "Radio jet s7 incl 88",
     "Ringed (vectors) s4242 incl 30",
     "Ringed (vectors) s4242 incl 50",
-    "Ringed (vectors) s4242 incl 30",
     "Ringed (vectors) s7 incl 30",
     "Ringed (vectors) s7 incl 50",
-    "Ringed (vectors) s7 incl 30",
-    "Shell galaxy (vectors) s4242 incl 88",
+    "Ringed (zoom 2) s4242 incl 30",
+    "Ringed (zoom 2) s7 incl 30",
+    "Ringed s4242 incl 30",
+    "Ringed s4242 incl 50",
+    "Ringed s7 incl 30",
+    "Ringed s7 incl 50",
     "Shell galaxy (vectors) s4242 incl 108",
     "Shell galaxy (vectors) s4242 incl 88",
-    "Shell galaxy (vectors) s7 incl 88",
     "Shell galaxy (vectors) s7 incl 108",
     "Shell galaxy (vectors) s7 incl 88",
+    "Shell galaxy (zoom 2) s4242 incl 88",
+    "Shell galaxy (zoom 2) s7 incl 88",
+    "Shell galaxy s4242 incl 108",
+    "Shell galaxy s4242 incl 88",
+    "Shell galaxy s7 incl 108",
+    "Shell galaxy s7 incl 88",
     "Smooth, round (stipple) s11 incl 10",
     "Smooth, round (stipple) s11 incl 30",
     "Smooth, round (stipple) s3 incl 10",
     "Smooth, round (stipple) s3 incl 30",
     "Smooth, round (stipple) s4242 incl 10",
     "Smooth, round (stipple) s4242 incl 30",
-    "Smooth, round (stipple) s4242 incl 10",
     "Smooth, round (stipple) s7 incl 10",
     "Smooth, round (stipple) s7 incl 30",
-    "Smooth, round (stipple) s7 incl 10",
-    "Stellar streams (vectors) s4242 incl 88",
+    "Smooth, round (zoom 2) s4242 incl 10",
+    "Smooth, round (zoom 2) s7 incl 10",
+    "Smooth, round s4242 incl 10",
+    "Smooth, round s4242 incl 30",
+    "Smooth, round s7 incl 10",
+    "Smooth, round s7 incl 30",
     "Stellar streams (vectors) s4242 incl 108",
     "Stellar streams (vectors) s4242 incl 88",
-    "Stellar streams (vectors) s7 incl 88",
     "Stellar streams (vectors) s7 incl 108",
     "Stellar streams (vectors) s7 incl 88",
     "Tightly wound (lines) s101 incl 30",
@@ -274,10 +258,14 @@
     "Tightly wound (lines) s7 incl 50",
     "Tightly wound (ribbons) s4242 incl 30",
     "Tightly wound (ribbons) s4242 incl 50",
-    "Tightly wound (ribbons) s4242 incl 30",
     "Tightly wound (ribbons) s7 incl 30",
     "Tightly wound (ribbons) s7 incl 50",
-    "Tightly wound (ribbons) s7 incl 30"
+    "Tightly wound (zoom 2) s4242 incl 30",
+    "Tightly wound (zoom 2) s7 incl 30",
+    "Tightly wound s4242 incl 30",
+    "Tightly wound s4242 incl 50",
+    "Tightly wound s7 incl 30",
+    "Tightly wound s7 incl 50"
   ],
   "families": {
     "spiral": {
@@ -484,22 +472,34 @@
             {
               "config": "Grand design s7 incl 30",
               "failed": true,
-              "by": ["coarse ssim 0.7447", "position angle 86.50°"]
+              "by": [
+                "coarse ssim 0.7447",
+                "position angle 86.50°"
+              ]
             },
             {
               "config": "Ringed s7 incl 30",
               "failed": true,
-              "by": ["coarse ssim 0.8471", "position angle -79.83°"]
+              "by": [
+                "coarse ssim 0.8471",
+                "position angle -79.83°"
+              ]
             },
             {
               "config": "Disc, no arms (stipple) s3 incl 45",
               "failed": true,
-              "by": ["coarse ssim 0.7278", "position angle -88.61°"]
+              "by": [
+                "coarse ssim 0.7278",
+                "position angle -88.61°"
+              ]
             },
             {
               "config": "Dusty spiral (ribbons) s4242 incl 35",
               "failed": true,
-              "by": ["coarse ssim 0.7250", "position angle -88.93°"]
+              "by": [
+                "coarse ssim 0.7250",
+                "position angle -88.93°"
+              ]
             }
           ]
         },
@@ -762,7 +762,11 @@
             {
               "config": "Ringed s7 incl 30",
               "failed": true,
-              "by": ["r25 -3.06%", "r90 -10.34%", "outer ink -3.76%"]
+              "by": [
+                "r25 -3.06%",
+                "r90 -10.34%",
+                "outer ink -3.76%"
+              ]
             },
             {
               "config": "Disc, no arms (stipple) s3 incl 45",
@@ -778,7 +782,11 @@
             {
               "config": "Dusty spiral (ribbons) s4242 incl 35",
               "failed": true,
-              "by": ["r50 -4.34%", "r90 -9.29%", "outer ink -3.39%"]
+              "by": [
+                "r50 -4.34%",
+                "r90 -9.29%",
+                "outer ink -3.39%"
+              ]
             }
           ]
         },
@@ -1570,22 +1578,34 @@
             {
               "config": "Dusty spiral (ribbons) s4242 incl 35",
               "failed": true,
-              "by": ["coarse ssim 0.8121", "position angle 31.05°"]
+              "by": [
+                "coarse ssim 0.8121",
+                "position angle 31.05°"
+              ]
             },
             {
               "config": "Grand design (ribbons) s7 incl 50",
               "failed": true,
-              "by": ["coarse ssim 0.6979", "position angle 28.78°"]
+              "by": [
+                "coarse ssim 0.6979",
+                "position angle 28.78°"
+              ]
             },
             {
               "config": "Loose, open arms (ribbons) s7 incl 50",
               "failed": true,
-              "by": ["coarse ssim 0.5965", "position angle 30.05°"]
+              "by": [
+                "coarse ssim 0.5965",
+                "position angle 30.05°"
+              ]
             },
             {
               "config": "Disc, no arms (stipple) s3 incl 65",
               "failed": true,
-              "by": ["coarse ssim 0.6247", "position angle 29.59°"]
+              "by": [
+                "coarse ssim 0.6247",
+                "position angle 29.59°"
+              ]
             }
           ]
         },
@@ -1693,22 +1713,34 @@
             {
               "config": "Dusty spiral (ribbons) s4242 incl 35",
               "failed": true,
-              "by": ["coarse ssim 0.8150", "position angle -28.96°"]
+              "by": [
+                "coarse ssim 0.8150",
+                "position angle -28.96°"
+              ]
             },
             {
               "config": "Grand design (ribbons) s7 incl 50",
               "failed": true,
-              "by": ["coarse ssim 0.7118", "position angle -31.32°"]
+              "by": [
+                "coarse ssim 0.7118",
+                "position angle -31.32°"
+              ]
             },
             {
               "config": "Loose, open arms (ribbons) s7 incl 50",
               "failed": true,
-              "by": ["coarse ssim 0.6092", "position angle -29.95°"]
+              "by": [
+                "coarse ssim 0.6092",
+                "position angle -29.95°"
+              ]
             },
             {
               "config": "Disc, no arms (stipple) s3 incl 65",
               "failed": true,
-              "by": ["coarse ssim 0.6509", "position angle -30.40°"]
+              "by": [
+                "coarse ssim 0.6509",
+                "position angle -30.40°"
+              ]
             }
           ]
         },
@@ -2078,12 +2110,18 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["coarse ssim 0.7780", "position angle 30.15°"]
+              "by": [
+                "coarse ssim 0.7780",
+                "position angle 30.15°"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 108",
               "failed": true,
-              "by": ["coarse ssim 0.8545", "position angle 30.06°"]
+              "by": [
+                "coarse ssim 0.8545",
+                "position angle 30.06°"
+              ]
             }
           ]
         },
@@ -2191,12 +2229,18 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["coarse ssim 0.7931", "position angle -29.85°"]
+              "by": [
+                "coarse ssim 0.7931",
+                "position angle -29.85°"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 108",
               "failed": true,
-              "by": ["coarse ssim 0.8496", "position angle -29.97°"]
+              "by": [
+                "coarse ssim 0.8496",
+                "position angle -29.97°"
+              ]
             }
           ]
         },
@@ -2308,7 +2352,10 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["coarse ssim 0.6356", "position angle -89.88°"]
+              "by": [
+                "coarse ssim 0.6356",
+                "position angle -89.88°"
+              ]
             },
             {
               "config": "Smooth, round (stipple) s3 incl 10",
@@ -2318,7 +2365,10 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 108",
               "failed": true,
-              "by": ["coarse ssim 0.7044", "position angle -89.90°"]
+              "by": [
+                "coarse ssim 0.7044",
+                "position angle -89.90°"
+              ]
             },
             {
               "config": "Smooth, round (stipple) s3 incl 30",
@@ -2431,17 +2481,26 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["ink 7.14%", "axis ratio 0.0825", "inner axis ratio 0.0761"]
+              "by": [
+                "ink 7.14%",
+                "axis ratio 0.0825",
+                "inner axis ratio 0.0761"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 108",
               "failed": true,
-              "by": ["axis ratio 0.0622", "inner axis ratio 0.0516"]
+              "by": [
+                "axis ratio 0.0622",
+                "inner axis ratio 0.0516"
+              ]
             },
             {
               "config": "Radio jet (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["axis ratio 0.0604"]
+              "by": [
+                "axis ratio 0.0604"
+              ]
             }
           ]
         },
@@ -2549,12 +2608,20 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["ink 9.94%", "axis ratio 0.1267", "inner axis ratio 0.1086"]
+              "by": [
+                "ink 9.94%",
+                "axis ratio 0.1267",
+                "inner axis ratio 0.1086"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 108",
               "failed": true,
-              "by": ["ink 5.89%", "axis ratio 0.0927", "inner axis ratio 0.0725"]
+              "by": [
+                "ink 5.89%",
+                "axis ratio 0.0927",
+                "inner axis ratio 0.0725"
+              ]
             }
           ]
         },
@@ -2662,22 +2729,44 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["ink 19.95%", "r25 11.15%", "r50 12.93%"]
+              "by": [
+                "ink 19.95%",
+                "r25 11.15%",
+                "r50 12.93%"
+              ]
             },
             {
               "config": "Smooth, round (stipple) s3 incl 10",
               "failed": true,
-              "by": ["ink 15.80%", "r25 10.41%", "r50 13.96%", "r90 9.51%", "outer ink 2.17%"]
+              "by": [
+                "ink 15.80%",
+                "r25 10.41%",
+                "r50 13.96%",
+                "r90 9.51%",
+                "outer ink 2.17%"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 108",
               "failed": true,
-              "by": ["ink 18.70%", "r25 10.62%", "r50 14.85%", "r90 10.26%", "outer ink 2.42%"]
+              "by": [
+                "ink 18.70%",
+                "r25 10.62%",
+                "r50 14.85%",
+                "r90 10.26%",
+                "outer ink 2.42%"
+              ]
             },
             {
               "config": "Smooth, round (stipple) s3 incl 30",
               "failed": true,
-              "by": ["ink 16.94%", "r25 11.23%", "r50 13.31%", "r90 12.39%", "outer ink 2.79%"]
+              "by": [
+                "ink 16.94%",
+                "r25 11.23%",
+                "r50 13.31%",
+                "r90 12.39%",
+                "outer ink 2.79%"
+              ]
             }
           ]
         },
@@ -2796,7 +2885,9 @@
             {
               "config": "Smooth, round (stipple) s3 incl 10",
               "failed": true,
-              "by": ["ink -5.13%"]
+              "by": [
+                "ink -5.13%"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 108",
@@ -3202,19 +3293,31 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["ink 6.82%", "axis ratio 0.0923", "inner axis ratio 0.0804"]
+              "by": [
+                "ink 6.82%",
+                "axis ratio 0.0923",
+                "inner axis ratio 0.0804"
+              ]
             },
             {
               "config": "Cigar-shaped (stipple) s4242 incl 108",
               "failed": true,
-              "by": ["ink 10.84%", "r25 3.07%", "axis ratio 0.1876", "inner axis ratio 0.1256"]
+              "by": [
+                "ink 10.84%",
+                "r25 3.07%",
+                "axis ratio 0.1876",
+                "inner axis ratio 0.1256"
+              ]
             }
           ]
         },
         "bulgeFlat −0.15": {
           "applicable": 4,
           "detected": 2,
-          "missed": ["Smooth, round (stipple) s3 incl 10", "Smooth, round (stipple) s4242 incl 10"],
+          "missed": [
+            "Smooth, round (stipple) s3 incl 10",
+            "Smooth, round (stipple) s4242 incl 10"
+          ],
           "ssim": {
             "n": 4,
             "min": 0.5039,
@@ -3320,12 +3423,17 @@
             {
               "config": "Smooth, round (stipple) s3 incl 30",
               "failed": true,
-              "by": ["inner axis ratio -0.0198"]
+              "by": [
+                "inner axis ratio -0.0198"
+              ]
             },
             {
               "config": "Radio jet (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["axis ratio -0.0789", "inner axis ratio -0.0690"]
+              "by": [
+                "axis ratio -0.0789",
+                "inner axis ratio -0.0690"
+              ]
             },
             {
               "config": "Smooth, round (stipple) s4242 incl 10",
@@ -3553,22 +3661,34 @@
             {
               "config": "Grand design (zoom 2) s4242 incl 30 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.4359", "position angle -88.38°"]
+              "by": [
+                "coarse ssim 0.4359",
+                "position angle -88.38°"
+              ]
             },
             {
               "config": "Flocculent (ribbons) s4242 incl 30 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.5872", "position angle -85.25°"]
+              "by": [
+                "coarse ssim 0.5872",
+                "position angle -85.25°"
+              ]
             },
             {
               "config": "Hand wobble (ribbons) s4242 incl 30 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.4464", "position angle -89.10°"]
+              "by": [
+                "coarse ssim 0.4464",
+                "position angle -89.10°"
+              ]
             },
             {
               "config": "Grand design (zoom 2) s7 incl 30 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.5270", "position angle 87.88°"]
+              "by": [
+                "coarse ssim 0.5270",
+                "position angle 87.88°"
+              ]
             }
           ]
         },
@@ -3692,7 +3812,9 @@
             {
               "config": "Flocculent (ribbons) s4242 incl 30 zoom 2",
               "failed": true,
-              "by": ["r25 4.96%"]
+              "by": [
+                "r25 4.96%"
+              ]
             },
             {
               "config": "Hand wobble (ribbons) s4242 incl 30 zoom 2",
@@ -4694,7 +4816,10 @@
             {
               "config": "Loose, open arms (ribbons) s7 incl 30 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.6159", "position angle -31.16°"]
+              "by": [
+                "coarse ssim 0.6159",
+                "position angle -31.16°"
+              ]
             }
           ]
         },
@@ -5020,7 +5145,10 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.5673", "position angle -89.44°"]
+              "by": [
+                "coarse ssim 0.5673",
+                "position angle -89.44°"
+              ]
             }
           ]
         },
@@ -5128,14 +5256,20 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["ink 6.66%", "axis ratio 0.1042", "inner axis ratio 0.0756"]
+              "by": [
+                "ink 6.66%",
+                "axis ratio 0.1042",
+                "inner axis ratio 0.0756"
+              ]
             }
           ]
         },
         "halo off": {
           "applicable": 1,
           "detected": 0,
-          "missed": ["Cigar-shaped (stipple) s4242 incl 88 zoom 2"],
+          "missed": [
+            "Cigar-shaped (stipple) s4242 incl 88 zoom 2"
+          ],
           "ssim": {
             "n": 1,
             "min": 0.5926,
@@ -5243,7 +5377,9 @@
         "RMAX 4.2": {
           "applicable": 1,
           "detected": 0,
-          "missed": ["Cigar-shaped (stipple) s4242 incl 88 zoom 2"],
+          "missed": [
+            "Cigar-shaped (stipple) s4242 incl 88 zoom 2"
+          ],
           "ssim": {
             "n": 1,
             "min": 0.5873,
@@ -5569,7 +5705,10 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.7475", "position angle 30.52°"]
+              "by": [
+                "coarse ssim 0.7475",
+                "position angle 30.52°"
+              ]
             }
           ]
         },
@@ -5677,7 +5816,10 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.7480", "position angle -29.46°"]
+              "by": [
+                "coarse ssim 0.7480",
+                "position angle -29.46°"
+              ]
             }
           ]
         },
@@ -5785,7 +5927,11 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["ink 9.15%", "axis ratio 0.1423", "inner axis ratio 0.1106"]
+              "by": [
+                "ink 9.15%",
+                "axis ratio 0.1423",
+                "inner axis ratio 0.1106"
+              ]
             }
           ]
         },
@@ -6008,7 +6154,11 @@
             {
               "config": "Cigar-shaped (stipple) s4242 incl 88 zoom 2",
               "failed": true,
-              "by": ["ink 6.26%", "axis ratio 0.1045", "inner axis ratio 0.0749"]
+              "by": [
+                "ink 6.26%",
+                "axis ratio 0.1045",
+                "inner axis ratio 0.0749"
+              ]
             }
           ]
         }
@@ -6213,6 +6363,2063 @@
         }
       },
       "negativeControls": {},
+      "v21Reroll": null
+    },
+    "slip": {
+      "engineRekey": {
+        "ssim": {
+          "n": 72,
+          "min": 0.249,
+          "p5": 0.2708,
+          "median": 0.3279,
+          "p95": 0.3643,
+          "max": 0.3744
+        },
+        "ssimCoarse": {
+          "n": 72,
+          "min": 0.8136,
+          "p5": 0.8357,
+          "median": 0.8735,
+          "p95": 0.896,
+          "max": 0.9043
+        },
+        "inkAbs": {
+          "n": 72,
+          "min": 0.0002,
+          "p5": 0.0005,
+          "median": 0.0061,
+          "p95": 0.0159,
+          "max": 0.0178
+        },
+        "medianAbs": {
+          "n": 72,
+          "min": 0.0001,
+          "p5": 0.0002,
+          "median": 0.0059,
+          "p95": 0.0184,
+          "max": 0.023
+        },
+        "p90Abs": {
+          "n": 72,
+          "min": 0.0006,
+          "p5": 0.0019,
+          "median": 0.023,
+          "p95": 0.0579,
+          "max": 0.09
+        },
+        "r25Abs": {
+          "n": 72,
+          "min": 0.0001,
+          "p5": 0.0004,
+          "median": 0.0048,
+          "p95": 0.0151,
+          "max": 0.0198
+        },
+        "r50Abs": {
+          "n": 72,
+          "min": 0.0001,
+          "p5": 0.0005,
+          "median": 0.0058,
+          "p95": 0.0157,
+          "max": 0.0184
+        },
+        "r90Abs": {
+          "n": 72,
+          "min": 0.0008,
+          "p5": 0.002,
+          "median": 0.0112,
+          "p95": 0.0323,
+          "max": 0.0435
+        },
+        "outerAbs": {
+          "n": 72,
+          "min": 0.0002,
+          "p5": 0.0005,
+          "median": 0.0038,
+          "p95": 0.0113,
+          "max": 0.0137
+        },
+        "qAbs": {
+          "n": 72,
+          "min": 0.0002,
+          "p5": 0.0012,
+          "median": 0.0065,
+          "p95": 0.0225,
+          "max": 0.0305
+        },
+        "qInnerAbs": {
+          "n": 72,
+          "min": 0,
+          "p5": 0.0005,
+          "median": 0.008,
+          "p95": 0.0168,
+          "max": 0.0215
+        },
+        "paAbs": {
+          "n": 72,
+          "min": 0.0913,
+          "p5": 0.1477,
+          "median": 1.3687,
+          "p95": 4.989,
+          "max": 8.25
+        }
+      },
+      "negativeControls": {
+        "pa +90°": {
+          "applicable": 24,
+          "detected": 24,
+          "missed": [],
+          "ssim": {
+            "n": 24,
+            "min": 0.1674,
+            "p5": 0.1731,
+            "median": 0.2104,
+            "p95": 0.2496,
+            "max": 0.2601
+          },
+          "ssimCoarse": {
+            "n": 24,
+            "min": 0.3882,
+            "p5": 0.3926,
+            "median": 0.5601,
+            "p95": 0.6941,
+            "max": 0.7043
+          },
+          "inkAbs": {
+            "n": 24,
+            "min": 0.0001,
+            "p5": 0.0009,
+            "median": 0.0063,
+            "p95": 0.0159,
+            "max": 0.0167
+          },
+          "medianAbs": {
+            "n": 24,
+            "min": 0.0023,
+            "p5": 0.0027,
+            "median": 0.0066,
+            "p95": 0.0195,
+            "max": 0.02
+          },
+          "p90Abs": {
+            "n": 24,
+            "min": 0.0009,
+            "p5": 0.0013,
+            "median": 0.0162,
+            "p95": 0.0691,
+            "max": 0.0827
+          },
+          "r25Abs": {
+            "n": 24,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.0031,
+            "p95": 0.0091,
+            "max": 0.0161
+          },
+          "r50Abs": {
+            "n": 24,
+            "min": 0.0003,
+            "p5": 0.0011,
+            "median": 0.0038,
+            "p95": 0.0108,
+            "max": 0.0127
+          },
+          "r90Abs": {
+            "n": 24,
+            "min": 0.0027,
+            "p5": 0.0049,
+            "median": 0.0106,
+            "p95": 0.0229,
+            "max": 0.0238
+          },
+          "outerAbs": {
+            "n": 24,
+            "min": 0.0008,
+            "p5": 0.0012,
+            "median": 0.0033,
+            "p95": 0.0073,
+            "max": 0.0074
+          },
+          "qAbs": {
+            "n": 24,
+            "min": 0.0006,
+            "p5": 0.0012,
+            "median": 0.0062,
+            "p95": 0.022,
+            "max": 0.0233
+          },
+          "qInnerAbs": {
+            "n": 24,
+            "min": 0.0007,
+            "p5": 0.0008,
+            "median": 0.006,
+            "p95": 0.013,
+            "max": 0.0144
+          },
+          "paAbs": {
+            "n": 24,
+            "min": 84.1869,
+            "p5": 84.6276,
+            "median": 88.6574,
+            "p95": 89.9435,
+            "max": 89.9966
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s3 incl 30",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.7043",
+                "position angle -89.23°"
+              ]
+            },
+            {
+              "config": "Plates slipped s11 incl 50",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.4152",
+                "position angle 90.00°"
+              ]
+            },
+            {
+              "config": "Plates slipped s1 incl 30",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.6802",
+                "position angle 89.53°"
+              ]
+            },
+            {
+              "config": "Plates slipped s2 incl 50",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.5354",
+                "position angle -89.77°"
+              ]
+            }
+          ]
+        },
+        "halo off": {
+          "applicable": 24,
+          "detected": 0,
+          "missed": [
+            "Plates slipped s3 incl 30",
+            "Plates slipped s11 incl 50",
+            "Plates slipped s1 incl 30",
+            "Plates slipped s2 incl 50",
+            "Plates slipped s17 incl 30",
+            "Plates slipped s21 incl 50",
+            "Plates slipped s3 incl 50",
+            "Plates slipped s19 incl 30",
+            "Plates slipped s1 incl 50",
+            "Plates slipped s13 incl 30",
+            "Plates slipped s17 incl 50",
+            "Plates slipped (single) s7 incl 30",
+            "Plates slipped s5 incl 30",
+            "Plates slipped s19 incl 50",
+            "Plates slipped s9 incl 30",
+            "Plates slipped s13 incl 50",
+            "Plates slipped (single) s4242 incl 30",
+            "Plates slipped (single) s7 incl 50",
+            "Plates slipped s11 incl 30",
+            "Plates slipped s5 incl 50",
+            "Plates slipped s2 incl 30",
+            "Plates slipped s9 incl 50",
+            "Plates slipped s21 incl 30",
+            "Plates slipped (single) s4242 incl 50"
+          ],
+          "ssim": {
+            "n": 24,
+            "min": 0.2492,
+            "p5": 0.2713,
+            "median": 0.3271,
+            "p95": 0.3632,
+            "max": 0.3731
+          },
+          "ssimCoarse": {
+            "n": 24,
+            "min": 0.8336,
+            "p5": 0.837,
+            "median": 0.8739,
+            "p95": 0.8984,
+            "max": 0.9032
+          },
+          "inkAbs": {
+            "n": 24,
+            "min": 0.0004,
+            "p5": 0.0006,
+            "median": 0.0071,
+            "p95": 0.0223,
+            "max": 0.0223
+          },
+          "medianAbs": {
+            "n": 24,
+            "min": 0.0005,
+            "p5": 0.0007,
+            "median": 0.0065,
+            "p95": 0.0181,
+            "max": 0.0241
+          },
+          "p90Abs": {
+            "n": 24,
+            "min": 0.0027,
+            "p5": 0.0089,
+            "median": 0.0222,
+            "p95": 0.0853,
+            "max": 0.0927
+          },
+          "r25Abs": {
+            "n": 24,
+            "min": 0.0006,
+            "p5": 0.0016,
+            "median": 0.0087,
+            "p95": 0.0172,
+            "max": 0.0182
+          },
+          "r50Abs": {
+            "n": 24,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.0041,
+            "p95": 0.0173,
+            "max": 0.0196
+          },
+          "r90Abs": {
+            "n": 24,
+            "min": 0.0039,
+            "p5": 0.0049,
+            "median": 0.0097,
+            "p95": 0.0215,
+            "max": 0.0217
+          },
+          "outerAbs": {
+            "n": 24,
+            "min": 0.0012,
+            "p5": 0.0012,
+            "median": 0.003,
+            "p95": 0.0068,
+            "max": 0.0069
+          },
+          "qAbs": {
+            "n": 24,
+            "min": 0.0008,
+            "p5": 0.0011,
+            "median": 0.0058,
+            "p95": 0.0228,
+            "max": 0.0232
+          },
+          "qInnerAbs": {
+            "n": 24,
+            "min": 0.0003,
+            "p5": 0.001,
+            "median": 0.005,
+            "p95": 0.016,
+            "max": 0.0174
+          },
+          "paAbs": {
+            "n": 24,
+            "min": 0.1115,
+            "p5": 0.1668,
+            "median": 1.0102,
+            "p95": 4.8362,
+            "max": 5.7681
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s3 incl 30",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s11 incl 50",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s1 incl 30",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s2 incl 50",
+              "failed": false,
+              "by": []
+            }
+          ]
+        },
+        "RMAX 4.2": {
+          "applicable": 24,
+          "detected": 24,
+          "missed": [],
+          "ssim": {
+            "n": 24,
+            "min": 0.2515,
+            "p5": 0.2751,
+            "median": 0.318,
+            "p95": 0.362,
+            "max": 0.3645
+          },
+          "ssimCoarse": {
+            "n": 24,
+            "min": 0.7266,
+            "p5": 0.7341,
+            "median": 0.7793,
+            "p95": 0.8101,
+            "max": 0.8231
+          },
+          "inkAbs": {
+            "n": 24,
+            "min": 0.0037,
+            "p5": 0.0066,
+            "median": 0.0251,
+            "p95": 0.04,
+            "max": 0.0403
+          },
+          "medianAbs": {
+            "n": 24,
+            "min": 0.0002,
+            "p5": 0.0011,
+            "median": 0.0129,
+            "p95": 0.0279,
+            "max": 0.0424
+          },
+          "p90Abs": {
+            "n": 24,
+            "min": 0.005,
+            "p5": 0.0112,
+            "median": 0.0379,
+            "p95": 0.095,
+            "max": 0.1442
+          },
+          "r25Abs": {
+            "n": 24,
+            "min": 0.0062,
+            "p5": 0.0112,
+            "median": 0.0224,
+            "p95": 0.032,
+            "max": 0.0338
+          },
+          "r50Abs": {
+            "n": 24,
+            "min": 0.0103,
+            "p5": 0.0182,
+            "median": 0.0338,
+            "p95": 0.0423,
+            "max": 0.0456
+          },
+          "r90Abs": {
+            "n": 24,
+            "min": 0.0838,
+            "p5": 0.0901,
+            "median": 0.1022,
+            "p95": 0.1212,
+            "max": 0.1265
+          },
+          "outerAbs": {
+            "n": 24,
+            "min": 0.0321,
+            "p5": 0.0344,
+            "median": 0.0406,
+            "p95": 0.0471,
+            "max": 0.0501
+          },
+          "qAbs": {
+            "n": 24,
+            "min": 0.0001,
+            "p5": 0.0014,
+            "median": 0.0125,
+            "p95": 0.0388,
+            "max": 0.0392
+          },
+          "qInnerAbs": {
+            "n": 24,
+            "min": 0.0006,
+            "p5": 0.0008,
+            "median": 0.0048,
+            "p95": 0.0144,
+            "max": 0.0203
+          },
+          "paAbs": {
+            "n": 24,
+            "min": 0.021,
+            "p5": 0.3595,
+            "median": 1.5364,
+            "p95": 4.8172,
+            "max": 8.5513
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s3 incl 30",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.7884",
+                "r90 -9.01%",
+                "outer ink -3.44%"
+              ]
+            },
+            {
+              "config": "Plates slipped s11 incl 50",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.7806",
+                "r25 -2.41%",
+                "r50 -3.81%",
+                "r90 -11.63%",
+                "outer ink -4.19%"
+              ]
+            },
+            {
+              "config": "Plates slipped s1 incl 30",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.7782",
+                "r50 -2.45%",
+                "r90 -9.40%",
+                "outer ink -3.66%"
+              ]
+            },
+            {
+              "config": "Plates slipped s2 incl 50",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.7424",
+                "r25 -2.84%",
+                "r50 -3.87%",
+                "r90 -11.96%",
+                "outer ink -4.66%"
+              ]
+            }
+          ]
+        },
+        "thick ×3": {
+          "applicable": 24,
+          "detected": 5,
+          "missed": [
+            "Plates slipped s3 incl 30",
+            "Plates slipped s1 incl 30",
+            "Plates slipped s2 incl 50",
+            "Plates slipped s17 incl 30",
+            "Plates slipped s3 incl 50",
+            "Plates slipped s19 incl 30",
+            "Plates slipped s1 incl 50",
+            "Plates slipped s13 incl 30",
+            "Plates slipped s17 incl 50",
+            "Plates slipped (single) s7 incl 30",
+            "Plates slipped s5 incl 30",
+            "Plates slipped s9 incl 30",
+            "Plates slipped s13 incl 50",
+            "Plates slipped (single) s4242 incl 30",
+            "Plates slipped s11 incl 30",
+            "Plates slipped s5 incl 50",
+            "Plates slipped s2 incl 30",
+            "Plates slipped s21 incl 30",
+            "Plates slipped (single) s4242 incl 50"
+          ],
+          "ssim": {
+            "n": 24,
+            "min": 0.2431,
+            "p5": 0.2659,
+            "median": 0.3234,
+            "p95": 0.3515,
+            "max": 0.3552
+          },
+          "ssimCoarse": {
+            "n": 24,
+            "min": 0.8341,
+            "p5": 0.8382,
+            "median": 0.8718,
+            "p95": 0.8878,
+            "max": 0.8963
+          },
+          "inkAbs": {
+            "n": 24,
+            "min": 0.0016,
+            "p5": 0.0049,
+            "median": 0.0283,
+            "p95": 0.05,
+            "max": 0.0535
+          },
+          "medianAbs": {
+            "n": 24,
+            "min": 0.0002,
+            "p5": 0.0006,
+            "median": 0.0075,
+            "p95": 0.0195,
+            "max": 0.0284
+          },
+          "p90Abs": {
+            "n": 24,
+            "min": 0.0007,
+            "p5": 0.0015,
+            "median": 0.0328,
+            "p95": 0.0767,
+            "max": 0.1129
+          },
+          "r25Abs": {
+            "n": 24,
+            "min": 0.0006,
+            "p5": 0.0011,
+            "median": 0.0066,
+            "p95": 0.0163,
+            "max": 0.0174
+          },
+          "r50Abs": {
+            "n": 24,
+            "min": 0.0005,
+            "p5": 0.0006,
+            "median": 0.0064,
+            "p95": 0.0141,
+            "max": 0.0182
+          },
+          "r90Abs": {
+            "n": 24,
+            "min": 0.0003,
+            "p5": 0.0024,
+            "median": 0.0128,
+            "p95": 0.0198,
+            "max": 0.0255
+          },
+          "outerAbs": {
+            "n": 24,
+            "min": 0.0003,
+            "p5": 0.0007,
+            "median": 0.0038,
+            "p95": 0.0067,
+            "max": 0.008
+          },
+          "qAbs": {
+            "n": 24,
+            "min": 0.0014,
+            "p5": 0.0021,
+            "median": 0.0169,
+            "p95": 0.035,
+            "max": 0.0371
+          },
+          "qInnerAbs": {
+            "n": 24,
+            "min": 0.0008,
+            "p5": 0.0016,
+            "median": 0.0093,
+            "p95": 0.0313,
+            "max": 0.0358
+          },
+          "paAbs": {
+            "n": 24,
+            "min": 0.2522,
+            "p5": 0.2896,
+            "median": 1.494,
+            "p95": 7.6039,
+            "max": 9.0108
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s3 incl 30",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s11 incl 50",
+              "failed": true,
+              "by": [
+                "ink 5.35%",
+                "inner axis ratio 0.0358"
+              ]
+            },
+            {
+              "config": "Plates slipped s1 incl 30",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s2 incl 50",
+              "failed": false,
+              "by": []
+            }
+          ]
+        },
+        "dot size ×1.3": {
+          "applicable": 24,
+          "detected": 24,
+          "missed": [],
+          "ssim": {
+            "n": 24,
+            "min": 0.1962,
+            "p5": 0.2166,
+            "median": 0.2594,
+            "p95": 0.2953,
+            "max": 0.3026
+          },
+          "ssimCoarse": {
+            "n": 24,
+            "min": 0.7353,
+            "p5": 0.7404,
+            "median": 0.7805,
+            "p95": 0.8203,
+            "max": 0.8227
+          },
+          "inkAbs": {
+            "n": 24,
+            "min": 0.2896,
+            "p5": 0.2974,
+            "median": 0.3346,
+            "p95": 0.3685,
+            "max": 0.374
+          },
+          "medianAbs": {
+            "n": 24,
+            "min": 0.1409,
+            "p5": 0.1525,
+            "median": 0.212,
+            "p95": 0.2749,
+            "max": 0.2785
+          },
+          "p90Abs": {
+            "n": 24,
+            "min": 0.3396,
+            "p5": 0.3849,
+            "median": 0.4847,
+            "p95": 0.6356,
+            "max": 0.64
+          },
+          "r25Abs": {
+            "n": 24,
+            "min": 0.0772,
+            "p5": 0.0899,
+            "median": 0.1076,
+            "p95": 0.1172,
+            "max": 0.1245
+          },
+          "r50Abs": {
+            "n": 24,
+            "min": 0.0567,
+            "p5": 0.0592,
+            "median": 0.0748,
+            "p95": 0.0983,
+            "max": 0.1036
+          },
+          "r90Abs": {
+            "n": 24,
+            "min": 0.0317,
+            "p5": 0.0436,
+            "median": 0.0562,
+            "p95": 0.0797,
+            "max": 0.0841
+          },
+          "outerAbs": {
+            "n": 24,
+            "min": 0.0117,
+            "p5": 0.0148,
+            "median": 0.0184,
+            "p95": 0.0284,
+            "max": 0.0295
+          },
+          "qAbs": {
+            "n": 24,
+            "min": 0.0007,
+            "p5": 0.0009,
+            "median": 0.0154,
+            "p95": 0.026,
+            "max": 0.0334
+          },
+          "qInnerAbs": {
+            "n": 24,
+            "min": 0.001,
+            "p5": 0.0016,
+            "median": 0.0121,
+            "p95": 0.0373,
+            "max": 0.0426
+          },
+          "paAbs": {
+            "n": 24,
+            "min": 0.1539,
+            "p5": 0.3169,
+            "median": 1.9933,
+            "p95": 8.2652,
+            "max": 8.6838
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s3 incl 30",
+              "failed": true,
+              "by": [
+                "ink 37.40%",
+                "coarse ssim 0.7571",
+                "median width 23.18%",
+                "p90 width 49.34%",
+                "r25 11.26%",
+                "r50 7.58%",
+                "r90 7.14%",
+                "outer ink 2.49%"
+              ]
+            },
+            {
+              "config": "Plates slipped s11 incl 50",
+              "failed": true,
+              "by": [
+                "ink 34.77%",
+                "coarse ssim 0.7908",
+                "median width 23.64%",
+                "p90 width 52.25%",
+                "r25 10.52%",
+                "r50 9.02%",
+                "r90 7.00%",
+                "outer ink 2.46%",
+                "inner axis ratio 0.0300"
+              ]
+            },
+            {
+              "config": "Plates slipped s1 incl 30",
+              "failed": true,
+              "by": [
+                "ink 33.50%",
+                "coarse ssim 0.7617",
+                "median width 19.78%",
+                "p90 width 50.93%",
+                "r25 10.76%",
+                "r50 7.31%",
+                "r90 5.59%",
+                "outer ink 1.81%"
+              ]
+            },
+            {
+              "config": "Plates slipped s2 incl 50",
+              "failed": true,
+              "by": [
+                "ink 28.96%",
+                "coarse ssim 0.7416",
+                "median width 18.67%",
+                "p90 width 33.96%",
+                "r25 9.93%",
+                "r50 8.76%",
+                "r90 7.32%",
+                "outer ink 2.58%"
+              ]
+            }
+          ]
+        },
+        "pa +30°": {
+          "applicable": 12,
+          "detected": 12,
+          "missed": [],
+          "ssim": {
+            "n": 12,
+            "min": 0.2097,
+            "p5": 0.2097,
+            "median": 0.2483,
+            "p95": 0.2936,
+            "max": 0.2936
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.617,
+            "p5": 0.617,
+            "median": 0.671,
+            "p95": 0.7434,
+            "max": 0.7434
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.0005,
+            "p5": 0.0005,
+            "median": 0.004,
+            "p95": 0.0167,
+            "max": 0.0167
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0064,
+            "p95": 0.0278,
+            "max": 0.0278
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0009,
+            "p5": 0.0009,
+            "median": 0.0262,
+            "p95": 0.0876,
+            "max": 0.0876
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0041,
+            "p95": 0.0107,
+            "max": 0.0107
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0005,
+            "p5": 0.0005,
+            "median": 0.0023,
+            "p95": 0.0158,
+            "max": 0.0158
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0065,
+            "p95": 0.0378,
+            "max": 0.0378
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.0019,
+            "p95": 0.0127,
+            "max": 0.0127
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0012,
+            "p5": 0.0012,
+            "median": 0.0049,
+            "p95": 0.018,
+            "max": 0.018
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0068,
+            "p95": 0.015,
+            "max": 0.015
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 26.1751,
+            "p5": 26.1751,
+            "median": 30.1274,
+            "p95": 32.3144,
+            "max": 32.3144
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s11 incl 50",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.6534",
+                "position angle 30.13°"
+              ]
+            },
+            {
+              "config": "Plates slipped s2 incl 50",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.6945",
+                "position angle 30.32°"
+              ]
+            },
+            {
+              "config": "Plates slipped s21 incl 50",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.6410",
+                "position angle 28.72°"
+              ]
+            },
+            {
+              "config": "Plates slipped s3 incl 50",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.7434",
+                "position angle 31.08°"
+              ]
+            }
+          ]
+        },
+        "pa −30°": {
+          "applicable": 12,
+          "detected": 12,
+          "missed": [],
+          "ssim": {
+            "n": 12,
+            "min": 0.222,
+            "p5": 0.222,
+            "median": 0.2503,
+            "p95": 0.3009,
+            "max": 0.3009
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.6119,
+            "p5": 0.6119,
+            "median": 0.6769,
+            "p95": 0.7389,
+            "max": 0.7389
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.001,
+            "p5": 0.001,
+            "median": 0.0068,
+            "p95": 0.0144,
+            "max": 0.0144
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0.0005,
+            "p5": 0.0005,
+            "median": 0.0052,
+            "p95": 0.0239,
+            "max": 0.0239
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0006,
+            "p5": 0.0006,
+            "median": 0.0189,
+            "p95": 0.0877,
+            "max": 0.0877
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.0014,
+            "p5": 0.0014,
+            "median": 0.0048,
+            "p95": 0.01,
+            "max": 0.01
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0004,
+            "p5": 0.0004,
+            "median": 0.0055,
+            "p95": 0.0141,
+            "max": 0.0141
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0004,
+            "p5": 0.0004,
+            "median": 0.0093,
+            "p95": 0.024,
+            "max": 0.024
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0006,
+            "p5": 0.0006,
+            "median": 0.0026,
+            "p95": 0.0085,
+            "max": 0.0085
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0015,
+            "p5": 0.0015,
+            "median": 0.0058,
+            "p95": 0.018,
+            "max": 0.018
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0077,
+            "p95": 0.0155,
+            "max": 0.0155
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 27.7109,
+            "p5": 27.7109,
+            "median": 29.6592,
+            "p95": 33.731,
+            "max": 33.731
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s11 incl 50",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.6659",
+                "position angle -29.84°"
+              ]
+            },
+            {
+              "config": "Plates slipped s2 incl 50",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.7050",
+                "position angle -29.55°"
+              ]
+            },
+            {
+              "config": "Plates slipped s21 incl 50",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.6317",
+                "position angle -31.18°"
+              ]
+            },
+            {
+              "config": "Plates slipped s3 incl 50",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.7389",
+                "position angle -29.02°"
+              ]
+            }
+          ]
+        },
+        "orbit 35°": {
+          "applicable": 12,
+          "detected": 12,
+          "missed": [],
+          "ssim": {
+            "n": 12,
+            "min": 0.2215,
+            "p5": 0.2215,
+            "median": 0.2369,
+            "p95": 0.2884,
+            "max": 0.2884
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.5079,
+            "p5": 0.5079,
+            "median": 0.621,
+            "p95": 0.688,
+            "max": 0.688
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.1755,
+            "p5": 0.1755,
+            "median": 0.2008,
+            "p95": 0.251,
+            "max": 0.251
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0.0042,
+            "p5": 0.0042,
+            "median": 0.0087,
+            "p95": 0.07,
+            "max": 0.07
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0203,
+            "p5": 0.0203,
+            "median": 0.0856,
+            "p95": 0.2512,
+            "max": 0.2512
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.0959,
+            "p5": 0.0959,
+            "median": 0.1347,
+            "p95": 0.1805,
+            "max": 0.1805
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0495,
+            "p5": 0.0495,
+            "median": 0.0937,
+            "p95": 0.1759,
+            "max": 0.1759
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0079,
+            "p5": 0.0079,
+            "median": 0.0173,
+            "p95": 0.0609,
+            "max": 0.0609
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0023,
+            "p5": 0.0023,
+            "median": 0.0049,
+            "p95": 0.0196,
+            "max": 0.0196
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.2009,
+            "p5": 0.2009,
+            "median": 0.2623,
+            "p95": 0.345,
+            "max": 0.345
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.1777,
+            "p5": 0.1777,
+            "median": 0.2243,
+            "p95": 0.2806,
+            "max": 0.2806
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 0.8578,
+            "p5": 0.8578,
+            "median": 4.5616,
+            "p95": 7.7265,
+            "max": 7.7265
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s11 incl 50",
+              "failed": true,
+              "by": [
+                "ink -17.73%",
+                "coarse ssim 0.6880",
+                "r25 -11.31%",
+                "r50 -6.76%",
+                "axis ratio -0.2009",
+                "inner axis ratio -0.1959",
+                "position angle 4.09°"
+              ]
+            },
+            {
+              "config": "Plates slipped s2 incl 50",
+              "failed": true,
+              "by": [
+                "ink -20.59%",
+                "coarse ssim 0.6489",
+                "r25 -12.45%",
+                "r50 -6.92%",
+                "axis ratio -0.2094",
+                "inner axis ratio -0.2193"
+              ]
+            },
+            {
+              "config": "Plates slipped s21 incl 50",
+              "failed": true,
+              "by": [
+                "ink -20.08%",
+                "coarse ssim 0.6249",
+                "p90 width 10.89%",
+                "r25 -10.07%",
+                "r50 -8.11%",
+                "axis ratio -0.2546",
+                "inner axis ratio -0.2358",
+                "position angle 4.27°"
+              ]
+            },
+            {
+              "config": "Plates slipped s3 incl 50",
+              "failed": true,
+              "by": [
+                "ink -17.55%",
+                "coarse ssim 0.6718",
+                "r25 -13.47%",
+                "r50 -5.05%",
+                "axis ratio -0.2338",
+                "inner axis ratio -0.2342",
+                "position angle 4.56°"
+              ]
+            }
+          ]
+        }
+      },
+      "v21Reroll": null
+    },
+    "slip@zoom": {
+      "engineRekey": {
+        "ssim": {
+          "n": 36,
+          "min": 0.2019,
+          "p5": 0.2032,
+          "median": 0.2539,
+          "p95": 0.2997,
+          "max": 0.3024
+        },
+        "ssimCoarse": {
+          "n": 36,
+          "min": 0.7914,
+          "p5": 0.7927,
+          "median": 0.8333,
+          "p95": 0.8644,
+          "max": 0.8665
+        },
+        "inkAbs": {
+          "n": 36,
+          "min": 0.0002,
+          "p5": 0.0002,
+          "median": 0.006,
+          "p95": 0.0213,
+          "max": 0.0236
+        },
+        "medianAbs": {
+          "n": 36,
+          "min": 0.0001,
+          "p5": 0.0001,
+          "median": 0.0031,
+          "p95": 0.0124,
+          "max": 0.0148
+        },
+        "p90Abs": {
+          "n": 36,
+          "min": 0.0002,
+          "p5": 0.0005,
+          "median": 0.0071,
+          "p95": 0.0186,
+          "max": 0.0198
+        },
+        "r25Abs": {
+          "n": 36,
+          "min": 0.0002,
+          "p5": 0.0004,
+          "median": 0.0072,
+          "p95": 0.0269,
+          "max": 0.0288
+        },
+        "r50Abs": {
+          "n": 36,
+          "min": 0.0004,
+          "p5": 0.0005,
+          "median": 0.0071,
+          "p95": 0.0231,
+          "max": 0.0257
+        },
+        "r90Abs": {
+          "n": 36,
+          "min": 0,
+          "p5": 0.0005,
+          "median": 0.0033,
+          "p95": 0.0144,
+          "max": 0.015
+        },
+        "outerAbs": {
+          "n": 36,
+          "min": 0.0001,
+          "p5": 0.0003,
+          "median": 0.0021,
+          "p95": 0.0084,
+          "max": 0.0089
+        },
+        "qAbs": {
+          "n": 36,
+          "min": 0.0001,
+          "p5": 0.0005,
+          "median": 0.0069,
+          "p95": 0.0198,
+          "max": 0.0224
+        },
+        "qInnerAbs": {
+          "n": 36,
+          "min": 0.0005,
+          "p5": 0.0006,
+          "median": 0.0083,
+          "p95": 0.0218,
+          "max": 0.0234
+        },
+        "paAbs": {
+          "n": 36,
+          "min": 0.2265,
+          "p5": 0.2351,
+          "median": 2.5981,
+          "p95": 21.7382,
+          "max": 48.7126
+        }
+      },
+      "negativeControls": {
+        "pa +90°": {
+          "applicable": 12,
+          "detected": 12,
+          "missed": [],
+          "ssim": {
+            "n": 12,
+            "min": 0.0818,
+            "p5": 0.0818,
+            "median": 0.1113,
+            "p95": 0.1452,
+            "max": 0.1452
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.2142,
+            "p5": 0.2142,
+            "median": 0.3555,
+            "p95": 0.4776,
+            "max": 0.4776
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.004,
+            "p5": 0.004,
+            "median": 0.0052,
+            "p95": 0.0238,
+            "max": 0.0238
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0.0004,
+            "p5": 0.0004,
+            "median": 0.0042,
+            "p95": 0.0188,
+            "max": 0.0188
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0007,
+            "p5": 0.0007,
+            "median": 0.0082,
+            "p95": 0.0166,
+            "max": 0.0166
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.008,
+            "p95": 0.0259,
+            "max": 0.0259
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.001,
+            "p5": 0.001,
+            "median": 0.0065,
+            "p95": 0.0228,
+            "max": 0.0228
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0006,
+            "p5": 0.0006,
+            "median": 0.0039,
+            "p95": 0.0077,
+            "max": 0.0077
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0029,
+            "p95": 0.0052,
+            "max": 0.0052
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.001,
+            "p5": 0.001,
+            "median": 0.007,
+            "p95": 0.0211,
+            "max": 0.0211
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0016,
+            "p5": 0.0016,
+            "median": 0.0096,
+            "p95": 0.0173,
+            "max": 0.0173
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 67.2786,
+            "p5": 67.2786,
+            "median": 85.9723,
+            "p95": 89.6682,
+            "max": 89.6682
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s5 incl 30 zoom 2",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.2692",
+                "position angle 87.59°"
+              ]
+            },
+            {
+              "config": "Plates slipped s9 incl 30 zoom 2",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.4101",
+                "position angle 89.56°"
+              ]
+            },
+            {
+              "config": "Plates slipped (single) s4242 incl 30 zoom 2",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.2799",
+                "position angle -88.21°"
+              ]
+            },
+            {
+              "config": "Plates slipped s11 incl 30 zoom 2",
+              "failed": true,
+              "by": [
+                "coarse ssim 0.3466",
+                "position angle -89.67°"
+              ]
+            }
+          ]
+        },
+        "halo off": {
+          "applicable": 12,
+          "detected": 1,
+          "missed": [
+            "Plates slipped s5 incl 30 zoom 2",
+            "Plates slipped s9 incl 30 zoom 2",
+            "Plates slipped (single) s4242 incl 30 zoom 2",
+            "Plates slipped s11 incl 30 zoom 2",
+            "Plates slipped s2 incl 30 zoom 2",
+            "Plates slipped s3 incl 30 zoom 2",
+            "Plates slipped s1 incl 30 zoom 2",
+            "Plates slipped s17 incl 30 zoom 2",
+            "Plates slipped s19 incl 30 zoom 2",
+            "Plates slipped s13 incl 30 zoom 2",
+            "Plates slipped (single) s7 incl 30 zoom 2"
+          ],
+          "ssim": {
+            "n": 12,
+            "min": 0.2038,
+            "p5": 0.2038,
+            "median": 0.2527,
+            "p95": 0.297,
+            "max": 0.297
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.8025,
+            "p5": 0.8025,
+            "median": 0.8329,
+            "p95": 0.8645,
+            "max": 0.8645
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.0094,
+            "p95": 0.0293,
+            "max": 0.0293
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0034,
+            "p95": 0.0133,
+            "max": 0.0133
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0007,
+            "p5": 0.0007,
+            "median": 0.0046,
+            "p95": 0.0144,
+            "max": 0.0144
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.0099,
+            "p5": 0.0099,
+            "median": 0.021,
+            "p95": 0.0442,
+            "max": 0.0442
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0011,
+            "p5": 0.0011,
+            "median": 0.0087,
+            "p95": 0.0314,
+            "max": 0.0314
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0008,
+            "p5": 0.0008,
+            "median": 0.0041,
+            "p95": 0.0089,
+            "max": 0.0089
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0007,
+            "p5": 0.0007,
+            "median": 0.0028,
+            "p95": 0.0062,
+            "max": 0.0062
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0004,
+            "p5": 0.0004,
+            "median": 0.0059,
+            "p95": 0.0224,
+            "max": 0.0224
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.007,
+            "p95": 0.0163,
+            "max": 0.0163
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 0.0787,
+            "p5": 0.0787,
+            "median": 2.1306,
+            "p95": 22.572,
+            "max": 22.572
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s5 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s9 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped (single) s4242 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s11 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            }
+          ]
+        },
+        "RMAX 4.2": {
+          "applicable": 12,
+          "detected": 0,
+          "missed": [
+            "Plates slipped s5 incl 30 zoom 2",
+            "Plates slipped s9 incl 30 zoom 2",
+            "Plates slipped (single) s4242 incl 30 zoom 2",
+            "Plates slipped s11 incl 30 zoom 2",
+            "Plates slipped s2 incl 30 zoom 2",
+            "Plates slipped s21 incl 30 zoom 2",
+            "Plates slipped s3 incl 30 zoom 2",
+            "Plates slipped s1 incl 30 zoom 2",
+            "Plates slipped s17 incl 30 zoom 2",
+            "Plates slipped s19 incl 30 zoom 2",
+            "Plates slipped s13 incl 30 zoom 2",
+            "Plates slipped (single) s7 incl 30 zoom 2"
+          ],
+          "ssim": {
+            "n": 12,
+            "min": 0.2038,
+            "p5": 0.2038,
+            "median": 0.2509,
+            "p95": 0.2987,
+            "max": 0.2987
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.7951,
+            "p5": 0.7951,
+            "median": 0.8333,
+            "p95": 0.8657,
+            "max": 0.8657
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.0114,
+            "p5": 0.0114,
+            "median": 0.0269,
+            "p95": 0.0477,
+            "max": 0.0477
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0.0001,
+            "p5": 0.0001,
+            "median": 0.0026,
+            "p95": 0.0105,
+            "max": 0.0105
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0012,
+            "p5": 0.0012,
+            "median": 0.0079,
+            "p95": 0.0217,
+            "max": 0.0217
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.0084,
+            "p5": 0.0084,
+            "median": 0.0146,
+            "p95": 0.0326,
+            "max": 0.0326
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0025,
+            "p5": 0.0025,
+            "median": 0.0063,
+            "p95": 0.0274,
+            "max": 0.0274
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0004,
+            "p5": 0.0004,
+            "median": 0.004,
+            "p95": 0.0094,
+            "max": 0.0094
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0026,
+            "p95": 0.0065,
+            "max": 0.0065
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0,
+            "p5": 0,
+            "median": 0.0059,
+            "p95": 0.0234,
+            "max": 0.0234
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0019,
+            "p5": 0.0019,
+            "median": 0.0073,
+            "p95": 0.0172,
+            "max": 0.0172
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 0.1461,
+            "p5": 0.1461,
+            "median": 1.9034,
+            "p95": 23.4813,
+            "max": 23.4813
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s5 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s9 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped (single) s4242 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s11 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            }
+          ]
+        },
+        "thick ×3": {
+          "applicable": 12,
+          "detected": 0,
+          "missed": [
+            "Plates slipped s5 incl 30 zoom 2",
+            "Plates slipped s9 incl 30 zoom 2",
+            "Plates slipped (single) s4242 incl 30 zoom 2",
+            "Plates slipped s11 incl 30 zoom 2",
+            "Plates slipped s2 incl 30 zoom 2",
+            "Plates slipped s21 incl 30 zoom 2",
+            "Plates slipped s3 incl 30 zoom 2",
+            "Plates slipped s1 incl 30 zoom 2",
+            "Plates slipped s17 incl 30 zoom 2",
+            "Plates slipped s19 incl 30 zoom 2",
+            "Plates slipped s13 incl 30 zoom 2",
+            "Plates slipped (single) s7 incl 30 zoom 2"
+          ],
+          "ssim": {
+            "n": 12,
+            "min": 0.1942,
+            "p5": 0.1942,
+            "median": 0.2435,
+            "p95": 0.2915,
+            "max": 0.2915
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.7873,
+            "p5": 0.7873,
+            "median": 0.8232,
+            "p95": 0.8497,
+            "max": 0.8497
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.0005,
+            "p5": 0.0005,
+            "median": 0.0097,
+            "p95": 0.0371,
+            "max": 0.0371
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.003,
+            "p95": 0.0136,
+            "max": 0.0136
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.0003,
+            "p5": 0.0003,
+            "median": 0.0101,
+            "p95": 0.023,
+            "max": 0.023
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.0002,
+            "p5": 0.0002,
+            "median": 0.0093,
+            "p95": 0.0282,
+            "max": 0.0282
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0005,
+            "p5": 0.0005,
+            "median": 0.008,
+            "p95": 0.0268,
+            "max": 0.0268
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0016,
+            "p5": 0.0016,
+            "median": 0.0042,
+            "p95": 0.0074,
+            "max": 0.0074
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.0007,
+            "p5": 0.0007,
+            "median": 0.0024,
+            "p95": 0.0047,
+            "max": 0.0047
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0026,
+            "p5": 0.0026,
+            "median": 0.0064,
+            "p95": 0.0152,
+            "max": 0.0152
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0007,
+            "p5": 0.0007,
+            "median": 0.0075,
+            "p95": 0.0236,
+            "max": 0.0236
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 0.6844,
+            "p5": 0.6844,
+            "median": 2.2341,
+            "p95": 22.7894,
+            "max": 22.7894
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s5 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s9 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped (single) s4242 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            },
+            {
+              "config": "Plates slipped s11 incl 30 zoom 2",
+              "failed": false,
+              "by": []
+            }
+          ]
+        },
+        "dot size ×1.3": {
+          "applicable": 12,
+          "detected": 12,
+          "missed": [],
+          "ssim": {
+            "n": 12,
+            "min": 0.1573,
+            "p5": 0.1573,
+            "median": 0.1928,
+            "p95": 0.2282,
+            "max": 0.2282
+          },
+          "ssimCoarse": {
+            "n": 12,
+            "min": 0.7042,
+            "p5": 0.7042,
+            "median": 0.7285,
+            "p95": 0.7629,
+            "max": 0.7629
+          },
+          "inkAbs": {
+            "n": 12,
+            "min": 0.3507,
+            "p5": 0.3507,
+            "median": 0.4003,
+            "p95": 0.4206,
+            "max": 0.4206
+          },
+          "medianAbs": {
+            "n": 12,
+            "min": 0.1563,
+            "p5": 0.1563,
+            "median": 0.2181,
+            "p95": 0.2802,
+            "max": 0.2802
+          },
+          "p90Abs": {
+            "n": 12,
+            "min": 0.3264,
+            "p5": 0.3264,
+            "median": 0.4004,
+            "p95": 0.5252,
+            "max": 0.5252
+          },
+          "r25Abs": {
+            "n": 12,
+            "min": 0.049,
+            "p5": 0.049,
+            "median": 0.0827,
+            "p95": 0.1,
+            "max": 0.1
+          },
+          "r50Abs": {
+            "n": 12,
+            "min": 0.0165,
+            "p5": 0.0165,
+            "median": 0.0428,
+            "p95": 0.0665,
+            "max": 0.0665
+          },
+          "r90Abs": {
+            "n": 12,
+            "min": 0.0047,
+            "p5": 0.0047,
+            "median": 0.0168,
+            "p95": 0.026,
+            "max": 0.026
+          },
+          "outerAbs": {
+            "n": 12,
+            "min": 0.004,
+            "p5": 0.004,
+            "median": 0.0116,
+            "p95": 0.0173,
+            "max": 0.0173
+          },
+          "qAbs": {
+            "n": 12,
+            "min": 0.0004,
+            "p5": 0.0004,
+            "median": 0.0072,
+            "p95": 0.0176,
+            "max": 0.0176
+          },
+          "qInnerAbs": {
+            "n": 12,
+            "min": 0.0022,
+            "p5": 0.0022,
+            "median": 0.0118,
+            "p95": 0.0321,
+            "max": 0.0321
+          },
+          "paAbs": {
+            "n": 12,
+            "min": 0.5761,
+            "p5": 0.5761,
+            "median": 2.7726,
+            "p95": 24.9577,
+            "max": 24.9577
+          },
+          "firstFailures": [
+            {
+              "config": "Plates slipped s5 incl 30 zoom 2",
+              "failed": true,
+              "by": [
+                "ink 41.14%",
+                "coarse ssim 0.7244",
+                "median width 16.59%",
+                "p90 width 40.04%",
+                "r25 7.48%",
+                "r50 4.84%"
+              ]
+            },
+            {
+              "config": "Plates slipped s9 incl 30 zoom 2",
+              "failed": true,
+              "by": [
+                "ink 36.31%",
+                "coarse ssim 0.7277",
+                "median width 18.89%",
+                "p90 width 40.26%",
+                "r25 8.46%",
+                "r50 4.11%"
+              ]
+            },
+            {
+              "config": "Plates slipped (single) s4242 incl 30 zoom 2",
+              "failed": true,
+              "by": [
+                "ink 41.52%",
+                "coarse ssim 0.7629",
+                "median width 19.29%",
+                "p90 width 38.53%",
+                "r25 6.88%"
+              ]
+            },
+            {
+              "config": "Plates slipped s11 incl 30 zoom 2",
+              "failed": true,
+              "by": [
+                "ink 40.68%",
+                "coarse ssim 0.7332",
+                "median width 24.70%",
+                "p90 width 46.78%",
+                "r25 8.27%",
+                "r50 4.28%",
+                "outer ink 1.40%"
+              ]
+            }
+          ]
+        }
+      },
       "v21Reroll": null
     }
   }
