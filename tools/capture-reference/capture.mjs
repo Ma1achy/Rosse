@@ -389,6 +389,8 @@ async function main() {
         seed: c.seed,
         chalk: c.surface === 'chalkboard',
         ...(c.variant ? { variant: c.variant, overrides: c.overrides } : {}),
+        // a real galaxy (M12) is drawn from its votes, not from a preset
+        ...(c.real != null ? { real: c.real } : {}),
         cameras: c.camera === 'orbit' ? ['home', 'orbit'] : [c.camera],
         keep: c.camera,
         redraw: k + 1,
