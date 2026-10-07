@@ -16,6 +16,16 @@ describe('the 42 real galaxies', () => {
     expect(new Set(cards.map((c) => c.photoUrl)).size).toBe(42);
   });
 
+  it('carries the attribution in every card (credit, licence link, changes, SDSS)', () => {
+    for (const c of cards) {
+      expect(c.attribution.licence.url).toBe('https://creativecommons.org/licenses/by/4.0/');
+      expect(c.attribution.credit).toContain('Galaxy Zoo 2');
+      expect(c.attribution.changes).toMatch(/^Changed:/);
+      expect(c.attribution.sdss).toContain('Sloan Digital Sky Survey');
+      expect(c.attribution.text).toContain(c.attribution.licence.url);
+    }
+  });
+
   it('draws what the photo measures', () => {
     for (const c of cards) {
       expect(c.drawnPa).toBe(Math.round(c.photoPa));

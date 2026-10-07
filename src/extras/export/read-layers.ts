@@ -33,7 +33,7 @@ export async function readBuffer(
   return copy;
 }
 
-/** A draw count from indirect arguments the buffer allows reading, else the layer's own count. */
+/** A draw count from indirect arguments. An unreadable argument buffer is an error, not a guess. */
 async function indirectWord(
   device: GPUDevice,
   buffer: GPUBuffer | undefined,
@@ -41,7 +41,9 @@ async function indirectWord(
   word: number,
   fallback: number,
 ): Promise<number> {
-  if (!buffer || !(buffer.usage & GPUBufferUsage.COPY_SRC)) return fallback;
+  if (!buffer) return fallback;
+  if (!(buffer.usage & GPUBufferUsage.COPY_SRC))
+    throw new Error(`the draw arguments "${buffer.label}" cannot be read back (no COPY_SRC)`);
   const a = new Uint32Array(await readBuffer(device, buffer, offset, 16));
   return a[word] ?? 0;
 }
@@ -51,7 +53,7 @@ function common(l: InkLayer) {
   return {
     gain: l.gain,
     ...(l.pop ? { pop: l.pop } : {}),
-    ...(l.svgLayer ? { svgLayer: l.svgLayer } : {}),
+    ...(l.kind.endsWith('sprites') && l.svgLayer ? { svgLayer: l.svgLayer } : {}),
   };
 }
 

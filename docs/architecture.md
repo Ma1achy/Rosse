@@ -41,6 +41,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0042](adr/0042-the-debris-of-a-merger-as-marks.md) | _Proposed:_ the debris of a merger as marks: classified on the counter RNG, thinned as v21 thins it, and what v21 builds and never draws is not built |
 | [0043](adr/0043-shells-on-the-gpu-detected-by-atomics-and-bisection.md) | _Proposed:_ shell galaxies: the satellite on the GPU, the shells found by integer atomics and a bisection, the arcs through a face-on camera |
 | [0044](adr/0044-m8-acceptance-overrides-and-the-merger-and-shell-thresholds.md) | _Proposed:_ the M8 goldens' overrides, and the thresholds of the merger and shell families |
+| [0060](adr/0060-the-real-galaxies-are-their-own-golden-family.md) | _Accepted (owner, 2026-10-07):_ the real galaxies are their own golden family (`real`), calibrated on engine re-draws of the 20 captures and one held-out seed |
 
 ## Modules
 

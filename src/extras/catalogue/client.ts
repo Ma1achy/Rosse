@@ -21,6 +21,7 @@ type Distribute<T> = T extends unknown ? Omit<T, 'id'> : never;
 export class CatalogueClient {
   private worker: Worker | null = null;
   private nextId = 1;
+  private loaded: { url: string; promise: Promise<LoadStats> } | null = null;
   private readonly pending = new Map<
     number,
     { ok: (v: unknown) => void; err: (e: Error) => void }
@@ -35,6 +36,21 @@ export class CatalogueClient {
       if (e.data.ok) p.ok(e.data.result);
       else p.err(new Error(e.data.error));
     };
+    // a crash of the worker, or a message it cannot read: nothing more will come, so every request
+    // waiting (and every one after) fails instead of hanging
+    this.worker.onerror = (e) => {
+      this.fail(new Error(`the catalogue worker failed: ${e.message || 'no message'}`));
+    };
+    this.worker.onmessageerror = () => {
+      this.fail(new Error('the catalogue worker sent a message that could not be read'));
+    };
+  }
+
+  private fail(error: Error): void {
+    this.worker?.terminate();
+    this.worker = null;
+    for (const p of this.pending.values()) p.err(error);
+    this.pending.clear();
   }
 
   private call<T>(req: Distribute<Request>): Promise<T> {
@@ -47,9 +63,16 @@ export class CatalogueClient {
     });
   }
 
-  /** Fetch and decode the catalogue at `url` (once). */
+  /** Fetch and decode the catalogue at `url`. Idempotent: calling again returns the same promise. */
   load(url: string): Promise<LoadStats> {
-    return this.call({ op: 'load', url });
+    if (this.loaded?.url !== url) {
+      const promise = this.call<LoadStats>({ op: 'load', url });
+      this.loaded = { url, promise };
+      promise.catch(() => {
+        if (this.loaded?.promise === promise) this.loaded = null;
+      });
+    }
+    return (this.loaded as { promise: Promise<LoadStats> }).promise;
   }
   /** One galaxy with its drawing parameters and caption. */
   card(index: number): Promise<GalaxyCard> {

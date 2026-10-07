@@ -35,9 +35,16 @@ export const GALAXY_TYPES = {
 export type GalaxyType = keyof typeof GALAXY_TYPES;
 export const GALAXY_TYPE_NAMES = Object.keys(GALAXY_TYPES) as GalaxyType[];
 
+/** A type's test; an unknown name is an error, not "no filter". */
+function testOf(type: string): Test {
+  if (!Object.hasOwn(GALAXY_TYPES, type))
+    throw new RangeError(`unknown type ${JSON.stringify(type)}`);
+  return GALAXY_TYPES[type as GalaxyType];
+}
+
 /** The indices of every galaxy of a type, ascending. */
 export function ofType(cat: Catalogue, type: GalaxyType, limit = Infinity): number[] {
-  const f: Test = GALAXY_TYPES[type];
+  const f = testOf(type);
   const out: number[] = [];
   for (let i = 0; i < cat.n && out.length < limit; i++) if (f(i, cat.cols)) out.push(i);
   return out;
@@ -48,7 +55,7 @@ export function ofType(cat: Catalogue, type: GalaxyType, limit = Infinity): numb
  * @param rand a uniform [0, 1) source, e.g. `Math.random`
  */
 export function randomOf(cat: Catalogue, type: GalaxyType, rand: () => number): number | null {
-  const f: Test = GALAXY_TYPES[type];
+  const f = testOf(type);
   let count = 0;
   for (let i = 0; i < cat.n; i++) if (f(i, cat.cols)) count++;
   if (!count) return null;
@@ -71,17 +78,23 @@ export function indexOfObjid(cat: Catalogue, id: bigint): number {
   return -1;
 }
 
+/** The difference of two right ascensions in degrees, across 0/360: in [-180, 180). */
+export function raDiff(a: number, b: number): number {
+  return ((((a - b) % 360) + 540) % 360) - 180;
+}
+
 /** The galaxy nearest a position (degrees), by v21's flat metric (RA scaled by cos Dec). */
 export function nearest(
   cat: Catalogue,
   ra: number,
   dec: number,
 ): { index: number; arcsec: number } | null {
+  if (!Number.isFinite(ra) || !Number.isFinite(dec)) return null;
   let best = -1;
   let bd = 1e9;
   const cd = Math.cos((dec * Math.PI) / 180);
   for (let k = 0; k < cat.n; k++) {
-    const dx = ((cat.ra[k] as number) - ra) * cd;
+    const dx = raDiff(cat.ra[k] as number, ra) * cd;
     const dy = (cat.dec[k] as number) - dec;
     const d = dx * dx + dy * dy;
     if (d < bd) {
@@ -152,6 +165,29 @@ export interface QueryResult {
 
 /** Filter the catalogue: type, field ranges and a cone, with paging. One scan of 240k rows. */
 export function filter(cat: Catalogue, q: Query): QueryResult {
+  if (q.type !== undefined && !Object.hasOwn(GALAXY_TYPES, q.type))
+    throw new RangeError(`unknown type ${JSON.stringify(q.type)}`);
+  // a NaN makes every comparison false, which would let every galaxy through: refuse it
+  const numbers: [string, number | undefined][] = [
+    ['offset', q.offset],
+    ['limit', q.limit],
+    ['cone.ra', q.cone?.ra],
+    ['cone.dec', q.cone?.dec],
+    ['cone.radiusArcsec', q.cone?.radiusArcsec],
+    ...(q.where ?? []).flatMap((c): [string, number | undefined][] => [
+      [`${c.field} min`, c.min],
+      [`${c.field} max`, c.max],
+    ]),
+  ];
+  for (const [name, v] of numbers)
+    if (v !== undefined && Number.isNaN(v)) throw new RangeError(`${name} is not a number`);
+  for (const c of q.where ?? [])
+    if (!Object.hasOwn(cat.cols, c.field))
+      throw new RangeError(`unknown field ${JSON.stringify(c.field)}`);
+  if (q.cone && !(q.cone.radiusArcsec >= 0 && Math.abs(q.cone.dec) <= 90))
+    throw new RangeError(
+      'the cone needs a radius of at least 0 and a declination within 90 degrees',
+    );
   const test: Test | null = q.type ? GALAXY_TYPES[q.type] : null;
   const where = q.where ?? [];
   const cone = q.cone;
@@ -164,7 +200,7 @@ export function filter(cat: Catalogue, q: Query): QueryResult {
   scan: for (let i = 0; i < cat.n; i++) {
     if (test && !test(i, cat.cols)) continue;
     if (cone) {
-      const dx = ((cat.ra[i] as number) - cone.ra) * cd;
+      const dx = raDiff(cat.ra[i] as number, cone.ra) * cd;
       const dy = (cat.dec[i] as number) - cone.dec;
       if (dx * dx + dy * dy > r2) continue;
     }

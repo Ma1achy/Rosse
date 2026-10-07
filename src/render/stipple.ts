@@ -409,6 +409,11 @@ export class GpuStipple {
   /** the camera of the last view (the cores are placed for it) */
   private camera: Camera | null = null;
 
+  /** The camera of the last view tier that ran (the SVG export lays the placed drawings out for it). */
+  get lastCamera(): Camera | null {
+    return this.camera;
+  }
+
   /**
    * The drawn core and nuclear spiral of a merging galaxy: placed on the CPU for the view as ever,
    * then carried by the tides on the GPU (v21: `inst(L.cores, …)`, app23.js:L1028, goes through SM).

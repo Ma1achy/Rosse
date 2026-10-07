@@ -8,6 +8,9 @@ import { CpuStipple } from '../../src/fallback/stipple';
 import {
   cubePalette,
   encodeGif,
+  encodeIndexed,
+  gifColours,
+  SURFACE_INDEX,
   frameTime,
   gifDelayCs,
   gifEncode,
@@ -26,10 +29,8 @@ import { loadAtlases, loadVectors, metaOf } from '../golden/compare/engine-cpu';
 import { decodeGif } from './support/gif-decode';
 
 const ROOT = join(import.meta.dirname, '../..');
-const PAPER: Rgb = [226, 217, 198];
-const INK: Rgb = [29, 27, 25];
-const CHALK_PAPER: Rgb = [38, 40, 36];
-const CHALK_INK: Rgb = [236, 228, 210];
+const { paper: PAPER, ink: INK } = gifColours('paper');
+const { paper: CHALK_PAPER, ink: CHALK_INK } = gifColours('chalk');
 
 describe("v21's frame timing", () => {
   it('spaces the frames from 0 to just short of the end, so the GIF loops', () => {
@@ -86,7 +87,7 @@ describe('the palettes', () => {
       expect(q[4]).toBe(255);
     }
   });
-  it('maps the colour modes through the cube', () => {
+  it('maps the colour modes through the cube, and an empty plate to the surface entry', () => {
     const px = new Uint8ClampedArray([0, 0, 0, 0, 255, 0, 0, 255]);
     const q = quantiseFrame(px, {
       width: 2,
@@ -95,8 +96,22 @@ describe('the palettes', () => {
       ink: INK,
       mode: 'cube',
     });
-    expect(q[0]).toBe(5 * 42 + 6 * 6 + 5); // empty over a white surface: white
+    expect(q[0]).toBe(SURFACE_INDEX);
     expect(q[1]).toBe(5 * 42); // opaque red
+    // over the engine's real surfaces, an empty plate is the surface and nothing else
+    for (const surface of ['paper', 'chalk'] as const) {
+      const { paper, ink } = gifColours(surface);
+      const empty = new Uint8ClampedArray(4 * 4);
+      expect(
+        Array.from(quantiseFrame(empty, { width: 4, height: 1, paper, ink, mode: 'cube' })),
+      ).toEqual([252, 252, 252, 252]);
+      // a faint ink is a cube colour, and the surface entry decodes to the surface itself
+      const faint = new Uint8ClampedArray([1, 1, 1, 2]);
+      expect(quantiseFrame(faint, { width: 1, height: 1, paper, ink, mode: 'cube' })[0]).not.toBe(
+        252,
+      );
+      expect(cubePalette(paper)[SURFACE_INDEX]).toEqual(paper);
+    }
   });
 });
 
@@ -127,6 +142,13 @@ describe('the encoder', () => {
       expect(f.delayCs).toBe(9);
       expect(Array.from(f.pixels)).toEqual(Array.from(frames[i] as Uint8Array));
     });
+  });
+
+  it('quantises and encodes in one go as it does in two', () => {
+    const w = 8;
+    const px = new Uint8ClampedArray(w * w * 4).map((_, i) => (i * 37) % 256);
+    const spec: GifSpec = { width: w, height: w, paper: PAPER, ink: INK, mode: 'ramp', delayCs: 5 };
+    expect(encodeGif([px], spec)).toEqual(encodeIndexed([quantiseFrame(px, spec)], spec));
   });
 
   it('refuses a frame of the wrong size', () => {
@@ -164,7 +186,7 @@ describe('a GIF of the CPU engine: its frames are single renders at those moment
       const bytes = await recordGif(
         { width: S, height: S, frame: (t) => Promise.resolve(render(t)) },
         { frames: n, end, speed: 1, paper, ink, mode: 'ramp' },
-        (frames, spec: GifSpec) => encodeGif(frames, spec),
+        (frames, spec: GifSpec) => encodeIndexed(frames, spec),
       );
       const gif = decodeGif(bytes);
       expect(gif.frames).toHaveLength(n);
@@ -236,7 +258,7 @@ describe('the merger timeline as a GIF (M8)', () => {
     const bytes = await recordGif(
       src,
       { frames: n, end, speed: 1, paper: PAPER, ink: INK, mode: 'ramp' },
-      (frames, spec: GifSpec) => encodeGif(frames, spec),
+      (frames, spec: GifSpec) => encodeIndexed(frames, spec),
     );
     const gif = decodeGif(bytes);
     expect(gif.frames).toHaveLength(n);
@@ -265,4 +287,83 @@ describe('the merger timeline as a GIF (M8)', () => {
       ).toBeGreaterThan(500);
     }
   }, 300_000);
+});
+
+describe('recording a GIF', () => {
+  const rec = { frames: 6, end: 2, speed: 1, paper: PAPER, ink: INK, mode: 'ramp' } as const;
+  const flat = (w: number, h: number) => (t: number) =>
+    Promise.resolve(new Uint8ClampedArray(w * h * 4).fill(Math.round(t * 100)));
+
+  it('quantises each frame as it arrives: the encoder holds one byte a pixel, not four', async () => {
+    const w = 64;
+    const h = 48;
+    let seen: readonly Uint8Array[] = [];
+    await recordGif({ width: w, height: h, frame: flat(w, h) }, rec, (frames, spec) => {
+      seen = frames;
+      return encodeIndexed(frames, spec);
+    });
+    expect(seen).toHaveLength(6);
+    const held = seen.reduce((a, f) => a + f.byteLength, 0);
+    expect(held).toBe(6 * w * h);
+    // v21's largest recording, 640 px and 120 frames, is 49 MB of indices (the RGBA frames were 197 MB)
+    expect(120 * 640 * 640).toBeLessThan(50e6);
+    for (const f of seen) expect(f.constructor).toBe(Uint8Array);
+  });
+
+  it('refuses a second recording while one runs, and runs `done` however it ends', async () => {
+    let finished = 0;
+    const slow = {
+      width: 8,
+      height: 8,
+      frame: async (t: number) => {
+        await new Promise((ok) => setTimeout(ok, 20));
+        return flat(8, 8)(t);
+      },
+    };
+    const first = recordGif(
+      slow,
+      rec,
+      (f, s) => encodeIndexed(f, s),
+      undefined,
+      () => {
+        finished++;
+      },
+    );
+    await expect(recordGif(slow, rec, (f, s) => encodeIndexed(f, s))).rejects.toThrow(/already/);
+    await first;
+    expect(finished).toBe(1);
+    // a failing source: the busy flag is released and `done` still runs
+    await expect(
+      recordGif(
+        { width: 8, height: 8, frame: () => Promise.reject(new Error('no frame')) },
+        rec,
+        (f, s) => encodeIndexed(f, s),
+        undefined,
+        () => {
+          finished++;
+        },
+      ),
+    ).rejects.toThrow('no frame');
+    expect(finished).toBe(2);
+    await recordGif({ width: 8, height: 8, frame: flat(8, 8) }, rec, (f, s) => encodeIndexed(f, s));
+  });
+
+  it('rejects sizes, delays and frames a GIF cannot hold', async () => {
+    const enc = (f: readonly Uint8Array[], s: GifSpec) => encodeIndexed(f, s);
+    await expect(recordGif({ width: 0, height: 0, frame: flat(0, 0) }, rec, enc)).rejects.toThrow(
+      /pixels/,
+    );
+    await expect(
+      recordGif({ width: 70000, height: 4, frame: flat(1, 1) }, rec, enc),
+    ).rejects.toThrow(/pixels/);
+    await expect(
+      recordGif({ width: 4, height: 4, frame: flat(4, 4) }, { ...rec, speed: 0.0001 }, enc),
+    ).rejects.toThrow(/delay/);
+    await expect(recordGif({ width: 4, height: 4, frame: flat(3, 3) }, rec, enc)).rejects.toThrow(
+      /RGBA/,
+    );
+    await expect(
+      recordGif({ width: 4, height: 4, frame: flat(4, 4) }, { ...rec, frames: 0 }, enc),
+    ).rejects.toThrow();
+  });
 });

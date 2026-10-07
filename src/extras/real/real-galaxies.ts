@@ -18,6 +18,7 @@
  * `photoQ`, `photoPa`) beside what the drawing uses (`drawnPa`, `drawnIncl`), so the page can
  * show the print next to the plate, and tests can check that they agree.
  */
+import { ATTRIBUTION, type Attribution } from '../attribution';
 import type { Params } from '../../core/params';
 import realGalaxies from '../../../assets/data/rosse/real-galaxies/real-galaxies.json';
 import {
@@ -29,9 +30,8 @@ import {
   type RealGalaxy,
 } from '../from-votes';
 
-export const REAL_GALAXY_ATTRIBUTION =
-  'Photographs: SDSS (Sloan Digital Sky Survey; see sdss.org/collaboration/citing-sdss). ' +
-  'Votes: Galaxy Zoo 2 (Willett et al. 2013, MNRAS 435, 2835; Hart et al. 2016, MNRAS 461, 3663), CC BY 4.0.';
+/** The attribution the page must show (../attribution.ts). */
+export const REAL_GALAXY_ATTRIBUTION = ATTRIBUTION.text;
 
 const photos = import.meta.glob<string>('../../../assets/data/rosse/real-galaxies/photos/*.jpg', {
   eager: true,
@@ -76,6 +76,8 @@ export interface RealCard {
   /** What the drawing uses: the plate angle and the inclination (degrees). */
   drawnPa: number;
   drawnIncl: number;
+  /** What the page must show with the photograph and the votes (CC BY 4.0, SDSS). */
+  attribution: Attribution;
   /** Where to see the real one (SkyServer). */
   skyServerUrl: string;
 }
@@ -107,6 +109,7 @@ export function realCard(i: number): RealCard {
     photoPa: galaxy.pa,
     drawnPa: res.p.pa,
     drawnIncl: res.p.incl,
+    attribution: ATTRIBUTION,
     skyServerUrl: `https://skyserver.sdss.org/dr17/VisualTools/explore/summary?ra=${galaxy.ra.toFixed(5)}&dec=${galaxy.dec.toFixed(5)}`,
   };
 }

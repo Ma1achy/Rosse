@@ -13,7 +13,7 @@ import { presetParams } from '../../src/core/presets';
 import { CpuRenderer } from '../../src/fallback';
 import { CpuMerger } from '../../src/fallback/merger';
 import { CpuStipple } from '../../src/fallback/stipple';
-import { gifDelayCs, quantiseFrame, type Rgb } from '../../src/extras/export/gif';
+import { gifColours, gifDelayCs, quantiseFrame } from '../../src/extras/export/gif';
 import { cpuInkFrame, gpuInkFrame } from '../../src/extras/export/gif-frames';
 import { encodeInWorker, frameTimes, recordGif } from '../../src/extras/export/record';
 import { timelineSource } from '../../src/extras/export/sources';
@@ -30,8 +30,7 @@ import thresholds from '../golden/thresholds.json';
 import { adapterName, device, run } from './harness';
 
 const S = 160;
-const PAPER: Rgb = [226, 217, 198];
-const INK: Rgb = [29, 27, 25];
+const { paper: PAPER, ink: INK } = gifColours('paper');
 
 run('GIF export (WebGPU frames, the GIF worker)', async () => {
   const { adapter, device: dev } = await device();

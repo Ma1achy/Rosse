@@ -132,7 +132,7 @@ run('SVG export (both engines, re-rasterised)', async () => {
     // WebGPU engine: a read-back of the buffers the frame drew
     st.setScene(buildScene(P, meta));
     st.setView(camera);
-    const b: SvgResult = await exportSvgGpu(st, 1);
+    const b: SvgResult = await exportSvgGpu(st);
 
     const counts: string[] = [];
     for (const k of SVG_LAYERS) {
@@ -182,6 +182,49 @@ run('SVG export (both engines, re-rasterised)', async () => {
       `${label}: ${counts.join(', ')}; ink ${inkRatio.toFixed(2)}×; structure SSIM CPU ${sCpu.toFixed(3)}, WebGPU ${sGpu.toFixed(3)} (band ${String(band)}${Number.isNaN(control) ? '' : `, turned 30°: ${control.toFixed(3)}`}); ${String(Math.round(b.svg.length / 1024))} KB`,
     );
     data[label] = { cpu: a.counts, gpu: b.counts, sCpu, sGpu, control };
+  }
+
+  // a view-only change (zoom 2, then an orbit): the export follows the last view, as the CPU's
+  {
+    const P = presetParams('Dusty spiral', 7, OVERRIDES);
+    st.setScene(buildScene(P, meta));
+    for (const [what, Q, zoom] of [
+      ['zoom 2', P, 2],
+      ['orbit', { ...P, az: P.az + 50, incl: Math.min(180, P.incl + 25) }, 1],
+    ] as [string, Params, number][]) {
+      st.setView(cameraOf(Q, zoom));
+      const gpu = await exportSvgGpu(st);
+      const want = exportSvgCpu(
+        new CpuStipple(buildScene(Q, meta)),
+        new CpuStipple(buildScene(Q, meta)).view(cameraOf(Q, zoom)),
+      );
+      const diffs = SVG_LAYERS.filter(
+        (k) =>
+          Math.abs(gpu.counts[k] - want.counts[k]) > Math.max(1, Math.ceil(0.001 * want.counts[k])),
+      ).map((k) => `${k} ${String(gpu.counts[k])}/${String(want.counts[k])}`);
+      if (diffs.length)
+        fail(
+          `after a view-only change (${what}) the export differs from the CPU's: ${diffs.join(', ')}`,
+        );
+      lines.push(`view-only change (${what}): export counts equal the CPU's at that view`);
+    }
+    // two exports at once are refused; a view change while one runs makes it stale
+    const first = exportSvgGpu(st);
+    const second = await exportSvgGpu(st).then(
+      () => 'accepted',
+      (e: unknown) => (e instanceof Error ? e.message : String(e)),
+    );
+    if (!/already running/.test(second))
+      fail(`a second concurrent export was not refused (${second})`);
+    await first;
+    const stale = exportSvgGpu(st);
+    st.setView(cameraOf(P, 1.5));
+    const msg = await stale.then(
+      () => 'accepted',
+      (e: unknown) => (e instanceof Error ? e.message : String(e)),
+    );
+    if (!/changed during the export/.test(msg)) fail(`a stale export was not refused (${msg})`);
+    lines.push('concurrent exports and an export across a view change are refused');
   }
   st.destroy();
   return { pass, lines, data };

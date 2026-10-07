@@ -273,7 +273,7 @@ async function captureJob(browser, url, job, out) {
  * @param {any[]} records this run's captures
  * @param {string} version the browser's version
  */
-function extraProvenance(previous, file, records, version) {
+function extraProvenance(previous, file, records, version, filtered = false) {
   /** @type {Record<string, { generated: string, browser: unknown }>} */
   const runs = { ...(previous?.runs ?? {}) };
   if (previous?.generated && !previous.runs)
@@ -281,8 +281,11 @@ function extraProvenance(previous, file, records, version) {
       runs[camera] = { generated: previous.generated, browser: previous.browser };
   const now = new Date().toISOString();
   const browser = { name: 'chromium', version, args: BROWSER_ARGS, deviceScaleFactor: 1 };
-  for (const camera of new Set(records.map((r) => String(r.camera))))
-    runs[camera] = { generated: now, browser };
+  // a filtered run (--only, --variants) re-made only some of a camera's captures: its per-capture
+  // `captured` times are the record, and the camera's run is left as it was
+  if (!filtered)
+    for (const camera of new Set(records.map((r) => String(r.camera))))
+      runs[camera] = { generated: now, browser };
   return {
     file,
     cameras: {
@@ -440,7 +443,13 @@ async function main() {
       ...manifest.captures.filter((/** @type {any} */ c) => !names.has(c.name)),
       ...records.map(entry),
     ]);
-    manifest.extra = extraProvenance(manifest.extra, extraFile, records, version);
+    manifest.extra = extraProvenance(
+      manifest.extra,
+      extraFile,
+      records,
+      version,
+      !!(only || opt('--variants')),
+    );
     writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
     console.log(`${records.length} extra captures added to ${manifestPath}`);
     return;

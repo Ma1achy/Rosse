@@ -23,7 +23,8 @@ interface LayerBase {
   pop?: Pop;
   /**
    * The SVG export's layer for this layer's marks (src/extras/export/svg.ts), when its atlas does
-   * not say: M7's deep-field dots set `'background'`. No effect on drawing.
+   * not say: M7's deep-field dots set `'background'`. Honoured for sprite layers only (ribbons are
+   * `arms`; capsules are assigned by their drawings). No effect on drawing.
    */
   svgLayer?: 'background' | 'drawings' | 'arms' | 'dust' | 'cores' | 'knots' | 'dots' | 'stars';
 }

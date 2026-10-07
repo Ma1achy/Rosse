@@ -154,7 +154,12 @@ export class GpuShells {
       );
     }
     this.buffers[10] = keep(
-      bufferWithData(d, new Uint32Array([4, n, 0, 0]), GPUBufferUsage.INDIRECT, 'shell dots args'),
+      bufferWithData(
+        d,
+        new Uint32Array([4, n, 0, 0]),
+        GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC,
+        'shell dots args',
+      ),
     );
     return this.arcs;
   }

@@ -10,6 +10,7 @@ import {
   type PackedCatalogue,
 } from '../../src/extras/catalogue/decode';
 import { fieldValue, galaxyAt, type Field } from '../../src/extras/catalogue/fields';
+import { CatalogueClient } from '../../src/extras/catalogue/client';
 import { CatalogueService } from '../../src/extras/catalogue/service';
 import {
   GALAXY_TYPE_NAMES,
@@ -17,6 +18,7 @@ import {
   find,
   indexOfObjid,
   nearest,
+  raDiff,
   ofType,
   randomOf,
 } from '../../src/extras/catalogue/tools';
@@ -199,6 +201,8 @@ describe('catalogue service', () => {
     expect(card.galaxy.index).toBe(4242);
     expect(card.mapping.p.seed).toBe(card.galaxy.seed);
     expect(card.caption.text).toContain(card.galaxy.objid);
+    expect(card.attribution.licence.url).toBe('https://creativecommons.org/licenses/by/4.0/');
+    expect(card.attribution.text).toContain('Galaxy Zoo 2');
     expect(card.caption.skyServerUrl).toContain('skyserver.sdss.org');
     const bad = await svc.handle({ id: 9, op: 'card', index: -5 });
     expect(bad).toMatchObject({ id: 9, ok: false });
@@ -207,4 +211,145 @@ describe('catalogue service', () => {
     const fresh = new CatalogueService();
     expect(await fresh.handle({ id: 1, op: 'card', index: 0 })).toMatchObject({ ok: false });
   }, 60_000);
+});
+
+describe('catalogue tools: wrap-around and bad input', () => {
+  it('wraps right ascension across 0 and 360', () => {
+    expect(raDiff(359.99, 0.01)).toBeCloseTo(-0.02, 10);
+    expect(raDiff(0.01, 359.99)).toBeCloseTo(0.02, 10);
+    // a catalogue of three galaxies astride RA 0
+    const tiny = {
+      ...cat,
+      n: 3,
+      ra: Float64Array.from([359.9999, 0.0001, 180]),
+      dec: Float64Array.from([10, 10, 10]),
+    };
+    expect(nearest(tiny, 359.9999, 10)?.index).toBe(0);
+    const r = nearest(tiny, 0.0001, 10);
+    expect(r?.index).toBe(1);
+    const near = filter(tiny, { cone: { ra: 0, dec: 10, radiusArcsec: 5 } });
+    expect(Array.from(near.indices).sort()).toEqual([0, 1]);
+    expect(filter(tiny, { cone: { ra: 359.9999, dec: 10, radiusArcsec: 5 } }).total).toBe(2);
+  });
+
+  it('refuses NaN, unknown types and unknown fields instead of matching everything', () => {
+    const bad = (q: Parameters<typeof filter>[1]) => () => filter(cat, q);
+    expect(bad({ cone: { ra: NaN, dec: 0, radiusArcsec: 5 } })).toThrow(RangeError);
+    expect(bad({ cone: { ra: 0, dec: NaN, radiusArcsec: 5 } })).toThrow(RangeError);
+    expect(bad({ cone: { ra: 0, dec: 0, radiusArcsec: NaN } })).toThrow(RangeError);
+    expect(bad({ cone: { ra: 0, dec: 95, radiusArcsec: 5 } })).toThrow(RangeError);
+    expect(bad({ where: [{ field: 'gr', min: NaN }] })).toThrow(RangeError);
+    expect(bad({ where: [{ field: 'gr', max: NaN }] })).toThrow(RangeError);
+    expect(bad({ limit: NaN })).toThrow(RangeError);
+    expect(bad({ type: 'not a type' as 'any' })).toThrow(/unknown type/);
+    expect(bad({ where: [{ field: 'nope' as 'gr', min: 0 }] })).toThrow(/unknown field/);
+    expect(() => ofType(cat, 'not a type' as 'any')).toThrow(RangeError);
+    expect(() => randomOf(cat, 'toString' as 'any', Math.random)).toThrow(RangeError);
+    expect(nearest(cat, NaN, 0)).toBeNull();
+    // and a real query is not refused
+    expect(filter(cat, { type: 'any', limit: 1 }).total).toBe(cat.n);
+  });
+});
+
+describe('catalogue service and client: failures', () => {
+  const file = readFileSync(join(ROOT, 'assets/data/rosse/gz2-catalogue.json'));
+  const ok = (() => Promise.resolve(new Response(file))) as typeof fetch;
+
+  it('loads once: a second load for the same url decodes nothing', async () => {
+    const svc = new CatalogueService();
+    let fetched = 0;
+    const counting = (() => {
+      fetched++;
+      return Promise.resolve(new Response(file));
+    }) as typeof fetch;
+    const [a, b] = await Promise.all([svc.load('u', counting), svc.load('u', counting)]);
+    expect(a).toBe(b);
+    expect(await svc.load('u', counting)).toBe(a);
+    expect(fetched).toBe(1);
+  }, 60_000);
+
+  it('reports a 404 and a corrupt file, and tries again after a failure', async () => {
+    const svc = new CatalogueService();
+    const notFound = (() => Promise.resolve(new Response('no', { status: 404 }))) as typeof fetch;
+    await expect(svc.load('u', notFound)).rejects.toThrow(/404/);
+    const packed = JSON.parse(file.toString()) as { hdr: unknown; b64: string };
+    const corrupt = (() =>
+      Promise.resolve(
+        new Response(JSON.stringify({ hdr: packed.hdr, b64: btoa('this is not gzip') })),
+      )) as typeof fetch;
+    await expect(svc.load('u', corrupt)).rejects.toThrow();
+    const truncated = (() =>
+      Promise.resolve(
+        new Response(JSON.stringify({ hdr: packed.hdr, b64: packed.b64.slice(0, 4000) })),
+      )) as typeof fetch;
+    await expect(svc.load('u', truncated)).rejects.toThrow();
+    expect(svc.cat).toBeNull();
+    expect((await svc.load('u', ok)).n).toBe(239_695);
+  }, 60_000);
+
+  it('answers a malformed request with an error instead of hanging', async () => {
+    const svc = new CatalogueService();
+    const r = await svc.handle({ id: 4, op: 'frobnicate' } as unknown as Parameters<
+      typeof svc.handle
+    >[0]);
+    expect(r).toEqual({ id: 4, ok: false, error: 'unknown request "frobnicate"' });
+  });
+
+  /** a worker that never answers, and can crash */
+  const fakeWorker = () => {
+    const w = {
+      sent: [] as unknown[],
+      terminated: 0,
+      onmessage: null as ((e: unknown) => void) | null,
+      onerror: null as ((e: unknown) => void) | null,
+      onmessageerror: null as ((e: unknown) => void) | null,
+      postMessage(m: unknown) {
+        w.sent.push(m);
+      },
+      terminate() {
+        w.terminated++;
+      },
+    };
+    return w;
+  };
+
+  it('rejects every pending request when the worker crashes, and every later one', async () => {
+    const w = fakeWorker();
+    const client = new CatalogueClient(w as unknown as Worker);
+    const a = client.card(1);
+    const b = client.find('x');
+    w.onerror?.({ message: 'boom' });
+    await expect(a).rejects.toThrow(/boom/);
+    await expect(b).rejects.toThrow(/boom/);
+    await expect(client.card(2)).rejects.toThrow(/closed/);
+    expect(w.terminated).toBe(1);
+  });
+
+  it('rejects pending requests on an unreadable message, and when closed with one in flight', async () => {
+    const w = fakeWorker();
+    const client = new CatalogueClient(w as unknown as Worker);
+    const a = client.random('barred');
+    w.onmessageerror?.({});
+    await expect(a).rejects.toThrow(/could not be read/);
+    const w2 = fakeWorker();
+    const c2 = new CatalogueClient(w2 as unknown as Worker);
+    const p = c2.filter({ limit: 1 });
+    c2.close();
+    await expect(p).rejects.toThrow(/closed/);
+    expect(w2.terminated).toBe(1);
+  });
+
+  it('asks the worker to load once, however often it is called, and again after a failure', async () => {
+    const w = fakeWorker();
+    const client = new CatalogueClient(w as unknown as Worker);
+    const a = client.load('/x.json');
+    const b = client.load('/x.json');
+    expect(a).toBe(b);
+    expect(w.sent).toHaveLength(1);
+    const id = (w.sent[0] as { id: number }).id;
+    w.onmessage?.({ data: { id, ok: false, error: 'the catalogue did not load (404)' } });
+    await expect(a).rejects.toThrow(/404/);
+    void client.load('/x.json').catch(() => undefined);
+    expect(w.sent).toHaveLength(2);
+  });
 });

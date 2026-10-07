@@ -6,13 +6,12 @@
  * are CC BY 4.0 (Willett et al. 2013, MNRAS 435, 2835; Hart et al. 2016, MNRAS 461, 3663), and
  * SDSS imagery needs its acknowledgement. `CATALOGUE_ATTRIBUTION` is the text.
  */
+import { ATTRIBUTION } from '../attribution';
 import { describe, shortType, type FromVotes } from '../from-votes';
 import type { CatalogueGalaxy } from './fields';
 
-export const CATALOGUE_ATTRIBUTION =
-  'Galaxy classifications: Galaxy Zoo 2 (Willett et al. 2013, MNRAS 435, 2835; ' +
-  'Hart et al. 2016, MNRAS 461, 3663), licensed CC BY 4.0, from the volunteers of galaxyzoo.org. ' +
-  'Positions, colours and sizes: SDSS DR7. Imagery: SDSS (see sdss.org/collaboration/citing-sdss).';
+/** The attribution the page must show (../attribution.ts). */
+export const CATALOGUE_ATTRIBUTION = ATTRIBUTION.text;
 
 export interface Caption {
   /** The sentence, as v21 writes it (ends with a space, before the link). */

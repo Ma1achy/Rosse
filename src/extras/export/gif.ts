@@ -20,7 +20,24 @@
  * page (src/extras/export/README in docs/milestones/m12): they supply the frames' ink.
  */
 
+import { SURFACES, type SurfaceName } from '../../render/surface';
+
 export type Rgb = readonly [number, number, number];
+
+/**
+ * The engine's own surface and key-ink colours, as 8-bit RGB: Paper #e6dece (230, 222, 206) with
+ * ink (29, 27, 25), Chalkboard #262b28 (38, 43, 40) with chalk (236, 228, 210). v21 reads the
+ * surface from the page's CSS; these are the engine's.
+ */
+export function gifColours(surface: SurfaceName): { paper: Rgb; ink: Rgb } {
+  const to8 = (c: readonly number[]): Rgb => [
+    Math.round((c[0] ?? 0) * 255),
+    Math.round((c[1] ?? 0) * 255),
+    Math.round((c[2] ?? 0) * 255),
+  ];
+  const s = SURFACES[surface];
+  return { paper: to8(s.field), ink: to8(s.palette.ink) };
+}
 
 /** The time of frame k of an n-frame timeline ending at `end` (v21's `k / nF * end`). */
 export function frameTime(k: number, n: number, end: number): number {
@@ -57,6 +74,9 @@ export function cubePalette(paper: Rgb): Rgb[] {
   return pal;
 }
 
+/** The colour cube's entry for the plate's own surface colour. */
+export const SURFACE_INDEX = 252;
+
 export type GifMode = 'ramp' | 'cube';
 
 export interface GifSpec {
@@ -88,15 +108,23 @@ export function quantiseFrame(
   }
   const { paper } = spec;
   for (let q = 0, o = 0; q < n; q++, o += 4) {
+    const a8 = rgba[o + 3] as number;
+    // an empty pixel is the surface itself: entry 252, which the cube cannot reach
+    if (a8 === 0) {
+      px[q] = SURFACE_INDEX;
+      continue;
+    }
     // premultiplied colours over the surface, to 8 bits as a canvas composes them
-    const a = (rgba[o + 3] as number) / 255;
+    const a = a8 / 255;
     const r = Math.round((rgba[o] as number) + paper[0] * (1 - a));
     const g = Math.round((rgba[o + 1] as number) + paper[1] * (1 - a));
     const b = Math.round((rgba[o + 2] as number) + paper[2] * (1 - a));
     px[q] =
-      Math.min(5, Math.round(r / 51)) * 42 +
-      Math.min(6, Math.round(g / 42.5)) * 6 +
-      Math.min(5, Math.round(b / 51));
+      r === paper[0] && g === paper[1] && b === paper[2]
+        ? SURFACE_INDEX
+        : Math.min(5, Math.round(r / 51)) * 42 +
+          Math.min(6, Math.round(g / 42.5)) * 6 +
+          Math.min(5, Math.round(b / 51));
   }
   return px;
 }
@@ -222,16 +250,31 @@ export function gifEncode(
   return out.slice(0, n);
 }
 
-/** Quantises and encodes frames of ink (see the file comment): what the worker runs. */
+/** Encodes frames already quantised to palette indices (one byte a pixel). */
+export function encodeIndexed(frames: readonly Uint8Array[], spec: GifSpec): Uint8Array {
+  checkSpec(spec);
+  return gifEncode(frames, spec.width, spec.height, paletteOf(spec), spec.delayCs);
+}
+
+/** The size and delay a GIF can hold: 16 bits each, and at least one pixel and one frame time. */
+export function checkSpec(spec: Pick<GifSpec, 'width' | 'height' | 'delayCs'>): void {
+  const ok = (v: number, lo: number) => Number.isInteger(v) && v >= lo && v <= 65535;
+  if (!ok(spec.width, 1) || !ok(spec.height, 1))
+    throw new Error(
+      `a GIF is 1 to 65535 pixels each way, not ${String(spec.width)} x ${String(spec.height)}`,
+    );
+  if (!ok(spec.delayCs, 0))
+    throw new Error(`the delay ${String(spec.delayCs)} cs does not fit a GIF`);
+}
+
+/** Quantises and encodes frames of ink (see the file comment); the frames are all in memory. */
 export function encodeGif(
   frames: readonly (Uint8ClampedArray | Uint8Array)[],
   spec: GifSpec,
 ): Uint8Array {
-  return gifEncode(
+  checkSpec(spec);
+  return encodeIndexed(
     frames.map((f) => quantiseFrame(f, spec)),
-    spec.width,
-    spec.height,
-    paletteOf(spec),
-    spec.delayCs,
+    spec,
   );
 }

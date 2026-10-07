@@ -1,10 +1,10 @@
 /**
- * The GIF worker: quantises and encodes the frames off the main thread (v21 does it between
+ * The GIF worker: encodes the (already quantised) frames off the main thread (v21 does it between
  * two `setTimeout`s on the page). Started by `encodeInWorker` (./record.ts).
- * Messages: `{ frames: ArrayBuffer[], spec: GifSpec }` in, `{ bytes: Uint8Array }` or `{ error }`
+ * Messages: `{ frames: ArrayBuffer[] (palette indices), spec: GifSpec }` in, `{ bytes: Uint8Array }` or `{ error }`
  * out; the frames' buffers are transferred, not copied.
  */
-import { encodeGif, type GifSpec } from './gif';
+import { encodeIndexed, type GifSpec } from './gif';
 
 interface Job {
   frames: ArrayBuffer[];
@@ -13,8 +13,8 @@ interface Job {
 
 self.onmessage = (e: MessageEvent<Job>) => {
   try {
-    const bytes = encodeGif(
-      e.data.frames.map((f) => new Uint8ClampedArray(f)),
+    const bytes = encodeIndexed(
+      e.data.frames.map((f) => new Uint8Array(f)),
       e.data.spec,
     );
     self.postMessage({ bytes }, { transfer: [bytes.buffer] });

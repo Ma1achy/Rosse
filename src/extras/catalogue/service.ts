@@ -3,6 +3,7 @@
  * catalogue. `./worker.ts` runs one in a Web Worker and `./client.ts` talks to it; the class
  * itself needs no worker, so Node tests it directly.
  */
+import { ATTRIBUTION, type Attribution } from '../attribution';
 import { catalogueCaption, type Caption } from './caption';
 import {
   base64ToBytes,
@@ -26,6 +27,8 @@ import {
 
 /** A galaxy with what Rosse makes of it: its parameters and the words. */
 export interface GalaxyCard {
+  /** What the page must show with the data (CC BY 4.0, SDSS). */
+  attribution: Attribution;
   galaxy: CatalogueGalaxy;
   mapping: FromVotes;
   caption: Caption;
@@ -66,9 +69,24 @@ function heapNow(): { heapBytes?: number } {
 
 export class CatalogueService {
   cat: Catalogue | null = null;
+  private loading: { url: string; promise: Promise<LoadStats> } | null = null;
 
-  /** Fetch, unpack and decode the packed catalogue at `url`. */
-  async load(url: string, fetcher: typeof fetch = fetch): Promise<LoadStats> {
+  /**
+   * Fetch, unpack and decode the packed catalogue at `url`. Idempotent: a second call for the same
+   * url (while loading, or after) gives the first's result and decodes nothing; a failed load is
+   * forgotten, so the next call tries again.
+   */
+  load(url: string, fetcher: typeof fetch = fetch): Promise<LoadStats> {
+    if (this.loading?.url === url) return this.loading.promise;
+    const promise = this.decode(url, fetcher);
+    this.loading = { url, promise };
+    promise.catch(() => {
+      if (this.loading?.promise === promise) this.loading = null;
+    });
+    return promise;
+  }
+
+  private async decode(url: string, fetcher: typeof fetch): Promise<LoadStats> {
     const t0 = performance.now();
     const res = await fetcher(url);
     if (!res.ok) throw new Error(`the catalogue did not load (${String(res.status)})`);
@@ -95,7 +113,7 @@ export class CatalogueService {
   card(index: number): GalaxyCard {
     const g = galaxyAt(this.need(), index);
     const mapping = fromVotes(g.votes, g.q, g.pa, g.windSign, g.seed, g.extras);
-    return { galaxy: g, mapping, caption: catalogueCaption(g, mapping) };
+    return { attribution: ATTRIBUTION, galaxy: g, mapping, caption: catalogueCaption(g, mapping) };
   }
 
   random(type: GalaxyType, rand: () => number = Math.random): number | null {
@@ -125,6 +143,10 @@ export class CatalogueService {
           return { id: req.id, ok: true, result: this.find(req.text) };
         case 'filter':
           return { id: req.id, ok: true, result: this.filter(req.query) };
+        default: {
+          const bad = req as { id: number; op?: unknown };
+          return { id: bad.id, ok: false, error: `unknown request ${JSON.stringify(bad.op)}` };
+        }
       }
     } catch (e) {
       return {

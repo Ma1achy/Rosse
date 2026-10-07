@@ -433,7 +433,8 @@ async function compareAll(G, node) {
       about:
         "The new engine's own goldens (ADR 0013 test e): SHA-256 of the 8-bit ink alpha of each required case, WebGPU on SwiftShader in Chromium. Written by npm run golden -- --update-engine.",
       adapter: gpu.adapter,
-      hashes: newHashes,
+      // a run narrowed with --only adds to the hashes already there and changes none of them
+      hashes: opt('--only') ? { ...engineHashes, ...newHashes } : newHashes,
     });
     console.log(`wrote ${enginePath}`);
   }

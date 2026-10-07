@@ -14845,12 +14845,12 @@
     "file": "tests/golden/extra-cases.json",
     "cameras": {
       "home": "the preset's own incl, az, pa",
-      "orbit": "az + 35\u00b0, incl + 20\u00b0 (clamped), from home",
+      "orbit": "az + 35°, incl + 20° (clamped), from home",
       "zoom": "home at zoom 2 (__GEN.zoom)"
     },
     "runs": {
       "home": {
-        "generated": "2026-10-07T11:27:54.717Z",
+        "generated": "2026-10-06T16:39:57.198Z",
         "browser": {
           "name": "chromium",
           "version": "141.0.7390.37",
@@ -14862,7 +14862,7 @@
         }
       },
       "orbit": {
-        "generated": "2026-10-07T11:27:54.717Z",
+        "generated": "2026-10-06T16:39:57.198Z",
         "browser": {
           "name": "chromium",
           "version": "141.0.7390.37",
