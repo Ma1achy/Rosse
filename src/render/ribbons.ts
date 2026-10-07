@@ -93,6 +93,11 @@ export class GpuRibbons {
     return this.need().buffers[3] as GPUBuffer;
   }
 
+  /** The curve table (the lensed branches are written into it by compute/lens-query.wgsl). */
+  get curveTable(): GPUBuffer {
+    return this.need().buffers[4] as GPUBuffer;
+  }
+
   /** The carving segments' first points. */
   get carve(): GPUBuffer {
     return this.need().carve;
@@ -126,7 +131,7 @@ export class GpuRibbons {
       1: keep(buf(RIB_LAYOUT.size, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'rib')),
       2: keep(data(R.points3, 'scene points')),
       3: keep(buf(R.nPoints * 8, src, 'projected points')),
-      4: keep(data(R.curveBuf, 'curves')),
+      4: keep(data(R.curveBuf, 'curves', STORAGE | GPUBufferUsage.COPY_SRC)),
       5: keep(buf(R.nPoints * 4, src, 'arc lengths')),
       6: keep(buf(Math.max(1, R.nCurves) * CURVE_STATE_LAYOUT.size, src, 'curve state')),
       7: keep(data(R.pieces, 'stroke pieces')),
@@ -153,10 +158,18 @@ export class GpuRibbons {
       30: noise,
     };
     const hdotArgs = keep(
-      data(new Uint32Array([4, R.nHDots, 0, 0]), 'hatch dots args', GPUBufferUsage.INDIRECT),
+      data(
+        new Uint32Array([4, R.nHDots, 0, 0]),
+        'hatch dots args',
+        GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC,
+      ),
     );
     const hblobArgs = keep(
-      data(new Uint32Array([4, R.nHBlobs, 0, 0]), 'hatch blobs args', GPUBufferUsage.INDIRECT),
+      data(
+        new Uint32Array([4, R.nHBlobs, 0, 0]),
+        'hatch blobs args',
+        GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC,
+      ),
     );
     const carve = keep(data(R.carve, 'carving segments'));
     const groups = Object.fromEntries(

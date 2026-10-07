@@ -25,6 +25,7 @@
     "tests/perf",
     "tests/vectors",
     "tests/golden/compare",
+    "tools/readme-assets/render.ts",
     "vite.config.ts"
   ]
 }

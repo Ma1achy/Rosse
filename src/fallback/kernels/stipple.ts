@@ -6,8 +6,9 @@
  * Reference: the proposal loop of `generate` (app23.js:L221–273). Each sample picks a component by
  * weight (bulge, halo, bar, ring, disc, or the Sérsic profile of a smooth galaxy), runs its bounded
  * rejection loop on its own draws, and is classified as a dot (old, disc or young population), a
- * knot, a sparkle star or a drawn star (`rstar`, classified only: drawn stars arrive with the vector
- * marks). A sample the model rejects is class NONE. Nothing here depends on the camera: the dust
+ * knot, a sparkle star or a drawn star (`rstar`: its drawing, size and spin are drawn here, on the
+ * sample's own counter; the view tier scales it with the zoom, compute/project.wgsl). A sample the
+ * model rejects is class NONE. Nothing here depends on the camera: the dust
  * optical depth is a view cull (./project.ts), which reads the uniform stored here in `u_tau`, so
  * orbiting never re-rolls the stipple (ADR 0004, 0010).
  *
@@ -18,7 +19,8 @@
  * After the proposals come the marks of the ring knots and clumps (app23.js:L282–297, groups
  * described in src/model/clumps.ts): `sampleExtra`, the twin of stipple.wgsl's `extra` entry point.
  *
- * Not yet here: the breathing room round bright drawn stars (M7, with the drawn stars).
+ * The breathing room round the bright drawn stars (app23.js:L275–281) is a pure view filter on
+ * these samples (./breathe.ts).
  */
 import { cosF, randGaussF, sinF, tanF } from '../../core/f32math';
 import { randF32 } from '../../core/rng';
@@ -29,6 +31,7 @@ import {
   GalaxyFlag,
   KNOT_POOL,
   SHAPE,
+  STAR_ASTERISK,
   sampleCount,
   type GalaxyDesc,
 } from '../../model/galaxy';
@@ -59,7 +62,7 @@ export const SAMPLE_LAYOUT: StructLayout = {
 export const SAMPLE_WORDS = SAMPLE_LAYOUT.size / 4;
 
 /** The draws of one sample. */
-class Rng {
+export class Rng {
   d = 0;
   constructor(
     readonly seed: number,
@@ -186,6 +189,43 @@ export function gammaS(k: number, r: Rng): number {
   return f(d * boost);
 }
 
+/**
+ * A drawn star's drawing, size and spin (`rstar`, app23.js:L184–190), on the sample's own draws.
+ * `young` raises the chance of a bright one (0.18 against 0.05) unless `forced`. The size is before
+ * the zoom's growth (ZL), which the view tier applies.
+ */
+export function drawStar(
+  r: Rng,
+  G: GalaxyDesc,
+  young: boolean,
+  forced: boolean,
+): { tile: number; size: number; rot: number; bright: boolean } {
+  const g = G.g;
+  const ns = g.n_ss_small;
+  const nb = g.n_ss_bright;
+  // without an `sstars` sheet the star is classified (and counted) but has nothing to draw
+  if (ns === 0) return { tile: 0, size: 0, rot: 0, bright: false };
+  let br = forced;
+  if (!br) br = r.next() < (young ? f(0.18) : f(0.05));
+  const off = KNOT_POOL + g.n_dot_pool;
+  let tile: number;
+  let asterisk = false;
+  if (br && nb > 0) {
+    tile = G.pool[off + ns + Math.min(nb - 1, Math.floor(f(r.next() * nb)))] ?? 0;
+  } else {
+    const e = G.pool[off + Math.min(ns - 1, Math.floor(f(r.next() * ns)))] ?? 0;
+    asterisk = (e & STAR_ASTERISK) !== 0;
+    tile = e & 0x7fffffff;
+  }
+  const pd = g.pen_dot;
+  const size = br
+    ? f(f(f(9) + f(f(9) * pow(r.next(), f(2.4)))) * pd)
+    : f(exp(f(log(f(4.6)) + f(f(0.38) * r.gauss()))) * pd);
+  const sd = br ? f(0.1) : asterisk ? f(0.35) : f(0.2);
+  const rot = f(g.spike + f(r.gauss() * sd));
+  return { tile, size, rot, bright: br };
+}
+
 /** Writes sample `i` into `out` (SAMPLE_WORDS per sample) as stipple.wgsl's `main` does. */
 export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Uint32Array): void {
   const g = G.g;
@@ -263,7 +303,17 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
     }
     const starMix = g.star_mix;
     if (starMix > f(0.01) && rS < f(f(2.2) * re) && r.next() < f(f(0.09) * starMix)) {
-      put(xS, yS, 0, Cls.rstar | SampleFlag.sersic2d, 0, 0, 0, 0);
+      const st = drawStar(r, G, false, false);
+      put(
+        xS,
+        yS,
+        0,
+        Cls.rstar | SampleFlag.sersic2d | (st.bright ? SampleFlag.bright : 0),
+        st.tile,
+        st.size,
+        st.rot,
+        0,
+      );
       return;
     }
     const t = dotTile();
@@ -406,7 +456,17 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
     const Rg = sqrt(f(f(px * px) + f(py * py)));
     const kc = comp === 0 ? f(0.4) : comp === 3 ? f(1.6) : arm > f(0.55) ? f(1.35) : f(0.85);
     if (Rg < f(2.7) && r.next() < f(f(f(f(0.34) * starMix) * kc) * (Rg > f(2.1) ? f(0.55) : 1))) {
-      put(px, py, pz, Cls.rstar | flagsOut, 0, 0, 0, uTau);
+      const st = drawStar(r, G, comp === 3 || (comp === 4 && arm > f(0.55)), false);
+      put(
+        px,
+        py,
+        pz,
+        Cls.rstar | flagsOut | (st.bright ? SampleFlag.bright : 0),
+        st.tile,
+        st.size,
+        st.rot,
+        uTau,
+      );
       return;
     }
   }
@@ -488,14 +548,22 @@ export function sampleExtra(
     fo[o + 7] = 0;
   };
   if (local >= count) {
-    // a drawn star: at the ring knot's centre, or scattered over the clump (classified only)
-    if (ring) put(cx, cy, cz, Cls.rstar, 0, 0, 0);
+    // a drawn star: at the ring knot's centre (bright with probability 0.6), or scattered over the
+    // clump (the first bright with probability 0.55), always `young` (app23.js:L288, L296)
+    let x = cx;
+    let y = cy;
+    let z = cz;
+    let forced: boolean;
+    if (ring) forced = r.next() < f(0.6);
     else {
       const ss = f(s * f(1.3));
-      const x = f(cx + f(r.gauss() * ss));
-      const y = f(cy + f(r.gauss() * ss));
-      put(x, y, 0, Cls.rstar, 0, 0, 0);
+      x = f(cx + f(r.gauss() * ss));
+      y = f(cy + f(r.gauss() * ss));
+      z = 0;
+      forced = local - count === 0 && r.next() < f(0.55);
     }
+    const st = drawStar(r, G, true, forced);
+    put(x, y, z, Cls.rstar | (st.bright ? SampleFlag.bright : 0), st.tile, st.size, st.rot);
     return;
   }
   const x = f(cx + f(r.gauss() * s));

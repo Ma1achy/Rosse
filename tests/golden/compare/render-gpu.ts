@@ -76,7 +76,7 @@ async function main(): Promise<void> {
     console.error('WebGPU error:', e.error.message);
   });
   const assets = await BuiltAssets.load('/');
-  const names: AtlasName[] = ['dots', 'knots', 'stars', 'cores', 'pieces', 'strokes'];
+  const names: AtlasName[] = ['dots', 'knots', 'stars', 'cores', 'fgstars', 'pieces', 'strokes'];
   const [atlases, paper, sheets] = await Promise.all([
     Promise.all(names.map((n) => assets.atlas(n))),
     assets.paper(),
@@ -94,6 +94,7 @@ async function main(): Promise<void> {
       knots: by('knots'),
       stars: by('stars'),
       cores: by('cores'),
+      fgstars: by('fgstars'),
       strokes: by('strokes'),
     },
     vectors.penlines,

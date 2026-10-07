@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en-GB" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <title>Rosse banner</title>
+    <!--
+      The README banner (docs/img/banner.png and banner-dark.png), 1100 x 380 CSS px, screenshotted
+      at 2x by tools/readme-assets/build.mjs. The galaxies in it are renders of this repository's
+      engine (tools/readme-assets/plan.mjs, ids banner-*). `?theme=dark` is the Chalkboard
+      variant: the grounds swap, the plates swap.
+      Design language: assets/reference/design-language/DESIGN-LANGUAGE.md. Type is Heros
+      (bold for the title) and IBM Plex Mono for the small capitals, both from assets/fonts/.
+    -->
+    <style>
+      @font-face {
+        font-family: 'Heros';
+        src: url('../../../assets/fonts/Heros-700.otf') format('opentype');
+        font-weight: 700;
+      }
+      @font-face {
+        font-family: 'Heros';
+        src: url('../../../assets/fonts/Heros-400.otf') format('opentype');
+        font-weight: 400;
+      }
+      @font-face {
+        font-family: 'Plex Mono';
+        src: url('../../../assets/fonts/ibm-plex-mono/IBMPlexMono-400.woff2') format('woff2');
+        font-weight: 400;
+      }
+      @font-face {
+        font-family: 'Plex Mono';
+        src: url('../../../assets/fonts/ibm-plex-mono/IBMPlexMono-600.woff2') format('woff2');
+        font-weight: 600;
+      }
+      :root {
+        --ground: #efe9dc;
+        --ink: #1d1b19;
+        --ink2: #6f6a5f;
+        --hair: #c9c2b2;
+        --field: #e6dece;
+        --chalk: #262b28;
+        --on-chalk: #efe9dc;
+        --paper-img: block;
+        --chalk-img: none;
+      }
+      :root[data-theme='dark'] {
+        --ground: #262b28;
+        --ink: #efe9dc;
+        --ink2: #a9a597;
+        --hair: #4d524e;
+        --field: #2d332f;
+        --paper-img: none;
+        --chalk-img: block;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      html,
+      body {
+        width: 1100px;
+        height: 380px;
+        background: var(--ground);
+        overflow: hidden;
+      }
+      body {
+        position: relative;
+        font-family: 'Heros', 'Helvetica Neue', Arial, sans-serif;
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+      }
+      /* paper grain, over everything but the plates */
+      body::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.55;
+        mix-blend-mode: multiply;
+        background-image: url('data:image/svg+xml;utf8,');
+        z-index: 9;
+      }
+      :root[data-theme='dark'] body::after {
+        mix-blend-mode: screen;
+        opacity: 0.18;
+      }
+      .mono {
+        font-family: 'Plex Mono', ui-monospace, monospace;
+        font-size: 10.5px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        font-weight: 400;
+        line-height: 1.5;
+      }
+      .abs {
+        position: absolute;
+      }
+      /* grid hairlines: 12 columns of the 1100 px poster, 28 px margins */
+      .vr {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+        background: var(--hair);
+        opacity: 0.55;
+      }
+      .hr {
+        position: absolute;
+        left: 28px;
+        right: 28px;
+        height: 1px;
+        background: var(--ink);
+      }
+      .hr.light {
+        background: var(--hair);
+      }
+      h1 {
+        position: absolute;
+        left: 24px;
+        top: 78px;
+        font-weight: 700;
+        font-size: 150px;
+        line-height: 1;
+        letter-spacing: -0.062em;
+        color: var(--ink);
+      }
+      .tag {
+        left: 30px;
+        top: 238px;
+        color: var(--ink);
+        letter-spacing: 0.3em;
+        font-size: 11.5px;
+        font-weight: 600;
+      }
+      .plate {
+        position: absolute;
+        overflow: hidden;
+      }
+      .plate img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+      }
+      .plate .p {
+        display: var(--paper-img);
+      }
+      .plate .c {
+        display: var(--chalk-img);
+      }
+      .frame {
+        position: absolute;
+        border: 1px solid var(--ink);
+      }
+      .lede {
+        left: 30px;
+        top: 290px;
+        width: 350px;
+        font-size: 12.5px;
+        line-height: 16px;
+        text-align: justify;
+        hyphens: auto;
+        color: var(--ink);
+      }
+      .spec {
+        position: absolute;
+        top: 302px;
+        width: 56px;
+        height: 56px;
+        overflow: hidden;
+        border: 1px solid var(--ink);
+      }
+      .spec img {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+      }
+      .ink {
+        position: absolute;
+        background: var(--ink);
+        -webkit-mask: url('../../../.cache/readme-assets/renders/banner-barred.ink.png') center /
+          100% 100%;
+        mask: url('../../../.cache/readme-assets/renders/banner-barred.ink.png') center / 100% 100%;
+      }
+      .cap {
+        color: var(--ink2);
+      }
+      /* the right block: whichever surface the left plate is not */
+      .block {
+        position: absolute;
+        left: 770px;
+        top: 0;
+        width: 330px;
+        height: 380px;
+        overflow: hidden;
+        background: var(--chalk);
+      }
+      :root[data-theme='dark'] .block {
+        background: var(--field);
+      }
+      .block img {
+        position: absolute;
+        width: 430px;
+        height: 430px;
+        left: -50px;
+        top: -25px;
+      }
+      .block .p {
+        display: var(--paper-img);
+      }
+      .block .c {
+        display: var(--chalk-img);
+      }
+      .block .cap {
+        color: #cfcabb;
+        position: relative;
+        z-index: 3;
+      }
+      :root[data-theme='dark'] .block .cap {
+        color: #4a463f;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="vr" style="left: 28px"></div>
+    <div class="vr" style="left: 410px"></div>
+    <div class="vr" style="left: 770px"></div>
+
+    <div class="hr" style="top: 28px"></div>
+    <div class="abs mono" style="left: 30px; top: 10px">Rosse · galaxy engine</div>
+    <div class="abs mono" style="left: 412px; top: 10px">WebGPU · WGSL · CPU twin</div>
+
+    <h1>Rosse</h1>
+    <div class="abs mono tag">Galaxies, drawn by hand</div>
+
+    <div class="hr light" style="top: 282px"></div>
+    <p class="abs lede">
+      Every mark is a scanned pen drawing. The engine builds a galaxy in three dimensions, then
+      places, transforms and inks those drawings on the GPU.
+    </p>
+
+    <!-- the galaxy is ink on the ground: the ink's alpha as a mask, so it is cream on the Chalkboard -->
+    <div class="ink" style="left: 424px; top: 34px; width: 340px; height: 340px"></div>
+    <div
+      class="abs mono cap"
+      style="left: 440px; top: 364px; font-size: 9.5px; letter-spacing: 0.1em"
+    >
+      Fig. 1 · Barred spiral · seed 11
+    </div>
+    <div
+      class="abs mono cap"
+      style="left: 30px; top: 354px; font-size: 9.5px; letter-spacing: 0.1em"
+    >
+      500 dots · 160 knots · 60 strokes · 156 galaxies
+    </div>
+
+    <div class="block">
+      <img class="p" src="../../../.cache/readme-assets/renders/banner-spiral.chalk.png" />
+      <img class="c" src="../../../.cache/readme-assets/renders/banner-spiral.paper.png" />
+      <div class="abs mono cap" id="surf" style="left: 16px; top: 10px">Fig. 2 · Chalkboard</div>
+      <div class="abs mono cap" style="left: 16px; top: 364px">Grand design · seed 12</div>
+    </div>
+
+    <script>
+      if (new URLSearchParams(location.search).get('theme') === 'dark') {
+        document.documentElement.dataset.theme = 'dark';
+        document.getElementById('surf').textContent = 'Fig. 2 · Paper';
+      }
+    </script>
+  </body>
+</html>

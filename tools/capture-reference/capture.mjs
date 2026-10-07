@@ -13,6 +13,11 @@
  *   node tools/capture-reference/capture.mjs [--out dir] [--only "Grand design,Ringed"] [--verify]
  *   node tools/capture-reference/capture.mjs --extra tests/golden/extra-cases.json [--verify]
  *   node tools/capture-reference/capture.mjs --reroll [--out dir] [--only …]
+ *   --redraws file  v21 drawn again, for the cases `file` lists ({ draws, cases: [capture names] };
+ *             tests/golden/v21-redraws.json, ADR 0036): draws 1 to N − 1 of the stipple of each, the
+ *             capture itself being draw 0. Only the stream `generate()` draws the marks from moves
+ *             (mulberry32(P.seed * 9973 + 1)); the variation, strokes, dust and parts are the
+ *             capture's own. Files `<name>__v21d<k>`, recorded under `v21Draws` in the manifest.
  *   --verify  capture again into a temporary folder and compare pixel hashes with the manifest.
  *   --extra   capture the cases of a file ({ cameras?, cases: [{ preset, variant, overrides,
  *             seeds?, zoom? }] }): a preset with parameter overrides set after it (and after the
@@ -21,6 +26,13 @@
  *             camera (home at zoom 2, through __GEN.zoom) for the seeds a case lists in `zoom`.
  *             A case with `chalk: true` is captured on the Chalkboard (theme dark; name suffix __chalk).
  *             They are added to (or replaced in) the existing manifest, which records the file.
+ *   --extra, real galaxies (M12): a case with `"real": <index>` (0 to 41, the order of
+ *             assets/data/rosse/real-galaxies/real-galaxies.json) captures one of the 42 real
+ *             galaxies as v21 draws it from its votes (`__GEN.real(i)`, v21's showReal), instead
+ *             of a preset. `preset` is then only its name ("Real galaxy 12"), `seeds` must list
+ *             the one seed fromVotes gives it (the capture fails if the page's seed differs), and
+ *             the overrides are set after it as for a preset. Names: real-galaxy-12--real__s6057__home.
+ *             Select them with `--variants real`.
  *   --only    presets, comma-separated, or separated by | when a name holds a comma
  *             (--only "Grand design|Loose, open arms").
  *   --cameras capture only these cameras (comma-separated), e.g. --cameras zoom.
@@ -99,9 +111,16 @@ const sha256 = (/** @type {Buffer} */ b) => createHash('sha256').update(b).diges
 
 function serve() {
   const html = readFileSync(PAGE);
-  const server = createServer((_req, res) => {
+  const text = html.toString('utf8');
+  const stream = 'mulberry32(P.seed * 9973 + 1)';
+  if (!text.includes(stream)) throw new Error('the stipple stream of generate() was not found');
+  const server = createServer((req, res) => {
     res.setHeader('content-type', 'text/html; charset=utf-8');
-    res.end(html);
+    // ?v21d=k: draw k of the stipple, the stream moved by k · 1000003 and nothing else
+    const k = Number(/[?&]v21d=(\d+)/.exec(req.url ?? '')?.[1] ?? 0);
+    res.end(
+      k ? text.replace(stream, `mulberry32(P.seed * 9973 + 1 + ${String(k * 1000003)})`) : html,
+    );
   });
   return new Promise((ok) => {
     server.listen(0, '127.0.0.1', () => {
@@ -112,8 +131,9 @@ function serve() {
 }
 
 /**
- * @typedef {{ preset: string, seed: number, chalk: boolean, variant?: string,
- *   overrides?: Record<string, unknown>, calibration?: boolean, cameras: readonly string[] }} Job
+ * @typedef {{ preset: string, seed: number, chalk: boolean, variant?: string, real?: number,
+ *   overrides?: Record<string, unknown>, calibration?: boolean, cameras: readonly string[],
+ *   redraw?: number, keep?: string }} Job
  */
 
 /**
@@ -142,7 +162,9 @@ async function captureJob(browser, url, job, out) {
   /** @type {string[]} */
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto(url);
+  // a re-draw of v21's stipple (--redraws, ADR 0036) is the same page with the one stream
+  // `generate()` draws the marks from moved (see `serve`): nothing else in it changes
+  await page.goto(job.redraw ? `${url}?v21d=${String(job.redraw)}` : url);
   await page.addStyleTag({
     content: '#gl{width:800px!important;height:800px!important;max-width:none!important}',
   });
@@ -158,11 +180,14 @@ async function captureJob(browser, url, job, out) {
   const results = [];
   for (const camera of job.cameras) {
     const state = await page.evaluate(
-      ({ preset, seed, camera, orbit, overrides, reroll, zoom }) => {
+      ({ preset, seed, camera, orbit, overrides, reroll, zoom, real }) => {
         const G = /** @type {any} */ (window).__GEN;
         if (camera === 'home' || camera === 'zoom') {
-          G.preset(preset);
-          G.set({ seed });
+          if (real != null) G.real(real);
+          else {
+            G.preset(preset);
+            G.set({ seed });
+          }
           if (overrides) G.set(overrides);
           if (camera === 'zoom') G.zoom(zoom);
         } else if (camera === 'reroll') {
@@ -194,10 +219,15 @@ async function captureJob(browser, url, job, out) {
         overrides: job.overrides ?? null,
         reroll: REROLL,
         zoom: ZOOM_CAMERA,
+        real: job.real ?? null,
       },
     );
+    if (job.real != null && state.P.seed !== job.seed)
+      throw new Error(`${job.preset}: v21 gives seed ${state.P.seed}, the case says ${job.seed}`);
     const base = job.variant ? `${slug(job.preset)}--${slug(job.variant)}` : slug(job.preset);
-    const name = `${base}__s${job.seed}__${camera}${job.chalk ? '__chalk' : ''}`;
+    const name = `${base}__s${job.seed}__${camera}${job.chalk ? '__chalk' : ''}${job.redraw ? `__v21d${String(job.redraw)}` : ''}`;
+    // a re-draw of an orbit view is reached from home, which is not kept
+    if (job.keep && camera !== job.keep) continue;
     const ink = Buffer.from(state.ink.split(',')[1] ?? '', 'base64');
     writeFileSync(join(out, `${name}.ink.png`), ink);
     await page
@@ -210,13 +240,18 @@ async function captureJob(browser, url, job, out) {
       camera,
       surface: job.chalk ? 'chalkboard' : 'paper',
       ...(job.variant ? { variant: job.variant, overrides: job.overrides } : {}),
+      ...(job.real != null ? { real: job.real } : {}),
       ...(job.calibration ? { calibration: true } : {}),
       sequence:
         camera === 'home' || camera === 'zoom'
           ? [
               `load page (theme ${job.chalk ? 'dark' : 'light'})`,
-              `__GEN.preset(${JSON.stringify(job.preset)})`,
-              `__GEN.set({ seed: ${job.seed} })`,
+              ...(job.real != null
+                ? [`__GEN.real(${job.real})`]
+                : [
+                    `__GEN.preset(${JSON.stringify(job.preset)})`,
+                    `__GEN.set({ seed: ${job.seed} })`,
+                  ]),
               ...(job.overrides ? [`__GEN.set(${JSON.stringify(job.overrides)})`] : []),
               ...(camera === 'zoom' ? [`__GEN.zoom(${String(ZOOM_CAMERA)})`] : []),
             ]
@@ -255,7 +290,7 @@ async function captureJob(browser, url, job, out) {
  * @param {any[]} records this run's captures
  * @param {string} version the browser's version
  */
-function extraProvenance(previous, file, records, version) {
+function extraProvenance(previous, file, records, version, filtered = false) {
   /** @type {Record<string, { generated: string, browser: unknown }>} */
   const runs = { ...(previous?.runs ?? {}) };
   if (previous?.generated && !previous.runs)
@@ -263,8 +298,11 @@ function extraProvenance(previous, file, records, version) {
       runs[camera] = { generated: previous.generated, browser: previous.browser };
   const now = new Date().toISOString();
   const browser = { name: 'chromium', version, args: BROWSER_ARGS, deviceScaleFactor: 1 };
-  for (const camera of new Set(records.map((r) => String(r.camera))))
-    runs[camera] = { generated: now, browser };
+  // a filtered run (--only, --variants) re-made only some of a camera's captures: its per-capture
+  // `captured` times are the record, and the camera's run is left as it was
+  if (!filtered)
+    for (const camera of new Set(records.map((r) => String(r.camera))))
+      runs[camera] = { generated: now, browser };
   return {
     file,
     cameras: {
@@ -285,6 +323,7 @@ async function main() {
   const verify = args.includes('--verify');
   const reroll = args.includes('--reroll');
   const extraFile = opt('--extra');
+  const redrawsFile = opt('--redraws');
   const goldenDir = resolve(
     ROOT,
     opt('--out') ?? (reroll ? 'tests/golden/actual/reroll' : 'tests/golden/reference'),
@@ -305,7 +344,7 @@ async function main() {
     /**
      * @type {{ cameras?: string[], cases: { preset: string, variant: string,
      *   overrides: Record<string, unknown>, seeds?: number[], zoom?: number[],
-     *   calibration?: boolean, chalk?: boolean }[] }}
+     *   calibration?: boolean, chalk?: boolean, real?: number }[] }}
      */
     const extra = JSON.parse(readFileSync(resolve(ROOT, extraFile), 'utf8'));
     const fileCams = extra.cameras ?? [...CAMERAS];
@@ -328,12 +367,35 @@ async function main() {
       .filter((c) => !only || only.includes(c.preset))
       .filter((c) => !variants || variants.includes(c.variant))
       .flatMap((c) => {
-        if (!presets[c.preset]) throw new Error(`unknown preset ${c.preset}`);
+        if (c.real == null && !presets[c.preset]) throw new Error(`unknown preset ${c.preset}`);
+        if (c.real != null && !(c.real >= 0 && c.real < 42))
+          throw new Error(`no real galaxy ${c.real}`);
         const { seeds, zoom, chalk, ...rest } = c;
         return (seeds ?? SEEDS)
           .map((seed) => ({ ...rest, seed, chalk: !!chalk, cameras: camsFor(zoom, seed) }))
           .filter((j) => j.cameras.length);
       });
+  } else if (redrawsFile) {
+    // v21 drawn again (ADR 0036): per listed capture, draws 1..N − 1 of its stipple, the capture
+    // itself being draw 0; their files are `<name>__v21d<k>`
+    const list = JSON.parse(readFileSync(resolve(ROOT, redrawsFile), 'utf8'));
+    const manifest = JSON.parse(readFileSync(join(goldenDir, 'manifest.json'), 'utf8'));
+    const by = new Map(manifest.captures.map((/** @type {any} */ c) => [c.name, c]));
+    jobs = /** @type {string[]} */ (list.cases).flatMap((n) => {
+      const c = /** @type {any} */ (by.get(n));
+      if (!c) throw new Error(`${n} is not in the manifest`);
+      return Array.from({ length: list.draws - 1 }, (_, k) => ({
+        preset: c.preset,
+        seed: c.seed,
+        chalk: c.surface === 'chalkboard',
+        ...(c.variant ? { variant: c.variant, overrides: c.overrides } : {}),
+        // a real galaxy (M12) is drawn from its votes, not from a preset
+        ...(c.real != null ? { real: c.real } : {}),
+        cameras: c.camera === 'orbit' ? ['home', 'orbit'] : [c.camera],
+        keep: c.camera,
+        redraw: k + 1,
+      }));
+    });
   } else if (reroll) {
     jobs = names.flatMap((preset) =>
       SEEDS.map((seed) => ({ preset, seed, chalk: false, cameras: ['home', 'reroll'] })),
@@ -392,6 +454,7 @@ async function main() {
     name: r.name,
     preset: r.preset,
     ...(r.variant ? { variant: r.variant, overrides: r.overrides } : {}),
+    ...(r.real != null ? { real: r.real } : {}),
     ...(r.calibration ? { calibration: true } : {}),
     seed: r.seed,
     camera: r.camera,
@@ -406,6 +469,30 @@ async function main() {
   /** @param {any[]} list */
   const sorted = (list) => list.sort((a, b) => a.name.localeCompare(b.name));
 
+  if (redrawsFile) {
+    // the draws are recorded beside the captures, not among them
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+    const list = JSON.parse(readFileSync(resolve(ROOT, redrawsFile), 'utf8'));
+    /** @type {Record<string, any[]>} */
+    const draws = {};
+    for (const r of records) {
+      const base = r.name.replace(/__v21d\d+$/, '');
+      (draws[base] ??= []).push({
+        draw: Number(/__v21d(\d+)$/.exec(r.name)?.[1]),
+        name: r.name,
+        inkPixelSha256: r.inkPixelSha256,
+        stats: r.stats,
+        captured: r.captured,
+        pageErrors: r.pageErrors.length,
+      });
+    }
+    for (const l of Object.values(draws)) l.sort((a, b) => a.draw - b.draw);
+    manifest.v21Draws = { file: redrawsFile, draws: list.draws, cases: draws };
+    writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+    console.log(`${records.length} v21 re-draws added to ${manifestPath}`);
+    return;
+  }
+
   if (reroll) {
     console.log(`${records.length} re-roll captures in ${out} (no manifest)`);
     return;
@@ -419,7 +506,13 @@ async function main() {
       ...manifest.captures.filter((/** @type {any} */ c) => !names.has(c.name)),
       ...records.map(entry),
     ]);
-    manifest.extra = extraProvenance(manifest.extra, extraFile, records, version);
+    manifest.extra = extraProvenance(
+      manifest.extra,
+      extraFile,
+      records,
+      version,
+      !!(only || opt('--variants')),
+    );
     writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
     console.log(`${records.length} extra captures added to ${manifestPath}`);
     return;

@@ -21,6 +21,13 @@ interface LayerBase {
   gain: number;
   /** the population: the colour plate's ink for the layer; the line work, when absent */
   pop?: Pop;
+  /**
+   * The SVG export's layer for this layer's marks (src/extras/export/svg.ts), when its atlas does
+   * not say: M7's sky (the deep field's dots and drawings, the foreground stars) sets
+   * `'background'`. A layer that names one sends all its marks there; a capsule layer that does not
+   * is the hatching and the placed drawings (assigned by their drawings). No effect on drawing.
+   */
+  svgLayer?: 'background' | 'drawings' | 'arms' | 'dust' | 'cores' | 'knots' | 'dots' | 'stars';
 }
 
 export interface SpriteLayer extends LayerBase {

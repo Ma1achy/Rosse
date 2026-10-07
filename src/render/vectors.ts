@@ -81,6 +81,11 @@ interface Model {
   markCap: number;
   dotArgs: GPUBuffer;
   blobArgs: GPUBuffer;
+  /**
+   * The slots of this view: a dynamic set expands and draws only as many as its view needs, which
+   * its capacity (the buffers' size) bounds; a static set's are its description's.
+   */
+  live: { caps: number; dots: number; blobs: number };
   groups: Record<Entry, GPUBindGroup>;
   /** the scan groups of the marks' job (the caps' are in `groups`) */
   markGroups: Record<'scan_local' | 'scan_blocks', GPUBindGroup>;
@@ -117,6 +122,14 @@ export class GpuVectors {
 
   get desc(): VectorDesc | null {
     return this.model?.D ?? null;
+  }
+
+  /**
+   * The instance table (VINST_LAYOUT): written by the CPU, by a rows pass for a dynamic set (M7), or
+   * for the lensed drawings' images by compute/lens-query.wgsl (M9).
+   */
+  get instances(): GPUBuffer {
+    return this.need().buffers[1] as GPUBuffer;
   }
 
   /** The library's tables, uploaded once per set of drawings. */
@@ -212,10 +225,18 @@ export class GpuVectors {
       31: tide ?? buf(16, STORAGE, 'no tides'),
     };
     const dotArgs = keep(
-      res.data(new Uint32Array([4, D.nDots, 0, 0]), GPUBufferUsage.INDIRECT, 'dots args'),
+      res.init(
+        new Uint32Array([4, D.nDots, 0, 0]),
+        GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC,
+        'dots args',
+      ),
     );
     const blobArgs = keep(
-      res.data(new Uint32Array([4, D.nBlobs, 0, 0]), GPUBufferUsage.INDIRECT, 'blob args'),
+      res.init(
+        new Uint32Array([4, D.nBlobs, 0, 0]),
+        GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC,
+        'blob args',
+      ),
     );
     const withJob = (J: Job): Record<number, GPUBuffer> => ({
       ...buffers,
@@ -270,6 +291,7 @@ export class GpuVectors {
       markCap,
       dotArgs,
       blobArgs,
+      live: { caps: D.nCapSlots, dots: D.nDots, blobs: D.nBlobs },
       groups,
       markGroups,
       own,
@@ -284,7 +306,8 @@ export class GpuVectors {
     const q = this.device.queue;
     if (V.nStreamSlots > m.markCap) throw new Error('stream slots beyond their capacity');
     q.writeBuffer(m.buffers[0] as GPUBuffer, 0, packStruct(VEC_LAYOUT, V.uniform));
-    if (m.D.nInst) q.writeBuffer(m.buffers[1] as GPUBuffer, 0, V.inst);
+    // a dynamic set's rows are written by compute/dyn-rows.wgsl
+    if (m.D.nInst && !m.D.dynamic) q.writeBuffer(m.buffers[1] as GPUBuffer, 0, V.inst);
     if (V.nStreamSegs) q.writeBuffer(m.buffers[13] as GPUBuffer, 0, V.streamSegs);
     q.writeBuffer(
       m.marks.uniform,
@@ -298,25 +321,42 @@ export class GpuVectors {
     );
     m.nSlots = V.nStreamSlots;
     m.nSegs = V.nStreamSegs;
+    const u = V.uniform;
+    m.live = {
+      caps: Math.min(u.n_cap_slots ?? 0, m.D.nCapSlots),
+      dots: Math.min(u.n_dots ?? 0, m.D.nDots),
+      blobs: Math.min(u.n_blobs ?? 0, m.D.nBlobs),
+    };
+    q.writeBuffer(
+      m.caps.uniform,
+      0,
+      packStruct(JOB_LAYOUT, {
+        n: m.live.caps,
+        blocks: blocksOf(m.live.caps),
+        cap: m.caps.cap,
+        mode: JobMode.caps,
+      }),
+    );
+    q.writeBuffer(m.dotArgs, 0, new Uint32Array([4, m.live.dots, 0, 0]));
+    q.writeBuffer(m.blobArgs, 0, new Uint32Array([4, m.live.blobs, 0, 0]));
   }
 
   /** Records the expansion and both compactions. */
   encode(pass: GPUComputePassEncoder): void {
     const m = this.need();
-    const D = m.D;
     const run = (e: Entry, n: number, group = m.groups[e], size = 64) => {
       if (!n) return;
       pass.setPipeline(this.pipes[e]);
       pass.setBindGroup(0, group);
       pass.dispatchWorkgroups(Math.ceil(n / size));
     };
-    run('expand_caps', D.nCapSlots);
-    run('expand_dots', D.nDots);
-    run('expand_blobs', D.nBlobs);
+    run('expand_caps', m.live.caps);
+    run('expand_dots', m.live.dots);
+    run('expand_blobs', m.live.blobs);
     // the compactions run even when empty, so the draw arguments say 0
-    run('scan_local', Math.max(1, D.nCapSlots), m.groups.scan_local, SCAN_BLOCK);
+    run('scan_local', Math.max(1, m.live.caps), m.groups.scan_local, SCAN_BLOCK);
     run('scan_blocks', 1, m.groups.scan_blocks, 1);
-    run('scatter_caps', D.nCapSlots);
+    run('scatter_caps', m.live.caps);
     run('stream_marks', m.nSlots);
     run('scan_local', Math.max(1, m.nSlots), m.markGroups.scan_local, SCAN_BLOCK);
     run('scan_blocks', 1, m.markGroups.scan_blocks, 1);
@@ -338,6 +378,8 @@ export class GpuVectors {
         gain: 1,
         indirect: m.caps.args,
       });
+    // the binding covers the set's capacity, not this view's live count (the indirect arguments hold
+    // that): a size that moved with the view would make a new batch for every camera move (ADR 0070)
     const sprites = (atlas: 'dots' | 'knots', buffer: GPUBuffer, n: number, args: GPUBuffer) =>
       out.push({
         kind: 'gpu-sprites',

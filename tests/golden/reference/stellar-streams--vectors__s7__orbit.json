@@ -5,11 +5,7 @@
   "camera": "orbit",
   "surface": "paper",
   "variant": "vectors",
-  "overrides": {
-    "starMix": 0,
-    "field": 0,
-    "fgstars": 0
-  },
+  "overrides": {},
   "sequence": [
     "after home",
     "__GEN.set({ az: az + 35, incl: clamp(incl + 20, 0, 180) })"
@@ -20,13 +16,13 @@
     800
   ],
   "stats": {
-    "rstars": 0,
-    "dots": 7000,
+    "rstars": 323,
+    "dots": 6724,
     "knots": 0,
     "stars": 0,
     "curves": 0,
-    "used": 16,
-    "ms": 8
+    "used": 57,
+    "ms": 42
   },
   "hand": [
     44,
@@ -92,7 +88,7 @@
     "lens": 0,
     "shells": 0,
     "tail": 0,
-    "fgstars": 0,
+    "fgstars": 0.3,
     "trails": 0,
     "arrow": 0,
     "plates": "ink",
@@ -131,9 +127,9 @@
     "ovArtefact": "none",
     "mTime": 1,
     "az": 35,
-    "starMix": 0,
+    "starMix": 0.6,
     "dustScribble": 0.5,
-    "field": 0,
+    "field": 0.3,
     "dustLines": 0,
     "bubbles": 0.4,
     "streams": 1,
@@ -167,6 +163,6 @@
     "shellStars": 6000
   },
   "pageErrors": [],
-  "inkPixelSha256": "2ea7831265b78451e4d1d31037c551513ef33c5e5f6d534f005b30df71eac741",
-  "captured": "2026-10-06T12:37:49.644Z"
+  "inkPixelSha256": "c74b590b49e00971345fe5993d50d2a464adda9ff97acfd4c936e833e07782f3",
+  "captured": "2026-10-06T17:32:13.440Z"
 }

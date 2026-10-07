@@ -8,8 +8,12 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { join } from 'node:path';
 import { PNG } from 'pngjs';
 import type { Params } from '../../../src/core/params';
-import { presetFamily, presetParams } from '../../../src/core/presets';
-import type { MarkCounts, SceneOptions } from '../../../src/model/scene';
+import { presetFamily, presetParams as presetParamsOf } from '../../../src/core/presets';
+import { fromReal, type RealGalaxy } from '../../../src/extras/from-votes';
+import { lensHomeOf } from '../../../src/core/home';
+import { buildScene, type MarkCounts, type SceneOptions } from '../../../src/model/scene';
+import { SRC_SCALE, describeLens, type LensOptions } from '../../../src/sim/lens';
+import { UNIT_SCALE } from '../../../src/view/camera';
 import type { Variation } from '../../../src/model/variation';
 import { CpuGolden } from './engine-cpu';
 import { v21CurvePicks, v21DustPicks, v21RingKnots } from './v21-curves';
@@ -44,6 +48,12 @@ import { mergerGalaxyParams } from '../../../src/sim/merger';
 import { strokeIndex, strokePools } from '../../../src/marks/strokes';
 import { mwarpPool } from '../../../src/model/merger';
 import { v21PartPicks } from './v21-parts';
+import { v21StarPicks } from './v21-stars';
+import { v21Companions, v21Sky } from './v21-sky';
+import { wantsStars } from '../../../src/model/stars';
+import { skyCounts } from '../../../src/model/sky';
+import { cameraOf, orientationOf } from '../../../src/view/camera';
+import { v21LensPlan } from './v21-lens';
 
 export { compareMeasures, countAllowance, evaluate, impossibleClasses, measure };
 export type { Comparison, Evaluation, Grey, ImageMeasures, Thresholds };
@@ -68,23 +78,21 @@ export interface CaptureRecord {
  */
 export function goldenFamily(preset: string, variant?: string): string {
   if (variant === 'lines') return 'lines';
+  // the real galaxies of M12 (ADR 0060): fromVotes' parameters, a mix of the spiral and smooth drawings
+  if (variant === 'real') return 'real';
   // the simulated shells (M8, ADR 0044): the satellite's stars are v21's own random draw, which the
   // engine's re-draws do not carry, so the family is calibrated on held-out v21 captures too
   if (variant === 'shells') return 'shells';
   const f = presetFamily(preset);
   if (f === 'merger' || f === 'lens' || f === 'star' || f === 'artefact') return f;
   if (preset === 'Layered: lensed merger') return 'merger';
+  // M7: a galaxy with a star or an artefact laid over it, and the deep field, have their own
+  if (f === 'layered') return 'layered';
+  if (preset === 'Deep field') return 'deepfield';
   // the slipped plates print each mark four times, offset: the same galaxy's alpha, a noisier image
   // for the density measures (docs/adr/0025-the-slipped-plates-are-their-own-golden-family.md)
   if (preset === 'Plates slipped') return 'slip';
-  const smooth = [
-    'Smooth, round',
-    'Cigar-shaped',
-    'Deep field',
-    'Radio jet',
-    'Stellar streams',
-    'Shell galaxy',
-  ];
+  const smooth = ['Smooth, round', 'Cigar-shaped', 'Radio jet', 'Stellar streams', 'Shell galaxy'];
   return smooth.includes(preset) ? 'smooth' : 'spiral';
 }
 
@@ -113,6 +121,27 @@ export function alphaHash(a: Grey): string {
   const bytes = new Uint8Array(a.data.length);
   for (let i = 0; i < bytes.length; i++) bytes[i] = Math.round((a.data[i] ?? 0) * 255);
   return createHash('sha256').update(bytes).digest('hex');
+}
+
+let realData: RealGalaxy[] | null = null;
+
+/**
+ * The parameters a case's name stands for, at a seed: a preset's, or, for the real galaxies of M12
+ * (`Real galaxy 12`, ADR 0060: no preset, v21's `fromReal` over the data file), what `fromReal`
+ * gives, as v21's `showReal` draws it. It is the case's home: the camera the capture started at.
+ */
+export function presetParams(name: string, seed: number, extra: Partial<Params> = {}): Params {
+  const m = /^Real galaxy (\d+)$/.exec(name);
+  if (!m) return presetParamsOf(name, seed, extra);
+  realData ??= JSON.parse(
+    readFileSync(
+      join(import.meta.dirname, '../../../assets/data/rosse/real-galaxies/real-galaxies.json'),
+      'utf8',
+    ),
+  ) as RealGalaxy[];
+  const g = realData[Number(m[1])];
+  if (!g) throw new Error(`unknown real galaxy ${JSON.stringify(name)}`);
+  return { ...fromReal(g).p, seed, ...extra };
 }
 
 export class GoldenNode {
@@ -147,18 +176,78 @@ export class GoldenNode {
    * the two engines make differently is v21's, and only the marks differ: the placement key
    * re-draws nothing else. From M5 (ADR 0021) also v21's part picks at this zoom.
    */
-  referenceOptions(P: Params, zoom = 1): SceneOptions {
-    if (P.merger) return this.mergerOptions(P);
+  referenceOptions(P: Params, zoom = 1, preset?: string): SceneOptions {
+    if (P.merger) return this.mergerOptions(P, zoom, preset);
     const variation = this.v21Variation(P);
-    const kinds = this.cpu.meta.strokes?.kind ?? [];
+    const meta = this.cpu.meta;
+    const kinds = meta.strokes?.kind ?? [];
+    // M7: v21's choices for the stars and the sky, and the overlays' home (open question Q3): the
+    // orientation the preset starts at, from which an orbit moves the camera round the scene
+    const home = orientationOf(cameraOf(preset ? presetParams(preset, P.seed) : P));
+    const c = skyCounts(P);
+    const fgTiles = meta.fgstars?.count ?? 0;
+    let sky: SceneOptions['sky'];
+    if (c.bg || c.fg || c.companions) {
+      const v = v21Sky(this.root, P, variation, meta, fgTiles);
+      sky = {
+        ...v.catalogue,
+        companions: c.companions
+          ? v21Companions(P, meta.vectors?.companions?.n ?? 0, mulberry32)
+          : [],
+      };
+    }
     return {
       ...(P.shellsOn ? { shells: this.shellOptions(P) } : {}),
       variation,
       curvePicks: this.v21CurvePicks(P, variation),
       noise: this.v21Noise(P.seed),
-      partPicks: v21PartPicks(P, variation, this.cpu.meta, zoom),
-      dustPicks: v21DustPicks(this.root, P, variation, kinds, this.cpu.meta.penlines?.n ?? 0),
+      partPicks: v21PartPicks(P, variation, meta, zoom),
+      ...(wantsStars(P) ? { starPicks: v21StarPicks(this.root, P, variation, meta, zoom) } : {}),
+      ...(sky ? { sky } : {}),
+      dustPicks: v21DustPicks(this.root, P, variation, kinds, meta.penlines?.n ?? 0),
       ringKnotPicks: v21RingKnots(this.root, P, variation),
+      home,
+      ...(P.lensOn && !P.merger && preset ? { lens: this.lensOptions(P, preset) } : {}),
+    };
+  }
+
+  /**
+   * The lens, drawn with v21's own choices (ADR 0050, 0051): the cluster's layout, each source's
+   * options and its own variation, strokes, noise and part picks, replayed from v21's streams
+   * (./v21-lens.ts), and the orientation the preset's camera gives (v21 places the sources there
+   * on the first view of a fresh page, which is how the captures were made; the orbit camera is
+   * reached from it).
+   */
+  lensOptions(P: Params, preset: string): LensOptions {
+    const home = lensHomeOf(presetParams(preset, P.seed));
+    const meta = this.cpu.meta;
+    const plan = v21LensPlan(P, this.root, meta.vectors?.whole?.type ?? []);
+    // describe once with v21's choices to learn each source's parameters, then give each the
+    // pens v21 drew it with
+    const first = describeLens(P, meta, buildScene, { home, picks: plan.picks });
+    const sources = first.sources.map((s, i) => ({
+      ...(plan.picks.sources?.[i] ?? {}),
+      ...(s.Ps ? { scene: this.sceneOptionsOf(s.Ps) } : {}),
+    }));
+    return { home, picks: { ...plan.picks, sources } };
+  }
+
+  /** v21's own variation, strokes, noise and part picks for a source galaxy (at its scale of 70). */
+  sceneOptionsOf(Ps: Params): SceneOptions {
+    const variation = this.v21Variation(Ps);
+    return {
+      variation,
+      curvePicks: this.v21CurvePicks(Ps, variation),
+      noise: this.v21Noise(Ps.seed),
+      partPicks: v21PartPicks(Ps, variation, this.cpu.meta, SRC_SCALE / UNIT_SCALE),
+      dustPicks: v21DustPicks(
+        this.root,
+        Ps,
+        variation,
+        this.cpu.meta.strokes?.kind ?? [],
+        this.cpu.meta.penlines?.n ?? 0,
+      ),
+      ringKnotPicks: v21RingKnots(this.root, Ps, variation),
     };
   }
 
@@ -168,7 +257,7 @@ export class GoldenNode {
    * variation, stroke choices, noise and part picks (replayed for the galaxy's own parameters); and
    * `mWarp`'s two whole drawings. The test stars' own draws are the engine's.
    */
-  mergerOptions(P: Params): SceneOptions {
+  mergerOptions(P: Params, zoom = 1, preset?: string): SceneOptions {
     const picks = v21MergerPicks(this.root, P);
     const meta = this.cpu.meta;
     const galaxy = [0, 1].map((g) => {
@@ -196,6 +285,10 @@ export class GoldenNode {
         variation: this.v21Variation(P),
         galaxy,
         ...(mwarp ? { mwarp } : {}),
+        // a merging pair can lens a galaxy behind it: the lens host's v21 draws (M9)
+        ...(P.lensOn && preset
+          ? { lens: this.referenceOptions({ ...P, merger: 0 }, zoom, preset) }
+          : {}),
       },
     };
   }
@@ -259,7 +352,10 @@ export class GoldenNode {
     if (!t) throw new Error(`no parity thresholds for ${preset}`);
     // the family's thresholds, with the preset's own where calibrated (axis ratios)
     const { byPreset, ...family } = t;
-    return { ...family, ...(byPreset?.[preset] ?? {}) };
+    // the dots' count spread is not a matter of the zoom: a zoom family with too few pairs of its
+    // own to measure it takes the family's (ADR 0035)
+    const countsBy = family.countsBy ?? this.thresholds.parity[f]?.countsBy;
+    return { ...family, ...(countsBy ? { countsBy } : {}), ...(byPreset?.[preset] ?? {}) };
   }
 
   writeReport(
@@ -295,21 +391,27 @@ export class GoldenNode {
     /** which parts to measure: the re-draw pairs, the negative controls (a resumed run may need one) */
     parts: { pairs: boolean; controls: boolean } = { pairs: true, controls: true },
   ) {
-    const pairs: Record<string, { preset: string; config: string; cs: Comparison[] }[]> = {};
+    const pairs: Record<string, CalibrationPair[]> = {};
     const controls: Record<string, Record<string, { config: string; cs: Comparison[] }[]>> = {};
     const heldOut: Record<string, { preset: string; config: string; cs: Comparison[] }[]> = {};
     for (const c of cases) {
       const zoom = c.zoom ?? 1;
-      const opts = this.referenceOptions(c.params, zoom);
-      const draw = (P: Params, o: SceneOptions, k: number) =>
-        measure(this.cpu.render(P, keyed(o, P.seed, k), zoom).alpha);
+      const opts = this.referenceOptions(c.params, zoom, c.base);
+      const drawBoth = (P: Params, o: SceneOptions, k: number) => {
+        const r = this.cpu.render(P, keyed(o, P.seed, k), zoom);
+        return { m: measure(r.alpha), counts: engineCounts(r.counts) };
+      };
+      const draw = (P: Params, o: SceneOptions, k: number) => drawBoth(P, o, k).m;
       // the controls compare with the first stand-in only
-      const stand = Array.from({ length: parts.pairs ? standIns : 1 }, (_, r) =>
-        draw(c.params, opts, STAND_IN_KEY + r),
+      const standBoth = Array.from({ length: parts.pairs ? standIns : 1 }, (_, r) =>
+        drawBoth(c.params, opts, STAND_IN_KEY + r),
       );
-      const drawn = parts.pairs
-        ? Array.from({ length: keys }, (_, k) => draw(c.params, opts, k))
+      const stand = standBoth.map((s) => s.m);
+      const drawnBoth = parts.pairs
+        ? Array.from({ length: keys }, (_, k) => drawBoth(c.params, opts, k))
         : [];
+      const drawn = drawnBoth.map((d) => d.m);
+      const drawnCounts = drawnBoth.map((d) => d.counts);
       const config = configLabel(c);
       // a held-out v21 capture (ADR 0018): v21 against the same K draws, for the renderers' own
       // differences, which re-draws of line-work drawn the same at every key cannot show
@@ -322,12 +424,15 @@ export class GoldenNode {
         });
       }
       if (parts.pairs)
-        for (const ref of stand)
-          // tagged with the preset, for the per-preset axis-ratio tolerances
+        for (const [i, ref] of stand.entries())
+          // tagged with the preset, for the per-preset axis-ratio tolerances; the mark counts of
+          // the stand-in and of each key go with them (ADR 0035)
           (pairs[c.family] ??= []).push({
             preset: c.base,
             config,
             cs: drawn.map((m) => compareMeasures(ref, m)),
+            ref: standBoth[i]?.counts ?? {},
+            keys: drawnCounts,
           });
       const ref = stand[0];
       if (!ref || !parts.controls) {
@@ -338,7 +443,7 @@ export class GoldenNode {
       for (const ctl of NEGATIVE_CONTROLS) {
         if (!ctl.applies(c.params, refQ)) continue;
         const P = ctl.params ? ctl.params(c.params) : c.params;
-        const o = { ...this.referenceOptions(P, zoom), ...(ctl.scene ?? {}) };
+        const o = { ...this.referenceOptions(P, zoom, c.base), ...(ctl.scene ?? {}) };
         const cs: Comparison[] = [];
         for (let k = 0; k < keys; k++) cs.push(compareMeasures(ref, draw(P, o, k)));
         ((controls[c.family] ??= {})[ctl.name] ??= []).push({ config, cs });
@@ -349,17 +454,86 @@ export class GoldenNode {
   }
 
   /**
+   * The counts of the calibration's re-draw pairs alone (ADR 0035): per configuration, each of
+   * `standIns` draws stands in for v21 and `keys` draws are the engine's, as `calibrateEngine`
+   * draws them, with no rasterising. Where the counts are all that a calibration is to measure
+   * (a family whose other thresholds stand).
+   */
+  calibrateCounts(cases: CalibrationCase[], keys: number, standIns: number) {
+    const pairs: Record<string, CalibrationPair[]> = {};
+    for (const c of cases) {
+      const zoom = c.zoom ?? 1;
+      const opts = this.referenceOptions(c.params, zoom, c.base);
+      const draw = (k: number) =>
+        engineCounts(this.cpu.counts(c.params, keyed(opts, c.params.seed, k), zoom));
+      const drawn = Array.from({ length: keys }, (_, k) => draw(k));
+      for (let r = 0; r < standIns; r++)
+        (pairs[c.family] ??= []).push({
+          preset: c.base,
+          config: configLabel(c),
+          cs: [],
+          ref: draw(STAND_IN_KEY + r),
+          keys: drawn,
+        });
+    }
+    return pairs;
+  }
+
+  /**
+   * The v21 draws of a case (ADR 0036): its capture first, then the other draws of its stipple the
+   * manifest records under `v21Draws` (tools/capture-reference `--redraws`), where it lists any.
+   * `[name]` alone otherwise, and the comparison is against the one capture, as ever.
+   */
+  referenceNames(name: string): string[] {
+    const m = this.manifest().v21Draws?.cases?.[name] as { name: string }[] | undefined;
+    return [name, ...(m ?? []).map((d) => d.name)];
+  }
+
+  /** v21's ink of each of the case's draws (`referenceNames`), measured. */
+  referenceMeasures(name: string): ImageMeasures[] {
+    return this.referenceNames(name).map((n) => measure(this.reference(n)));
+  }
+
+  /** v21's mark counts: those of the capture, or the mean over the case's draws. */
+  referenceCounts(name: string): Record<string, number> {
+    const stats = this.referenceNames(name).map((n) =>
+      countsOf(n === name ? this.record(name).stats : this.record(n).stats),
+    );
+    return meanCounts(stats);
+  }
+
+  /**
+   * An engine draw against v21 (ADR 0036): against the one capture, or, for a case that has v21
+   * re-draws, the mean of its comparisons with each of v21's draws, as ADR 0018 takes the mean over
+   * the engine's draws.
+   */
+  compareToReference(refs: ImageMeasures[], render: ImageMeasures): Comparison {
+    return meanComparison(refs.map((r) => compareMeasures(r, render)));
+  }
+
+  private manifestCache: { v21Draws?: { cases?: Record<string, unknown> } } | null = null;
+  private manifest() {
+    this.manifestCache ??= JSON.parse(
+      readFileSync(join(this.root, 'tests/golden/reference/manifest.json'), 'utf8'),
+    ) as { v21Draws?: { cases?: Record<string, unknown> } };
+    return this.manifestCache;
+  }
+
+  /**
    * The comparison's re-draws (ADR 0018): the CPU engine drawing a required case with keys
    * 1..K − 1, each compared with v21's capture; key 0, the canonical draw, is each engine's own.
    */
   redraws(name: string, keys: number): { c: Comparison; counts: Record<string, number> }[] {
     const rec = this.record(name);
-    const opts = this.referenceOptions(rec.params, rec.zoom ?? 1);
-    const ref = measure(this.reference(name));
+    const opts = this.referenceOptions(rec.params, rec.zoom ?? 1, rec.preset);
+    const refs = this.referenceMeasures(name);
     const out: { c: Comparison; counts: Record<string, number> }[] = [];
     for (let k = 1; k < keys; k++) {
       const r = this.cpu.render(rec.params, keyed(opts, rec.params.seed, k), rec.zoom ?? 1);
-      out.push({ c: compareMeasures(ref, measure(r.alpha)), counts: engineCounts(r.counts) });
+      out.push({
+        c: this.compareToReference(refs, measure(r.alpha)),
+        counts: engineCounts(r.counts),
+      });
     }
     return out;
   }
@@ -471,6 +645,29 @@ export function meanCounts(list: Record<string, number>[]): Record<string, numbe
   return out;
 }
 
+/** One re-draw pair of the calibration: the K comparisons, and the mark counts they compared. */
+export interface CalibrationPair {
+  preset: string;
+  config: string;
+  cs: Comparison[];
+  /** the stand-in's counts per class */
+  ref: Record<string, number>;
+  /** each key's counts per class, in key order */
+  keys: Record<string, number>[];
+}
+
+/**
+ * The relative difference of each class's count between a stand-in for v21 and the mean over the
+ * first K keys, for the classes the stand-in holds `minCount` marks or more of (ADR 0035).
+ */
+export function countSpread(p: CalibrationPair, K: number, minCount = 100): Record<string, number> {
+  const mean = meanCounts(p.keys.slice(0, K));
+  const out: Record<string, number> = {};
+  for (const [k, ref] of Object.entries(p.ref))
+    if (ref >= minCount) out[k] = Math.abs((mean[k] ?? 0) - ref) / ref;
+  return out;
+}
+
 /** One configuration of the calibration. */
 export interface CalibrationCase {
   preset: string;
@@ -579,6 +776,32 @@ export const NEGATIVE_CONTROLS: {
       name: 'halo off',
       applies: (P) => !P.merger && P.halo > 0,
       params: (P) => ({ ...P, halo: 0 }),
+    },
+    // the lens (M9): a change of what is lensed, which the lensed ink must show
+    {
+      name: 'lensR ×1.12',
+      applies: (P) => P.lensOn === 1,
+      params: (P) => ({ ...P, lensR: Math.min(2.2, P.lensR * 1.12) }),
+    },
+    {
+      name: 'lensSize ×1.4',
+      applies: (P) => P.lensOn === 1 && P.lensSource !== 'drawing',
+      params: (P) => ({ ...P, lensSize: Math.min(0.6, P.lensSize * 1.4) }),
+    },
+    {
+      name: 'lensStars ×0.5',
+      applies: (P) => P.lensOn === 1 && P.lensSource !== 'drawing',
+      params: (P) => ({ ...P, lensStars: Math.max(500, P.lensStars * 0.5) }),
+    },
+    {
+      name: 'lensShear +0.1',
+      applies: (P) => P.lensOn === 1,
+      params: (P) => ({ ...P, lensShear: Math.min(0.3, P.lensShear + 0.1) }),
+    },
+    {
+      name: 'lensSrc +0.25',
+      applies: (P) => P.lensOn === 1 && P.lensSource !== 'drawing' && !P.lensCluster,
+      params: (P) => ({ ...P, lensSrc: Math.min(0.8, P.lensSrc + 0.25) }),
     },
     { name: 'RMAX 4.2', applies: (P) => !P.merger, scene: { rmax: 4.2 } },
     {

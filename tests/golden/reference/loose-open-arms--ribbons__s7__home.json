@@ -6,9 +6,6 @@
   "surface": "paper",
   "variant": "ribbons",
   "overrides": {
-    "starMix": 0,
-    "field": 0,
-    "fgstars": 0,
     "bubbles": 0,
     "whole": 0,
     "envelope": 0
@@ -17,7 +14,7 @@
     "load page (theme light)",
     "__GEN.preset(\"Loose, open arms\")",
     "__GEN.set({ seed: 7 })",
-    "__GEN.set({\"starMix\":0,\"field\":0,\"fgstars\":0,\"bubbles\":0,\"whole\":0,\"envelope\":0})"
+    "__GEN.set({\"bubbles\":0,\"whole\":0,\"envelope\":0})"
   ],
   "zoom": 1,
   "canvas": [
@@ -25,13 +22,13 @@
     800
   ],
   "stats": {
-    "rstars": 0,
-    "dots": 9285,
-    "knots": 219,
-    "stars": 22,
+    "rstars": 1595,
+    "dots": 7940,
+    "knots": 194,
+    "stars": 18,
     "curves": 4,
-    "used": 46,
-    "ms": 117
+    "used": 88,
+    "ms": 641
   },
   "hand": [
     9,
@@ -137,7 +134,7 @@
     "lens": 0,
     "shells": 0,
     "tail": 0,
-    "fgstars": 0,
+    "fgstars": 0.3,
     "trails": 0,
     "arrow": 0,
     "plates": "ink",
@@ -176,9 +173,9 @@
     "ovArtefact": "none",
     "mTime": 1,
     "az": 0,
-    "starMix": 0,
+    "starMix": 0.6,
     "dustScribble": 0.5,
-    "field": 0,
+    "field": 0.3,
     "dustLines": 0,
     "bubbles": 0,
     "streams": 0,
@@ -212,6 +209,6 @@
     "shellStars": 6000
   },
   "pageErrors": [],
-  "inkPixelSha256": "471ad40eb968667d0d01baf81186ea250a2e5380bbae07f5f945a2abedd7d93f",
-  "captured": "2026-10-06T11:01:13.251Z"
+  "inkPixelSha256": "0a7717d000ae2aa5e3fe4cdd352b58d39afdaf2898356c7ff61a4bd74d5da353",
+  "captured": "2026-10-06T17:27:55.602Z"
 }

@@ -5,9 +5,13 @@
  * change of any other parameter rebuilds (re-integrates) the merger; a change of these does not.
  */
 import type { Params } from '../core/params';
+import type { Orientation } from '../view/camera';
 
 const NOT_MODEL = new Set<string>(['az', 'incl', 'pa', 'winding', 'mTime', 'plates']);
 
 export function pageModelKey(P: Params): string {
   return JSON.stringify(Object.entries(P).filter(([k]) => !NOT_MODEL.has(k)));
 }
+
+/** The scene options that fix a lens's sources at the home orientation (ADR 0050). */
+export const lensOpts = (P: Params, home: Orientation) => (P.lensOn ? { lens: { home } } : {});

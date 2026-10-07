@@ -36,11 +36,25 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0024](adr/0024-plates-are-present-tier-passes.md) | Plates (`slip`, `colour`) are present-tier passes over layers that carry their population; switching them builds uniforms only. |
 | [0025](adr/0025-the-slipped-plates-are-their-own-golden-family.md) | _Proposed:_ the slipped plates are their own golden family (`slip`), calibrated alone. |
 | [0026](adr/0026-per-preset-bands-widen-only.md) | _Proposed:_ per-preset bands for the radii, the position angle and the axis ratio: the larger of the current band and 1.5 × the preset's largest re-draw spread (the owner's decision of 2026-10-07). |
+| [0030](adr/0030-overlays-take-an-explicit-home-orientation.md) | Overlays (a foreground star, an artefact) take an explicit home orientation, the camera they are placed at, in place of v21's `homeFor`: the open question Q3, option (b). |
+| [0031](adr/0031-m7-golden-cases-and-retired-overrides.md) | M7's golden cases (stars, artefacts, layered scenes, the deep field, no overrides), and the retirement of the `starMix`, `field` and `fgstars` overrides of M2 to M5, whose captures are made again. |
+| [0032](adr/0032-the-sky-is-a-catalogue-built-on-the-gpu.md) | The sky is a model-tier catalogue (deep-field galaxies, foreground stars, companions), culled, drawn and bounded per view by GPU passes. |
+| [0033](adr/0033-stars-and-sky-follow-v21s-draws.md) | The loops, quirks and limits of `starSprites` and `buildSky` that are reproduced (`// v21 parity`). |
+| [0034](adr/0034-m7-checks-after-the-merge-with-m5.md) | _Proposed:_ four changes to checks and cases when M7 met M5's line-work set (the `lines` cases keep their overrides; the orbit check and the stars' raster check; the GPU page time limit). |
+| [0035](adr/0035-m7-calibration-with-the-stars-on-and-the-dots-count-spread.md) | _Proposed:_ the dots' count tolerance from the engine's own re-draw spread; M7's families and `spiral` and `smooth` calibrated with the stars on (`Edge-on with dust` keeps M5's thresholds); the engine's own goldens made again. |
+| [0036](adr/0036-v21-drawn-again-and-compared-as-its-mean.md) | _Proposed:_ v21 drawn again (its stipple stream moved) for three cases, which are compared with the mean of its 8 draws; no band changes. |
 | [0040](adr/0040-merger-stars-snapshots-and-the-framing-read-back.md) | _Proposed:_ the merger's test stars on the GPU in chunks, the f16 snapshots under a 64 MiB budget, and the model tier's one 12 kB read-back for `frameOf` |
 | [0041](adr/0041-a-merging-galaxy-is-carried-after-its-own-kernels.md) | _Proposed:_ a merging galaxy is built as a single galaxy and carried by its tides (the 4-nearest-star warp grid) after its own kernels |
 | [0042](adr/0042-the-debris-of-a-merger-as-marks.md) | _Proposed:_ the debris of a merger as marks: classified on the counter RNG, thinned as v21 thins it, and what v21 builds and never draws is not built |
 | [0043](adr/0043-shells-on-the-gpu-detected-by-atomics-and-bisection.md) | _Proposed:_ shell galaxies: the satellite on the GPU, the shells found by integer atomics and a bisection, the arcs through a face-on camera |
 | [0044](adr/0044-m8-acceptance-overrides-and-the-merger-and-shell-thresholds.md) | _Proposed:_ the M8 goldens' overrides, and the thresholds of the merger and shell families |
+| [0050](adr/0050-the-lens-marks-slots-and-explicit-home.md) | _Proposed:_ the lens's marks, slots and explicit home: 8 slots per mark, mark classes, the fixed-point κ, the saved source orientation (open question Q3, option b) that the orbit never re-rolls. |
+| [0051](adr/0051-goldens-drawn-with-v21s-lens-picks.md) | _Proposed:_ the goldens draw the lens with v21's lens picks, replayed from v21's own streams and checked against v21's solver; the engine's own picks are tested by their distributions. Extends 0015 item 5 and 0021. |
+| [0052](adr/0052-m9-acceptance-overrides.md) | _Proposed:_ the overrides of the M9 acceptance captures (the deep field, drawn stars and foreground stars; and `Layered: lensed merger`, lens on, since M8). |
+| [0053](adr/0053-lens-family-calibration-and-count-gate.md) | _Proposed:_ the `lens` family's calibration (28 configurations, `--only-family lens`), and its count gate at `poisson` 4.5 (lensed knots are over-dispersed: 1.27 against 0.82). |
+| [0054](adr/0054-lens-inner-axis-ratio-band.md) | the `lens` family's inner axis-ratio band becomes 0.044 (1.1 × the largest of 84 v21 captures, 0.0395), after two of the 28 acceptance cases missed 0.033 by 0.0002 and 0.0065. |
+| [0060](adr/0060-the-real-galaxies-are-their-own-golden-family.md) | _Accepted (owner, 2026-10-07):_ the real galaxies are their own golden family (`real`), calibrated on engine re-draws of the 20 captures and one held-out seed |
+| [0061](adr/0061-real-galaxies-with-the-sky-on-and-two-more-cases-against-v21s-mean.md) | _Proposed:_ the real galaxies drawn with the sky on (captures without the overrides): the `real` family's dots tolerance calibrated again (ADR 0035's procedure, factor 2; no other threshold), and `Real galaxy 6` and `barred-spiral--knob-ring-lines` (s7 home) compared with the mean of v21's 8 draws (ADR 0036). |
 | [0070](adr/0070-pooled-scratch-shared-uploads-and-kept-batches.md) | _Proposed:_ pooled scratch buffers (cleared on reuse), content-addressed shared uploads and kept ink batches, so a model rebuild and an orbit frame create almost no resources. Output unchanged. |
 | [0071](adr/0071-the-cpu-engine-runs-in-a-worker.md) | _Proposed:_ the CPU engine runs in a worker behind messages (`fallback/core.ts`, `worker.ts`, `client.ts`), so a CPU frame never blocks the page. |
 
@@ -49,7 +63,8 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 ```
 src/core/        parameters (typed DEF), schema (ranges, tiers), presets, the CPU half of the RNG
 src/model/       scene description for a galaxy: variation, component weights, arm and spur
-                 coefficients, part placement; the sky catalogue
+                 coefficients, part placement; the stars and artefacts (stars.ts), the sky
+                 catalogue (sky.ts), dynamic vector sets (dynvec.ts)
 src/view/        the camera: one rotation for project / rotFwd / rotInv / toView, perspective
 src/sim/         merger (core track, snapshots), lens (halos, solver driver), shells
 src/marks/       bitmap sheets → texture arrays; vector records → segment, dot and blob buffers;
@@ -93,7 +108,7 @@ Nothing produced on the GPU is read back on the frame path. Counts flow into ind
 These are intended changes in behaviour, each confirmed or rejected by the owner (docs/open-questions.md):
 
 1. **Orbiting keeps the marks.** In v21, orbiting with dust lanes on re-rolls the stipple (reference notes, flagged item 1). Here a camera move never changes which marks exist.
-2. **The home orientation is a parameter.** v21 remembers the camera at which lensed sources and overlays were first placed (`homeFor`), which makes a render depend on navigation history. Here it is explicit and saved.
+2. **The home orientation is a parameter.** v21 remembers the camera at which lensed sources and overlays were first placed (`homeFor`), which makes a render depend on navigation history. Here it is explicit and saved. Built for overlays in M7 (`SceneOptions.home`, ADR 0030); lensed sources follow in M9.
 3. **No mip bleed.** Each drawing has its own mip chain, so small dots no longer pick up ink from neighbouring cells.
 4. **Round pen ends.** Vector drawings other than pen lines are drawn as capsules, with round caps and joins; v21's quads extend 0.9 of the width past each end and rely on MSAA. The spike measured capsules as closer to a real pen stroke (ADR 0006). Pen lines (the dust hatching) are not a divergence: M4 draws them as v21's own quads, 0.9 w past each end, unioned at v21's four MSAA sample positions, because capsules composited per pixel inked 18–41% more than v21 at the joins (ADR 0019, proposed).
 5. **Integer-lattice value noise** replaces the `sin`-hash noise, so flocculence, patchiness and dust gaps are the same on every machine. The patterns differ from v21's, but their statistics do not.

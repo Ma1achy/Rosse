@@ -35,6 +35,10 @@ export const NoiseSalt = {
   /** the hand wobble, x and y (SM, app23.js:L163) */
   wobbleX: 9,
   wobbleY: 10,
+  /** a star's faint rings, a trail's flicker, a ghost's ragged disc (starSprites, app23.js:L414–431) */
+  starRing: 11,
+  starTrail: 12,
+  starGhost: 13,
 } as const;
 
 /** Salts a noise field can hold, and the words of its header per salt. */

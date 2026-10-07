@@ -18,9 +18,11 @@ import type { Params } from '../../src/core/params';
 import { INSTANCE_WORDS, runProject } from '../../src/fallback/kernels/project';
 import { ribbonModel, runRibbons } from '../../src/fallback/kernels/ribbons';
 import { cullsUniform, ribUniform } from '../../src/model/ribbons';
+import { breatheRoom } from '../../src/fallback/kernels/breathe';
 import { compact } from '../../src/fallback/kernels/scan';
 import { SAMPLE_WORDS, runStipple } from '../../src/fallback/kernels/stipple';
 import { BuiltAssets } from '../../src/marks/atlas';
+import { VECTOR_ATLASES, type VectorLibrary } from '../../src/marks/vector';
 import { CLASS_COUNT } from '../../src/model/classes';
 import { buildScene, drawingsMeta } from '../../src/model/scene';
 import { GpuStipple } from '../../src/render/stipple';
@@ -74,10 +76,10 @@ run('stipple kernels (GPU = CPU, L1)', async () => {
     (['dots', 'knots', 'stars', 'cores', 'strokes'] as const).map((n) => assets.atlas(n)),
   );
   if (!dots || !knots || !stars || !cores || !strokes) throw new Error('atlases missing');
-  const meta = drawingsMeta(
-    { dots, knots, stars, cores, strokes },
-    await assets.vector('penlines'),
-  );
+  // every sheet: the drawn stars (M7) need `sstars`
+  const sheets = await Promise.all(VECTOR_ATLASES.map((n) => assets.vector(n)));
+  const lib = Object.fromEntries(VECTOR_ATLASES.map((n, i) => [n, sheets[i]])) as VectorLibrary;
+  const meta = drawingsMeta({ dots, knots, stars, cores, strokes }, lib.penlines, lib);
   const gpu = GpuStipple.create(dev);
   const swiftShader = /swiftshader/i.test(adapterName(adapter));
   const lines = [
@@ -98,7 +100,8 @@ run('stipple kernels (GPU = CPU, L1)', async () => {
     const gSu = new Uint32Array(gS.buffer);
     const gP = await gpu.readProjected();
     const gPf = new Float32Array(gP.instances);
-    const gCounts = await gpu.readCounts();
+    // the galaxy's own marks: the lens's are compared in tests/gpu/lens*.ts
+    const gCounts = await gpu.readCounts(false);
     const gOut = await gpu.readInstances();
 
     const cS = runStipple(scene.galaxy);
@@ -117,6 +120,8 @@ run('stipple kernels (GPU = CPU, L1)', async () => {
       carve: scene.ribbons.carve,
       noise: G.noise,
     });
+    // the breathing room round bright drawn stars (M7)
+    const cleared = G.g.star_mix > 0.01 ? breatheRoom(cP.classes, G.g.n, cP.f32, cS.u32) : 0;
     const cC = compact(cP.classes, n, cP.u32);
 
     // samples, model tier
@@ -202,7 +207,7 @@ run('stipple kernels (GPU = CPU, L1)', async () => {
     worstCount = Math.max(worstCount, countWorst);
     worstPos = Math.max(worstPos, pPosMax);
     lines.push(
-      `${ok ? 'ok  ' : 'FAIL'} ${name}: n ${String(n)}; samples: ${String(sClassDiff)} class differences, max |Δp| ${sPosMax.toExponential(2)} px; ` +
+      `${ok ? 'ok  ' : 'FAIL'} ${name}: n ${String(n)}; ${String(cleared)} cleared by the breathing room; samples: ${String(sClassDiff)} class differences, max |Δp| ${sPosMax.toExponential(2)} px; ` +
         `instances: ${String(pClassDiff)} class differences, ${(100 * match).toFixed(3)}% within tolerance, max |Δp| ${pPosMax.toExponential(2)} px; ` +
         `counts GPU [${Array.from(gCounts.perClass).join(', ')}] CPU [${Array.from(cC.counts).join(', ')}] (worst ${(100 * countWorst).toFixed(3)}%); ` +
         `compacted slots ${String(slots - slotsBad)}/${String(slots)} match`,

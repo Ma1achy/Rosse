@@ -30,7 +30,15 @@ import { PALETTES } from '../../../src/render/palette';
 import type { Plates } from '../../../src/render/plates';
 import { grey, type Grey } from './metrics';
 
-export const ATLASES: AtlasName[] = ['dots', 'knots', 'stars', 'cores', 'pieces', 'strokes'];
+export const ATLASES: AtlasName[] = [
+  'dots',
+  'knots',
+  'stars',
+  'cores',
+  'fgstars',
+  'pieces',
+  'strokes',
+];
 
 export function loadAtlases(root: string): AtlasData[] {
   const dir = join(root, 'assets-built');
@@ -67,6 +75,7 @@ export function metaOf(atlases: AtlasData[], penlines?: VectorSheet, vectors?: V
       knots: by('knots'),
       stars: by('stars'),
       cores: by('cores'),
+      fgstars: by('fgstars'),
       strokes: by('strokes'),
     },
     penlines,
@@ -102,6 +111,11 @@ export class CpuGolden {
       { width: 1, height: 1, data: new Uint8Array(4) },
     );
     for (const a of this.atlases) this.renderer.addAtlas(a);
+  }
+
+  /** The mark counts of a draw alone, without the raster (ADR 0035). */
+  counts(P: Params, opts: SceneOptions = {}, zoom = 1): MarkCounts {
+    return new CpuStipple(buildScene(P, this.meta, opts)).view(cameraOf(P, zoom)).counts;
   }
 
   /** `zoom`: the reference's ZOOM at capture (1, or 2 for the zoom camera). */

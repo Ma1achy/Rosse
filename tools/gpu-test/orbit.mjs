@@ -125,7 +125,15 @@ export async function orbitCheck(browser, url) {
     if (s1.camera.pa !== s0.camera.pa || s1.camera.zoom !== s0.camera.zoom)
       fail(`${tag} a drag changed pa or zoom`);
     if (after === before) fail(`${tag} the marks did not move`);
-    if (JSON.stringify(s1.counts) !== JSON.stringify(s0.counts))
+    // the breathing room round the drawn stars is a filter of the view (ADR 0010): the dots it
+    // clears, and the drawings used by those that remain, follow the camera (docs/architecture.md, the view tier); every other count is
+    // the model's and must not change (ADR 0034, proposed)
+    const model = (/** @type {Record<string, unknown>} */ c) => {
+      const { dots, old, disc, young, used, ...rest } = c;
+      void [dots, old, disc, young, used];
+      return JSON.stringify(rest);
+    };
+    if (model(s1.counts) !== model(s0.counts))
       fail(
         `${tag} the mark counts changed: ${JSON.stringify(s0.counts)} → ${JSON.stringify(s1.counts)}`,
       );

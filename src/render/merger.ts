@@ -36,6 +36,7 @@ import {
   type MergerScene,
   type MergerSceneOptions,
 } from '../model/merger';
+import { cameraOf } from '../view/camera';
 import { markCounts, STIPPLE_LAYERS, type MarkCounts } from '../model/scene';
 import type { DrawingsMeta } from '../model/variation';
 import type { Params } from '../core/params';
@@ -92,6 +93,8 @@ export class GpuMerger {
   private debris: Debris | null = null;
   private poolBuffers: { pool: GPUBuffer; dotBase: GPUBuffer; noise: GPUBuffer } | null = null;
   private mwarpOn = false;
+  /** the lens's host (M9): a merging pair can lens a galaxy behind it */
+  private lensHost: GpuStipple | null = null;
 
   /** the buffers of the warp's vector pass and the shells (each galaxy has its own, M10) */
   private readonly res: GpuResources;
@@ -261,6 +264,15 @@ export class GpuMerger {
         }),
       );
 
+    // the lens of `lensOn`: a merging pair can lens a galaxy behind it (M9)
+    if (scene.lensHost) {
+      this.lensHost ??= GpuStipple.create(d);
+      this.lensHost.setScene(scene.lensHost);
+    } else {
+      this.lensHost?.destroy();
+      this.lensHost = null;
+    }
+
     // mWarp's drawings: the main picture's hand, torn through the tidal map itself
     const MW = mwarpDesc(scene);
     this.mwarpOn = !!MW;
@@ -311,6 +323,7 @@ export class GpuMerger {
       s.setView(G.camera);
     });
     if (this.shellsOn) this.shells.view(zoom);
+    this.lensHost?.setView(cameraOf(scene.P, zoom), scene.P.mTime);
     if (this.mwarpOn) {
       const MW = mwarpDesc(scene);
       if (MW) {
@@ -350,6 +363,7 @@ export class GpuMerger {
       ...this.mwarp.layers(),
       ...this.debrisLayers(),
       ...(this.shellsOn ? this.shells.layers() : []),
+      ...(this.lensHost?.lensLayers() ?? []),
     ];
   }
 
@@ -363,6 +377,8 @@ export class GpuMerger {
     const parts = await Promise.all(this.galaxies.map((s) => s.readCounts()));
     for (const p of parts)
       for (let c = 0; c < CLASS_COUNT; c++) perClass[c] = (perClass[c] ?? 0) + (p.perClass[c] ?? 0);
+    const lens = await (this.lensHost?.lensCounts() ?? Promise.resolve([] as number[]));
+    for (let c = 0; c < CLASS_COUNT; c++) perClass[c] = (perClass[c] ?? 0) + (lens[c] ?? 0);
     // the shells' stars are `old` dots
     if (this.shellsOn) perClass[Cls.old] = (perClass[Cls.old] ?? 0) + this.shells.count;
     const counts: MarkCounts = { ...markCounts(perClass) };
@@ -413,5 +429,6 @@ export class GpuMerger {
     this.mwarp.destroy();
     this.shells.destroy();
     this.res.destroy();
+    this.lensHost?.destroy();
   }
 }

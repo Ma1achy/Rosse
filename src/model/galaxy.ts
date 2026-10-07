@@ -89,6 +89,12 @@ const GALAXY_FIELDS = [
   ['warp_a', 'f32'],
   ['rmax', 'f32'],
   ['n_extra', 'u32'],
+  // the drawn stars' pools (M7): small and bright `sstars` drawings after the dot pool, and the
+  // variation's spike direction (app23.js:L189)
+  ['n_ss_small', 'u32'],
+  ['n_ss_bright', 'u32'],
+  ['spike', 'f32'],
+  ['pad_g', 'u32'],
 ] as const;
 
 export type GalaxyField = (typeof GALAXY_FIELDS)[number][0];
@@ -108,7 +114,11 @@ export interface GalaxyDesc {
   g: GalaxyScalars;
   /** SHAPE.size vec4s: arms, spurs, dust patches */
   shape: Float32Array<ArrayBuffer>;
-  /** knot pool (24) then dot pool */
+  /**
+   * knot pool (24), dot pool, then the drawn stars' pools (M7): the small `sstars` drawings and the
+   * bright ones (outline kind) of `generate`'s `rstar`. A small drawing's high bit marks an
+   * asterisk (its spin scatters more, app23.js:L189).
+   */
   pool: Uint32Array<ArrayBuffer>;
   /** per dot tile: the quad size at k = 1 (dotSprite, app23.js:L81) */
   dotBase: Float32Array<ArrayBuffer>;
@@ -155,6 +165,31 @@ export function packGroups(groups: readonly MarkGroup[]): { buf: ArrayBuffer; to
     first += (u[o + 5] ?? 0) + (u[o + 6] ?? 0);
   });
   return { buf, total: first };
+}
+
+/**
+ * An upper bound on the drawn stars (`rstar` samples) the proposals and the groups can make, with a
+ * margin of 8 standard deviations: the capacity of the drawn stars' rows (src/model/dynvec.ts). A
+ * star beyond it is dropped, in sample order, so the cut is deterministic.
+ */
+export function rstarBound(G: GalaxyDesc): number {
+  const g = G.g;
+  let extras = 0;
+  for (const grp of G.groupList) extras += Math.min(grp.rstars, 8);
+  if (!(g.star_mix > 0.01)) return extras;
+  const sm = g.star_mix;
+  const w = (a: number, b: number) => (g.tot > 0 ? Math.max(0, b - a) / g.tot : 0);
+  const wBulge = w(0, g.c_bulge);
+  const wBar = w(g.c_halo, g.c_bar);
+  const wRing = w(g.c_bar, g.c_ring);
+  const wDisc = w(g.c_ring, g.tot);
+  const armsOn = (g.flags & GalaxyFlag.armsOn) !== 0;
+  const sersic = (g.flags & GalaxyFlag.sersic) !== 0;
+  let p = wBulge * (sersic ? 0.09 * sm : 0.34 * sm * 0.4);
+  p += 0.34 * sm * (wBar * 0.85 + wRing * 1.6 + wDisc * (armsOn ? 1.35 : 0.85));
+  p = Math.min(1, Math.max(0, p));
+  const mean = g.n * p;
+  return Math.min(g.n, Math.ceil(mean + 8 * Math.sqrt(mean) + 32)) + extras;
 }
 
 /** Every sample the stipple buffer holds: the proposals, then the ring knots' and clumps' marks. */
@@ -234,6 +269,10 @@ export function describeGalaxy(
     warp_a: f(V.warpA),
     rmax: f(RMAX),
     n_extra: 0,
+    n_ss_small: 0,
+    n_ss_bright: 0,
+    spike: f(V.spike),
+    pad_g: 0,
   };
   const groupList = markGroups(P, V, key, opts.ringKnots);
   const packed = packGroups(groupList);
@@ -251,12 +290,39 @@ export function describeGalaxy(
     shape.set([d.R, d.th, d.s, 0], (SHAPE.dust + i) * 4);
   });
 
-  const pool = new Uint32Array(KNOT_POOL + V.dotPool.length);
+  const ss = starPools(meta, false);
+  g.n_ss_small = ss.small.length;
+  g.n_ss_bright = ss.bright.length;
+  const pool = new Uint32Array(KNOT_POOL + V.dotPool.length + ss.small.length + ss.bright.length);
   pool.set(V.knotPool.slice(0, KNOT_POOL), 0);
   pool.set(V.dotPool, KNOT_POOL);
+  pool.set(ss.small, KNOT_POOL + V.dotPool.length);
+  pool.set(ss.bright, KNOT_POOL + V.dotPool.length + ss.small.length);
 
   const dotBase = new Float32Array(meta.dots.size.map((s) => dotSprite(s, penDot, 1)));
   return { g, shape, pool, dotBase, groups: packed.buf, groupList, noise: packNoise() };
+}
+
+/** High bit of a small drawn-star tile in the pool: an asterisk. */
+export const STAR_ASTERISK = 0x80000000;
+
+/**
+ * The `sstars` drawings split into small and bright (generate, app23.js:L181–182: bright are the
+ * `outline` kind; starSprites, L401: `outline` and `burst`). Entries are tile indices, a small
+ * asterisk's with `STAR_ASTERISK`.
+ */
+export function starPools(
+  meta: DrawingsMeta,
+  sprites: boolean,
+): { small: number[]; bright: number[] } {
+  const kinds = meta.vectors?.sstars?.kind ?? [];
+  const small: number[] = [];
+  const bright: number[] = [];
+  kinds.forEach((k, i) => {
+    if (k === 'outline' || (sprites && k === 'burst')) bright.push(i);
+    else small.push(k === 'asterisk' ? (i | STAR_ASTERISK) >>> 0 : i);
+  });
+  return { small, bright };
 }
 
 /** The Galaxy uniform as bytes. */

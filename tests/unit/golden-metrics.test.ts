@@ -19,7 +19,7 @@ import {
   type Comparison,
   type Grey,
 } from '../../tests/golden/compare/metrics';
-import { meanComparison, meanCounts } from '../../tests/golden/compare/node';
+import { countSpread, meanComparison, meanCounts } from '../../tests/golden/compare/node';
 import {
   countAllowance,
   evaluate,
@@ -202,7 +202,34 @@ describe('golden metric (ADR 0013)', () => {
     expect(countAllowance(720, 774, t)).toBeCloseTo(3 * Math.sqrt(1494), 6);
     expect(countAllowance(9500, 9500, t)).toBeCloseTo(285, 6);
     expect(countAllowance(1016, 1082, t)).toBeCloseTo(30.48, 6);
+    // ADR 0035: a class the family measured wider than the ADR's 3% has its own relative tolerance
+    const wide = { ...t, countsBy: { dots: 0.08 } };
+    expect(countAllowance(6000, 6400, wide, false, 'dots')).toBeCloseTo(480, 6);
+    expect(countAllowance(6000, 6400, wide, false, 'rstars')).toBeCloseTo(180, 6);
+    expect(countAllowance(6000, 6400, wide)).toBeCloseTo(180, 6);
+    // ...and a class under 100 marks keeps its own rule (here the Poisson allowance is the wider)
+    expect(countAllowance(50, 50, wide, false, 'dots')).toBeCloseTo(30, 6);
+    expect(evaluate(c, { dots: 6000 }, { dots: 6400 }, t).pass).toBe(false);
+    expect(evaluate(c, { dots: 6000 }, { dots: 6400 }, wide).pass).toBe(true);
+    expect(evaluate(c, { dots: 6000 }, { dots: 6700 }, wide).pass).toBe(false);
   }, 30_000);
+
+  it('the count spread of a calibration pair: the mean of the first K keys against the stand-in', () => {
+    const pair = {
+      preset: 'p',
+      config: 'c',
+      cs: [],
+      ref: { dots: 1000, knots: 50, rstars: 200 },
+      keys: [
+        { dots: 1100, knots: 40, rstars: 200 },
+        { dots: 900, knots: 60, rstars: 220 },
+        { dots: 5000, knots: 0, rstars: 0 },
+      ],
+    };
+    // two keys: the mean 1000 of dots is the stand-in's; knots (under 100) are left out
+    expect(countSpread(pair, 2)).toEqual({ dots: 0, rstars: 0.05 });
+    expect(countSpread(pair, 3).dots).toBeCloseTo(Math.abs((7000 / 3 - 1000) / 1000), 9);
+  });
 
   it('measures extent and shape: radii, outer ink, axis ratio, position angle', () => {
     const round = blobDots(6000, 6, 400, 400, 30, 800);

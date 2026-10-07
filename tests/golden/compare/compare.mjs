@@ -34,14 +34,21 @@
  *   --calibrate       measure "same galaxy, other dots" pairs and the negative controls, and write
  *                     ../thresholds.json and ../calibration.json; needs tests/golden/actual/reroll/
  *                     from `npm run capture:reference -- --reroll` for the v21 source
+ *   --calibrate-counts  with --families, only re-measure the count tolerances of these families
+ *                     (ADR 0035), leaving their other thresholds as they are: minutes, no rasters
+ *   --families a,b    with --calibrate, only these families (and their `@zoom`): their thresholds
+ *                     and numbers replace the files' own and the other families are kept as they
+ *                     are (M7 calibrated the star, artefact, layered and deepfield families so)
  *     --keys K        the K of the mean (default 6, ADR 0018)
  *     --resume        keep what a stopped calibration measured (test-results/calibration-shard-*)
  *     --controls-every n  the negative controls on every n-th configuration only (default 1)
  *     --reuse-shards  only aggregate the last calibration's measurements (test-results/
  *                     calibration-shard-*.json, made with at least K keys) for this K
  *     --only-family f  calibrate the families named f (and f@zoom) alone and merge them into the
- *                     two files, leaving every other family as it is (M6: `slip`)
+ *                     two files, leaving every other family as it is (M6: `slip`; M9: `lens`)
  *   --jobs n          parallel processes for the re-draws and the calibration (default 4)
+ *   --reuse-redraws   with the comparison, the last run's re-draws as they are (a run stopped after
+ *                     them); only while the engine and the cases are unchanged
  *   --no-gpu          the CPU engine only (no browser)
  *   --only a,b        only the cases whose name contains one of these (for working on a few; the
  *                     run then checks fewer than the required set)
@@ -62,6 +69,8 @@ const opt = (/** @type {string} */ k) => {
   const i = args.indexOf(k);
   return i >= 0 ? args[i + 1] : undefined;
 };
+/** The calibration's multiple of the 95th percentile of the re-draw spread (ADR 0018: 1.5; `--factor`, ADR 0035). */
+const FAC = Number(opt('--factor') ?? 1.5);
 const dir = resolve(import.meta.dirname, '../reference');
 const manifestPath = join(dir, 'manifest.json');
 if (!existsSync(manifestPath)) {
@@ -102,6 +111,24 @@ for (const c of manifest.captures) {
     console.error(`FAIL  ${c.name}: ${/** @type {Error} */ (e).message}`);
   }
 }
+// v21's other draws of some cases (ADR 0036), by the same check
+let nDraws = 0;
+for (const list of Object.values(manifest.v21Draws?.cases ?? {}))
+  for (const d of /** @type {any[]} */ (list)) {
+    nDraws++;
+    try {
+      const hash = createHash('sha256')
+        .update(PNG.sync.read(readFileSync(join(dir, `${d.name}.ink.png`))).data)
+        .digest('hex');
+      if (hash !== d.inkPixelSha256) throw new Error('pixel hash differs from the manifest');
+      if (d.pageErrors) throw new Error(`${d.pageErrors} page errors during capture`);
+      if (!existsSync(join(dir, `${d.name}.json`))) throw new Error('missing .json');
+    } catch (e) {
+      bad++;
+      console.error(`FAIL  ${d.name}: ${/** @type {Error} */ (e).message}`);
+    }
+  }
+if (nDraws) console.log(`${nDraws} v21 re-draws checked`);
 console.log(
   `${manifest.captures.length - bad}/${manifest.captures.length} reference captures intact`,
 );
@@ -118,6 +145,9 @@ try {
   const node = new G.GoldenNode(ROOT);
   if (flag('--redraws')) {
     redrawShard(node);
+    failed = 0;
+  } else if (flag('--calibrate-counts')) {
+    await calibrateCountsOnly(G, node);
     failed = 0;
   } else failed = flag('--calibrate') ? (await calibrate(G, node), 0) : await compareAll(G, node);
 } finally {
@@ -231,7 +261,9 @@ async function compareAll(G, node) {
     const jobs = Math.max(1, Math.min(Number(opt('--jobs') ?? 4), required.length));
     mkdirSync(join(ROOT, 'test-results'), { recursive: true });
     const pass = args.filter((a, i) => a === '--only' || args[i - 1] === '--only');
-    await shards(['--redraws', ...pass], jobs);
+    // --reuse-redraws: the last run's re-draws (test-results/redraws-shard-*.json), for a run that
+    // was stopped after them; only valid if nothing the engine draws has changed since
+    if (!flag('--reuse-redraws')) await shards(['--redraws', ...pass], jobs);
     for (let k = 0; k < jobs; k++)
       Object.assign(
         redraws,
@@ -265,10 +297,13 @@ async function compareAll(G, node) {
     // v21's own variation (ADR 0015) and, from M4, v21's own stroke choices (v21-curves.ts) and
     // noise field (v21-noise.ts): both engines draw the same galaxy with the same pens, strokes,
     // flocculence and wobble, and only the dots differ
-    const opts = node.referenceOptions(rec.params, rec.zoom ?? 1);
+    const opts = node.referenceOptions(rec.params, rec.zoom ?? 1, rec.preset);
     const ref = node.reference(c.name);
-    const refM = G.measure(ref);
-    const refCounts = G.countsOf(rec.stats);
+    // v21's draws (ADR 0036): its capture, and, for a case that has them, its other draws; the
+    // comparison is with the mean of them
+    const refs = node.referenceMeasures(c.name);
+    const refM = /** @type {any} */ (refs[0]);
+    const refCounts = node.referenceCounts(c.name);
     const parity = node.parity(rec.preset, rec.zoom ?? 1, rec.variant);
     const strict = node.thresholds.strict;
     /** @type {Record<string, any>} */
@@ -305,7 +340,7 @@ async function compareAll(G, node) {
     const more = isRequired ? (redraws[c.name] ?? []) : [];
     if (isRequired && more.length !== keys - 1) throw new Error(`${c.name}: re-draws missing`);
     for (const e of engines) {
-      const single = G.compareMeasures(refM, e.measures);
+      const single = node.compareToReference(refs, e.measures);
       const cmp = G.meanComparison([single, ...more.map((x) => x.c)]);
       const ev = G.evaluate(
         cmp,
@@ -351,7 +386,7 @@ async function compareAll(G, node) {
     }
     // the engine's own variation, for information
     const own = node.renderCpu(rec.params, {}, zoom);
-    const ownCmp = G.compareMeasures(refM, G.measure(own.alpha));
+    const ownCmp = node.compareToReference(refs, G.measure(own.alpha));
     row.ownVariation = ownCmp;
     console.log(`${''.padEnd(44)} ${'own var.'.padEnd(9)} ${line(ownCmp)}  (information only)`);
     if (gpu) {
@@ -433,7 +468,8 @@ async function compareAll(G, node) {
       about:
         "The new engine's own goldens (ADR 0013 test e): SHA-256 of the 8-bit ink alpha of each required case, WebGPU on SwiftShader in Chromium. Written by npm run golden -- --update-engine.",
       adapter: gpu.adapter,
-      hashes: newHashes,
+      // a run narrowed with --only adds to the hashes already there and changes none of them
+      hashes: opt('--only') ? { ...engineHashes, ...newHashes } : newHashes,
     });
     console.log(`wrote ${enginePath}`);
   }
@@ -446,16 +482,107 @@ async function compareAll(G, node) {
 }
 
 /**
- * ADR 0013 / 0015 calibration: thresholds per family from "same galaxy, other dots" pairs, then
- * the negative controls evaluated against them.
+ * ADR 0035: the dots' count tolerance. Every other class is a count of independent proposals, which
+ * the ADR's relative tolerance and the Poisson allowance cover; the dots are not: the dots round a
+ * drawn star are cleared (v21's breathing room), so their number follows where the few large stars
+ * fall. The tolerance is the ADR's own, or 1.5 × the 95th percentile of the engine's re-draws'
+ * own spread of the dots where that is wider: for the family (eight pairs or more), and for each
+ * preset of it that has eight or more.
+ *
+ * @param {typeof import('./node.ts')} G
+ * @param {{ preset: string, spread: Record<string, number> }[]} items `countSpread` of each pair
+ * @param {number} floor
+ */
+function countTolerances(G, items, floor) {
+  const CLASSES = ['dots'];
+  const tol = (/** @type {number[]} */ xs) => {
+    const w = Math.ceil(FAC * G.summary(xs).p95 * 1000) / 1000;
+    return w > floor ? w : null;
+  };
+  /** @type {Record<string, number[]>} */
+  const spreadOf = {};
+  /** @type {Record<string, Record<string, number[]>>} */
+  const byPresetSpread = {};
+  for (const { preset, spread } of items)
+    for (const k of CLASSES) {
+      const v = spread[k];
+      if (v === undefined) continue;
+      (spreadOf[k] ??= []).push(v);
+      ((byPresetSpread[preset] ??= {})[k] ??= []).push(v);
+    }
+  /** @type {Record<string, number>} */
+  const countsBy = {};
+  for (const [k, xs] of Object.entries(spreadOf)) {
+    const w = xs.length >= 8 ? tol(xs) : null;
+    if (w !== null) countsBy[k] = w;
+  }
+  /** @type {Record<string, Record<string, number>>} */
+  const byPreset = {};
+  for (const [preset, by] of Object.entries(byPresetSpread))
+    for (const [k, xs] of Object.entries(by)) {
+      // a preset the family's tolerance already covers keeps it: only a wider or a narrower
+      // calibrated value of its own is recorded
+      const w = xs.length >= 8 ? tol(xs) : null;
+      (byPreset[preset] ??= {})[k] = w ?? floor;
+    }
+  return { spreadOf, countsBy, byPreset };
+}
+
+/**
+ * ADR 0035, counts only: re-measure the count tolerances of some families (`--families`), leaving
+ * every other threshold of theirs as it is. Draws no rasters, so it takes minutes.
  *
  * @param {typeof import('./node.ts')} G
  * @param {import('./node.ts').GoldenNode} node
  */
-async function calibrate(G, node) {
-  /** ADR 0018: the K of the mean, and the stand-ins for v21 per configuration */
+async function calibrateCountsOnly(G, node) {
   const K = Number(opt('--keys') ?? 6);
   const R = 3;
+  const only = opt('--families')?.split(',');
+  if (!only) throw new Error('--calibrate-counts needs --families');
+  const cases = calibrationCases(G, node);
+  console.log(`count calibration: ${cases.length} configurations × (${R} stand-ins, ${K} keys)`);
+  const pairs = node.calibrateCounts(cases, K, R);
+  const thresholdsPath = join(ROOT, 'tests/golden/thresholds.json');
+  const calibrationPath = join(ROOT, 'tests/golden/calibration.json');
+  const th = JSON.parse(readFileSync(thresholdsPath, 'utf8'));
+  const cal = JSON.parse(readFileSync(calibrationPath, 'utf8'));
+  for (const [family, list] of Object.entries(pairs)) {
+    const { spreadOf, countsBy, byPreset } = countTolerances(
+      G,
+      list.map((p) => ({ preset: p.preset, spread: G.countSpread(p, K) })),
+      th.parity[family]?.counts ?? 0.03,
+    );
+    if (!th.parity[family]) continue;
+    if (Object.keys(countsBy).length) th.parity[family].countsBy = countsBy;
+    else delete th.parity[family].countsBy;
+    // each preset's own, kept beside its axis-ratio tolerances
+    for (const [preset, by] of Object.entries(byPreset)) {
+      const bp = (th.parity[family].byPreset ??= {});
+      if (Object.values(by).every((w) => w === (th.parity[family].counts ?? 0.03))) {
+        if (bp[preset]) delete bp[preset].countsBy;
+        continue;
+      }
+      (bp[preset] ??= {}).countsBy = by;
+    }
+    cal.families[family] ??= {};
+    cal.families[family].countSpread = Object.fromEntries(
+      Object.entries(spreadOf).map(([k, xs]) => [k, G.summary(xs)]),
+    );
+    console.log(family.padEnd(14), JSON.stringify(countsBy), `(${list.length} pairs)`);
+  }
+  await writeJson(thresholdsPath, th);
+  await writeJson(calibrationPath, cal);
+}
+
+/**
+ * The configurations a calibration measures: the single-galaxy presets at home, orbit and zoom,
+ * and every variant capture; with `--families`, those of these families (and their `@zoom`).
+ *
+ * @param {typeof import('./node.ts')} G
+ * @param {import('./node.ts').GoldenNode} node
+ */
+function calibrationCases(G, node) {
   /** The single-galaxy presets the M2 engine draws (stipple). */
   const presets = [
     'Grand design',
@@ -502,8 +629,25 @@ async function calibrate(G, node) {
         cases.push({ preset, base: preset, family: `${family}@zoom`, params: P, zoom: 2 });
       }
   }
+  if (onlyFamily === 'real') {
+    // held-out configurations of the real galaxies (ADR 0060): their captured parameters with
+    // other seeds, home and an orbit (re-draw pairs need no v21 capture)
+    for (const c of manifest.captures.filter(
+      (/** @type {any} */ x) => x.variant === 'real' && x.camera === 'home',
+    )) {
+      const rec = node.record(c.name);
+      for (const seed of [3]) {
+        const P = { ...rec.params, seed };
+        const orbit = { ...P, az: P.az + 35, incl: Math.min(180, P.incl + 20) };
+        const label = `${rec.preset}`;
+        cases.push({ preset: label, base: label, family: 'real', params: P });
+        cases.push({ preset: label, base: label, family: 'real', params: orbit });
+      }
+    }
+  }
   for (const c of manifest.captures.filter((/** @type {any} */ x) => x.variant)) {
-    if (onlyFamily && G.goldenFamily(node.record(c.name).preset) !== onlyFamily) continue;
+    if (onlyFamily && G.goldenFamily(node.record(c.name).preset, c.variant) !== onlyFamily)
+      continue;
     if (c.name.endsWith('__chalk')) continue; // the same parameters as the paper capture
     const rec = node.record(c.name);
     const zoom = rec.zoom ?? 1;
@@ -518,6 +662,12 @@ async function calibrate(G, node) {
       ...(c.calibration ? { heldOut: c.name } : {}),
     });
   }
+  const onlyFamilies = opt('--families')?.split(',');
+  if (onlyFamilies) {
+    const keep = cases.filter((c) => onlyFamilies.includes(c.family.replace('@zoom', '')));
+    cases.length = 0;
+    cases.push(...keep);
+  }
   // --family merger: only the families starting with this (their rows of thresholds.json and
   // calibration.json are replaced, the others kept): a milestone adds its own family without
   // re-measuring the earlier ones
@@ -527,6 +677,24 @@ async function calibrate(G, node) {
     cases.length = 0;
     cases.push(...kept);
   }
+  return cases;
+}
+
+/**
+ * ADR 0013 / 0015 calibration: thresholds per family from "same galaxy, other dots" pairs, then
+ * the negative controls evaluated against them.
+ *
+ * @param {typeof import('./node.ts')} G
+ * @param {import('./node.ts').GoldenNode} node
+ */
+async function calibrate(G, node) {
+  /** ADR 0018: the K of the mean, and the stand-ins for v21 per configuration */
+  const K = Number(opt('--keys') ?? 6);
+  const R = 3;
+  const onlyFamily = opt('--only-family');
+  const onlyFamilies = opt('--families')?.split(',');
+  const famFilter = opt('--family');
+  const cases = calibrationCases(G, node);
   console.log(
     `calibration: ${cases.length} configurations × (${R} stand-ins, ${K} keys) and the negative controls × ${K} keys`,
   );
@@ -579,7 +747,9 @@ async function calibrate(G, node) {
       const label = G.configLabel(c);
       // the controls on every n-th of each shard's own configurations, so the shards stay
       // balanced; the line-work alone has its own breaks instead (docs/milestones/m4/README.md)
-      const wantControls = c.family !== 'lines' && Math.floor(i / n) % controlsEvery === 0;
+      // (a held-out v21 capture is there for v21's spread, not for the controls)
+      const wantControls =
+        !c.heldOut && c.family !== 'lines' && Math.floor(i / n) % controlsEvery === 0;
       const needPairs = !done.has(label);
       const needControls = wantControls && !controlsDone.has(label);
       if (!needPairs && !needControls) continue;
@@ -610,6 +780,7 @@ async function calibrate(G, node) {
         '--controls-every',
         String(controlsEvery),
         ...(flag('--resume') ? ['--resume'] : []),
+        ...(onlyFamilies ? ['--families', onlyFamilies.join(',')] : []),
         ...(famFilter ? ['--family', famFilter] : []),
         ...(onlyFamily ? ['--only-family', onlyFamily] : []),
       ],
@@ -620,8 +791,8 @@ async function calibrate(G, node) {
     if (cs.length < K) throw new Error(`calibration shards hold ${cs.length} keys, not ${K}`);
     return G.meanComparison(cs.slice(0, K));
   };
-  /** @type {{ pairs: Record<string, any[]>, controls: Record<string, Record<string, any[]>>, heldOut: Record<string, any[]> }} */
-  const eng = { pairs: {}, controls: {}, heldOut: {} };
+  /** @type {{ pairs: Record<string, any[]>, controls: Record<string, Record<string, any[]>>, heldOut: Record<string, any[]>, counts: Record<string, { preset: string, spread: Record<string, number> }[]> }} */
+  const eng = { pairs: {}, controls: {}, heldOut: {}, counts: {} };
   // which configurations the negative controls ran on, as the shards recorded it (a
   // re-aggregation must not write its own defaults)
   /** @type {Set<string>} */
@@ -635,6 +806,13 @@ async function calibrate(G, node) {
     for (const byName of Object.values(part.controls ?? {}))
       for (const list of Object.values(/** @type {any} */ (byName)))
         for (const e of /** @type {any[]} */ (list)) withControls.add(e.config);
+    // ADR 0035: how far a count of the stand-in for v21 is from the mean of the K draws' counts
+    for (const [f, list] of Object.entries(part.pairs))
+      (eng.counts[f] ??= []).push(
+        ...list
+          .filter((/** @type {any} */ e) => e.keys)
+          .map((/** @type {any} */ e) => ({ preset: e.preset, spread: G.countSpread(e, K) })),
+      );
     for (const [f, list] of Object.entries(part.pairs))
       (eng.pairs[f] ??= []).push(
         ...list.map((/** @type {any} */ e) => ({ ...mean(e.cs), preset: e.preset })),
@@ -658,6 +836,15 @@ async function calibrate(G, node) {
   console.log(`  ${v21.used} v21 pairs whose stipple re-rolled`);
 
   const ADR = { ink: 0.05, median: 0.1, p90: 0.1, counts: 0.03, countsSmall: 0.1, poisson: 3 };
+  /** the lens family's count gate, in standard deviations of two Poisson draws (ADR 0053) */
+  const LENS_POISSON = 4.5;
+  /**
+   * the lens family's least inner axis-ratio band: 1.1 × the largest |Δq| of the inner aperture
+   * over the 84 v21 captures of the family (the 56 held out, 0.027, and the 28 acceptance cases,
+   * 0.0395), ADR 0054 (accepted). ADR 0018 sets the band no lower than 1.1 × the largest value of
+   * the held-out sample, and the acceptance captures are 28 more such samples.
+   */
+  const LENS_QINNER = 0.044;
   const KEYS = /** @type {const} */ ([
     ['ssim', (/** @type {any} */ c) => c.ssim],
     ['ssimCoarse', (/** @type {any} */ c) => c.ssimCoarse],
@@ -677,22 +864,34 @@ async function calibrate(G, node) {
       KEYS.map(([k, f]) => [k, G.summary(list.map(f).filter((x) => !Number.isNaN(x)))]),
     );
   const floor2 = (/** @type {number} */ x) => Math.floor(x * 100) / 100;
+  /** the 5th percentile less 0.02, and, for a factor over 1.5, as much of the median's distance to it again as FAC/1.5 − 1 */
+  const ssimBound = (/** @type {{ p5: number, median: number }} */ s) =>
+    floor2(s.p5 - (FAC / 1.5 - 1) * (s.median - s.p5) - 0.02);
   const ceil3 = (/** @type {number} */ x) => Math.ceil(x * 1000) / 1000;
   /** 1.5 × p95 of the re-draw spread, and at least `min` */
   const spread = (/** @type {any} */ s, /** @type {string} */ k, /** @type {number} */ min) =>
-    Math.max(min, ceil3(1.5 * s[k].p95));
+    Math.max(min, ceil3(FAC * s[k].p95));
   /** @type {Record<string, any>} */
   const parity = {};
   /** @type {Record<string, any>} */
   const numbers = {};
-  const families = onlyFamily ? [] : ['spiral', 'smooth', 'merger', 'lens', 'star', 'artefact'];
-  for (const f of Object.keys(eng.pairs)) if (!families.includes(f)) families.push(f);
+  const ofFamily = (/** @type {string} */ f) =>
+    !onlyFamily || f === onlyFamily || f === `${onlyFamily}@zoom`;
+  const families = onlyFamilies
+    ? [...onlyFamilies]
+    : onlyFamily
+      ? []
+      : ['spiral', 'smooth', 'merger', 'lens', 'star', 'artefact'];
+  for (const f of Object.keys(eng.pairs))
+    if (ofFamily(f) && !families.includes(f)) families.push(f);
   for (const family of families) {
     const list = eng.pairs[family] ?? [];
     const base = {
       counts: ADR.counts,
       countsSmall: ADR.countsSmall,
-      poisson: ADR.poisson,
+      // the lensed knots and drawn stars of a source are clustered (its arms' knots, the images
+      // of one knot) and so more variable than Poisson draws: ADR 0053 (proposed)
+      poisson: family === 'lens' ? LENS_POISSON : ADR.poisson,
       // the drawn stars of a disc galaxy (about 1,000–1,100 of ~11,000 proposals) are a binomial
       // draw too: ±3% there is under one standard deviation of the difference of two draws
       poissonBelow: 2000,
@@ -722,10 +921,10 @@ async function calibrate(G, node) {
       return {
         // the ADR's ±5% and ±10% stay as floors: they also cover the renderers' deliberate
         // differences (per-drawing mipmaps, no MSAA, f16 accumulation), which re-draw pairs do not
-        ink: Math.max(ADR.ink, ceil3(1.5 * s.inkAbs.p95)),
-        ssimCoarse: floor2(s.ssimCoarse.p5 - 0.02),
-        median: Math.max(ADR.median, ceil3(1.5 * s.medianAbs.p95)),
-        p90: Math.max(ADR.p90, ceil3(1.5 * s.p90Abs.p95)),
+        ink: Math.max(ADR.ink, ceil3(FAC * s.inkAbs.p95)),
+        ssimCoarse: ssimBound(s.ssimCoarse),
+        median: Math.max(ADR.median, ceil3(FAC * s.medianAbs.p95)),
+        p90: Math.max(ADR.p90, ceil3(FAC * s.p90Abs.p95)),
         // the moment and extent test: 1.5 × the p95 of the re-draw spread, with small floors for
         // a quantity's resolution (half a radial bin of 0.25 px is 0.1% of a 100 px radius)
         r25: spread(s, 'r25Abs', 0.01),
@@ -739,6 +938,8 @@ async function calibrate(G, node) {
     };
     /** @type {Record<string, number>} */
     const t = rule(list);
+    const counted = countTolerances(G, eng.counts[family] ?? [], ADR.counts);
+    const { spreadOf, countsBy } = counted;
     // ADR 0018: where held-out v21 captures exist (the line-work alone, drawn the same at every
     // key), the same rule on v21 against the engine there, and the wider of the two
     const held = eng.heldOut[family] ?? [];
@@ -757,7 +958,6 @@ async function calibrate(G, node) {
         ['r90', 'r90Abs'],
         ['outer', 'outerAbs'],
         ['q', 'qAbs'],
-        ['qInner', 'qInnerAbs'],
       ]))
         t[k] = Math.max(t[k] ?? 0, ceil3(1.1 * (hs[m]?.max ?? 0)));
     }
@@ -776,7 +976,14 @@ async function calibrate(G, node) {
       ]))
         t[k] = Math.max(t[k] ?? 0, ceil3(1.1 * (ms[m]?.max ?? 0)));
     }
-    parity[family] = { ...base, ...t, ...(held.length ? { heldOut: held.length } : {}) };
+    parity[family] = {
+      ...base,
+      ...t,
+      ...(Object.keys(countsBy).length ? { countsBy } : {}),
+      ...(held.length ? { heldOut: held.length } : {}),
+    };
+    if (family === 'lens')
+      parity[family].qInner = Math.max(parity[family].qInner ?? 0, LENS_QINNER);
     // per-preset axis-ratio tolerances: near-round galaxies are noisier in q than flat ones, so
     // a family-wide value would be too wide for the flat ones (ADR 0015)
     /** @type {Record<string, any>} */
@@ -786,38 +993,53 @@ async function calibrate(G, node) {
       const mine = list.filter((c) => c.preset === preset);
       if (mine.length < 8) continue;
       const ps = stats(mine);
-      // the coarse SSIM too, where the preset's own re-draws agree with each other less than the
-      // family's do (a merger's chaotic remnant, ADR 0044): the same rule on its own sample, and
-      // only ever below the family's
-      const ssimOwn = floor2(ps.ssimCoarse.p5 - 0.02);
+      const pa = positionAngle(mine);
+      const fam = /** @type {Record<string, number>} */ (parity[family]);
+      // ADR 0035: the moment and extent measures and the SSIM have a preset's own tolerance where
+      // that is wider than the family's (a cigar's position angle, a ring's inner axis ratio), by
+      // the same rule; a calmer preset keeps the family's, as fewer pairs would give it a band
+      // that a draw of v21's would too easily leave
+      const wider = {
+        ssimCoarse: Math.min(ssimBound(ps.ssimCoarse), fam.ssimCoarse ?? 1),
+        r25: Math.max(spread(ps, 'r25Abs', 0.01), fam.r25 ?? 0),
+        r50: Math.max(spread(ps, 'r50Abs', 0.01), fam.r50 ?? 0),
+        r90: Math.max(spread(ps, 'r90Abs', 0.01), fam.r90 ?? 0),
+        outer: Math.max(spread(ps, 'outerAbs', 0.003), fam.outer ?? 0),
+        paA: Math.max(pa.paA, fam.paA ?? 0),
+      };
       byPreset[preset] = {
+        ...wider,
         q: spread(ps, 'qAbs', 0.005),
         qInner: spread(ps, 'qInnerAbs', 0.005),
         // the preset's own noise floor of the ellipticity (a smooth Sérsic profile is far quieter
         // than a galaxy with a sparse halo); the family's paA
-        paEps0: Math.max(0.01, positionAngle(mine).paEps0),
-        ...(family.startsWith('merger') && ssimOwn < (t['ssimCoarse'] ?? 0)
-          ? { ssimCoarse: ssimOwn }
+        paEps0: Math.max(0.01, pa.paEps0),
+        // ADR 0035, where this preset's own count spread is wider than the ADR's tolerance
+        ...(Object.values(counted.byPreset[preset] ?? {}).some((w) => w > ADR.counts)
+          ? { countsBy: counted.byPreset[preset] }
           : {}),
       };
-      // ADR 0026 (widen-only): for the radii, the axis ratio and the position angle, the band is
-      // the larger of the band that applies to the preset now (the family's, or for the axis
-      // ratio the preset's own, set above) and 1.5 × the preset's own largest re-draw spread.
-      // Only a preset whose own spread exceeds that band gets a change, so none gets narrower.
+      // ADR 0026 (widen-only): where the owner approved it (`widenOnly`: `Edge-on with dust`), the band for
+      // a measure is the larger of the band that applies to the preset now (the family's, or the
+      // preset's own, set above) and 1.5 × the preset's own largest re-draw spread. Only a preset
+      // whose own spread exceeds that band gets a change, so none gets narrower, and nothing
+      // else is widened.
       const own = /** @type {Record<string, number>} */ (byPreset[preset]);
-      const fam = /** @type {Record<string, number>} */ (t);
       for (const [k, m] of /** @type {const} */ ([
         ['r25', 'r25Abs'],
         ['r50', 'r50Abs'],
         ['r90', 'r90Abs'],
         ['q', 'qAbs'],
       ])) {
+        if (!widenOnly(family, preset, k)) continue;
         const wide = ceil3(1.5 * (ps[m]?.max ?? 0));
         if (wide > (own[k] ?? fam[k] ?? 0)) own[k] = wide;
       }
-      const eps0 = /** @type {number} */ (own.paEps0);
-      const paWide = positionAngle(mine, { eps0, largest: true }).paA;
-      if (paWide > (fam.paA ?? 0)) own.paA = paWide;
+      if (widenOnly(family, preset, 'paA')) {
+        const eps0 = /** @type {number} */ (own.paEps0);
+        const paWide = positionAngle(mine, { eps0, largest: true }).paA;
+        if (paWide > (own.paA ?? fam.paA ?? 0)) own.paA = paWide;
+      }
     }
     parity[family].byPreset = byPreset;
     // the negative controls against these thresholds
@@ -839,7 +1061,15 @@ async function calibrate(G, node) {
       };
     }
     numbers[family] = {
+      factor: FAC,
       engineRekey: stats(list),
+      ...(Object.keys(spreadOf).length
+        ? {
+            countSpread: Object.fromEntries(
+              Object.entries(spreadOf).map(([k, xs]) => [k, G.summary(xs)]),
+            ),
+          }
+        : {}),
       ...(held.length ? { heldOutV21: stats(held) } : {}),
       negativeControls: ctl,
       v21Reroll: v21.pairs[family]?.length ? stats(v21.pairs[family]) : null,
@@ -874,14 +1104,18 @@ async function calibrate(G, node) {
       const c = JSON.parse(readFileSync(cPath, 'utf8'));
       Object.assign(t.parity, parity);
       Object.assign(c.families, numbers);
+      // the other families' configurations keep their order; this family's are added after them
+      const have = new Set(c.configurations);
       c.configurations = [
-        ...new Set([
-          ...c.configurations,
-          ...cases.map((x) => `${x.preset} s${x.params.seed} incl ${x.params.incl}`),
-        ]),
-      ].sort();
-      writeFileSync(tPath, JSON.stringify(t, null, 2) + '\n');
-      writeFileSync(cPath, JSON.stringify(c, null, 2) + '\n');
+        ...c.configurations,
+        ...new Set(
+          cases
+            .map((x) => `${x.preset} s${x.params.seed} incl ${x.params.incl}`)
+            .filter((x) => !have.has(x)),
+        ),
+      ];
+      await writeJson(tPath, t);
+      await writeJson(cPath, c);
     }
     console.log(JSON.stringify(parity, null, 1));
     return;
@@ -910,8 +1144,9 @@ async function calibrate(G, node) {
     },
     parity,
   };
-  await writeJson(join(ROOT, 'tests/golden/thresholds.json'), file);
-  await writeJson(join(ROOT, 'tests/golden/calibration.json'), {
+  const thresholdsPath = join(ROOT, 'tests/golden/thresholds.json');
+  const calibrationPath = join(ROOT, 'tests/golden/calibration.json');
+  const calibration = {
     about:
       "ADR 0013 / 0015 / 0018 calibration: per family, summaries (n, min, p5, median, p95, max) of each measure. engineRekey: the new engine (CPU, equal to WebGPU at L1) drawing v21's replayed variation and re-keying its placement stream: per configuration, each of `standIns` draws stands in for v21 against the mean of each measure over the `keys` draws of keys 0..K − 1 (a full re-draw). negativeControls: one structural or pen change per control, drawn with the same K keys, against the first stand-in, with how many applicable configurations the thresholds caught. v21Reroll: v21 at az and az + 0.3° where its stipple re-rolled (a partial re-draw, one draw against one).",
     keys: K,
@@ -924,7 +1159,25 @@ async function calibrate(G, node) {
     },
     configurations: cases.map((c) => `${c.preset} s${c.params.seed} incl ${c.params.incl}`),
     families: numbers,
-  });
+  };
+  if (onlyFamilies) {
+    // a partial run replaces its families and keeps everything else in the files as it is
+    const old = JSON.parse(readFileSync(thresholdsPath, 'utf8'));
+    const oldCal = JSON.parse(readFileSync(calibrationPath, 'utf8'));
+    file.parity = { ...old.parity, ...parity };
+    calibration.families = { ...oldCal.families, ...numbers };
+    calibration.configurations = [
+      ...oldCal.configurations.filter(
+        (/** @type {string} */ c) => !calibration.configurations.includes(c),
+      ),
+      ...calibration.configurations,
+    ];
+    calibration.keys = oldCal.keys;
+    calibration.standIns = oldCal.standIns;
+    calibration.controlsEvery = oldCal.controlsEvery;
+  }
+  await writeJson(thresholdsPath, file);
+  await writeJson(calibrationPath, calibration);
   for (const [family, n] of Object.entries(numbers))
     if (n.negativeControls)
       for (const [name, x] of Object.entries(n.negativeControls))
@@ -935,13 +1188,35 @@ async function calibrate(G, node) {
 }
 
 /**
- * The presets of a calibration family that --only-family adds held-out configurations for.
+ * The presets of a calibration family that --only-family adds held-out configurations for (those
+ * whose held-out configurations are not captured).
  *
  * @param {string} family
  */
 function onlyFamilyPresets(family) {
   if (family === 'slip') return ['Plates slipped'];
+  // the lens presets' held-out configurations are captured (`calibration` cases of the manifest)
+  if (family === 'lens') return [];
+  if (family === 'real') return []; // its held-out configurations come from the captures (ADR 0060)
   throw new Error(`no held-out presets for family ${family}`);
+}
+
+/**
+ * The per-preset bands the owner approved to widen (ADR 0026, 2026-10-07: `Edge-on with dust`):
+ * family, preset and measure. Nothing else is widened.
+ *
+ * @param {string} family
+ * @param {string} preset
+ * @param {string} [measure]
+ */
+function widenOnly(family, preset, measure) {
+  /** @type {Record<string, string[] | undefined>} */
+  const listed = {
+    'spiral|Edge-on with dust': ['r25', 'r50', 'r90', 'q', 'paA'],
+    'spiral@zoom|Edge-on with dust': ['r25', 'r50', 'r90', 'q', 'paA'],
+  };
+  const m = listed[`${family}|${preset}`];
+  return m ? measure === undefined || m.includes(measure) : false;
 }
 
 /**
@@ -962,10 +1237,10 @@ function positionAngle(list, own = {}) {
   };
   const ceil3 = (/** @type {number} */ x) => Math.ceil(x * 1000) / 1000;
   const paEps0 =
-    own.eps0 ?? ceil3(1.5 * p95(list.map((c) => Math.abs(eps(c.render.q) - eps(c.ref.q)))));
+    own.eps0 ?? ceil3(FAC * p95(list.map((c) => Math.abs(eps(c.render.q) - eps(c.ref.q)))));
   const above = list.filter((c) => eps(c.ref.q) > paEps0);
   const paA = ceil3(
-    Math.max(0.5, 1.5 * p95(above.map((c) => Math.abs(c.paDiff) * (eps(c.ref.q) - paEps0)))),
+    Math.max(0.5, FAC * p95(above.map((c) => Math.abs(c.paDiff) * (eps(c.ref.q) - paEps0)))),
   );
   return { paA, paEps0 };
 }

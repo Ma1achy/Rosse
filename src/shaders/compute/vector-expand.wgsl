@@ -31,6 +31,7 @@
 // CPU twin: src/fallback/kernels/vector.ts, function for function (ADR 0014).
 
 // #import "common/instance.wgsl"
+// #import "common/vinst.wgsl"
 // #import "common/rng.wgsl"
 // #import "common/tide.wgsl"
 // #import "common/warp.wgsl"
@@ -54,30 +55,6 @@ struct Vec {
   stream_keep: f32,
   // PEN.dot
   pen_dot: f32,
-}
-
-// VINST_LAYOUT: one placed drawing
-struct VInst {
-  // tile -> plate px, column-major
-  m: vec4<f32>,
-  t: vec2<f32>,
-  // pen scale
-  ps: f32,
-  // sqrt |det m|, the dots' and blobs' scale
-  sc: f32,
-  // warp parameters: rewind (dk, flip, 0, 0); post (cx, cy, 0, 0); tide (galaxy, R2, 0, 0);
-  // tide on the screen (mWarp) (galaxy, flip, 0, 0)
-  w: vec4<f32>,
-  // post: the affine S, column-major
-  w2: vec4<f32>,
-  drawing: u32,
-  warp: u32,
-  cap_first: u32,
-  dot_first: u32,
-  blob_first: u32,
-  pad0: u32,
-  pad1: u32,
-  pad2: u32,
 }
 
 // STREAM_SEG_LAYOUT
@@ -187,11 +164,12 @@ fn place(I: VInst, p: vec2<f32>) -> vec2<f32> {
   return vec2<f32>((I.t.x + I.m.x * p.x) + I.m.z * p.y, (I.t.y + I.m.y * p.x) + I.m.w * p.y);
 }
 
-// The post hook: c + S (q - c).
+// The post hook: c + t + S (q - c); t is zero except for a lensed image, which is carried to its
+// own place (w.zw).
 fn post(I: VInst, q: vec2<f32>) -> vec2<f32> {
   let dx = q.x - I.w.x;
   let dy = q.y - I.w.y;
-  return vec2<f32>((I.w.x + I.w2.x * dx) + I.w2.z * dy, (I.w.y + I.w2.y * dx) + I.w2.w * dy);
+  return vec2<f32>(((I.w.x + I.w.z) + I.w2.x * dx) + I.w2.z * dy, ((I.w.y + I.w.w) + I.w2.y * dx) + I.w2.w * dy);
 }
 
 // expandVector's tf (app23.js:L1194-1198): the warp, the matrix, the wobble.
@@ -241,6 +219,11 @@ fn expand_caps(@builtin(global_invocation_id) id: vec3<u32>) {
   let I = inst[inst_of(i, 0u)];
   let k = i - I.cap_first;
   let o = I.drawing * DRAWING_WORDS;
+  if (I.drawing == INACTIVE || (I.warp == WARP_NONE && k >= table[o + 1u])) {
+    caps_raw[i] = Capsule(vec2<f32>(0.0), vec2<f32>(0.0), 0.0, 0.0, 0.0, 0.0);
+    keys[i] = DROP;
+    return;
+  }
   var a: vec2<f32>;
   var b: vec2<f32>;
   var ra: vec2<f32>;
@@ -281,6 +264,9 @@ fn expand_caps(@builtin(global_invocation_id) id: vec3<u32>) {
       }
     }
   }
+  if (I.pad0 != 0u) {
+    key = DROP;
+  }
   caps_raw[i] = Capsule(a, b, (vu.pen_line / 2.0) * I.ps, 1.0, 0.0, 0.0);
   keys[i] = key;
 }
@@ -292,6 +278,14 @@ fn expand_dots(@builtin(global_invocation_id) id: vec3<u32>) {
     return;
   }
   let I = inst[inst_of(i, 1u)];
+  if (
+    I.pad0 != 0u ||
+    I.drawing == INACTIVE ||
+    i - I.dot_first >= table[I.drawing * DRAWING_WORDS + 3u]
+  ) {
+    dots_out[i] = Instance(vec2<f32>(0.0), 0u, 0.0, vec4<f32>(0.0));
+    return;
+  }
   let d = vdots[table[I.drawing * DRAWING_WORDS + 2u] + i - I.dot_first];
   let p = tf(I, d.xy);
   let t = pool[KNOT_POOL + u32(d.w) % max(1u, vu.n_dot_pool)];
@@ -308,6 +302,14 @@ fn expand_blobs(@builtin(global_invocation_id) id: vec3<u32>) {
     return;
   }
   let I = inst[inst_of(i, 2u)];
+  if (
+    I.pad0 != 0u ||
+    I.drawing == INACTIVE ||
+    i - I.blob_first >= table[I.drawing * DRAWING_WORDS + 5u]
+  ) {
+    blobs_out[i] = Instance(vec2<f32>(0.0), 0u, 0.0, vec4<f32>(0.0));
+    return;
+  }
   let o = 2u * (table[I.drawing * DRAWING_WORDS + 4u] + i - I.blob_first);
   let b0 = vblobs[o];
   let b1 = vblobs[o + 1u];

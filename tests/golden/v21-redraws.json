@@ -1,0 +1,11 @@
+{
+  "about": "Cases that are compared with the mean of several draws of v21's stipple, not one (ADR 0036, proposed; owner's decision of 2026-10-07; ADR 0061 adds the last two): `npm run capture:reference -- --redraws tests/golden/v21-redraws.json` captures draws 1 to N − 1 of each (the capture itself is draw 0).",
+  "draws": 8,
+  "cases": [
+    "cigar-shaped--stipple__s4242__orbit",
+    "ringed--vectors__s7__zoom",
+    "layered-barred-spiral-satellite-trail--layered__s7__zoom",
+    "real-galaxy-6--real__s586__home",
+    "barred-spiral--knob-ring-lines__s7__home"
+  ]
+}

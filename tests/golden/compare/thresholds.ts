@@ -38,6 +38,12 @@ export interface Thresholds {
   paEps0: number;
   /** |Δ count| / reference per class, at most (classes of 100 marks or more) */
   counts: number;
+  /**
+   * Per class, in place of `counts`, where the engine's own re-draws spread wider than that (ADR
+   * 0035): the dots a drawn star clears round it, whose number follows where the few large stars
+   * fall, differ between two draws by several per cent in a scene with many of them.
+   */
+  countsBy?: Record<string, number>;
   /** the same for classes under 100 marks */
   countsSmall: number;
   /**
@@ -64,24 +70,45 @@ export interface ThresholdFile {
 
 /**
  * Classes the parameters make impossible, which must then be 0 in both drawings: knots need
- * `knots` (or a group that makes its own: ring knots and clumps, `groupKnots`, app23.js:L282–297),
- * sparkle stars `sparkle` and drawn stars `starMix` (generate, app23.js:L266–272).
+ * `knots` (or a group that makes its own, `groupKnots`, app23.js:L282–297; or a ring's knots, or a
+ * star's heart, or a cosmic ray's), sparkle stars `sparkle` (a galaxy's only) and drawn stars `starMix` (generate, app23.js:L266–272), a ring (its knots'
+ * stars), a star or an artefact, or an overlay that draws one (starSprites, L419–436).
  */
 export function impossibleClasses(
   P: {
     knots: number;
     sparkle: number;
     starMix: number;
+    subject?: string;
+    ring?: number;
+    /** a lens (M9): its source galaxies have knots and sparkle stars of their own */
+    lensOn?: number;
+    lensSource?: string;
     merger?: number;
+    ovStar?: number;
+    ovArtefact?: string;
   },
   groupKnots = false,
 ): Set<string> {
   const out = new Set<string>();
-  if (!(P.knots > 0) && !groupKnots) out.add('knots');
-  if (!(P.sparkle > 0)) out.add('stars');
+  const star = P.subject === 'star' || P.subject === 'artefact';
+  const overlay = (P.ovStar ?? 0) > 0.02 || (!!P.ovArtefact && P.ovArtefact !== 'none');
+  const ring = (P.ring ?? 0) > 0.1 && !P.merger;
+  const lensed = P.lensOn === 1;
+  if (!(P.knots > 0) && !star && !overlay && !ring && !groupKnots && !lensed) out.add('knots');
+  if ((!(P.sparkle > 0) && !lensed) || star) out.add('stars');
   // a merger's galaxies keep the drawn stars of their clumps, and a knot in a tidal tail has a
-  // bright one whatever `starMix` says (mergerSprites, app23.js:L522–524)
-  if (!(P.starMix > 0.01) && !P.merger) out.add('rstars');
+  // bright one whatever `starMix` says (mergerSprites, app23.js:L522–524); a quasar's images are
+  // each a drawn star
+  if (
+    !(P.starMix > 0.01) &&
+    !star &&
+    !overlay &&
+    !ring &&
+    !P.merger &&
+    !(lensed && P.lensSource === 'quasar')
+  )
+    out.add('rstars');
   return out;
 }
 
@@ -108,9 +135,11 @@ export function countAllowance(
   render: number,
   t: Thresholds,
   impossible = false,
+  cls?: string,
 ): number {
   if (impossible) return 0;
-  const relative = (ref < 100 ? t.countsSmall : t.counts) * ref;
+  const perClass = cls ? t.countsBy?.[cls] : undefined;
+  const relative = (ref < 100 ? t.countsSmall : (perClass ?? t.counts)) * ref;
   const poisson = ref < t.poissonBelow ? t.poisson * Math.sqrt(ref + render) : 0;
   return Math.max(relative, poisson);
 }
@@ -145,7 +174,7 @@ export function evaluate(
     const ref = refCounts[k] ?? 0;
     const render = renderCounts[k] ?? 0;
     const rel = ref === 0 ? (render === 0 ? 0 : Infinity) : (render - ref) / ref;
-    const allowed = countAllowance(ref, render, t, impossible.has(k));
+    const allowed = countAllowance(ref, render, t, impossible.has(k), k);
     counts[k] = { ref, render, rel, allowed };
     if (Math.abs(render - ref) > allowed)
       failures.push(`${k} ${String(render)} vs ${String(ref)} (±${allowed.toFixed(1)})`);

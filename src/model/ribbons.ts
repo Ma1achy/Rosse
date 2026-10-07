@@ -250,6 +250,8 @@ export interface RibbonDesc {
   penLine: number;
   sheetW: number;
   sheetH: number;
+  /** pieces of the strokes sheet, per row (the lens sizes its branch slots from them, M9) */
+  strokePieces: number[];
   /** the scene's noise field (the wobble of ribbons, pieces and hatches) */
   noise: NoiseField;
 }
@@ -386,6 +388,7 @@ export function describeRibbons(
     penLine,
     sheetW,
     sheetH,
+    strokePieces: pcs.count,
     noise,
   };
 }
@@ -434,7 +437,7 @@ export function cullsUniform(R: RibbonDesc | null, cam: Camera, P: Params, key: 
     carve_w2: f(cw * cw),
     carve_p: R ? f(R.carveP) : 0,
     wobble: wobbleAmplitude(P.distort),
-    pad0: 0,
+    pen_dot: f(penWeights(P.pen).dot),
     pad1: 0,
     pad2: 0,
   };

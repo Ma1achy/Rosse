@@ -10,9 +10,9 @@
  * blobs of vector drawings.
  *
  * The engine counts the same sources from what it draws, on the CPU engine (the WebGPU engine
- * would need its instance buffers read back). Two sources v21 counts are not counted yet: the
- * drawn stars (`sstars`, M7) and the carving lines' pen lines, whose picks the line-work does not
- * keep.
+ * would need its instance buffers read back): since M7 also the drawn stars (`sstars`), the deep
+ * field's galaxies, their dots, the foreground stars and the companions. One source v21 counts is
+ * not counted yet: the carving lines' pen lines, whose picks the line-work does not keep.
  */
 import type { Instance } from '../marks/instance';
 import type { VectorRow } from './parts';
@@ -31,6 +31,10 @@ export interface UsedInput {
   rows: readonly VectorRow[];
   /** pen lines used by the hatching and the streams */
   penlines: Iterable<number>;
+  /** M7: vector drawings the sky and the stars place (a drawn star, a galaxy of the deep field) */
+  extra?: readonly { atlas: string; tile: number }[];
+  /** M7: foreground stars (layers of `fgstars`) */
+  fgstars?: Iterable<number>;
 }
 
 export function usedDrawings(meta: DrawingsMeta, u: UsedInput): number {
@@ -49,5 +53,8 @@ export function usedDrawings(meta: DrawingsMeta, u: UsedInput): number {
   add(meta.strokes?.src, u.strokes, 'strokes');
   for (const r of u.rows) add(meta.vectors?.[r.atlas]?.src, [r.tile], r.atlas);
   add(meta.penlines?.src, u.penlines, 'penlines');
+  for (const r of u.extra ?? [])
+    add(meta.vectors?.[r.atlas as keyof typeof meta.vectors]?.src, [r.tile], r.atlas);
+  add(meta.fgstars?.src, u.fgstars ?? [], 'fgstars');
   return used.size;
 }

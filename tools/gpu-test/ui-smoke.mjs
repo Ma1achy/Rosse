@@ -10,7 +10,8 @@
  *   address; a preset card draws its preset and the controls follow; a part can be taken out and
  *   added back;
  * - Paper and the Chalkboard, kept in the address; a link restores the drawing, with a dark colour
- *   scheme and with storage blocked; a link cannot ask for what the engine does not draw;
+ *   scheme and with storage blocked; a link cannot ask for what the engine does not draw (the sky);
+ *   the lens presets are offered, and a lensed quasar's flare runs on the timeline;
  * - a merger preset draws two galaxies (two dense blobs of ink), a single galaxy one, and the
  *   timeline changes the picture without running the model tier again; the timeline stays inside
  *   its end and the address follows it while it plays;
@@ -25,7 +26,7 @@
 import { readFileSync } from 'node:fs';
 import { PNG } from 'pngjs';
 
-const BIG = { timeout: 600_000 };
+const BIG = { timeout: Number(process.env.ROSSE_UI_TIMEOUT_MS ?? 600_000) };
 
 /**
  * @param {import('playwright').Browser} browser
@@ -53,6 +54,9 @@ export async function uiSmokeCheck(browser, url) {
     /** @type {string[]} */
     const errors = [];
     page.on('pageerror', (e) => errors.push(String(e)));
+    page.on('crash', () => {
+      console.error(`${backend}: the page crashed`);
+    });
     page.on('console', (m) => {
       if (m.type() === 'error') errors.push(m.text());
     });
@@ -289,7 +293,7 @@ export async function uiSmokeCheck(browser, url) {
     if ((await page.locator('#c-arms').inputValue()) !== '5')
       fail(`${label}: ?arms=5 did not set the slider`);
 
-    // ---- a link cannot ask for what the engine does not draw (the lens, the sky)
+    // ---- a link asks for the lens and the stars together (M7, M9): both are drawn, both stay in the link
     await page.goto(q('&preset=Lens%3A+Einstein+ring&lensR=1.5&spikes=0.9&starMix=0.1&arms=4'));
     await page.waitForFunction(() => (window.__rosse?.frames ?? 0) >= 1, undefined, BIG);
     await page.waitForFunction(() => location.search.includes('arms=4'), undefined, {
@@ -297,11 +301,37 @@ export async function uiSmokeCheck(browser, url) {
     });
     const search = await page.evaluate(() => location.search);
     st = await rosse();
-    if (st.preset !== 'Grand design') fail(`${label}: a lens preset was drawn (${st.preset})`);
+    if (st.preset !== 'Lens: Einstein ring')
+      fail(`${label}: the lens preset was not drawn (${st.preset})`);
     for (const k of ['lensR', 'spikes', 'starMix'])
-      if (search.includes(`${k}=`)) fail(`${label}: the link kept ?${k}=`);
-    if (await page.locator('button.card[data-preset="Lens: Einstein ring"]').count())
-      fail(`${label}: a card for a lens preset`);
+      if (!search.includes(`${k}=`)) fail(`${label}: the link dropped ?${k}=`);
+
+    // ---- the lens (M9): its presets and controls are offered, a lens preset draws more than the
+    // plain galaxy, and the quasar's flare runs on the timeline without the model tier
+    await open('&preset=Lens%3A+Einstein+ring&seed=7');
+    st = await rosse();
+    if (st.preset !== 'Lens: Einstein ring')
+      fail(`${label}: the lens preset was not drawn (${st.preset})`);
+    if (!(await page.locator('button.card[data-preset="Lens: Einstein ring"]').count()))
+      fail(`${label}: no card for a lens preset`);
+    if (st.home === undefined || st.home.incl !== st.camera.incl)
+      fail(`${label}: the lens preset's home is not its camera`);
+    await open('&preset=Lens%3A+Einstein+cross+%28quasar%29&seed=7');
+    if (!(await page.locator('#timeline').isVisible())) fail(`${label}: no timeline for a quasar`);
+    const q0 = await rosse();
+    const f0 = await plate();
+    n = await frames();
+    await page.locator('#tl-scrub').fill('0.4');
+    // the lens's frame is slow on SwiftShader: wait for the view tier that ran for the new moment
+    await page.waitForFunction((v) => (window.__rosse?.tiers.view ?? 0) > v, q0.tiers.view, BIG);
+    await settled(n);
+    const f1 = await plate();
+    const q1 = await rosse();
+    if (f0.hash === f1.hash) fail(`${label}: the quasar's scrub did not change the picture`);
+    if (q1.tiers.model !== q0.tiers.model)
+      fail(
+        `${label}: the quasar's scrub ran the model tier again (${q0.tiers.model} → ${q1.tiers.model})`,
+      );
 
     // ---- New stars, Surprise me (also with a variant), a typed seed
     await open('&seed=7');
