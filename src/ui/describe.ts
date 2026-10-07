@@ -6,7 +6,8 @@
 import type { Params } from '../core/params';
 import { PRESETS, presetFamily, PRESET_NAMES } from '../core/presets';
 import { DEF } from '../core/params';
-import { FEATURES, type FeatureName } from './layout';
+import type { Features } from './layout';
+import type { FeatureName } from './layout';
 
 const NUMBERS = ['', 'one', 'two', 'three', 'four', 'five', 'six'];
 
@@ -44,9 +45,7 @@ export function needs(name: string): FeatureName[] {
 }
 
 /** The presets the page can draw now, in the preset table's order. */
-export function availablePresets(
-  features: Record<FeatureName, boolean> = FEATURES,
-): readonly string[] {
+export function availablePresets(features: Features): readonly string[] {
   return PRESET_NAMES.filter((n) => needs(n).every((f) => features[f]));
 }
 

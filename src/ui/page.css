@@ -37,6 +37,8 @@
   --ink: #1d1b19;
   --ink2: #4a463f;
   --hair: #a39b8a;
+  /* the edge of a control: 3:1 on the paper and on the field */
+  --edge: #80786a;
   --mag: #b80f5e;
   --pencil: #9e1b12;
   --gutter: 16px;
@@ -51,6 +53,7 @@
   --ink: #ece4d2;
   --ink2: #c3bba8;
   --hair: #6d665a;
+  --edge: #857d6d;
   --mag: #e86aa0;
   --pencil: #e0806f;
   color-scheme: dark;
@@ -334,11 +337,11 @@ input[type='range'] {
 }
 input[type='range']::-webkit-slider-runnable-track {
   height: 1px;
-  background: linear-gradient(to right, var(--ink) var(--fill), var(--hair) var(--fill));
+  background: linear-gradient(to right, var(--ink) var(--fill), var(--edge) var(--fill));
 }
 input[type='range']::-moz-range-track {
   height: 1px;
-  background: linear-gradient(to right, var(--ink) var(--fill), var(--hair) var(--fill));
+  background: linear-gradient(to right, var(--ink) var(--fill), var(--edge) var(--fill));
 }
 input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -360,49 +363,210 @@ input[type='range']:disabled {
   cursor: default;
 }
 
-/* the panel */
+/* the panel: a sheet of paper laid on the ground (the rail), the tabs stuck along its top */
 .panel {
   min-width: 0;
+  padding: 0 14px 16px;
+  background: var(--paper) url('./art/rail.jpg') 0 0 / 512px 512px;
+  box-shadow:
+    1px 2px 1.5px rgba(0, 0, 0, 0.28),
+    2px 6px 10px rgba(0, 0, 0, 0.14);
+}
+:root[data-theme='dark'] .panel {
+  background-image: none;
+  background-color: var(--field);
+  box-shadow: inset 0 0 0 1px var(--edge);
 }
 .tabs {
   display: flex;
   flex-wrap: wrap;
-  border-bottom: 1px solid var(--ink);
+  gap: 6px 10px;
+  margin: 0 -4px;
+  padding: 12px 0 10px;
 }
+/* a tab is a strip of tape with its word hand-lettered on it; the word is also the button's name */
 .tab {
-  font: inherit;
+  position: relative;
+  min-width: 84px;
   min-height: 44px;
-  padding: 0 14px;
+  padding: 0 12px;
   border: 0;
-  border-bottom: 3px solid transparent;
-  margin-bottom: -1px;
-  background: transparent;
-  color: var(--ink2);
+  background: transparent center / 100% 100% no-repeat;
+  color: var(--ink);
+  font: inherit;
   cursor: pointer;
+  filter: saturate(0.8);
+  transform: rotate(var(--tilt, 0deg));
+}
+.tab-choose {
+  background-image: url('./art/tab-choose.webp');
+  --tilt: -1deg;
+}
+.tab-galaxy {
+  background-image: url('./art/tab-galaxy.webp');
+  --tilt: 0.8deg;
+}
+.tab-merger {
+  background-image: url('./art/tab-merger.webp');
+  --tilt: -0.6deg;
+}
+.tab-sky {
+  background-image: url('./art/tab-sky.webp');
+  --tilt: 1deg;
+}
+.tab-ink {
+  background-image: url('./art/tab-ink.webp');
+  --tilt: -0.8deg;
+}
+.tab:not(.tab-merger) .tab-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.tab-merger .tab-label {
+  font-weight: 700;
+  color: #1d1b19;
 }
 .tab[aria-selected='true'] {
-  color: var(--ink);
-  font-weight: 700;
-  border-bottom-color: var(--ink);
+  filter: none;
+  box-shadow:
+    0 3px 0 -1px var(--ink),
+    1px 2px 3px rgba(0, 0, 0, 0.3);
 }
 .pane {
-  padding-top: 12px;
+  padding-top: 4px;
 }
 .pane-hint {
-  margin: 0 0 8px;
+  margin: 0 0 12px;
   color: var(--ink2);
 }
-.group {
-  margin: 0;
-  padding: 16px 0 8px;
-  border-top: 1px solid var(--hair);
-}
-.group > h3,
-.cards > h3 {
+.cards > h3,
+.rc-nm {
   margin: 0 0 8px;
+}
+.cards > h3 {
   font: 700 12px/1.2 var(--mono);
   text-transform: uppercase;
   letter-spacing: 0.16em;
+}
+
+/* the recipe: a card for each part of the picture */
+.rstack {
+  display: grid;
+  gap: 10px;
+}
+.rcard {
+  border: 1px solid var(--edge);
+  background: var(--paper);
+}
+:root[data-theme='dark'] .rcard {
+  background: var(--paper);
+}
+.rc-top {
+  display: flex;
+  align-items: stretch;
+  margin: 0;
+  font: inherit;
+}
+.rc-hd {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 6px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  min-width: 0;
+}
+.rc-ic {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.rc-tx {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.rc-nm {
+  margin: 0;
+  font-weight: 700;
+}
+.rc-sm {
+  color: var(--ink2);
+  font-size: 12px;
+}
+.rc-chev {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+  transform: rotate(45deg);
+  margin: 0 4px 4px 0;
+}
+.rc-hd[aria-expanded='true'] .rc-chev {
+  transform: rotate(-135deg);
+  margin-bottom: -4px;
+}
+.rc-take {
+  flex: none;
+  min-width: 44px;
+  min-height: 44px;
+  align-self: center;
+  margin-right: 6px;
+  padding: 0 8px;
+  border: 1px solid var(--edge);
+  background: transparent;
+  color: var(--ink2);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.rc-take:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+.rc-body {
+  padding: 4px 12px 10px;
+  border-top: 1px solid var(--hair);
+}
+.rc-more {
+  margin: 4px 0 8px;
+  min-height: 44px;
+}
+.radd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+}
+.radd:empty {
+  display: none;
+}
+.radd-lab {
+  font: 700 12px/1 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ink2);
+}
+.radd-b {
+  background: var(--paper);
 }
 .field {
   margin: 0 0 8px;
@@ -501,13 +665,13 @@ input[type='range']:disabled {
   gap: 0;
 }
 
-/* the preset cards */
+/* the preset cards: a small drawing of the preset by this engine, then its name and what it draws */
 .cards {
   margin: 0 0 16px;
 }
 .card-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
   gap: 8px;
 }
 .card {
@@ -515,10 +679,10 @@ input[type='range']:disabled {
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  min-height: 64px;
-  padding: 8px 10px;
-  border: 1px solid var(--hair);
+  gap: 2px;
+  min-height: 44px;
+  padding: 6px;
+  border: 1px solid var(--edge);
   border-radius: 0;
   background: transparent;
   color: var(--ink);
@@ -531,16 +695,135 @@ input[type='range']:disabled {
   border-color: var(--ink);
   box-shadow: inset 0 0 0 1px var(--ink);
 }
+.card-th {
+  display: block;
+  aspect-ratio: 1;
+  margin-bottom: 4px;
+  background: var(--field);
+}
+.card-th:empty {
+  display: none;
+}
+.card-th img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.th-chalk,
+:root[data-theme='dark'] .th-paper {
+  display: none !important;
+}
+:root[data-theme='dark'] .th-chalk {
+  display: block !important;
+}
 .card-title {
   font-weight: 700;
+  font-size: 13px;
+  line-height: 1.25;
 }
 .card-desc {
   color: var(--ink2);
-  font-size: 12px;
+  font-size: 11px;
+  line-height: 1.3;
 }
 .pending {
   color: var(--ink2);
   margin: 8px 0 0;
+}
+
+/* a print taped to the page: the preset being drawn (also for M12's real galaxies) */
+.print {
+  position: relative;
+  width: 176px;
+  margin: 8px auto 20px;
+  padding: 10px 10px 6px;
+  background: #f3eee2 url('./art/sheet.jpg') 0 0 / 256px 256px;
+  box-shadow:
+    1px 2px 1.5px rgba(0, 0, 0, 0.28),
+    2px 6px 10px rgba(0, 0, 0, 0.14);
+  transform: rotate(1.5deg);
+}
+.print img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  background: var(--field);
+}
+.print figcaption {
+  margin-top: 6px;
+  color: #1d1b19;
+  font: 400 17px/1.15 var(--hand);
+  text-align: center;
+}
+.tape {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 74px;
+  height: 22px;
+  margin-left: -37px;
+  background: rgba(247, 241, 222, 0.72);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.22);
+  transform: rotate(-3deg);
+  pointer-events: none;
+}
+:root[data-theme='dark'] .print {
+  background-image: none;
+  background-color: #2a2621;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+:root[data-theme='dark'] .print figcaption {
+  color: #ece4d2;
+}
+:root[data-theme='dark'] .tape {
+  background: rgba(236, 228, 210, 0.28);
+}
+
+/* Surprise me: a pile of post-its; pressing it lifts the top one off */
+.pile {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 0 8px 0 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.pile-img {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  background: url('./art/pile.webp') center / contain no-repeat;
+  transition: transform 0.15s ease-out;
+}
+.pile:hover .pile-img {
+  transform: rotate(-3deg) translateY(-1px);
+}
+.pile.pull .pile-img {
+  animation: pullone 0.45s ease-out;
+}
+@keyframes pullone {
+  40% {
+    transform: translate(10px, -10px) rotate(6deg);
+  }
+}
+.pile-tx {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pile-tx b {
+  font-size: 14px;
+}
+.pile-tx span {
+  font-size: 12px;
+  color: var(--ink2);
 }
 
 .about {
@@ -604,6 +887,62 @@ input[type='range']:disabled {
   .btn[aria-pressed='true'],
   .btn.primary {
     forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+  /* the slider is drawn by the page, so forced colours would drop its track and thumb to the
+     background: keep them, in system colours */
+  input[type='range'] {
+    forced-color-adjust: none;
+    --track: ButtonText;
+  }
+  input[type='range']::-webkit-slider-runnable-track {
+    forced-color-adjust: none;
+    height: 2px;
+    background: linear-gradient(to right, Highlight var(--fill), ButtonText var(--fill));
+  }
+  input[type='range']::-moz-range-track {
+    forced-color-adjust: none;
+    height: 2px;
+    background: linear-gradient(to right, Highlight var(--fill), ButtonText var(--fill));
+  }
+  input[type='range']::-webkit-slider-thumb {
+    forced-color-adjust: none;
+    background: ButtonText;
+    border: 2px solid Canvas;
+    outline: 1px solid ButtonText;
+  }
+  input[type='range']::-moz-range-thumb {
+    forced-color-adjust: none;
+    background: ButtonText;
+    border: 2px solid Canvas;
+  }
+  input[type='range']:focus-visible::-webkit-slider-thumb {
+    background: Highlight;
+  }
+  .rc-chev {
+    border-color: ButtonText;
+  }
+  .rc-ic {
+    stroke: ButtonText;
+  }
+  .rcard,
+  .card {
+    border-color: ButtonText;
+  }
+  .tab {
+    forced-color-adjust: none;
+  }
+  .tab:not(.tab-merger) .tab-label {
+    position: static;
+    width: auto;
+    height: auto;
+    clip-path: none;
+    color: ButtonText;
+    background: Canvas;
+    padding: 2px 6px;
+  }
+  .tab[aria-selected='true'] .tab-label {
     background: Highlight;
     color: HighlightText;
   }

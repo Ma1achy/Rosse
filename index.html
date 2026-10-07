@@ -9,10 +9,24 @@
       name="description"
       content="Rosse draws galaxies entirely from hand-made marks: dots, strokes, stars and whole drawings, in ink on paper."
     />
+    <script>
+      // the surface before the first paint, so a viewer on the Chalkboard does not see Paper flash:
+      // the link's choice, else the one remembered, else the colour scheme (as src/ui/theme.ts)
+      (function () {
+        var s = null;
+        try {
+          s = new URLSearchParams(location.search).get('surface');
+          if (s !== 'paper' && s !== 'chalk') s = localStorage.getItem('rosse-surface');
+        } catch (e) {}
+        if (s !== 'paper' && s !== 'chalk')
+          s = matchMedia('(prefers-color-scheme: dark)').matches ? 'chalk' : 'paper';
+        document.documentElement.dataset.theme = s === 'chalk' ? 'dark' : 'light';
+      })();
+    </script>
     <link rel="stylesheet" href="/src/ui/page.css" />
   </head>
   <body>
-    <a class="skip" href="#plate">Skip to the plate</a>
+    <a class="skip" id="skip-link" href="#plate">Skip to the plate</a>
     <div class="wrap">
       <header class="top">
         <div class="title">
@@ -100,7 +114,10 @@
                 <input id="seed" class="num" type="number" min="1" max="9999" step="1" value="7"
               /></label>
               <button type="button" class="btn" id="reseed">New stars</button>
-              <button type="button" class="btn primary" id="surprise">Surprise me</button>
+              <button type="button" class="pile" id="surprise">
+                <span class="pile-img" aria-hidden="true"></span>
+                <span class="pile-tx"><b>Surprise me</b><span>pull one off the pile</span></span>
+              </button>
               <button type="button" class="btn" id="export-png">Export PNG</button>
               <button type="button" class="btn" id="copy-link">Copy link</button>
             </div>

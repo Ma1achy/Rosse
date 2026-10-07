@@ -7,9 +7,13 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Added
 
 - M11, the page and UI (docs/milestones/m11):
-  - The page on the design language: Paper and Chalkboard, a tabbed panel whose controls are generated from the schema (`src/ui/layout.ts`, `controls.ts`), preset cards, Surprise me, New stars, the seed, PNG export (`snapshot()` on both engines), a link that holds the preset, edits, camera and surface (`src/ui/urlstate.ts`), the merger timeline, and the "drawn on the CPU" note.
-  - Controls for the sky (M7), the merger (M8) and the lens (M9) appear when their flag in `FEATURES` is switched on; `?features=` previews them.
-  - `tools/gpu-test/ui-smoke.mjs` (`npm run test:ui`, part of `npm run test:gpu`), contrast and layout unit tests; the plates page check drives the Ink tab.
+  - The page on the design language: Paper and Chalkboard, v21's recipe of cards generated from the schema (`src/ui/layout.ts`, `controls.ts`), hand-lettered tabs, a post-it pile, a taped print, preset cards with thumbnails drawn by this engine (`npm run thumbnails`), Surprise me, New stars, the seed, PNG export (`snapshot()` on both engines), and the "drawn on the CPU" note.
+  - The merger and the simulated shells are drawn by the page, built inside the frame queue (`Engine.draw` is asynchronous), with the timeline (play, scrub, end up to 30, loop, speed); `mTime` runs to the horizon (schema range 0 to 30).
+  - `Engine.capabilities` (`src/render/capabilities.ts`): the page builds its controls, presets and links from what the engine draws; M7 and M9 switch theirs on. A link holds the preset, edits, camera, surface and `mTime`, and cannot ask for what is not drawn.
+  - Change kinds (`params`, `preset`, `camera`, `surface`): the overlays' home orientation is set again for a preset or seed only.
+  - Interfaces for M12: `ExportSource`, `Page.addExport`, `Page.timeline`, `PageState.from`.
+  - `assets/LICENCES.md` records the fonts' terms as the pack gives them.
+  - `tools/gpu-test/ui-smoke.mjs` (`npm run test:ui`, part of `npm run test:gpu`) checks the page on pixels on both engines; contrast, layout and link unit tests.
 
 - M8, mergers:
   - `sim/merger`: the core track in f64 (v21's `coreTrack` bit for bit, `tests/vectors/merger.json`), the timeline plan, the snapshots as f16 positions relative to the nearer core with a 64 MiB budget, `mTime` and the horizon (ADR 0040); the test stars on the GPU (`compute/merger.wgsl`, KDK at dt 0.012, in chunks) with a CPU twin and the model tier's one 12 kB read-back for `frameOf`.

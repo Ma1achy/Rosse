@@ -24,6 +24,26 @@ export function contrast(a: string, b: string): number {
   return ((hi ?? 0) + 0.05) / ((lo ?? 0) + 0.05);
 }
 
+/** WCAG 2.x 1.4.11: the boundary of a control (a slider's track, a card's or a box's edge) is 3:1. */
+describe('contrast of the edges of controls', () => {
+  for (const [name, t] of [
+    ['Paper', light],
+    ['Chalkboard', { ...light, ...dark }],
+  ] as const) {
+    for (const bg of ['paper', 'field']) {
+      it(`${name}: edge on ${bg} is at least 3:1`, () => {
+        expect(t.edge).toBeDefined();
+        expect(contrast(t.edge ?? '', t[bg] ?? '')).toBeGreaterThanOrEqual(3);
+      });
+    }
+  }
+  it('uses the edge, not the hairline, for the slider track and the cards', () => {
+    expect(css).toMatch(/slider-runnable-track[^}]*var\(--edge\)/);
+    expect(css).toMatch(/\.card \{[^}]*border: 1px solid var\(--edge\)/);
+    expect(css).toMatch(/\.rcard \{[^}]*border: 1px solid var\(--edge\)/);
+  });
+});
+
 describe('colour contrast of the page', () => {
   for (const [name, t] of [
     ['Paper', light],

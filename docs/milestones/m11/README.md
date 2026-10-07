@@ -1,89 +1,101 @@
 # M11: the page and UI
 
-The page: a plate, Paper and Chalkboard, controls generated from the schema, preset cards, the merger timeline, PNG export, a link that holds the drawing, and the "drawn on the CPU" note. It follows the design language (`assets/reference/design-language/`): type, grid and hairlines on flat cream paper with grain, one filled button, 44 px targets, a magenta focus ring, a 1 px slider track with a square thumb, a red-pencil note only for a limit. The engines are not touched: the golden hashes are unchanged.
+The page: a plate, Paper and Chalkboard, the recipe of cards (v21's, generated from the schema), preset cards with thumbnails drawn by this engine, the merger and its timeline, PNG export, a link that holds the drawing, and the "drawn on the CPU" note. It follows the design language (`assets/reference/design-language/`): type, grid and hairlines on flat cream paper with grain, hand-lettered tabs, a post-it pile, a taped print and a rail of paper as the objects v21 has, 44 px targets, a magenta focus ring, a red-pencil note only for a limit. The engines' output is unchanged (the golden hashes are the same); the merger and the shells are now drawn by the page.
 
-| Paper (Galaxy tab) | Chalkboard (Choose tab) | Phone width |
-| --- | --- | --- |
-| ![The page on Paper](page-paper.jpg) | ![The page on the Chalkboard](page-chalkboard.jpg) | ![The page at 390 px](page-phone.jpg) |
+| Paper, Galaxy tab | Chalkboard, Choose tab |
+| --- | --- |
+| ![The page on Paper, Galaxy tab](page-paper.jpg) | ![The page on the Chalkboard, Choose tab](page-chalkboard.jpg) |
+| **A merger and its timeline** | **Phone width (390 px)** |
+| ![A merger, with the timeline and the Merger tab](page-merger.jpg) | ![The page at 390 px](page-phone.jpg) |
 
 ## How it is built
 
-- `src/ui/layout.ts`: v21's groups and tabs (`GROUPS`, app23.js:L1412–1435 and L1587–1590) laid over the schema. The schema gives every control its kind, range, step and unit; the layout says only where it sits. A unit test fails if a schema entry with `control: true` is placed in no group or in two (`unplaced()`).
-- **Features.** `FEATURES` (`stars`, `merger`, `lens`) says what the engine draws. A control whose parameter belongs to a milestone that has not landed is not shown, and a preset that needs one is not offered (the Choose tab says how many are waiting). The pull request that lands M7, M8 or M9 in the page switches its flag on, and its controls, tab and presets appear. `?features=merger,lens,stars` previews the controls without the drawing.
-- `src/ui/controls.ts`: sliders (native `input[type=range]` plus a typeable value, clamped), radio groups for up to three options and a menu for more, v21's off/on buttons for `lines`, `whole`, `envelope` and `outline`, tabs on the WAI-ARIA pattern, and a group whose switch (merger, lens, shells) is off as a disabled `fieldset`.
-- `src/ui/page.ts`: the state the viewer edits (preset, parameters, zoom, surface), reported to `main.ts` through one `onChange`. `main.ts` keeps the engines; the engines gained one method, `snapshot()` (composite into a texture of its own and read back, on demand and in the frame queue), for the PNG.
-- `src/ui/urlstate.ts`: the link holds `preset`, `seed`, the camera, `surface` and every parameter that differs from the preset (`?preset=Barred+spiral&arms=4&stroke=beaded`). Reading clamps numbers, ignores bad choices, and leaves `backend`, `present` and `variant` alone.
-- `src/ui/timeline.ts`: play, scrub, end, loop and speed as v21's (6 s per unit of t at 1×); it writes only `mTime`, a view-tier input. It never starts by itself, and loops by default only when the viewer has not asked for reduced motion.
-- `src/ui/surprise.ts`: v21's "Surprise me", draws in v21's order, with a random source that tests can fix; it adds only what the page draws.
+- `src/render/capabilities.ts`: what the engines draw (`merger` on; `stars` for M7 and `lens` for M9 off). **Each engine reports it as `Engine.capabilities`, and the page reads it**: it builds controls, presets and links from it, so it cannot offer what is not drawn. M7 and M9 switch their flag on in the pull request that wires their drawing into the page; their controls, tabs and presets appear with it.
+- `src/ui/layout.ts`: v21's components (`COMPONENTS`, app23.js:L1456) laid over the schema, in their tabs: the schema gives every control its kind, range, step and unit, and the layout says where it sits and what the card's summary says. A unit test fails if a schema entry with `control: true` is placed in no card or twice.
+- `src/ui/controls.ts`: the recipe. A card has an icon (one of the library's own pen drawings, `icons.ts`), a name, a summary of its settings in words, its main controls and "More"; a part that can be left out has "Take out" and an "Add" button in its tab; the Merger tab has one card whose controls are disabled until the merger is on. Controls are sliders (native `input[type=range]` and a typeable value, clamped), radio groups up to three options and a menu for more, and v21's off/on buttons for `lines`, `whole`, `envelope` and `outline`.
+- `src/ui/page.ts`: the state the viewer edits, reported to `main.ts` through one `onChange` with a **kind**: `params`, `preset` (a preset, a new seed, Surprise me), `camera`, `surface`. The overlays' home orientation (open question Q3) is set again for `preset` only, never when a View control moves; M7 and M9 read `wanted.home` (`window.__rosse.home` for tests).
+- `src/main.ts` drives the merger and the shells in the frame path. `Engine.draw` is asynchronous: a merger's model tier (`GpuMerger.build`, the integration in chunks) is built inside the frame queue, so the previous frame stays on the plate meanwhile, the page says "Simulating the merger…", and `snapshot` (PNG), further frames and surface changes wait their turn. The model tier is keyed on every parameter except the camera, `mTime`, the winding and the plates (`src/render/page-key.ts`), so the timeline and the orbit only run the view tier (`tests`: the scrub runs no model tier). If the device is replaced during a build the frame fails like a lost device and is drawn again. The CPU engine builds on the main thread (it blocks while it does: M10 moves it to a worker). Shell galaxies' simulated shells are built the same way.
+- `src/ui/urlstate.ts`: the link holds `preset` (or `from`, for M12's galaxies), `seed`, the camera, `surface` (always: a link means the same on a viewer whose own choice or colour scheme differs) and every parameter that differs from the preset, including `mTime` and `mHorizon` up to 30. Reading clamps numbers, ignores bad choices, **drops a preset or parameter the engine does not draw**, and leaves `backend`, `present` and `variant` alone. `?features=` is gone.
+- `src/ui/timeline.ts`: play, scrub, end, loop and speed as v21's (6 s per unit of t at 1×). The moment is kept inside 0 and the end (v21's `tlSetEnd`), the horizon follows the end, and the schema's `mTime` now runs to 30 (owner decision of 2026-10-07; the one deliberate difference from the reference's ranges in `tests/unit/params.test.ts`). The address is written at most four times a second, so it follows a playing timeline. It never starts by itself, and loops by default only when the viewer has not asked for reduced motion.
+- `tools/thumbnails/make.mjs` (`npm run thumbnails`): draws every preset the page offers with this engine (seed 7, the preset's own camera, the middle three quarters of the plate at 192 px, WebP) on Paper and on the Chalkboard into `src/ui/thumbs/`. Run it again when M7 or M9 add presets. The thumbnails are this engine's own picks, not v21's captures.
+- Objects (`src/ui/art/`, small files from v21's own embedded pictures): the hand-lettered tabs (the word is the button's accessible name), the rail of paper under the panel, the post-it pile of "Surprise me", and the taped print of the preset being drawn (`.print`, also for M12's real galaxies).
+- Fonts: `assets/LICENCES.md` records what the pack says of each.
 
 ## Checklist: v21's controls
 
-Status: **done**, **waits for M7/M8/M9** (the control is built from the schema and appears when the feature flag is switched on), **M12** (left out on purpose), **changed**.
+Status: **done**, **waits for M7 / M9** (built from the schema; appears when the engine's capability is on), **M12** (left out on purpose), **changed**.
 
 | v21 control | status |
 | --- | --- |
-| Presets, grouped (galaxies, mergers, lenses, stars and artefacts, scenes, creative) | done as text cards (name and what it draws, `aria-pressed`); thumbnails are not rebuilt (v21's are pre-rendered images in `assets/data/rosse`); presets for M7 to M9 wait |
-| Surprise me | done (merger, star and artefact additions wait) |
-| New stars (re-seed), seed number | done (the seed box is typeable, 1 to 9999) |
-| Shape: bulge fraction, size, roundness, disc thickness, halo | done |
-| Arms: number, pitch, contrast, width, flocculence, arms drawn as | done |
-| Bar and ring: strength, length, ring, radius, bar and ring drawn as | done |
-| Stars: stars sampled, stipple density, knots on arms, bright stars | done |
-| Star or artefact: draw (galaxy, star, artefact), artefact, brightness, spikes, rings, bleed | waits for M7 |
-| In the field: foreground star, distance, direction, artefact across it | waits for M7 |
-| View: inclination, orbit round the axis, roll, dust lane, winding | done; the plate also orbits, rolls and zooms by pointer and keys (M3) and the sliders follow it |
-| Oddities: companions, tidal tail, drawn arcs, drawn shells, trails, stray arrow, jet | done |
-| Oddities: foreground stars | waits for M7 |
-| Creative: dust carved by pen lines, bubbles, streams, hand wobble | done |
-| Creative: deep field of drawn galaxies | waits for M7 |
-| Stars and dust: drawn stars among the dots | waits for M7; dust lanes hatched with pen lines is done |
-| Pen and variation: pen weight, variation | done |
-| The drawings: line strokes, whole drawing, halo or disc drawing, outline arcs, stroke kind, nuclear spiral, rewind the drawings | done |
-| Print: plates (ink, slipped CMY, colour by population) | done (Ink tab) |
+| Presets, grouped (galaxies, mergers, lenses, stars and artefacts, scenes, creative) | done, with this engine's thumbnails (28 now); the lens, star and artefact presets wait for M9 and M7 |
+| Surprise me (the post-it pile) | done (star and artefact additions wait for M7); `?variant=` overrides apply |
+| New stars, seed | done (the seed box takes 1 to 9999) |
+| Recipe cards: What it is, Bulge, Disc, Spiral arms, Bar, Ring, Dust, Stars and knots | done; "What it is" (galaxy, star, artefact) waits for M7 |
+| The star or artefact; A foreground star; An artefact | wait for M7 |
+| Camera (inclination, orbit round the axis, roll), winding | done; the plate orbits, rolls and zooms by pointer and keys (M3) and the sliders follow it |
+| Companions and oddities | done (foreground stars wait for M7) |
+| The deep field | bubbles, streams, hand wobble done; the deep field itself waits for M7 |
+| Pen, Stars and dust (hatching), The drawings, Print (plates) | done (drawn stars wait for M7) |
+| Lensing, the quasar flare | wait for M9 |
+| Shells (simulated) | done (drawn by the page since M11) |
+| The merger: moment, ratio, approach, time since closest approach, tilts, friction, arms, sizes, orbit tilt, speed, stars simulated, galaxy types, merger on, tearing | done |
+| Timeline: play, scrub, end (0.2 to 30), loop, speed | done |
 | Paper and Chalkboard (v21's dark mode) | done, remembered, and in the link |
-| Merger: moment, ratio, approach, time since closest approach, tilts, friction, arms, sizes, orbit tilt, speed, stars simulated, galaxy types, merger on, tearing | waits for M8 (built; see below) |
-| Timeline: play, scrub, end, loop, speed | built and tested; shown for a merger once M8's flag is on |
-| Lensing: every slider, source, cluster, second source, lens on | waits for M9 |
-| Shells (simulated): time, direction, stars, on | waits for M8 |
-| Quasar flare on the timeline | waits for M9 |
-| PNG export | done (v21 had none; the file is the plate as shown, at its pixel size) |
+| PNG export | done (v21 had none): the plate's drawing at its pixel size, without the caption written over it on the page |
 | URL state | done (v21 had none) |
 | "Drawn on the CPU" note | done (`#note`, red pencil, announced as a status) |
 | Plate caption, "drag to orbit" hint, double-click reset | done |
-| Export SVG | M12 |
-| Export GIF | M12 |
+| Recipe rail, hand-lettered tabs, post-it pile, taped print | done (see Objects) |
+| Export SVG, Export GIF | M12 |
 | Any Galaxy Zoo 2 galaxy (random by type, find) and real galaxies with photos | M12 |
-| v21's "recipe" rail of component cards, Principia post-it pile, taped print | not rebuilt: the tab bar and preset cards do the same job; the objects are photographed assets, a design decision for the owner |
-| `winding` S-wise/Z-wise, `mTime` in the merger group | done |
-| Line strokes and the other four switches | changed: v21's off/on buttons, and any value above 0 reads as on (a preset's 0.9 or 0.3 shows "on"); the URL and presets keep the exact value |
+| Line strokes, whole drawing, halo or disc drawing, outline arcs | changed: v21's off/on buttons, and any value above 0 reads as on (a preset's 0.9 shows "on"); links and presets keep the exact value |
 
 ### Not buildable yet
 
-- **M7**: star or artefact, in the field, foreground stars, deep field, drawn stars among the dots, and the presets that use them (`Star: …`, `Artefact: …`, `Layered: …` with a star or artefact).
-- **M8, the page's side**: M8 is merged, but `main.ts` does not call `GpuMerger`, `CpuMerger` or the shells passes (only the golden harness does), and `GpuMerger.build` is asynchronous where the page's `draw` is not. A merger preset therefore draws as a single galaxy on the page. The wiring is a change to the engines' frame path, which M7 and M9 also change, so it is left to land after them (see the owner decisions). Until then `FEATURES.merger` is off.
-- **M9**: the lens controls, the quasar flare and the lens presets.
+- **M7**: the star or artefact, in the field, the deep field, foreground stars, drawn stars among the dots, and the presets that use them.
+- **M9**: the lens, the quasar flare and the lens presets.
+
+## Integration points for M12
+
+(PR #11 asked for these; M11 provides the interfaces and leaves the buttons and the catalogue UI to M12.)
+
+1. **Export hook.** `ExportSource` (`src/ui/export.ts`): `backend()`, `snapshot()` (the plate as pixels), `layers()` (the last drawing's ink layers, for an SVG that reads buffers back on demand) and `device()` (the GPU device, or null). `Page.addExport({ id, label, run(source, page) })` adds a button after Export PNG and handles busy and errors. The engine itself stays private to `main.ts`.
+2. **Timeline accessors.** `Page.timeline()` gives `{ end, speed, loop, playing }`; `Page.state().P.mTime` and `mHorizon` give the rest, and a GIF re-draws moments by setting `mTime` through the page.
+3. **A galaxy that is not a preset.** `PageState.preset` may be `null` with `PageState.from` a string naming the galaxy (`gz2:<id>`, `real:<n>`); the link writes `?from=` and every parameter that differs from the defaults, and `parseUrlState` returns `from` for M12 to load. The address bar no longer fails silently: if it cannot be updated the page says so once in the status line and the console.
 
 ## Accessibility
 
-- Every control has a visible label tied to it (`label for`, or a `fieldset` with a `legend` for a group of radio buttons); the number box of a slider is named `<label>, value`. The Playwright test checks every visible input, select, button and tab has a name.
-- Keyboard: the whole page is reachable in reading order (skip link, surface, plate, buttons, tabs, panel). Sliders take the arrow, Home, End and Page keys; the tabs take Left, Right, Home and End; the plate takes the arrows, Q and E, plus and minus, 0 (M3); typing in a number box does not turn the plate.
-- Focus is a 2 px magenta ring on every control, never removed. Targets are at least 44 px high.
-- Contrast: all text and the magenta and red-pencil inks are at least 4.5:1 on both grounds, in Paper and on the Chalkboard (`tests/unit/ui-contrast.test.ts`, WCAG 2.x). Hairlines are decoration, not information.
-- Reduced motion: no transitions or animation; the timeline never plays by itself and does not loop by default; scrolling is not smoothed.
-- Status messages (the CPU note, the mark counts, "Saved rosse-7.png", "Link copied") are `aria-live` regions. A group switched off is a disabled `fieldset`, announced as unavailable, with a line saying what turns it on.
-- The plate is `role="application"` with a name that lists its keys; its pixels have no text alternative beyond the caption (a plain description of what is drawn, `aria-hidden` on the visible copy so it is not read twice) and the mark counts.
-- Forced colours: the selected states use `Highlight`.
-- Not done: a screen-reader pass with a real reader on a device, and a 200% zoom review on the phone, are not run here. Only Chromium is tested.
+- Every control has a visible label tied to it (`label for`, or a `fieldset` with a `legend` for a group of radio buttons); the number box of a slider is named `<label>, value`; a hand-lettered tab's word is its accessible name. The Playwright test checks every input, select, button and tab of every panel, hidden and closed ones included, has a name.
+- Keyboard: the page is reachable in reading order (skip link, surface, plate, seed, buttons, tabs, panel), and the test presses Tab through it and checks the order. Sliders take the arrow, Home, End and Page keys; tabs take Left, Right, Home and End; the plate takes the arrows, Q and E, plus and minus, 0 (M3); typing in a number box does not turn the plate. A card header is a button with `aria-expanded`.
+- Focus is a 2 px magenta ring on every control; the test checks it on what the keyboard reaches, a slider, a card header and a tab included. Targets are at least 44 px high.
+- Contrast (`tests/unit/ui-contrast.test.ts`, WCAG 2.x): all text and both inks are at least 4.5:1 on both grounds, and **the edge of every control** (a slider's track, a card's border) at least 3:1 (`--edge`, 3.6:1 on Paper and 4.6:1 on the Chalkboard). The lighter hairline (`--hair`) is used only for decorative rules between parts, never as the only boundary of a control.
+- Reduced motion: no transitions or animation; the timeline never plays by itself and does not loop by default.
+- Live regions: the mark counts, the CPU note, the status line and the plate's caption are written only when their text changes (a test counts the mutations over three surface changes: none).
+- Forced colours: the selected states use `Highlight`, and the slider's track and thumb, which the page draws, are kept in system colours (the test checks the pixels of the slider under forced colours).
+- A group that is switched off is a disabled `fieldset`, announced as unavailable, with a line saying what turns it on.
+
+### Not tested
+
+A real GPU; phones and touch; a screen reader; any browser other than Chromium; 200% zoom. The plate itself has no text alternative beyond its caption and the mark counts.
+
+### Testing limits
+
+`vite preview` and `vite dev` answer HTTP 431 to a URL of more than about 16 KB (Node's header limit). A link carries only what differs from its preset, so this matters for hand-built addresses, not for the page's own.
 
 ## Tests
 
-- `tests/unit/ui-page.test.ts`: the layout places every schema control once and hides the gated ones; presets follow the flags; the link round-trips and clamps; the timeline's clock; Surprise me is valid for 200 random draws.
-- `tests/unit/ui-contrast.test.ts`: the colour tokens.
-- `tools/gpu-test/ui-smoke.mjs` (`npm run test:ui`, and in `npm run test:gpu`): on the CPU engine and on WebGPU (SwiftShader), the page loads without error; the tabs follow the keyboard; a slider and a number box change the drawing and the link; a preset card draws; Paper and Chalkboard; a link restores the drawing; New stars and Surprise me; a PNG of the plate's size is downloaded; every control has a name; reduced motion; the merger preview shows the timeline and scrubs `mTime`. `tools/gpu-test/plates-page.mjs` now drives the Plates choice in the Ink tab.
+- `tests/unit/ui-page.test.ts`: the layout places every schema control once and hides the gated ones; presets follow the capabilities; links round-trip (both surfaces, `mTime` and `mHorizon` to 30, a galaxy with a source), clamp, drop what the engine does not draw and keep the page's own keys; the timeline's clock; Surprise me draws afresh (seeds, presets, looks and v21's ranges, over 300 draws).
+- `tests/unit/ui-contrast.test.ts`: the colour tokens and the edges of controls.
+- `tools/gpu-test/ui-smoke.mjs` (`npm run test:ui`, and in `npm run test:gpu`), on the CPU engine and on WebGPU: the checks listed at its head, on pixels: a slider changes the plate; a merger has two concentrations of ink and a single galaxy one; the scrub changes the picture and runs no model tier; the PNG is the plate's size and the two engines' PNGs agree (mean difference 0.00 of 255); with a dark colour scheme and storage blocked a link keeps Paper or the Chalkboard; names, keyboard order and focus rings; forced colours; the home orientation. `tools/gpu-test/plates-page.mjs` drives the Plates choice in the Ink tab.
 
-## Owner decisions
+## Owner decisions taken (2026-10-07)
 
-1. **Fonts.** The page loads Heros, IBM Plex Mono and Threshold Grain (as "Principia Hand") from `assets/fonts` through Vite. Their licences are open question Q1; settle them before the page is published.
-2. **The M8 page wiring** (above): who does it, and when. Recommended: one small change after M7 and M9 have merged, as it touches the same frame path.
-3. **Preset thumbnails and the photographed objects** (post-it pile, taped print, recipe rail): v21 has pre-rendered thumbnails and photographs; rebuilding them as real objects is a design task beyond this milestone.
-4. **`mTime` range.** The schema limits `mTime` to 0 to 2 while v21's timeline end can reach 30 (`mHorizon`); the timeline sets `mHorizon` as v21 does but a link clamps `mTime` to 2. M8's owner should widen the schema range with the horizon.
+1. **Fonts**: Threshold Grain is the owner's own handwriting (unrestricted); the others are listed in `assets/LICENCES.md` as the pack gives them (IBM Plex Mono: OFL 1.1 with its text; Heros: no licence file in the pack, its files name TeX Gyre Heros under the GUST Font License, not checked here). The project licence is still undecided (Q1).
+2. **Thumbnails and objects**: rebuilt as above.
+3. **The merger on the page**: wired; `capabilities.merger` is on.
+4. **`mTime` follows the horizon** to 30.
+
+## Left open
+
+- M7 and M9 each: switch their capability on in the pull request that wires them, regenerate the thumbnails (`npm run thumbnails`), and attach their `home` to `wanted` where `home` is set today (`kind === 'preset'`).
+- The CPU engine's merger blocks the main thread while it integrates (M10: a worker).

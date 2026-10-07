@@ -2,15 +2,16 @@
  * "Surprise me": a galaxy at random, as v21's button builds it (`$('surprise').onclick`,
  * app23.js:L1743–1760): a random preset, with the seed, tilt, roll, winding, pitch, strokes, whole
  * drawings, plates, pen and the rest drawn afresh, and sometimes a merger, a bright star or an
- * artefact laid on top. The random source is a parameter, so the choice is testable; the draws are
- * taken in v21's order, so the same random numbers give v21's galaxy where the page draws what v21
- * does. Parts the engine does not draw yet (FEATURES) are never added, and every number is
+ * artefact laid on top. The random source is a parameter, so the choice is testable. The draws follow
+ * v21's order, but they are not v21's galaxy for the same numbers: a part the engine does not draw
+ * (`features`) is skipped together with its draws, so the sequence runs differently from the point
+ * where one is skipped, and v21 uses `Math.random` whose stream cannot be replayed. Every number is
  * clamped by the schema.
  */
 import { DEF, type Params } from '../core/params';
 import { PRESETS } from '../core/presets';
 import { sanitise } from '../core/schema';
-import { FEATURES, type FeatureName } from './layout';
+import type { Features } from './layout';
 
 const round2 = (v: number) => Math.round(v * 100) / 100;
 
@@ -18,7 +19,7 @@ const round2 = (v: number) => Math.round(v * 100) / 100;
 export function surprise(
   r: () => number,
   names: readonly string[],
-  features: Record<FeatureName, boolean> = FEATURES,
+  features: Features,
 ): { P: Params; preset: string } {
   const preset = names[Math.floor(r() * names.length)] ?? 'Grand design';
   const base: Partial<Params> = PRESETS[preset] ?? {};

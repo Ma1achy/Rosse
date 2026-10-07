@@ -7,26 +7,22 @@
  * unit test keeps that group empty, so a new schema entry is placed on purpose).
  *
  * Features: the page shows controls for what the engine draws. A parameter that belongs to a
- * milestone that has not landed yet (the sky, the merger, the lens) is hidden until its flag in
- * `FEATURES` is switched on, which is the one line each of M7, M8 and M9 changes when it merges.
+ * milestone that has not landed yet (the sky, the lens) is hidden until the engine's capability
+ * for it is on (src/render/capabilities.ts), the one line each of M7 and M9 changes when it merges.
  * Everything here is pure (no DOM), so it is unit-tested.
  */
 import type { ParamKey, Params } from '../core/params';
+import type { VectorAtlas } from '../marks/vector';
 import { PARAM_KEYS } from '../core/params';
 import { SCHEMA } from '../core/schema';
 
-/** What the engine draws, by milestone; each flag is flipped by the milestone that lands it. */
+/**
+ * What the engine draws, by milestone. The engine says it (`Engine.capabilities`, src/render/
+ * capabilities.ts) and the page reads it, so the page cannot offer a control for what is not drawn.
+ */
 export type FeatureName = 'stars' | 'merger' | 'lens';
 
-/**
- * M7 (stars, artefacts, overlays, the sky), M8 (the merger, its timeline and the simulated
- * shells) and M9 (the lens) switch their flag on in the pull request that merges them.
- */
-export const FEATURES: Record<FeatureName, boolean> = {
-  stars: false,
-  merger: false,
-  lens: false,
-};
+export type Features = Record<FeatureName, boolean>;
 
 /** The milestone behind each feature, for the notes on the page. */
 export const FEATURE_MILESTONE: Record<FeatureName, string> = {
@@ -73,6 +69,7 @@ export const KEY_FEATURE: Partial<Record<ParamKey, FeatureName>> = Object.fromEn
     'mSize2',
     'mTilt',
     'mEcc',
+    'mHorizon',
     'shellsOn',
     'shellTime',
     'shellAxis',
@@ -107,62 +104,157 @@ export const TABS: readonly { id: TabId; label: string; hint: string }[] = [
   { id: 'ink', label: 'Ink', hint: 'how it is drawn: pen, stars, dust and print' },
 ];
 
-export interface Group {
+/** An icon: a drawing of v21's library, by sheet and index, or by a word of its type or kind. */
+export type IconSpec = readonly [VectorAtlas, number | string];
+
+/**
+ * One card of the recipe (v21's `COMPONENTS`, app23.js:L1456–1478): a part of the picture with a
+ * name, a summary of its settings in words, its main controls, and more behind a disclosure. A part
+ * with `on` can be taken out and added back; a `gate` part is always there, and its controls are
+ * disabled while its first control (the switch) is off.
+ */
+export interface Component {
   id: string;
-  title: string;
   tab: TabId;
-  /** the controls, in order: sliders first, then choices, as v21 */
-  items: readonly ParamKey[];
-  /**
-   * A switch that turns the group on: its other controls are disabled while it is off, and the
-   * page says so. Used by the merger, the lens and the shells.
-   */
-  switch?: ParamKey;
+  name: string;
+  icon: IconSpec;
+  /** the card is built by hand: the subject (a galaxy, a star, an artefact) */
+  custom?: 'subject';
+  /** taking the part out sets `key` to `offVal`; adding it back to its last value, or `onVal` */
+  on?: { key: ParamKey; onVal: number | string; offVal: number | string };
+  gate?: boolean;
+  show?: (P: Params) => boolean;
+  main: readonly ParamKey[];
+  more?: readonly ParamKey[];
+  summary: (P: Params) => string;
+  /** open when the page first opens */
+  open?: boolean;
 }
 
-/** v21's groups with the tab each sits in (TABOF, L1590), in the order the tabs show them. */
-export const GROUPS: readonly Group[] = [
+const pct = (v: number) => `${String(Math.round(v * 100))}%`;
+const isGalaxy = (P: Params) => P.subject === 'galaxy' && !P.merger;
+
+/** v21's components, in v21's order, with the tab each sits in. */
+export const COMPONENTS: readonly Component[] = [
   {
-    id: 'shape',
-    title: 'Shape',
+    id: 'subject',
     tab: 'galaxy',
-    items: ['bulge', 'bulgeSize', 'bulgeFlat', 'thick', 'halo'],
+    name: 'What it is',
+    icon: ['whole', 'galaxy:spiral'],
+    custom: 'subject',
+    main: ['subject'],
+    open: true,
+    summary: (P) =>
+      P.merger
+        ? 'two galaxies, merging'
+        : P.subject === 'star'
+          ? 'a lone star'
+          : P.subject === 'artefact'
+            ? 'an artefact'
+            : 'a single galaxy',
+  },
+  {
+    id: 'star',
+    tab: 'galaxy',
+    name: 'The star or artefact',
+    icon: ['sstars', 'plus'],
+    show: (P) => P.subject === 'star' || P.subject === 'artefact',
+    main: ['starBright', 'spikes'],
+    more: ['starRings', 'bleed', 'artefact'],
+    summary: (P) =>
+      P.subject === 'artefact'
+        ? optionLabel('artefact', P.artefact)
+        : `brightness ${pct(P.starBright)}, spikes ${pct(P.spikes)}`,
+  },
+  {
+    id: 'bulge',
+    tab: 'galaxy',
+    name: 'Bulge',
+    icon: ['sstars', 'burst'],
+    on: { key: 'bulge', onVal: 0.5, offVal: 0 },
+    show: isGalaxy,
+    main: ['bulge', 'bulgeSize'],
+    more: ['bulgeFlat'],
+    summary: (P) =>
+      `${P.bulge > 0.7 ? 'dominant' : P.bulge > 0.35 ? 'prominent' : 'modest'}, ${P.bulgeFlat < 0.6 ? 'flattened' : 'round'}`,
+  },
+  {
+    id: 'disc',
+    tab: 'galaxy',
+    name: 'Disc',
+    icon: ['env', 'disc'],
+    show: isGalaxy,
+    main: ['thick', 'halo'],
+    summary: (P) => `${P.thick > 0.5 ? 'thick' : 'thin'}${P.halo > 0.08 ? ', with a halo' : ''}`,
   },
   {
     id: 'arms',
-    title: 'Arms',
     tab: 'galaxy',
-    items: ['arms', 'pitch', 'armStrength', 'armWidth', 'flocc', 'armStyle'],
+    name: 'Spiral arms',
+    icon: ['arms', 34],
+    on: { key: 'arms', onVal: 2, offVal: 0 },
+    show: isGalaxy,
+    open: true,
+    main: ['arms', 'pitch', 'armStrength'],
+    more: ['armWidth', 'flocc', 'armStyle', 'winding'],
+    summary: (P) => {
+      const n = Math.round(P.arms);
+      return `${String(n)} arm${n > 1 ? 's' : ''}, ${P.pitch < 14 ? 'tightly wound' : P.pitch > 26 ? 'open' : 'moderately wound'}, ${String(Math.round(P.pitch))}°${P.flocc > 0.4 ? ', flocculent' : ''}`;
+    },
   },
   {
     id: 'bar',
-    title: 'Bar and ring',
     tab: 'galaxy',
-    items: ['bar', 'barLen', 'ring', 'ringR', 'barStyle', 'ringStyle'],
+    name: 'Bar',
+    icon: ['bars', 0],
+    on: { key: 'bar', onVal: 0.6, offVal: 0 },
+    show: isGalaxy,
+    main: ['bar', 'barLen'],
+    more: ['barStyle'],
+    summary: (P) =>
+      `${P.bar > 0.7 ? 'strong' : P.bar > 0.35 ? 'clear' : 'weak'}, ${P.barLen > 0.55 ? 'long' : 'short'}`,
+  },
+  {
+    id: 'ring',
+    tab: 'galaxy',
+    name: 'Ring',
+    icon: ['rings', 0],
+    on: { key: 'ring', onVal: 0.6, offVal: 0 },
+    show: isGalaxy,
+    main: ['ring', 'ringR'],
+    more: ['ringStyle'],
+    summary: (P) => `strength ${pct(P.ring)}, at radius ${P.ringR.toFixed(1)}`,
+  },
+  {
+    id: 'dust',
+    tab: 'galaxy',
+    name: 'Dust',
+    icon: ['penlines', 0],
+    on: { key: 'dust', onVal: 0.5, offVal: 0 },
+    show: (P) => P.subject === 'galaxy',
+    main: ['dust', 'dustLines'],
+    summary: (P) =>
+      `${P.dust > 0.6 ? 'heavy' : 'light'}${P.dustLines > 0.1 ? ', with dust lanes' : ''}`,
   },
   {
     id: 'stars',
-    title: 'Stars',
     tab: 'galaxy',
-    items: ['stars', 'stipple', 'knots', 'sparkle'],
-  },
-  {
-    id: 'subject',
-    title: 'Star or artefact',
-    tab: 'galaxy',
-    items: ['starBright', 'spikes', 'starRings', 'bleed', 'subject', 'artefact'],
+    name: 'Stars and knots',
+    icon: ['sstars', 'spark'],
+    main: ['stars', 'knots'],
+    more: ['stipple', 'sparkle'],
+    summary: (P) =>
+      `${Math.round(P.stars).toLocaleString('en-GB')} stars, ${P.knots > 0.5 ? 'plenty of knots' : P.knots > 0.15 ? 'a few knots' : 'no knots'}`,
   },
   {
     id: 'merger',
-    title: 'Merger',
     tab: 'merger',
-    switch: 'merger',
-    items: [
-      'merger',
-      'mTime',
-      'mRatio',
-      'mPeri',
-      'mStage',
+    name: 'The merger',
+    icon: ['companions', 0],
+    gate: true,
+    open: true,
+    main: ['merger', 'mTime', 'mStage', 'mRatio', 'mPeri'],
+    more: [
       'mSpin1',
       'mSpin2',
       'mFriction',
@@ -177,83 +269,130 @@ export const GROUPS: readonly Group[] = [
       'mType2',
       'mWarp',
     ],
+    summary: (P) =>
+      P.merger
+        ? `mass ratio ${P.mRatio.toFixed(2)}, pericentre ${P.mPeri.toFixed(1)}`
+        : 'not a merger',
   },
   {
-    id: 'view',
-    title: 'View',
+    id: 'camera',
     tab: 'sky',
-    items: ['incl', 'az', 'pa', 'dust', 'winding'],
+    name: 'Camera',
+    icon: ['misc', 'arrow'],
+    open: true,
+    main: ['incl', 'az', 'pa'],
+    summary: (P) => `tilted ${String(Math.round(P.incl))}°, turned ${String(Math.round(P.pa))}°`,
   },
   {
-    id: 'field',
-    title: 'In the field',
+    id: 'lens',
     tab: 'sky',
-    items: ['ovStar', 'ovStarD', 'ovStarA', 'ovArtefact'],
-  },
-  {
-    id: 'oddities',
-    title: 'Oddities',
-    tab: 'sky',
-    items: ['companions', 'tail', 'lens', 'shells', 'fgstars', 'trails', 'arrow', 'jet'],
-  },
-  {
-    id: 'creative',
-    title: 'Creative',
-    tab: 'sky',
-    items: ['field', 'dustLines', 'bubbles', 'streams', 'distort'],
-  },
-  {
-    id: 'lensing',
-    title: 'Lensing',
-    tab: 'sky',
-    switch: 'lensOn',
-    items: [
-      'lensOn',
-      'lensR',
-      'lensSrc',
+    name: 'Lensing',
+    icon: ['arcs', 'einstein-ring'],
+    on: { key: 'lensOn', onVal: 1, offVal: 0 },
+    main: ['lensR', 'lensSrc', 'lensSize'],
+    more: [
+      'lensSource',
+      'lensCluster',
+      'lensDouble',
       'lensSrcA',
-      'lensSize',
       'lensShear',
       'lensShearA',
       'lensStars',
       'lensQ',
       'lensAngle',
       'lensCore',
-      'lensSource',
-      'lensCluster',
-      'lensDouble',
     ],
+    summary: (P) =>
+      `${P.lensCluster ? 'a galaxy cluster' : P.lensSource === 'quasar' ? 'a lensed quasar' : P.lensDouble ? 'two sources behind' : 'a galaxy behind'}, Einstein radius ${P.lensR.toFixed(1)}`,
+  },
+  {
+    id: 'fgstar',
+    tab: 'sky',
+    name: 'A foreground star',
+    icon: ['sstars', 'asterisk'],
+    on: { key: 'ovStar', onVal: 0.7, offVal: 0 },
+    main: ['ovStar', 'ovStarD', 'ovStarA'],
+    summary: (P) =>
+      `brightness ${pct(P.ovStar)}, ${P.ovStarD < 0.6 ? 'on top of the galaxy' : 'beside it'}`,
+  },
+  {
+    id: 'artefact',
+    tab: 'sky',
+    name: 'An artefact',
+    icon: ['trails', 'trail'],
+    on: { key: 'ovArtefact', onVal: 'trail', offVal: 'none' },
+    main: ['ovArtefact'],
+    summary: (P) => optionLabel('ovArtefact', P.ovArtefact),
   },
   {
     id: 'shells',
-    title: 'Shells',
     tab: 'sky',
-    switch: 'shellsOn',
-    items: ['shellsOn', 'shellTime', 'shellAxis', 'shellStars'],
+    name: 'Shells',
+    icon: ['shells', 0],
+    on: { key: 'shellsOn', onVal: 1, offVal: 0 },
+    main: ['shellTime', 'shellAxis', 'shellStars'],
+    summary: () => 'shells from a galaxy it swallowed',
+  },
+  {
+    id: 'odd',
+    tab: 'sky',
+    name: 'Companions and oddities',
+    icon: ['companions', 0],
+    main: ['companions', 'tail'],
+    more: ['lens', 'shells', 'fgstars', 'trails', 'arrow', 'jet'],
+    summary: (P) => {
+      const o: string[] = [];
+      if (P.companions > 0.05) o.push('companions');
+      if (P.tail > 0.05) o.push('a tidal tail');
+      if (P.lens > 0.05) o.push('drawn arcs');
+      if (P.fgstars > 0.05) o.push('field stars');
+      if (P.trails > 0.05) o.push('trails');
+      return o.length ? o.join(', ') : 'none';
+    },
+  },
+  {
+    id: 'field',
+    tab: 'sky',
+    name: 'The deep field',
+    icon: ['whole', 'galaxy:flocculent'],
+    main: ['field', 'bubbles'],
+    more: ['streams', 'distort'],
+    summary: (P) => (P.field > 0.05 ? `galaxies behind, ${pct(P.field)}` : 'a bare sky'),
   },
   {
     id: 'pen',
-    title: 'Pen and variation',
     tab: 'ink',
-    items: ['pen', 'vary'],
+    name: 'Pen',
+    icon: ['penlines', 3],
+    open: true,
+    main: ['pen', 'vary'],
+    summary: (P) => `line weight ${P.pen.toFixed(1)}, variation ${pct(P.vary)}`,
   },
   {
-    id: 'mix',
-    title: 'Stars and dust',
+    id: 'inkstars',
     tab: 'ink',
-    items: ['starMix', 'dustScribble'],
+    name: 'Stars and dust',
+    icon: ['sstars', 'asterisk'],
+    main: ['starMix', 'dustScribble'],
+    summary: (P) => `drawn stars ${pct(P.starMix)}, hatching ${pct(P.dustScribble)}`,
   },
   {
     id: 'drawings',
-    title: 'The drawings',
     tab: 'ink',
-    items: ['lines', 'whole', 'envelope', 'outline', 'stroke', 'nuclear', 'rewind'],
+    name: 'The drawings',
+    icon: ['whole', 'galaxy:spiral'],
+    main: ['lines', 'whole', 'envelope', 'outline'],
+    more: ['stroke', 'nuclear', 'rewind'],
+    summary: () => 'which kinds of drawing are used',
   },
   {
     id: 'print',
-    title: 'Print',
     tab: 'ink',
-    items: ['plates'],
+    name: 'Print',
+    icon: ['misc', 'spring'],
+    open: true,
+    main: ['plates'],
+    summary: (P) => optionLabel('plates', P.plates),
   },
 ];
 
@@ -303,36 +442,42 @@ export function optionLabel(key: ParamKey, option: string | number): string {
 }
 
 /** Whether the engine draws what a parameter controls. */
-export function isBuilt(key: ParamKey, features: Record<FeatureName, boolean> = FEATURES): boolean {
+export function isBuilt(key: ParamKey, features: Features): boolean {
   const f = KEY_FEATURE[key];
   return f === undefined || features[f];
 }
 
-/** A group with only the controls that are drawn and have one; null when none are left. */
-export function visibleGroup(
-  g: Group,
-  features: Record<FeatureName, boolean> = FEATURES,
-): Group | null {
-  const items = g.items.filter((k) => SCHEMA[k].control && isBuilt(k, features));
-  if (!items.length) return null;
-  // a switch that is not drawn leaves the group without a reason to exist
-  if (g.switch && !isBuilt(g.switch, features)) return null;
-  return { ...g, items };
+/** A component with only the controls that are drawn; null when none are left. */
+export function visibleComponent(c: Component, features: Features): Component | null {
+  const keep = (ks: readonly ParamKey[]) =>
+    ks.filter((k) => SCHEMA[k].control && isBuilt(k, features));
+  const main = keep(c.main);
+  const more = keep(c.more ?? []);
+  if (!main.length && !more.length) return null;
+  // a part switched by a key that is not drawn has no reason to exist
+  if (c.on && !isBuilt(c.on.key, features)) return null;
+  if (c.gate && !isBuilt(c.main[0] as ParamKey, features)) return null;
+  // the subject has nothing to choose until there is more than a galaxy
+  if (c.custom === 'subject' && !features.stars) return null;
+  return { ...c, main, more };
 }
 
-/** The groups of one tab that are visible, in order. */
-export function groupsOf(tab: TabId, features: Record<FeatureName, boolean> = FEATURES): Group[] {
-  return GROUPS.filter((g) => g.tab === tab)
-    .map((g) => visibleGroup(g, features))
-    .filter((g): g is Group => g !== null);
+/** The components of one tab that are drawn, in order. */
+export function componentsOf(tab: TabId, features: Features): Component[] {
+  return COMPONENTS.filter((c) => c.tab === tab)
+    .map((c) => visibleComponent(c, features))
+    .filter((c): c is Component => c !== null);
 }
 
 /**
- * The parameters that have a control in the reference and are placed in no group. Empty, and kept
- * empty by a unit test: a schema entry with `control: true` must be placed on purpose.
+ * The parameters that have a control in the reference and are placed in no component. Empty, and
+ * kept empty by a unit test: a schema entry with `control: true` must be placed on purpose.
  */
 export function unplaced(): ParamKey[] {
-  const placed = new Set(GROUPS.flatMap((g) => g.items));
+  // a part's switch (`on`) is its Take out and Add buttons
+  const placed = new Set(
+    COMPONENTS.flatMap((c) => [...c.main, ...(c.more ?? []), ...(c.on ? [c.on.key] : [])]),
+  );
   return PARAM_KEYS.filter((k) => SCHEMA[k].control && !placed.has(k));
 }
 
@@ -355,14 +500,17 @@ export function endLabel(v: number, step: number): string {
   return Math.abs(v) >= 1000 ? `${String(v / 1000)}k` : String(+v.toFixed(dec));
 }
 
-/** Which tabs have anything to show now (a tab with no group is hidden). */
-export function visibleTabs(features: Record<FeatureName, boolean> = FEATURES): TabId[] {
-  return TABS.filter((t) => t.id === 'choose' || groupsOf(t.id, features).length > 0).map(
+/** Which tabs have anything to show now (a tab with no component is hidden). */
+export function visibleTabs(features: Features): TabId[] {
+  return TABS.filter((t) => t.id === 'choose' || componentsOf(t.id, features).length > 0).map(
     (t) => t.id,
   );
 }
 
-/** Whether a group's switch is on for these parameters. */
-export function groupOn(g: Group, P: Params): boolean {
-  return g.switch === undefined || Number(P[g.switch]) > 0;
+/** Whether a part is in the picture: no switch, or its switch is not at its off value. */
+export function isOn(c: Component, P: Params): boolean {
+  if (c.gate) return Number(P[c.main[0] as ParamKey]) > 0;
+  if (!c.on) return true;
+  const v = P[c.on.key];
+  return typeof c.on.offVal === 'number' ? Number(v) > 0.02 : v !== c.on.offVal;
 }

@@ -4,6 +4,8 @@
  * own output), so the file is the same on both engines and does not depend on a canvas keeping its
  * drawing buffer.
  */
+import type { InkLayer } from '../render/layers';
+
 export interface Pixels {
   px: Uint8ClampedArray<ArrayBuffer>;
   width: number;
@@ -36,4 +38,19 @@ export function downloadBlob(blob: Blob, filename: string): void {
   setTimeout(() => {
     URL.revokeObjectURL(url);
   }, 10_000);
+}
+
+/**
+ * What an export reads from the engine, in place of the engine (whose interface is private to
+ * src/main.ts): the PNG uses `snapshot`; M12's SVG export reads `layers()` back on demand (never on
+ * the frame path), and its GIF re-draws moments of the timeline through the page.
+ */
+export interface ExportSource {
+  backend(): 'webgpu' | 'cpu';
+  /** the plate as shown, composited for the surface and plates now (queued after any frame) */
+  snapshot(): Promise<Pixels>;
+  /** the ink layers of the last drawing, in draw order; empty before the first frame */
+  layers(): readonly InkLayer[];
+  /** the GPU device of the engine drawing now, or null on the CPU engine */
+  device(): GPUDevice | null;
 }

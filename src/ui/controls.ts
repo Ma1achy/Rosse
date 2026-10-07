@@ -5,25 +5,32 @@
  * its own: it reads parameters with `get`, reports a change with `set`, and `sync` brings every
  * control to the parameters (after a preset, the orbit or the URL changes them).
  *
+ * The Galaxy, Sky and Ink tabs are v21's recipe: a stack of cards, one for each part of the picture
+ * (a name, a summary of its settings in words, its main controls, and more behind a disclosure). A
+ * part that can be left out has a "Take out" button and an "Add" button in its tab. The Merger tab
+ * has one card whose controls are disabled until the merger is switched on.
+ *
  * Accessibility: every control has a visible label tied to it (`label for`, or a `fieldset` with a
  * `legend` for a group of radios); sliders are native `input[type=range]` (arrow keys, Home, End,
  * Page keys), with the value also in a text box that takes a typed number; the tabs follow the
- * WAI-ARIA tabs pattern (arrow keys, Home, End; the panel is a tab stop of its own); a group whose
- * switch is off is a disabled `fieldset`, so its controls are skipped and announced as unavailable.
+ * WAI-ARIA tabs pattern (arrow keys, Home, End; the panel is a tab stop of its own); a card's
+ * header is a button with `aria-expanded`; a part that is switched off is a disabled `fieldset`,
+ * so its controls are skipped and announced as unavailable.
  */
 import type { ParamKey, Params } from '../core/params';
 import { SCHEMA, type ChoiceSpec, type NumberSpec } from '../core/schema';
 import {
+  componentsOf,
   decimalsOf,
   endLabel,
-  groupOn,
-  groupsOf,
+  isOn,
   optionLabel,
   TABS,
   TOGGLES,
   visibleTabs,
-  type FeatureName,
-  type Group,
+  type Component,
+  type Features,
+  type IconSpec,
   type TabId,
 } from './layout';
 
@@ -91,7 +98,8 @@ function sliderControl(
   root.append(label, row);
 
   const paint = (v: number) => {
-    const f = spec.max === spec.min ? 0 : ((v - spec.min) / (spec.max - spec.min)) * 100;
+    const hi = Number(range.max);
+    const f = hi === spec.min ? 0 : ((v - spec.min) / (hi - spec.min)) * 100;
     range.style.setProperty('--fill', `${String(Math.min(100, Math.max(0, f)))}%`);
     range.setAttribute('aria-valuetext', `${v.toFixed(dec)}${spec.unit ?? ''}`);
     if (document.activeElement !== num) num.value = v.toFixed(dec);
@@ -105,6 +113,7 @@ function sliderControl(
     const v = parseFloat(num.value.replace(',', '.'));
     if (Number.isFinite(v)) {
       const c = Math.min(spec.max, Math.max(spec.min, v));
+      if (c > Number(range.max)) range.max = String(c);
       range.value = String(c);
       host.set(key, c);
     }
@@ -118,10 +127,17 @@ function sliderControl(
   num.addEventListener('blur', () => {
     paint(Number(host.get()[key]));
   });
+  const maxTick = ticks.lastElementChild;
   return {
     root,
     sync(P) {
       const v = Number(P[key]);
+      // the moment in the merger runs to the timeline's horizon (v21), not to the schema's limit
+      if (key === 'mTime') {
+        const max = Math.max(2, P.mHorizon);
+        range.max = String(max);
+        if (maxTick) maxTick.textContent = endLabel(max, spec.step);
+      }
       if (document.activeElement !== range) range.value = String(v);
       paint(v);
     },
@@ -221,68 +237,59 @@ function controlFor(key: ParamKey, host: PanelHost): { root: HTMLElement } & Con
   );
 }
 
-interface Section {
-  group: Group;
+interface Card {
+  comp: Component;
   root: HTMLElement;
+  summary: HTMLElement;
+  header: HTMLButtonElement;
+  body: HTMLElement;
   inner: HTMLFieldSetElement | null;
   hint: HTMLElement | null;
+  take: HTMLButtonElement | null;
   controls: Control[];
 }
 
-function sectionFor(group: Group, host: PanelHost): Section {
-  const root = el('section', 'group');
-  root.setAttribute('aria-labelledby', `g-${group.id}`);
-  root.append(Object.assign(el('h3', undefined, group.title), { id: `g-${group.id}` }));
-  const controls: Control[] = [];
-  let inner: HTMLFieldSetElement | null = null;
-  let hint: HTMLElement | null = null;
-  let into: HTMLElement = root;
-  for (const key of group.items) {
-    const c = controlFor(key, host);
-    controls.push(c);
-    if (key === group.switch) {
-      root.append(c.root);
-      hint = el(
-        'p',
-        'hint',
-        `Switch this on to use the controls under ${group.title.toLowerCase()}.`,
-      );
-      inner = el('fieldset', 'inner');
-      root.append(hint, inner);
-      into = inner;
-    } else into.append(c.root);
-  }
-  return { group, root, inner, hint, controls };
+export interface PanelOptions {
+  host: PanelHost;
+  features: Features;
+  /** the Choose tab's own content (the preset cards) */
+  choose: HTMLElement;
+  /** a card's icon, from the library's drawings */
+  icon?: (spec: IconSpec) => SVGElement | null;
+  initial?: TabId;
+}
+
+/** Sets text only when it differs, so a screen reader is not told the same thing again. */
+export function setText(e: HTMLElement, text: string): void {
+  if (e.textContent !== text) e.textContent = text;
 }
 
 export class ControlPanel {
   readonly tabs: TabId[];
-  private readonly sections: Section[] = [];
+  private readonly cards: Card[] = [];
   private readonly buttons = new Map<TabId, HTMLButtonElement>();
   private readonly panes = new Map<TabId, HTMLElement>();
+  private readonly adds = new Map<TabId, HTMLElement>();
+  /** the value a part had when it was taken out, to put back */
+  private readonly stash = new Map<ParamKey, number | string>();
   private current: TabId;
+  private last: Params | null = null;
+  private readonly host: PanelHost;
 
-  /**
-   * `choose` is the Choose tab's own content (the preset cards); the others are built from the
-   * layout for the features that are drawn.
-   */
-  constructor(
-    root: HTMLElement,
-    host: PanelHost,
-    choose: HTMLElement,
-    features: Record<FeatureName, boolean>,
-    initial: TabId = 'choose',
-  ) {
-    this.tabs = visibleTabs(features);
-    this.current = this.tabs.includes(initial) ? initial : 'choose';
+  constructor(root: HTMLElement, o: PanelOptions) {
+    this.host = o.host;
+    this.tabs = visibleTabs(o.features);
+    this.current = this.tabs.includes(o.initial ?? 'choose') ? (o.initial ?? 'choose') : 'choose';
     const bar = el('div', 'tabs');
     bar.setAttribute('role', 'tablist');
     bar.setAttribute('aria-label', 'Parts of the panel');
     root.append(bar);
     for (const t of TABS.filter((x) => this.tabs.includes(x.id))) {
-      const b = el('button', 'tab', t.label);
+      const b = el('button', `tab tab-${t.id}`);
       b.type = 'button';
       b.id = `tab-${t.id}`;
+      // the hand-lettered tab is a picture of the word; the word is the button's name
+      b.append(el('span', 'tab-label', t.label));
       b.setAttribute('role', 'tab');
       b.setAttribute('aria-controls', `pane-${t.id}`);
       b.addEventListener('click', () => {
@@ -298,18 +305,106 @@ export class ControlPanel {
       pane.setAttribute('role', 'tabpanel');
       pane.setAttribute('aria-labelledby', b.id);
       pane.tabIndex = 0;
-      pane.append(Object.assign(el('p', 'pane-hint'), { textContent: `${t.label}: ${t.hint}` }));
-      if (t.id === 'choose') pane.append(choose);
-      else
-        for (const g of groupsOf(t.id, features)) {
-          const s = sectionFor(g, host);
-          this.sections.push(s);
-          pane.append(s.root);
+      pane.append(el('p', 'pane-hint', `${t.label}: ${t.hint}`));
+      if (t.id === 'choose') pane.append(o.choose);
+      else {
+        const stack = el('div', 'rstack');
+        for (const c of componentsOf(t.id, o.features)) {
+          const card = this.card(c, o.icon);
+          this.cards.push(card);
+          stack.append(card.root);
         }
+        const add = el('div', 'radd');
+        this.adds.set(t.id, add);
+        pane.append(stack, add);
+      }
       root.append(pane);
       this.panes.set(t.id, pane);
     }
     this.select(this.current, false);
+  }
+
+  private card(c: Component, icon?: (spec: IconSpec) => SVGElement | null): Card {
+    const host = this.host;
+    const root = el('section', 'rcard');
+    root.dataset.id = c.id;
+    const top = el('h3', 'rc-top');
+    const header = el('button', 'rc-hd');
+    header.type = 'button';
+    header.id = `rc-${c.id}-hd`;
+    header.setAttribute('aria-controls', `rc-${c.id}-body`);
+    const ic = icon?.(c.icon);
+    if (ic) header.append(ic);
+    const tx = el('span', 'rc-tx');
+    const summary = el('span', 'rc-sm');
+    tx.append(el('span', 'rc-nm', c.name), summary);
+    header.append(tx, el('span', 'rc-chev'));
+    top.append(header);
+    const body = el('div', 'rc-body');
+    body.id = `rc-${c.id}-body`;
+    const setOpen = (open: boolean) => {
+      header.setAttribute('aria-expanded', String(open));
+      body.hidden = !open;
+    };
+    header.addEventListener('click', () => {
+      setOpen(header.getAttribute('aria-expanded') !== 'true');
+    });
+    setOpen(c.open === true);
+    let take: HTMLButtonElement | null = null;
+    if (c.on) {
+      take = el('button', 'rc-take');
+      take.type = 'button';
+      take.setAttribute('aria-label', `Take the ${c.name.toLowerCase()} out`);
+      take.append(el('span', undefined, 'Take out'));
+      take.addEventListener('click', () => {
+        const on = c.on;
+        if (!on) return;
+        this.stash.set(on.key, host.get()[on.key]);
+        host.set(on.key, on.offVal);
+        // the card has gone: the way back is the Add button for it
+        this.adds.get(c.tab)?.querySelector<HTMLElement>(`[data-add="${c.id}"]`)?.focus();
+      });
+      top.append(take);
+    }
+    root.append(top, body);
+
+    const controls: Control[] = [];
+    let inner: HTMLFieldSetElement | null = null;
+    let hint: HTMLElement | null = null;
+    let into: HTMLElement = body;
+    c.main.forEach((key, i) => {
+      const ctl = controlFor(key, host);
+      controls.push(ctl);
+      if (c.gate && i === 0) {
+        body.append(ctl.root);
+        hint = el('p', 'hint', `Turn on “${SCHEMA[key].label}” to use the controls below.`);
+        inner = el('fieldset', 'inner');
+        body.append(hint, inner);
+        into = inner;
+      } else into.append(ctl.root);
+    });
+    if (c.more?.length) {
+      const wrap = el('div', 'rc-morew');
+      wrap.id = `rc-${c.id}-more`;
+      wrap.hidden = true;
+      const more = el('button', 'btn rc-more', 'More');
+      more.type = 'button';
+      more.setAttribute('aria-expanded', 'false');
+      more.setAttribute('aria-controls', wrap.id);
+      more.addEventListener('click', () => {
+        const open = more.getAttribute('aria-expanded') !== 'true';
+        more.setAttribute('aria-expanded', String(open));
+        more.textContent = open ? 'Fewer' : 'More';
+        wrap.hidden = !open;
+      });
+      for (const key of c.more) {
+        const ctl = controlFor(key, host);
+        controls.push(ctl);
+        wrap.append(ctl.root);
+      }
+      into.append(more, wrap);
+    }
+    return { comp: c, root, summary, header, body, inner, hint, take, controls };
   }
 
   select(id: TabId, focus = false): void {
@@ -328,6 +423,12 @@ export class ControlPanel {
     return this.current;
   }
 
+  /** Opens a card (a test, or a link to a part, may ask). */
+  open(id: string): void {
+    const card = this.cards.find((c) => c.comp.id === id);
+    if (card && card.header.getAttribute('aria-expanded') !== 'true') card.header.click();
+  }
+
   private tabKey(e: KeyboardEvent, id: TabId): void {
     const i = this.tabs.indexOf(id);
     const n = this.tabs.length;
@@ -344,11 +445,56 @@ export class ControlPanel {
 
   /** Brings every control to these parameters. */
   sync(P: Params): void {
-    for (const s of this.sections) {
-      for (const c of s.controls) c.sync(P);
-      const on = groupOn(s.group, P);
-      if (s.inner) s.inner.disabled = !on;
-      if (s.hint) s.hint.hidden = on;
+    this.last = P;
+    for (const card of this.cards) {
+      const c = card.comp;
+      for (const ctl of card.controls) ctl.sync(P);
+      setText(card.summary, c.summary(P));
+      const shown = c.show ? c.show(P) : true;
+      card.root.hidden = !shown || (!c.gate && !isOn(c, P));
+      if (card.take) card.take.hidden = false;
+      if (card.inner) card.inner.disabled = !isOn(c, P);
+      if (card.hint) card.hint.hidden = isOn(c, P);
     }
+    this.renderAdds(P);
+  }
+
+  /** The "Add" row of each tab: the parts that can be in the picture and are not. */
+  private renderAdds(P: Params): void {
+    for (const [tab, add] of this.adds) {
+      const off = this.cards.filter(
+        (k) =>
+          k.comp.tab === tab &&
+          k.comp.on &&
+          !k.comp.gate &&
+          (k.comp.show?.(P) ?? true) &&
+          !isOn(k.comp, P),
+      );
+      const key = off.map((k) => k.comp.id).join();
+      if (add.dataset.key === key) continue;
+      add.dataset.key = key;
+      add.replaceChildren();
+      if (!off.length) continue;
+      add.append(el('span', 'radd-lab', 'Add'));
+      for (const k of off) {
+        const on = k.comp.on;
+        if (!on) continue;
+        const b = el('button', 'btn radd-b', `+ ${k.comp.name.replace(/^An? /, '')}`);
+        b.type = 'button';
+        b.dataset.add = k.comp.id;
+        b.setAttribute('aria-label', `Add the ${k.comp.name.toLowerCase()}`);
+        b.addEventListener('click', () => {
+          this.host.set(on.key, this.stash.get(on.key) ?? on.onVal);
+          this.open(k.comp.id);
+          k.header.focus();
+        });
+        add.append(b);
+      }
+    }
+  }
+
+  /** The parameters the panel last showed (for tests). */
+  get shown(): Params | null {
+    return this.last;
   }
 }
