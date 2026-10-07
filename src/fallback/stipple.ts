@@ -41,7 +41,8 @@ import { Cls } from '../model/classes';
 import { classCapacity, compact } from './kernels/scan';
 import { runStipple } from './kernels/stipple';
 import { runVectors, vectorInputs, type VectorOut } from './kernels/vector';
-import { vectorView, type VectorView } from '../model/vectors';
+import { warpCaps, warpInstances, warpRibbons, type TideData } from './kernels/tide';
+import { hatchRows, vectorView, type VectorView } from '../model/vectors';
 import { usedDrawings } from '../model/used';
 
 export interface CpuStippleView {
@@ -178,11 +179,23 @@ export function streamLayers(vo: VectorOut): InkLayer[] {
   ];
 }
 
+/** A merging galaxy's tides (M8): the tidal map, which galaxy this is, and R2 for this view. */
+export interface CpuTide {
+  data: TideData;
+  g: 0 | 1;
+  /** the plate px the map's grid spans (2 · 4.2 · s0, app23.js:L1243) */
+  r2: number;
+}
+
 export class CpuStipple {
   readonly samples: ReturnType<typeof runStipple>;
   readonly lines: RibbonModel;
 
-  constructor(readonly scene: GalaxyScene) {
+  constructor(
+    readonly scene: GalaxyScene,
+    /** set (and `r2` updated) for a merging galaxy: its marks are carried by the tides after each kernel */
+    public tide: CpuTide | null = null,
+  ) {
     this.samples = runStipple(scene.galaxy);
     this.lines = ribbonModel(scene.ribbons, scene.galaxy.pool, scene.galaxy.dotBase);
   }
@@ -230,6 +243,16 @@ export class CpuStipple {
     // the breathing room round bright drawn stars: a pure view filter (app23.js:L275–281)
     const cleared =
       galaxy.g.star_mix > 0.01 ? breatheRoom(p.classes, galaxy.g.n, p.f32, this.samples.u32) : 0;
+    const T = this.tide;
+    if (T) {
+      // carried by the tides: the stipple's marks before the compaction, the line-work's outputs
+      warpInstances(T.data, T.g, T.r2, p.f32, n);
+      warpRibbons(T.data, T.g, T.r2, rv.segs, R.nSegs);
+      warpInstances(T.data, T.g, T.r2, rv.pieces, rv.nPieces);
+      warpCaps(T.data, T.g, T.r2, rv.caps, R.nCaps);
+      warpInstances(T.data, T.g, T.r2, rv.hdots, R.nHDots);
+      warpInstances(T.data, T.g, T.r2, rv.hblobs, R.nHBlobs);
+    }
     const { out, counts, cap } = compact(p.classes, nTot, p.u32);
     const outF = new Float32Array(out.buffer);
     const list = (cls: number): Instance[] => {
@@ -248,8 +271,20 @@ export class CpuStipple {
       return res;
     };
     const { variation, meta, vectors: VD } = this.scene;
-    const vv = vectorView(VD, P, variation, meta, cam, galaxy.g.key, galaxy.g.n_dot_pool);
-    const vo = runVectors(vectorInputs(VD.lib, vv, galaxy.pool, galaxy.dotBase, galaxy.noise));
+    const vv = vectorView(
+      VD,
+      P,
+      variation,
+      meta,
+      cam,
+      galaxy.g.key,
+      galaxy.g.n_dot_pool,
+      T?.r2 ?? 0,
+      T ? hatchRows(R, cam) : [],
+    );
+    const vo = runVectors(
+      vectorInputs(VD.lib, vv, galaxy.pool, galaxy.dotBase, galaxy.noise, T?.data),
+    );
     // the drawn stars, one `sstars` drawing per compacted `rstar` (M7)
     const spec = this.scene.rstars;
     const nStars = counts[Cls.rstar] ?? 0;
@@ -345,6 +380,12 @@ export class CpuStipple {
       ...stipple.slice(3),
     ];
     const cores = coreInstances(P, meta, cam, galaxy.noise, VD.parts.picks.nuclear);
+    if (T)
+      for (const c of cores) {
+        const q = T.data.post(T.g, c.x, c.y, T.r2);
+        c.x = q[0];
+        c.y = q[1];
+      }
     if (cores.length)
       layers.push({ kind: 'sprites', atlas: 'cores', gain: 1, pop: 'old', instances: cores });
     layers.push(...fgLayers);

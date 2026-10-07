@@ -16,17 +16,18 @@ import scanWgsl from '../shaders/compute/scan.wgsl';
 import breatheWgsl from '../shaders/compute/breathe.wgsl';
 import starMarksWgsl from '../shaders/compute/star-marks.wgsl';
 import { bufferWithData } from '../gpu/buffers';
-import { INSTANCE_LAYOUT } from '../marks/instance';
+import { INSTANCE_LAYOUT, packInstances } from '../marks/instance';
 import { CLASS_COUNT, Cls } from '../model/classes';
 import { packGalaxy, sampleCount } from '../model/galaxy';
 import { cullsUniform } from '../model/ribbons';
 import { packStruct } from '../gpu/buffers';
 import { CULLS_LAYOUT } from '../fallback/kernels/project';
 import { GpuRibbons } from './ribbons';
+import { GpuTide } from './tide';
 import { GpuVectors } from './vectors';
 import { GpuStarSet } from './star-set';
 import { GpuSky } from './sky';
-import { vectorView } from '../model/vectors';
+import { hatchRows, vectorView } from '../model/vectors';
 import { coreInstances } from '../model/parts';
 import {
   STIPPLE_LAYERS,
@@ -43,6 +44,7 @@ import { TierState, type TierWork } from './tiers';
 import { SAMPLE_LAYOUT } from '../fallback/kernels/stipple';
 import { STAR_JOB_LAYOUT, STAR_UNIFORM_LAYOUT, packStarJobs, starJobs } from '../model/stars';
 import { wobbleAmplitude } from '../view/warp';
+import { INSTANCE_LAYOUT as INSTANCE } from '../marks/instance';
 import { BLOCK_STRIDE, blockCount, classCapacity } from '../fallback/kernels/scan';
 import type { GpuSpriteLayer, InkLayer } from './layers';
 
@@ -123,6 +125,13 @@ export class GpuStipple {
   readonly tiers = new TierState();
   /** the drawings' metadata the model tier was built with (part of its key) */
   private meta: DrawingsMeta | null = null;
+  /**
+   * A merging galaxy (M8): the tidal map's buffer and which galaxy this is. Its marks are carried
+   * by the tides after the single-galaxy kernels have made them (compute/tide-apply.wgsl).
+   */
+  private tide: { buffer: GPUBuffer; g: 0 | 1; r2: number } | null = null;
+  /** the drawn core, warped on the GPU when there are tides: its instance and draw arguments */
+  private core: { inst: GPUBuffer; args: GPUBuffer; count: number } | null = null;
 
   private constructor(
     readonly device: GPUDevice,
@@ -145,6 +154,8 @@ export class GpuStipple {
     readonly stars: GpuStarSet,
     /** the deep field, the foreground stars (M7) */
     readonly sky: GpuSky,
+    /** a merging galaxy's tides (M8) */
+    private readonly tideApply: GpuTide,
   ) {}
 
   static create(device: GPUDevice): GpuStipple {
@@ -166,7 +177,24 @@ export class GpuStipple {
       GpuVectors.create(device),
       GpuStarSet.create(device),
       GpuSky.create(device),
+      GpuTide.create(device),
     );
+  }
+
+  /**
+   * A merging galaxy: carry its marks by the tidal map in `buffer` (galaxy `g`). Call before
+   * `setScene`; `null` makes this a single galaxy again. R2 (the plate px the map's grid spans) is
+   * the view's: `setTideR2`.
+   */
+  setTide(buffer: GPUBuffer | null, g: 0 | 1 = 0): void {
+    this.tide = buffer ? { buffer, g, r2: this.tide?.r2 ?? 1 } : null;
+    this.tiers.invalidate();
+    this.tideApply.reset();
+  }
+
+  /** The plate px the tidal grid spans for the next view (2 · 4.2 · s0, app23.js:L1243). */
+  setTideR2(r2: number): void {
+    if (this.tide) this.tide.r2 = r2;
   }
 
   /**
@@ -237,7 +265,7 @@ export class GpuStipple {
     const view = buf(64, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'view');
     const culls = buf(CULLS_LAYOUT.size, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'culls');
     this.ribbons.load(scene.ribbons, view, pool, dotBase, noise);
-    this.vectors.load(scene.vectors, pool, dotBase, noise);
+    this.vectors.load(scene.vectors, pool, dotBase, noise, this.tide?.buffer);
     const scan = bufferWithData(
       d,
       new Uint32Array([n, cap, blocks, 0]),
@@ -521,6 +549,8 @@ export class GpuStipple {
         cam,
         galaxy.g.key,
         galaxy.g.n_dot_pool,
+        this.tide?.r2 ?? 0,
+        this.tide ? hatchRows(this.scene.ribbons, cam) : [],
       ),
     );
     this.camera = cam;
@@ -556,6 +586,18 @@ export class GpuStipple {
       pass.setBindGroup(0, r.groups.clear);
       pass.dispatchWorkgroups(Math.ceil(galaxy.g.n / 64));
     }
+    // a merging galaxy: the stipple's marks carried by the tides, before the compaction reads them
+    // (after the breathing room, which v21 clears before the warp)
+    const T = this.tide;
+    if (T)
+      this.tideApply.encode(pass, T.buffer, {
+        key: 'projected',
+        entry: 'warp_instances',
+        buffer: m.projected,
+        n: m.n,
+        g: T.g,
+        r2: T.r2,
+      });
     pass.setPipeline(P.local);
     pass.setBindGroup(0, m.groups.local);
     pass.dispatchWorkgroups(blockCount(nTot));
@@ -566,6 +608,10 @@ export class GpuStipple {
     pass.setBindGroup(0, m.groups.scatter);
     pass.dispatchWorkgroups(Math.ceil(nTot / 64) || 1);
     this.ribbons.encodeExpand(pass);
+    if (T) {
+      this.ribbons.encodeTide(pass, this.tideApply, T.buffer, T.g, T.r2);
+      this.warpCore(pass, T);
+    }
     this.vectors.encode(pass);
     this.stars.encode(pass);
     this.sky.encode(pass);
@@ -577,6 +623,46 @@ export class GpuStipple {
   private camera: Camera | null = null;
   /** the star marks' slots of the last view */
   private nStarSlots = 0;
+
+  /**
+   * The drawn core and nuclear spiral of a merging galaxy: placed on the CPU for the view as ever,
+   * then carried by the tides on the GPU (v21: `inst(L.cores, …)`, app23.js:L1028, goes through SM).
+   */
+  private warpCore(
+    pass: GPUComputePassEncoder,
+    T: { buffer: GPUBuffer; g: 0 | 1; r2: number },
+  ): void {
+    if (!this.scene || !this.camera) return;
+    const { P, meta, galaxy, vectors } = this.scene;
+    const cores = coreInstances(P, meta, this.camera, galaxy.noise, vectors.parts.picks.nuclear);
+    const d = this.device;
+    if (!this.core) {
+      this.core = {
+        inst: d.createBuffer({
+          label: 'merging core',
+          size: 2 * INSTANCE.size,
+          usage: STORAGE | GPUBufferUsage.COPY_DST,
+        }),
+        args: d.createBuffer({
+          label: 'merging core args',
+          size: 16,
+          usage: GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_DST,
+        }),
+        count: 0,
+      };
+    }
+    this.core.count = cores.length;
+    d.queue.writeBuffer(this.core.inst, 0, packInstances(cores));
+    d.queue.writeBuffer(this.core.args, 0, new Uint32Array([4, cores.length, 0, 0]));
+    this.tideApply.encode(pass, T.buffer, {
+      key: 'core',
+      entry: 'warp_instances',
+      buffer: this.core.inst,
+      n: cores.length,
+      g: T.g,
+      r2: T.r2,
+    });
+  }
 
   /**
    * Every ink layer of the galaxy, in the reference's order (scene(), app23.js:L1289–1301): the
@@ -591,7 +677,26 @@ export class GpuStipple {
     const pieces = line.filter((l) => 'atlas' in l && l.atlas === 'pieces');
     const stipple = this.layers();
     const { P, meta, galaxy, vectors } = this.scene;
-    const cores = coreInstances(P, meta, this.camera, galaxy.noise, vectors.parts.picks.nuclear);
+    const cores = this.tide
+      ? []
+      : coreInstances(P, meta, this.camera, galaxy.noise, vectors.parts.picks.nuclear);
+    const tided: InkLayer[] =
+      this.tide && this.core?.count
+        ? [
+            {
+              kind: 'gpu-sprites',
+              atlas: 'cores',
+              gain: 1,
+              source: {
+                buffer: this.core.inst,
+                offset: 0,
+                size: Math.max(16, this.core.count * INSTANCE.size),
+                indirect: this.core.args,
+                indirectOffset: 0,
+              },
+            },
+          ]
+        : [];
     // v21 expands the hatching and the placed drawings into one line buffer: their pen-line
     // quads are one layer, one union per sample (ADR 0019)
     const placed = this.vectors.layers();
@@ -624,6 +729,7 @@ export class GpuStipple {
         ? [{ kind: 'sprites', atlas: 'cores', gain: 1, pop: 'old', instances: cores } as InkLayer]
         : []),
       ...this.sky.foreground(),
+      ...tided,
     ];
   }
 
@@ -802,6 +908,9 @@ export class GpuStipple {
     this.sky.unload();
     this.ribbons.destroy();
     this.vectors.unload();
+    this.core?.inst.destroy();
+    this.core?.args.destroy();
+    this.core = null;
     this.model = null;
   }
 

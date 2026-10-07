@@ -10,7 +10,8 @@ struct VInst {
   ps: f32,
   // sqrt |det m|, the dots' and blobs' scale
   sc: f32,
-  // warp parameters: rewind (dk, flip, 0, 0); post (cx, cy, 0, 0)
+  // warp parameters: rewind (dk, flip, 0, 0); post (cx, cy, 0, 0); tide (galaxy, R2, 0, 0);
+  // tide on the screen (mWarp) (galaxy, flip, 0, 0)
   w: vec4<f32>,
   // post: the affine S, column-major
   w2: vec4<f32>,

@@ -27,6 +27,11 @@ export const Stream = {
   stars: 9,
   /** Merger initial conditions (test stars). */
   mergerInit: 10,
+  /**
+   * The merger's debris: each test star's mark (a dot, a knot, a sparkle or a drawn star) and the
+   * thinning of the debris (M8, mergerSprites, app23.js:L518–528, L1236–1238).
+   */
+  mergerSprites: 41,
   /** Lens sources and members. */
   lens: 11,
   /** Shells. */

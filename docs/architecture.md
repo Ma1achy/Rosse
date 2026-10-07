@@ -42,6 +42,11 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0033](adr/0033-stars-and-sky-follow-v21s-draws.md) | The loops, quirks and limits of `starSprites` and `buildSky` that are reproduced (`// v21 parity`). |
 | [0034](adr/0034-m7-checks-after-the-merge-with-m5.md) | _Proposed:_ four changes to checks and cases when M7 met M5's line-work set (the `lines` cases keep their overrides; the orbit check and the stars' raster check; the GPU page time limit). |
 | [0035](adr/0035-m7-calibration-with-the-stars-on-and-the-dots-count-spread.md) | _Proposed:_ the dots' count tolerance from the engine's own re-draw spread; M7's families and `spiral` and `smooth` calibrated with the stars on (`Edge-on with dust` keeps M5's thresholds); the engine's own goldens made again. |
+| [0040](adr/0040-merger-stars-snapshots-and-the-framing-read-back.md) | _Proposed:_ the merger's test stars on the GPU in chunks, the f16 snapshots under a 64 MiB budget, and the model tier's one 12 kB read-back for `frameOf` |
+| [0041](adr/0041-a-merging-galaxy-is-carried-after-its-own-kernels.md) | _Proposed:_ a merging galaxy is built as a single galaxy and carried by its tides (the 4-nearest-star warp grid) after its own kernels |
+| [0042](adr/0042-the-debris-of-a-merger-as-marks.md) | _Proposed:_ the debris of a merger as marks: classified on the counter RNG, thinned as v21 thins it, and what v21 builds and never draws is not built |
+| [0043](adr/0043-shells-on-the-gpu-detected-by-atomics-and-bisection.md) | _Proposed:_ shell galaxies: the satellite on the GPU, the shells found by integer atomics and a bisection, the arcs through a face-on camera |
+| [0044](adr/0044-m8-acceptance-overrides-and-the-merger-and-shell-thresholds.md) | _Proposed:_ the M8 goldens' overrides, and the thresholds of the merger and shell families |
 
 ## Modules
 

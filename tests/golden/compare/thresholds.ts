@@ -93,7 +93,9 @@ export function impossibleClasses(
   const ring = (P.ring ?? 0) > 0.1 && !P.merger;
   if (!(P.knots > 0) && !star && !overlay && !ring && !groupKnots) out.add('knots');
   if (!(P.sparkle > 0) || star) out.add('stars');
-  if (!(P.starMix > 0.01) && !star && !overlay && !ring) out.add('rstars');
+  // a merger's galaxies keep the drawn stars of their clumps, and a knot in a tidal tail has a
+  // bright one whatever `starMix` says (mergerSprites, app23.js:L522–524)
+  if (!(P.starMix > 0.01) && !star && !overlay && !ring && !P.merger) out.add('rstars');
   return out;
 }
 
