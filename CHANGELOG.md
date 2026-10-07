@@ -15,6 +15,21 @@ All notable changes to this project are documented here. The format follows [Kee
   - Golden calibration after the merge with M5 (ADR 0035, proposed): the dots' count tolerance from the engine's re-draw spread (`countsBy`, counts-only `--calibrate-counts`), `--families` reaching the calibration's shards, `--factor`, per-preset widening of the moment, extent and SSIM tolerances, the star, artefact, layered, deep-field, spiral and smooth families calibrated with the stars on (`Edge-on with dust` keeps M5's thresholds), engine goldens made again. Calibration factor 2 (the owner's choice). v21 drawn again for three cases and compared as the mean of its draws (ADR 0036, proposed; `capture:reference --redraws`, `tests/golden/v21-redraws.json`).
 
 
+- M11, the page and UI (docs/milestones/m11):
+  - The page on the design language: Paper and Chalkboard, v21's recipe of cards generated from the schema (`src/ui/layout.ts`, `controls.ts`), hand-lettered tabs, a post-it pile, a taped print, preset cards with thumbnails drawn by this engine (`npm run thumbnails`), Surprise me, New stars, the seed, PNG export (`snapshot()` on both engines), and the "drawn on the CPU" note.
+  - The merger and the simulated shells are drawn by the page, built inside the frame queue (`Engine.draw` is asynchronous), with the timeline (play, scrub, end up to 30, loop, speed); `mTime` runs to the horizon (schema range 0 to 30).
+  - `Engine.capabilities` (`src/render/capabilities.ts`): the page builds its controls, presets and links from what the engine draws; M7 and M9 switch theirs on. A link holds the preset, edits, camera, surface and `mTime`, and cannot ask for what is not drawn.
+  - Change kinds (`params`, `preset`, `camera`, `surface`): the overlays' home orientation is set again for a preset or seed only.
+  - Interfaces for M12: `ExportSource`, `Page.addExport`, `Page.timeline`, `PageState.from`.
+  - `assets/LICENCES.md` records the fonts' terms as the pack gives them.
+  - `tools/gpu-test/ui-smoke.mjs` (`npm run test:ui`, part of `npm run test:gpu`) checks the page on pixels on both engines; contrast, layout and link unit tests.
+
+- M10, the performance pass (docs/milestones/m10; no budget is claimed on real hardware, every number names its adapter):
+  - A profiling harness: `npm run perf` (a WebGPU page with `timestamp-query` per pass, allocation counts, merger scenarios, and a CPU-engine bench in Node), `npm run perf:worker`, and `npm run perf:report` for the budget table (`docs/milestones/m10/perf-report.md`). `ROSSE_WEBGPU_ADAPTER` selects the adapter for every browser tool.
+  - `npm run l1`: a WebGPU adapter against the CPU engine at the strict thresholds, one entry per adapter in `docs/milestones/m10/l1-report.json` and `.md` (SwiftShader: 16 of 16 cases, and bit-identical to the engine's goldens where they exist).
+  - Buffer pooling, shared uploads and kept batches (ADR 0070, proposed): an orbit frame creates 0 to 2 buffers where it created 8 to 21; a model rebuild creates 28 buffers where it created 76. Output is unchanged.
+  - The CPU engine runs in a worker (ADR 0071, proposed; `?cpuworker=off` for the main thread): dragging the plate no longer blocks the page (longest gap between animation frames 27 ms, against 211 ms and 60 long tasks on the main thread). The composite keeps the surface under the ink (about 160 ms to 10 ms) and the bilinear tap allocates nothing; both byte-identical.
+
 - M8, mergers:
   - `sim/merger`: the core track in f64 (v21's `coreTrack` bit for bit, `tests/vectors/merger.json`), the timeline plan, the snapshots as f16 positions relative to the nearer core with a 64 MiB budget, `mTime` and the horizon (ADR 0040); the test stars on the GPU (`compute/merger.wgsl`, KDK at dt 0.012, in chunks) with a CPU twin and the model tier's one 12 kB read-back for `frameOf`.
   - A merging galaxy built as a single galaxy and carried by the tidal map (`compute/tide.wgsl`, `tide-apply.wgsl`, twin `fallback/kernels/tide.ts`): the 4-nearest-star warp grid, `post` warps on the vector kernels, tearing at v21's 22 px and 1.8× (ADR 0041); `mWarp`'s whole drawings torn through the tidal map itself.

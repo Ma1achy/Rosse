@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * The plates check (M6): the page's Plates menu, driven through Playwright, on WebGPU (SwiftShader,
+ * The plates check (M6): the page's Plates choice (the Ink tab's Print group), driven through Playwright, on WebGPU (SwiftShader,
  * `?present=copy`) and on the CPU engine.
  *
  * `Stellar populations` opens on the colour plates. Choosing `ink`, `slipped CMY plates` and
@@ -41,6 +41,8 @@ export async function platesPageCheck(browser, url) {
     await page.waitForFunction(() => (window.__rosse?.frames ?? 0) >= 1, undefined, {
       timeout: 120_000,
     });
+    // Plates are in the Print group of the Ink tab
+    await page.click('#tab-ink');
     /** the plate: a hash, and how many pixels are clearly coloured (max − min of RGB > 70) */
     const look = () =>
       page.evaluate(() => {
@@ -81,14 +83,14 @@ export async function platesPageCheck(browser, url) {
     let surface = 'paper';
     const choose = async (/** @type {string} */ plates) => {
       const before = (await state()).frames;
-      await page.selectOption('#plates', plates);
+      await page.locator(`input[name="c-plates"][value="${plates}"]`).check();
       await settle(before, plates, surface);
       return look();
     };
     const first = await look();
     const s0 = await state();
     const label = `${backend}`;
-    if ((await page.inputValue('#plates')) !== 'colour')
+    if ((await page.locator('input[name="c-plates"]:checked').inputValue()) !== 'colour')
       fail(`${label}: the menu does not show the preset's plates`);
     if (first.coloured < 300)
       fail(`${label}: the colour plate has ${String(first.coloured)} coloured pixels`);

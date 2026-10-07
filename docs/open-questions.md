@@ -17,6 +17,8 @@ Options:
 
 **Recommendation:** (b), with MIT for the code, the drawings all rights reserved until you decide otherwise, and a `NOTICE` listing third-party terms. Galaxy Zoo 2 is CC BY 4.0 (it needs attribution), and SDSS imagery needs its acknowledgement.
 
+**Owner's decision of 2026-10-07 (the fonts only):** the Threshold fonts (Grain, Mark, Patina, Signs; loaded as "Principia Hand") are the owner's own handwriting and are unrestricted. The other fonts get their licences listed, as the pack gives them, in [assets/LICENCES.md](../assets/LICENCES.md): IBM Plex Mono is under the SIL OFL 1.1 (the pack includes the text); the pack includes no licence file for Heros, whose files name TeX Gyre Heros under the GUST Font License (not yet checked against that licence's conditions). The project's own licence, the photographed objects and the data are still undecided or unrecorded.
+
 ### Q2. Orbiting: keep v21's re-roll, or keep the marks?
 
 In v21, with dust lanes on (the default), turning the camera even 0.3° re-draws every dot (reference notes, flagged item 1).
@@ -151,6 +153,17 @@ npx prettier --write tests/golden/thresholds.json tests/golden/calibration.json
 ```
 
 If a case then fails, or a negative control that was caught is missed, the thresholds or the ADR are revisited.
+
+**M10 adds to the same visit** (docs/milestones/m10/README.md): the budget table and the L1 report need a real adapter, and the harnesses exist now:
+
+```
+ROSSE_WEBGPU_ADAPTER=hardware npm run perf -- --gpu     # perf/gpu-hardware.json: GPU timestamps per pass, wall clock, allocations
+ROSSE_WEBGPU_ADAPTER=hardware npm run l1                # the adapter against the CPU engine at the strict thresholds
+npm run perf:report                                     # rewrites docs/milestones/m10/perf-report.md
+npx prettier --write docs/milestones/m10
+```
+
+Commit the changed files under `docs/milestones/m10/`. Check the first line each prints names an adapter other than SwiftShader (Chromium may need `ROSSE_CHROMIUM_ARGS`). Until then no budget of docs/architecture.md is claimed on real hardware; the integrated, discrete and mobile measurements are the M10 acceptance this environment could not do.
 
 Also re-check then, from M7 (ADRs 0035 and 0036, proposed): the calibration factor 2 and the dots' count tolerance, and the three cases compared with the mean of v21's draws (`cigar-shaped--stipple` s4242 orbit, `ringed--vectors` s7 zoom, `layered-barred-spiral-satellite-trail--layered` s7 zoom; `tests/golden/v21-redraws.json`). If they pass against v21's single capture on real hardware, remove them from that list; if more cases fail by v21's single draw, add them with `npm run capture:reference -- --redraws tests/golden/v21-redraws.json`.
 

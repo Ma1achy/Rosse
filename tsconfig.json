@@ -22,6 +22,7 @@
     "src",
     "tests/unit",
     "tests/gpu",
+    "tests/perf",
     "tests/vectors",
     "tests/golden/compare",
     "vite.config.ts"

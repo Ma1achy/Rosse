@@ -16,6 +16,8 @@ import scanWgsl from '../shaders/compute/scan.wgsl';
 import breatheWgsl from '../shaders/compute/breathe.wgsl';
 import starMarksWgsl from '../shaders/compute/star-marks.wgsl';
 import { bufferWithData } from '../gpu/buffers';
+import { GpuResources } from '../gpu/pool';
+import type { GpuProfiler } from '../gpu/profile';
 import { INSTANCE_LAYOUT, packInstances } from '../marks/instance';
 import { CLASS_COUNT, Cls } from '../model/classes';
 import { packGalaxy, sampleCount } from '../model/galaxy';
@@ -156,6 +158,8 @@ export class GpuStipple {
     readonly sky: GpuSky,
     /** a merging galaxy's tides (M8) */
     private readonly tideApply: GpuTide,
+    /** the model tier's buffers: pooled scratch and shared uploads (M10) */
+    readonly res: GpuResources,
   ) {}
 
   static create(device: GPUDevice): GpuStipple {
@@ -170,14 +174,16 @@ export class GpuStipple {
       pipeline(device, breatheWgsl, 'clear', 'breathe.wgsl'),
       pipeline(device, starMarksWgsl, 'star_marks', 'star-marks.wgsl'),
     ];
+    const res = new GpuResources(device);
     return new GpuStipple(
       device,
       { stipple, extra, project, local, blocks, scatter, brightKeys, clear, starMarks },
-      GpuRibbons.create(device),
-      GpuVectors.create(device),
+      GpuRibbons.create(device, res),
+      GpuVectors.create(device, res),
       GpuStarSet.create(device),
       GpuSky.create(device),
       GpuTide.create(device),
+      res,
     );
   }
 
@@ -249,29 +255,27 @@ export class GpuStipple {
     const nTot = n + scene.starSlots;
     const cap = classCapacity(nTot);
     const blocks = blockCount(nTot);
-    // at least one element of the largest struct bound (a star or an artefact has no samples)
+    // at least one element of every array, whatever n: a binding smaller than its WGSL type's
+    // minimum (one element) is invalid, and would take the line-work's view pass down with it
+    // when a scene has no stipple samples (QA D1)
+    const res = this.res;
     const buf = (size: number, usage: number, label: string) =>
-      d.createBuffer({ label, size: Math.max(64, size), usage });
+      res.scratch(Math.max(64, size), usage, label);
     const n1 = Math.max(1, n);
     // COPY_SRC: the tier tests read the model buffers back (never on the frame path)
     const SRC = GPUBufferUsage.COPY_SRC;
-    const galaxy = bufferWithData(d, packGalaxy(G.g), GPUBufferUsage.UNIFORM | SRC, 'galaxy');
-    const shape = bufferWithData(d, G.shape, STORAGE | SRC, 'galaxy shape');
-    const pool = bufferWithData(d, G.pool, STORAGE | SRC, 'galaxy pools');
-    const dotBase = bufferWithData(d, G.dotBase, STORAGE | SRC, 'dot sizes');
-    const groupsBuf = bufferWithData(d, G.groups, STORAGE | SRC, 'ring knots and clumps');
-    const noise = bufferWithData(d, G.noise.u, STORAGE | SRC, 'noise field');
+    const galaxy = res.data(packGalaxy(G.g), GPUBufferUsage.UNIFORM | SRC, 'galaxy');
+    const shape = res.data(G.shape, STORAGE | SRC, 'galaxy shape');
+    const pool = res.data(G.pool, STORAGE | SRC, 'galaxy pools');
+    const dotBase = res.data(G.dotBase, STORAGE | SRC, 'dot sizes');
+    const groupsBuf = res.data(G.groups, STORAGE | SRC, 'ring knots and clumps');
+    const noise = res.data(G.noise.u, STORAGE | SRC, 'noise field');
     const samples = buf(n1 * SAMPLE_LAYOUT.size, STORAGE | GPUBufferUsage.COPY_SRC, 'samples');
     const view = buf(64, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'view');
     const culls = buf(CULLS_LAYOUT.size, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'culls');
     this.ribbons.load(scene.ribbons, view, pool, dotBase, noise);
     this.vectors.load(scene.vectors, pool, dotBase, noise, this.tide?.buffer);
-    const scan = bufferWithData(
-      d,
-      new Uint32Array([n, cap, blocks, 0]),
-      GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-      'scan',
-    );
+    const scan = res.data(new Uint32Array([n, cap, blocks, 0]), GPUBufferUsage.UNIFORM, 'scan');
     const projected = buf(
       nTot * INSTANCE_LAYOUT.size,
       STORAGE | GPUBufferUsage.COPY_SRC,
@@ -477,7 +481,8 @@ export class GpuStipple {
       G.g.n_dot_pool,
     );
     const enc = d.createCommandEncoder({ label: 'stipple model' });
-    const pass = enc.beginComputePass({ label: 'stipple' });
+    const ts = this.profiler?.span('model: stipple');
+    const pass = enc.beginComputePass({ label: 'stipple', ...(ts ? { timestampWrites: ts } : {}) });
     pass.setPipeline(P.stipple);
     pass.setBindGroup(0, this.model.groups.stipple);
     pass.dispatchWorkgroups(Math.ceil(G.g.n / 64) || 1);
@@ -555,7 +560,11 @@ export class GpuStipple {
     );
     this.camera = cam;
     const enc = d.createCommandEncoder({ label: 'stipple view' });
-    const pass = enc.beginComputePass({ label: 'project + compact' });
+    const ts = this.profiler?.span('view: project, scan, expand');
+    const pass = enc.beginComputePass({
+      label: 'project + compact',
+      ...(ts ? { timestampWrites: ts } : {}),
+    });
     const P = this.pipes;
     this.ribbons.encodeProject(pass);
     pass.setPipeline(P.project);
@@ -618,6 +627,9 @@ export class GpuStipple {
     pass.end();
     d.queue.submit([enc.finish()]);
   }
+
+  /** Timestamps around the compute passes (M10; the profiling harness sets it, the page never does). */
+  profiler: GpuProfiler | null = null;
 
   /** the camera of the last view (the cores are placed for it) */
   private camera: Camera | null = null;
@@ -761,14 +773,14 @@ export class GpuStipple {
   /** Test and statistics only: copies a buffer back. */
   private async read(src: GPUBuffer, size: number): Promise<ArrayBuffer> {
     const d = this.device;
-    const dst = d.createBuffer({ size, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+    const dst = this.res.pool.acquire(size, GPUBufferUsage.MAP_READ, 'readback', { zero: false });
     const enc = d.createCommandEncoder();
     enc.copyBufferToBuffer(src, 0, dst, 0, size);
     d.queue.submit([enc.finish()]);
-    await dst.mapAsync(GPUMapMode.READ);
-    const copy = dst.getMappedRange().slice(0);
+    await dst.mapAsync(GPUMapMode.READ, 0, size);
+    const copy = dst.getMappedRange(0, size).slice(0);
     dst.unmap();
-    dst.destroy();
+    this.res.release(dst);
     return copy;
   }
 
@@ -903,7 +915,7 @@ export class GpuStipple {
       m.room.args,
       m.room.out,
     ])
-      b.destroy();
+      this.res.release(b);
     this.stars.unload();
     this.sky.unload();
     this.ribbons.destroy();
@@ -920,5 +932,6 @@ export class GpuStipple {
     this.vectors.destroy();
     this.stars.destroy();
     this.sky.destroy();
+    this.res.destroy();
   }
 }
