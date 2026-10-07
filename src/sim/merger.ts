@@ -724,6 +724,11 @@ export function framingAt(
 /**
  * `mergerGalaxyParams` (app23.js:L381–389), as overrides of the main parameters: each merging
  * galaxy described as a single galaxy would be, face-on and with no extras.
+ *
+ * v21 parity (Q13, reference notes 20.20): these are overrides of the main parameters, as v21's
+ * `Object.assign({}, mainP, mergerGalaxyParams(...))` has them, so everything not listed here
+ * (`dust`, `dustLines`, `streams`, `bubbles`, `patchy`, `thick`, `stroke`...) is the main picture's,
+ * whatever the preset.
  */
 export function mergerGalaxyParams(P: Params, g: 0 | 1, picks?: MergerPicks): Partial<Params> {
   const ty = typeOf(g === 0 ? P.mType1 : P.mType2);
