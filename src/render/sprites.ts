@@ -6,6 +6,7 @@ import spriteWgsl from '../shaders/render/sprite.wgsl';
 import { bufferWithData, packStruct } from '../gpu/buffers';
 import type { GpuAtlas } from '../marks/atlas';
 import { packInstances, type Instance, type StructLayout } from '../marks/instance';
+import { KEY_STYLE, styleKey, withStyle, type PassStyle } from './pass-style';
 
 /** The `Sprite` uniform of sprite.wgsl. */
 export const SPRITE_UNIFORMS_LAYOUT: StructLayout = {
@@ -22,6 +23,7 @@ export const SPRITE_UNIFORMS_LAYOUT: StructLayout = {
     { name: 'max_lod', type: 'f32', offset: 44, size: 4 },
     { name: 'layer_base', type: 'u32', offset: 48, size: 4 },
     { name: 'layer_count', type: 'u32', offset: 52, size: 4 },
+    { name: 'off', type: 'vec2<f32>', offset: 56, size: 8 },
   ],
 };
 
@@ -82,6 +84,41 @@ export class SpritePipeline {
   }
 }
 
+interface SpriteOpts {
+  targetWidth: number;
+  targetHeight: number;
+  pxPerUnit: number;
+  gain: number;
+  ink?: readonly [number, number, number];
+  off?: readonly [number, number];
+}
+
+function spriteUniforms(
+  device: GPUDevice,
+  atlas: GpuAtlas,
+  arr: { first: number; count: number },
+  opts: SpriteOpts,
+  label: string,
+): GPUBuffer {
+  return bufferWithData(
+    device,
+    packStruct(SPRITE_UNIFORMS_LAYOUT, {
+      ink: [...(opts.ink ?? [1, 1, 1]), 1],
+      target_size: [opts.targetWidth, opts.targetHeight],
+      edge: atlas.data.edge,
+      px_per_unit: opts.pxPerUnit,
+      gain: opts.gain,
+      cell: atlas.cellWidth,
+      max_lod: atlas.maxLod,
+      layer_base: arr.first,
+      layer_count: arr.count,
+      off: opts.off ?? [0, 0],
+    }),
+    GPUBufferUsage.UNIFORM,
+    label,
+  );
+}
+
 export interface SpriteDraw {
   bindGroup: GPUBindGroup;
   count: number;
@@ -90,73 +127,80 @@ export interface SpriteDraw {
 
 /**
  * One layer of sprites, ready to draw: its instances on the GPU, split per texture array of the
- * atlas. With one ink, the order across arrays changes only rounding (ADR 0007).
+ * atlas. With one ink, the order across arrays changes only rounding (ADR 0007). The uniforms
+ * (ink, gain, offset) belong to a pass of the plates and are made per style, on first use.
  */
 export class SpriteBatch {
   private buffers: GPUBuffer[] = [];
-  readonly draws: SpriteDraw[] = [];
+  /** per texture array: its instance count and storage buffer */
+  private readonly arrays: {
+    arr: GpuAtlas['arrays'][number];
+    count: number;
+    storage: GPUBuffer;
+  }[] = [];
+  private readonly styled = new Map<string, SpriteDraw[]>();
 
   constructor(
-    pipe: SpritePipeline,
-    atlas: GpuAtlas,
+    private readonly pipe: SpritePipeline,
+    private readonly atlas: GpuAtlas,
     instances: readonly Instance[],
-    opts: {
-      targetWidth: number;
-      targetHeight: number;
-      pxPerUnit: number;
-      gain: number;
-      ink?: readonly [number, number, number];
-    },
+    private readonly opts: SpriteOpts,
   ) {
-    const device = pipe.device;
     for (const arr of atlas.arrays) {
       const list = instances.filter((s) => s.layer >= arr.first && s.layer < arr.first + arr.count);
       if (!list.length) continue;
-      const uniforms = bufferWithData(
-        device,
-        packStruct(SPRITE_UNIFORMS_LAYOUT, {
-          ink: [...(opts.ink ?? [1, 1, 1]), 1],
-          target_size: [opts.targetWidth, opts.targetHeight],
-          edge: atlas.data.edge,
-          px_per_unit: opts.pxPerUnit,
-          gain: opts.gain,
-          cell: atlas.cellWidth,
-          max_lod: atlas.maxLod,
-          layer_base: arr.first,
-          layer_count: arr.count,
-        }),
-        GPUBufferUsage.UNIFORM,
-        `sprite uniforms ${atlas.data.name}`,
-      );
       const storage = bufferWithData(
-        device,
+        pipe.device,
         packInstances(list),
         GPUBufferUsage.STORAGE,
         `instances ${atlas.data.name}`,
       );
-      this.buffers.push(uniforms, storage);
-      this.draws.push({
-        bindGroup: device.createBindGroup({
+      this.buffers.push(storage);
+      this.arrays.push({ arr, count: list.length, storage });
+    }
+  }
+
+  /** The draws of one pass of the plates. */
+  get draws(): SpriteDraw[] {
+    return this.drawsFor(KEY_STYLE);
+  }
+
+  private drawsFor(style: PassStyle): SpriteDraw[] {
+    const key = styleKey(style);
+    let draws = this.styled.get(key);
+    if (draws) return draws;
+    const { pipe, atlas } = this;
+    const opts = withStyle(this.opts, style);
+    draws = this.arrays.map(({ arr, count, storage }) => {
+      const uniforms = spriteUniforms(
+        pipe.device,
+        atlas,
+        arr,
+        opts,
+        `sprite uniforms ${atlas.data.name}`,
+      );
+      this.buffers.push(uniforms);
+      return {
+        bindGroup: pipe.device.createBindGroup({
           layout: pipe.layout,
           entries: [
             { binding: 0, resource: { buffer: uniforms } },
             { binding: 1, resource: { buffer: storage } },
             { binding: 2, resource: arr.view },
-            {
-              binding: 3,
-              resource: atlas.data.repeatU ? pipe.samplerRepeat : pipe.sampler,
-            },
+            { binding: 3, resource: atlas.data.repeatU ? pipe.samplerRepeat : pipe.sampler },
           ],
         }),
-        count: list.length,
+        count,
         first: 0,
-      });
-    }
+      };
+    });
+    this.styled.set(key, draws);
+    return draws;
   }
 
-  encode(pass: GPURenderPassEncoder, pipe: SpritePipeline): void {
+  encode(pass: GPURenderPassEncoder, pipe: SpritePipeline, style: PassStyle = KEY_STYLE): void {
     pass.setPipeline(pipe.pipeline);
-    for (const d of this.draws) {
+    for (const d of this.drawsFor(style)) {
       pass.setBindGroup(0, d.bindGroup);
       pass.draw(4, d.count, 0, d.first);
     }
@@ -166,6 +210,8 @@ export class SpriteBatch {
     this.buffers.forEach((b) => {
       b.destroy();
     });
+    this.buffers = [];
+    this.styled.clear();
   }
 }
 
@@ -187,59 +233,50 @@ export interface GpuInstances {
  */
 export class IndirectSpriteBatch {
   private buffers: GPUBuffer[] = [];
-  private readonly draws: GPUBindGroup[] = [];
+  private readonly styled = new Map<string, GPUBindGroup[]>();
 
   constructor(
-    pipe: SpritePipeline,
-    atlas: GpuAtlas,
+    private readonly pipe: SpritePipeline,
+    private readonly atlas: GpuAtlas,
     readonly source: GpuInstances,
-    opts: {
-      targetWidth: number;
-      targetHeight: number;
-      pxPerUnit: number;
-      gain: number;
-      ink?: readonly [number, number, number];
-    },
-  ) {
-    const device = pipe.device;
-    for (const arr of atlas.arrays) {
-      const uniforms = bufferWithData(
-        device,
-        packStruct(SPRITE_UNIFORMS_LAYOUT, {
-          ink: [...(opts.ink ?? [1, 1, 1]), 1],
-          target_size: [opts.targetWidth, opts.targetHeight],
-          edge: atlas.data.edge,
-          px_per_unit: opts.pxPerUnit,
-          gain: opts.gain,
-          cell: atlas.cellWidth,
-          max_lod: atlas.maxLod,
-          layer_base: arr.first,
-          layer_count: arr.count,
-        }),
-        GPUBufferUsage.UNIFORM,
+    private readonly opts: SpriteOpts,
+  ) {}
+
+  private groupsFor(style: PassStyle): GPUBindGroup[] {
+    const key = styleKey(style);
+    let groups = this.styled.get(key);
+    if (groups) return groups;
+    const { pipe, atlas, source } = this;
+    const opts = withStyle(this.opts, style);
+    groups = atlas.arrays.map((arr) => {
+      const uniforms = spriteUniforms(
+        pipe.device,
+        atlas,
+        arr,
+        opts,
         `sprite uniforms ${atlas.data.name} (indirect)`,
       );
       this.buffers.push(uniforms);
-      this.draws.push(
-        device.createBindGroup({
-          layout: pipe.layout,
-          entries: [
-            { binding: 0, resource: { buffer: uniforms } },
-            {
-              binding: 1,
-              resource: { buffer: source.buffer, offset: source.offset, size: source.size },
-            },
-            { binding: 2, resource: arr.view },
-            { binding: 3, resource: atlas.data.repeatU ? pipe.samplerRepeat : pipe.sampler },
-          ],
-        }),
-      );
-    }
+      return pipe.device.createBindGroup({
+        layout: pipe.layout,
+        entries: [
+          { binding: 0, resource: { buffer: uniforms } },
+          {
+            binding: 1,
+            resource: { buffer: source.buffer, offset: source.offset, size: source.size },
+          },
+          { binding: 2, resource: arr.view },
+          { binding: 3, resource: atlas.data.repeatU ? pipe.samplerRepeat : pipe.sampler },
+        ],
+      });
+    });
+    this.styled.set(key, groups);
+    return groups;
   }
 
-  encode(pass: GPURenderPassEncoder, pipe: SpritePipeline): void {
+  encode(pass: GPURenderPassEncoder, pipe: SpritePipeline, style: PassStyle = KEY_STYLE): void {
     pass.setPipeline(pipe.pipeline);
-    for (const g of this.draws) {
+    for (const g of this.groupsFor(style)) {
       pass.setBindGroup(0, g);
       pass.drawIndirect(this.source.indirect, this.source.indirectOffset);
     }
@@ -249,5 +286,7 @@ export class IndirectSpriteBatch {
     this.buffers.forEach((b) => {
       b.destroy();
     });
+    this.buffers = [];
+    this.styled.clear();
   }
 }

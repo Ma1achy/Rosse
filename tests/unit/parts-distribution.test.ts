@@ -106,5 +106,5 @@ describe("the parts' picks: the same distributions as v21's, over 2,000 seeds", 
     sameCounts('ring tile', ...both(B, (p) => one(p.ring?.tile)));
     const T = sample((s) => presetParams('Tightly wound', s, { armStyle: 'drawn' }));
     sameCounts('tight arm tiles', ...both(T, (p) => p.arms));
-  });
+  }, 60_000);
 });

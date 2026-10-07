@@ -373,6 +373,56 @@
       "paEps0": 0.052,
       "heldOut": 56,
       "byPreset": {}
+    },
+    "slip": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.81,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.023,
+      "r50": 0.024,
+      "r90": 0.049,
+      "outer": 0.017,
+      "q": 0.034,
+      "qInner": 0.026,
+      "paA": 0.962,
+      "paEps0": 0.04,
+      "byPreset": {
+        "Plates slipped": {
+          "q": 0.034,
+          "qInner": 0.026,
+          "paEps0": 0.04
+        }
+      }
+    },
+    "slip@zoom": {
+      "counts": 0.03,
+      "countsSmall": 0.1,
+      "poisson": 3,
+      "poissonBelow": 2000,
+      "ink": 0.05,
+      "ssimCoarse": 0.77,
+      "median": 0.1,
+      "p90": 0.1,
+      "r25": 0.041,
+      "r50": 0.035,
+      "r90": 0.022,
+      "outer": 0.013,
+      "q": 0.03,
+      "qInner": 0.033,
+      "paA": 0.779,
+      "paEps0": 0.034,
+      "byPreset": {
+        "Plates slipped": {
+          "q": 0.03,
+          "qInner": 0.033,
+          "paEps0": 0.034
+        }
+      }
     }
   }
 }

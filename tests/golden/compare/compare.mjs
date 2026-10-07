@@ -39,6 +39,8 @@
  *     --controls-every n  the negative controls on every n-th configuration only (default 1)
  *     --reuse-shards  only aggregate the last calibration's measurements (test-results/
  *                     calibration-shard-*.json, made with at least K keys) for this K
+ *     --only-family f  calibrate the families named f (and f@zoom) alone and merge them into the
+ *                     two files, leaving every other family as it is (M6: `slip`)
  *   --jobs n          parallel processes for the re-draws and the calibration (default 4)
  *   --no-gpu          the CPU engine only (no browser)
  *   --only a,b        only the cases whose name contains one of these (for working on a few; the
@@ -453,7 +455,8 @@ async function calibrate(G, node) {
   ];
   /** @type {import('./node.ts').CalibrationCase[]} */
   const cases = [];
-  for (const preset of presets)
+  const onlyFamily = opt('--only-family');
+  for (const preset of onlyFamily ? [] : presets)
     for (const seed of [7, 4242])
       for (const camera of ['home', 'orbit']) {
         const rec = node.record(`${manifestSlug(preset)}__s${seed}__${camera}`);
@@ -469,7 +472,22 @@ async function calibrate(G, node) {
             zoom: 2,
           });
       }
+  if (onlyFamily) {
+    // held-out configurations of the family's presets: other seeds, home, an orbit, and zoom 2, as
+    // the captures are (they need no v21 capture: the pairs are the engine's own re-draws)
+    for (const preset of onlyFamilyPresets(onlyFamily))
+      for (const seed of [3, 11, 5, 19, 1, 2, 9, 13, 17, 21]) {
+        const P = G.presetCase(preset, seed, { starMix: 0, field: 0, fgstars: 0 });
+        const orbit = { ...P, az: P.az + 35, incl: Math.min(180, P.incl + 20) };
+        const family = G.goldenFamily(preset);
+        cases.push({ preset, base: preset, family, params: P });
+        cases.push({ preset, base: preset, family, params: orbit });
+        cases.push({ preset, base: preset, family: `${family}@zoom`, params: P, zoom: 2 });
+      }
+  }
   for (const c of manifest.captures.filter((/** @type {any} */ x) => x.variant)) {
+    if (onlyFamily && G.goldenFamily(node.record(c.name).preset) !== onlyFamily) continue;
+    if (c.name.endsWith('__chalk')) continue; // the same parameters as the paper capture
     const rec = node.record(c.name);
     const zoom = rec.zoom ?? 1;
     // the zoom camera is calibrated on its own (`<family>@zoom`), the line-work alone too
@@ -566,6 +584,7 @@ async function calibrate(G, node) {
         '--controls-every',
         String(controlsEvery),
         ...(flag('--resume') ? ['--resume'] : []),
+        ...(onlyFamily ? ['--only-family', onlyFamily] : []),
       ],
       jobs,
     );
@@ -639,7 +658,7 @@ async function calibrate(G, node) {
   const parity = {};
   /** @type {Record<string, any>} */
   const numbers = {};
-  const families = ['spiral', 'smooth', 'merger', 'lens', 'star', 'artefact'];
+  const families = onlyFamily ? [] : ['spiral', 'smooth', 'merger', 'lens', 'star', 'artefact'];
   for (const f of Object.keys(eng.pairs)) if (!families.includes(f)) families.push(f);
   for (const family of families) {
     const list = eng.pairs[family] ?? [];
@@ -777,6 +796,25 @@ async function calibrate(G, node) {
       v21Reroll: v21.pairs[family]?.length ? stats(v21.pairs[family]) : null,
     };
   }
+  if (onlyFamily) {
+    // merge: the other families' thresholds and numbers stay as they are
+    const tPath = join(ROOT, 'tests/golden/thresholds.json');
+    const cPath = join(ROOT, 'tests/golden/calibration.json');
+    const t = JSON.parse(readFileSync(tPath, 'utf8'));
+    const c = JSON.parse(readFileSync(cPath, 'utf8'));
+    Object.assign(t.parity, parity);
+    Object.assign(c.families, numbers);
+    c.configurations = [
+      ...new Set([
+        ...c.configurations,
+        ...cases.map((x) => `${x.preset} s${x.params.seed} incl ${x.params.incl}`),
+      ]),
+    ].sort();
+    writeFileSync(tPath, JSON.stringify(t, null, 2) + '\n');
+    writeFileSync(cPath, JSON.stringify(c, null, 2) + '\n');
+    console.log(JSON.stringify(parity, null, 1));
+    return;
+  }
   const file = {
     about:
       'Golden thresholds (ADR 0013, as calibrated in ADR 0015 and amended by ADR 0018). keys: the K of the parity comparison, which sets v21 against the mean of each measure over K engine draws, and for which the parity thresholds are calibrated. parity: the new engine against v21 (L2), per family; strict: the CPU engine against WebGPU (L1), one draw each. Gated: ink, coarse SSIM (b′), widths, counts, and the moment and extent test (r25, r50, r90, outer ink, axis ratio q, position angle pa where the reference q < paBelowQ). Written by `npm run golden -- --calibrate`; the numbers behind them are in calibration.json and docs/milestones/m2/README.md. Families marked provisional have no engine yet.',
@@ -823,6 +861,16 @@ async function calibrate(G, node) {
           `${family.padEnd(7)} ${name.padEnd(16)} detected ${x.detected}/${x.applicable}${x.missed.length ? `  missed: ${x.missed.join(', ')}` : ''}`,
         );
   console.log(JSON.stringify(parity, null, 1));
+}
+
+/**
+ * The presets of a calibration family that --only-family adds held-out configurations for.
+ *
+ * @param {string} family
+ */
+function onlyFamilyPresets(family) {
+  if (family === 'slip') return ['Plates slipped'];
+  throw new Error(`no held-out presets for family ${family}`);
 }
 
 /**

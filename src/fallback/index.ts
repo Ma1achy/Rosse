@@ -10,6 +10,7 @@
 import type { AtlasData, AtlasName, ImageData8 } from '../marks/atlas';
 import type { InkLayer } from '../render/layers';
 import { PLATE } from '../view/camera';
+import { DEFAULT_LOOK, platePasses, type InkLook, type Plates } from '../render/plates';
 import type { Surface } from '../render/surface';
 import {
   composite,
@@ -29,6 +30,7 @@ export class CpuRenderer {
   ink!: InkBuffer;
   private readonly atlases = new Map<AtlasName, AtlasData>();
   private layers: readonly InkLayer[] = [];
+  private plates: Plates = 'ink';
 
   constructor(
     public size: { plateCss: number; dpr: number },
@@ -54,20 +56,33 @@ export class CpuRenderer {
     this.layers = layers;
   }
 
-  drawInk(): void {
+  /**
+   * Inks every layer, once per pass of the plates (the twin of GpuRenderer.drawInk): the key ink
+   * on Paper, one pass, by default.
+   */
+  drawInk(look: InkLook = DEFAULT_LOOK): void {
+    this.plates = look.plates;
     this.ink.data.fill(0);
-    for (const l of this.layers) {
-      const params = { pxPerUnit: this.pxPerUnit, gain: l.gain };
-      if (l.kind === 'capsules') {
-        rasteriseCapsules(this.ink, l.caps, l.count, params);
-        continue;
+    for (const p of platePasses(look.plates, look.palette)) {
+      for (const l of this.layers) {
+        const params = {
+          pxPerUnit: this.pxPerUnit,
+          gain: l.gain * p.gain,
+          ink: p.inkOf(l.pop ?? 'line'),
+          off: p.off,
+        };
+        if (l.kind === 'capsules') {
+          rasteriseCapsules(this.ink, l.caps, l.count, params);
+          continue;
+        }
+        if (l.kind !== 'sprites' && l.kind !== 'ribbons')
+          throw new Error('the CPU engine draws CPU instance lists only');
+        const atlas = this.atlases.get(l.atlas);
+        if (!atlas) throw new Error(`atlas ${l.atlas} not loaded`);
+        if (l.kind === 'ribbons')
+          rasteriseRibbons(this.ink, atlas, l.segs, l.segsU, l.count, params);
+        else rasteriseSprites(this.ink, atlas, l.instances, params);
       }
-      if (l.kind !== 'sprites' && l.kind !== 'ribbons')
-        throw new Error('the CPU engine draws CPU instance lists only');
-      const atlas = this.atlases.get(l.atlas);
-      if (!atlas) throw new Error(`atlas ${l.atlas} not loaded`);
-      if (l.kind === 'ribbons') rasteriseRibbons(this.ink, atlas, l.segs, l.segsU, l.count, params);
-      else rasteriseSprites(this.ink, atlas, l.instances, params);
     }
   }
 
@@ -75,7 +90,13 @@ export class CpuRenderer {
   present(surface: Surface, out = new Uint8ClampedArray(this.width * this.height * 4)) {
     composite(
       this.ink,
-      { surface, paper: this.paper, dpr: this.size.dpr, plateCss: this.size.plateCss },
+      {
+        surface,
+        paper: this.paper,
+        dpr: this.size.dpr,
+        plateCss: this.size.plateCss,
+        plates: this.plates,
+      },
       out,
     );
     return out;
