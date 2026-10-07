@@ -226,8 +226,8 @@ export class RibbonBatch {
 /**
  * One layer of pen lines (ADR 0019): `prepass` unions its quads per sample into the pipeline's
  * coverage target (shared, and kept across rebuilds), outside the ink pass; `encode` resolves that
- * coverage over the ink. It draws `count` quads, or, with `indirect`, as many as its draw
- * arguments [6·n, 1, 0, 0] say (a compaction's output, `count` being the buffer's capacity).
+ * coverage over the ink. It draws each source's `count` quads, or, with `indirect`, as many as its
+ * draw arguments [6·n, 1, 0, 0] say (a compaction's output, `count` being the buffer's capacity).
  */
 export class CapsuleBatch {
   private readonly uniforms: GPUBuffer;
