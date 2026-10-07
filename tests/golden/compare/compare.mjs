@@ -846,43 +846,43 @@ async function calibrate(G, node) {
     };
   }
   if (famFilter || onlyFamily) {
-  if (famFilter) {
-    // keep the other families' rows as they are
-    const prev = JSON.parse(readFileSync(join(ROOT, 'tests/golden/thresholds.json'), 'utf8'));
-    const prevCal = JSON.parse(readFileSync(join(ROOT, 'tests/golden/calibration.json'), 'utf8'));
-    for (const k of Object.keys(parity)) if (!k.startsWith(famFilter)) delete parity[k];
-    for (const k of Object.keys(numbers)) if (!k.startsWith(famFilter)) delete numbers[k];
-    for (const k of Object.keys(prev.parity)) if (k.startsWith(famFilter)) delete prev.parity[k];
-    for (const k of Object.keys(prevCal.families))
-      if (k.startsWith(famFilter)) delete prevCal.families[k];
-    Object.assign(prev.parity, parity);
-    Object.assign(prevCal.families, numbers);
-    await writeJson(join(ROOT, 'tests/golden/thresholds.json'), prev);
-    prevCal.merged = [...new Set([...(prevCal.merged ?? []), famFilter])];
-    await writeJson(join(ROOT, 'tests/golden/calibration.json'), prevCal);
-    for (const [family, n] of Object.entries(numbers))
-      if (n.negativeControls)
-        for (const [name, x] of Object.entries(n.negativeControls))
-          console.log(
-            `${family.padEnd(9)} ${name.padEnd(22)} detected ${x.detected}/${x.applicable}${x.missed.length ? `  missed: ${x.missed.join(', ')}` : ''}`,
-          );
-  } else if (onlyFamily) {
-    // merge: the other families' thresholds and numbers stay as they are
-    const tPath = join(ROOT, 'tests/golden/thresholds.json');
-    const cPath = join(ROOT, 'tests/golden/calibration.json');
-    const t = JSON.parse(readFileSync(tPath, 'utf8'));
-    const c = JSON.parse(readFileSync(cPath, 'utf8'));
-    Object.assign(t.parity, parity);
-    Object.assign(c.families, numbers);
-    c.configurations = [
-      ...new Set([
-        ...c.configurations,
-        ...cases.map((x) => `${x.preset} s${x.params.seed} incl ${x.params.incl}`),
-      ]),
-    ].sort();
-    writeFileSync(tPath, JSON.stringify(t, null, 2) + '\n');
-    writeFileSync(cPath, JSON.stringify(c, null, 2) + '\n');
-  }
+    if (famFilter) {
+      // keep the other families' rows as they are
+      const prev = JSON.parse(readFileSync(join(ROOT, 'tests/golden/thresholds.json'), 'utf8'));
+      const prevCal = JSON.parse(readFileSync(join(ROOT, 'tests/golden/calibration.json'), 'utf8'));
+      for (const k of Object.keys(parity)) if (!k.startsWith(famFilter)) delete parity[k];
+      for (const k of Object.keys(numbers)) if (!k.startsWith(famFilter)) delete numbers[k];
+      for (const k of Object.keys(prev.parity)) if (k.startsWith(famFilter)) delete prev.parity[k];
+      for (const k of Object.keys(prevCal.families))
+        if (k.startsWith(famFilter)) delete prevCal.families[k];
+      Object.assign(prev.parity, parity);
+      Object.assign(prevCal.families, numbers);
+      await writeJson(join(ROOT, 'tests/golden/thresholds.json'), prev);
+      prevCal.merged = [...new Set([...(prevCal.merged ?? []), famFilter])];
+      await writeJson(join(ROOT, 'tests/golden/calibration.json'), prevCal);
+      for (const [family, n] of Object.entries(numbers))
+        if (n.negativeControls)
+          for (const [name, x] of Object.entries(n.negativeControls))
+            console.log(
+              `${family.padEnd(9)} ${name.padEnd(22)} detected ${x.detected}/${x.applicable}${x.missed.length ? `  missed: ${x.missed.join(', ')}` : ''}`,
+            );
+    } else if (onlyFamily) {
+      // merge: the other families' thresholds and numbers stay as they are
+      const tPath = join(ROOT, 'tests/golden/thresholds.json');
+      const cPath = join(ROOT, 'tests/golden/calibration.json');
+      const t = JSON.parse(readFileSync(tPath, 'utf8'));
+      const c = JSON.parse(readFileSync(cPath, 'utf8'));
+      Object.assign(t.parity, parity);
+      Object.assign(c.families, numbers);
+      c.configurations = [
+        ...new Set([
+          ...c.configurations,
+          ...cases.map((x) => `${x.preset} s${x.params.seed} incl ${x.params.incl}`),
+        ]),
+      ].sort();
+      writeFileSync(tPath, JSON.stringify(t, null, 2) + '\n');
+      writeFileSync(cPath, JSON.stringify(c, null, 2) + '\n');
+    }
     console.log(JSON.stringify(parity, null, 1));
     return;
   }
