@@ -21,6 +21,13 @@
  *             camera (home at zoom 2, through __GEN.zoom) for the seeds a case lists in `zoom`.
  *             A case with `chalk: true` is captured on the Chalkboard (theme dark; name suffix __chalk).
  *             They are added to (or replaced in) the existing manifest, which records the file.
+ *   --extra, real galaxies (M12): a case with `"real": <index>` (0 to 41, the order of
+ *             assets/data/rosse/real-galaxies/real-galaxies.json) captures one of the 42 real
+ *             galaxies as v21 draws it from its votes (`__GEN.real(i)`, v21's showReal), instead
+ *             of a preset. `preset` is then only its name ("Real galaxy 12"), `seeds` must list
+ *             the one seed fromVotes gives it (the capture fails if the page's seed differs), and
+ *             the overrides are set after it as for a preset. Names: real-galaxy-12--real__s6057__home.
+ *             Select them with `--variants real`.
  *   --only    presets, comma-separated, or separated by | when a name holds a comma
  *             (--only "Grand design|Loose, open arms").
  *   --cameras capture only these cameras (comma-separated), e.g. --cameras zoom.
@@ -112,7 +119,7 @@ function serve() {
 }
 
 /**
- * @typedef {{ preset: string, seed: number, chalk: boolean, variant?: string,
+ * @typedef {{ preset: string, seed: number, chalk: boolean, variant?: string, real?: number,
  *   overrides?: Record<string, unknown>, calibration?: boolean, cameras: readonly string[] }} Job
  */
 
@@ -158,11 +165,14 @@ async function captureJob(browser, url, job, out) {
   const results = [];
   for (const camera of job.cameras) {
     const state = await page.evaluate(
-      ({ preset, seed, camera, orbit, overrides, reroll, zoom }) => {
+      ({ preset, seed, camera, orbit, overrides, reroll, zoom, real }) => {
         const G = /** @type {any} */ (window).__GEN;
         if (camera === 'home' || camera === 'zoom') {
-          G.preset(preset);
-          G.set({ seed });
+          if (real != null) G.real(real);
+          else {
+            G.preset(preset);
+            G.set({ seed });
+          }
           if (overrides) G.set(overrides);
           if (camera === 'zoom') G.zoom(zoom);
         } else if (camera === 'reroll') {
@@ -194,8 +204,11 @@ async function captureJob(browser, url, job, out) {
         overrides: job.overrides ?? null,
         reroll: REROLL,
         zoom: ZOOM_CAMERA,
+        real: job.real ?? null,
       },
     );
+    if (job.real != null && state.P.seed !== job.seed)
+      throw new Error(`${job.preset}: v21 gives seed ${state.P.seed}, the case says ${job.seed}`);
     const base = job.variant ? `${slug(job.preset)}--${slug(job.variant)}` : slug(job.preset);
     const name = `${base}__s${job.seed}__${camera}${job.chalk ? '__chalk' : ''}`;
     const ink = Buffer.from(state.ink.split(',')[1] ?? '', 'base64');
@@ -210,13 +223,18 @@ async function captureJob(browser, url, job, out) {
       camera,
       surface: job.chalk ? 'chalkboard' : 'paper',
       ...(job.variant ? { variant: job.variant, overrides: job.overrides } : {}),
+      ...(job.real != null ? { real: job.real } : {}),
       ...(job.calibration ? { calibration: true } : {}),
       sequence:
         camera === 'home' || camera === 'zoom'
           ? [
               `load page (theme ${job.chalk ? 'dark' : 'light'})`,
-              `__GEN.preset(${JSON.stringify(job.preset)})`,
-              `__GEN.set({ seed: ${job.seed} })`,
+              ...(job.real != null
+                ? [`__GEN.real(${job.real})`]
+                : [
+                    `__GEN.preset(${JSON.stringify(job.preset)})`,
+                    `__GEN.set({ seed: ${job.seed} })`,
+                  ]),
               ...(job.overrides ? [`__GEN.set(${JSON.stringify(job.overrides)})`] : []),
               ...(camera === 'zoom' ? [`__GEN.zoom(${String(ZOOM_CAMERA)})`] : []),
             ]
@@ -305,7 +323,7 @@ async function main() {
     /**
      * @type {{ cameras?: string[], cases: { preset: string, variant: string,
      *   overrides: Record<string, unknown>, seeds?: number[], zoom?: number[],
-     *   calibration?: boolean, chalk?: boolean }[] }}
+     *   calibration?: boolean, chalk?: boolean, real?: number }[] }}
      */
     const extra = JSON.parse(readFileSync(resolve(ROOT, extraFile), 'utf8'));
     const fileCams = extra.cameras ?? [...CAMERAS];
@@ -328,7 +346,9 @@ async function main() {
       .filter((c) => !only || only.includes(c.preset))
       .filter((c) => !variants || variants.includes(c.variant))
       .flatMap((c) => {
-        if (!presets[c.preset]) throw new Error(`unknown preset ${c.preset}`);
+        if (c.real == null && !presets[c.preset]) throw new Error(`unknown preset ${c.preset}`);
+        if (c.real != null && !(c.real >= 0 && c.real < 42))
+          throw new Error(`no real galaxy ${c.real}`);
         const { seeds, zoom, chalk, ...rest } = c;
         return (seeds ?? SEEDS)
           .map((seed) => ({ ...rest, seed, chalk: !!chalk, cameras: camsFor(zoom, seed) }))
@@ -392,6 +412,7 @@ async function main() {
     name: r.name,
     preset: r.preset,
     ...(r.variant ? { variant: r.variant, overrides: r.overrides } : {}),
+    ...(r.real != null ? { real: r.real } : {}),
     ...(r.calibration ? { calibration: true } : {}),
     seed: r.seed,
     camera: r.camera,

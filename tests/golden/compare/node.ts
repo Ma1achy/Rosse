@@ -61,6 +61,8 @@ export interface CaptureRecord {
  */
 export function goldenFamily(preset: string, variant?: string): string {
   if (variant === 'lines') return 'lines';
+  // the real galaxies of M12 (ADR 0060): fromVotes' parameters, a mix of the spiral and smooth drawings
+  if (variant === 'real') return 'real';
   const f = presetFamily(preset);
   if (f === 'merger' || f === 'lens' || f === 'star' || f === 'artefact') return f;
   if (preset === 'Layered: lensed merger') return 'merger';

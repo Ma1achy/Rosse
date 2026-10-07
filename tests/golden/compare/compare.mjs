@@ -485,8 +485,25 @@ async function calibrate(G, node) {
         cases.push({ preset, base: preset, family: `${family}@zoom`, params: P, zoom: 2 });
       }
   }
+  if (onlyFamily === 'real') {
+    // held-out configurations of the real galaxies (ADR 0060): their captured parameters with
+    // other seeds, home and an orbit (re-draw pairs need no v21 capture)
+    for (const c of manifest.captures.filter(
+      (/** @type {any} */ x) => x.variant === 'real' && x.camera === 'home',
+    )) {
+      const rec = node.record(c.name);
+      for (const seed of [3]) {
+        const P = { ...rec.params, seed };
+        const orbit = { ...P, az: P.az + 35, incl: Math.min(180, P.incl + 20) };
+        const label = `${rec.preset}`;
+        cases.push({ preset: label, base: label, family: 'real', params: P });
+        cases.push({ preset: label, base: label, family: 'real', params: orbit });
+      }
+    }
+  }
   for (const c of manifest.captures.filter((/** @type {any} */ x) => x.variant)) {
-    if (onlyFamily && G.goldenFamily(node.record(c.name).preset) !== onlyFamily) continue;
+    if (onlyFamily && G.goldenFamily(node.record(c.name).preset, c.variant) !== onlyFamily)
+      continue;
     if (c.name.endsWith('__chalk')) continue; // the same parameters as the paper capture
     const rec = node.record(c.name);
     const zoom = rec.zoom ?? 1;
@@ -870,6 +887,7 @@ async function calibrate(G, node) {
  */
 function onlyFamilyPresets(family) {
   if (family === 'slip') return ['Plates slipped'];
+  if (family === 'real') return []; // its held-out configurations come from the captures (ADR 0060)
   throw new Error(`no held-out presets for family ${family}`);
 }
 
