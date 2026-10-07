@@ -40,9 +40,7 @@ export function spring(t, zeta = 0.62, omega = 14) {
   if (t <= 0) return 0;
   const wd = omega * Math.sqrt(1 - zeta * zeta);
   return (
-    1 -
-    Math.exp(-zeta * omega * t) *
-      (Math.cos(wd * t) + ((zeta * omega) / wd) * Math.sin(wd * t))
+    1 - Math.exp(-zeta * omega * t) * (Math.cos(wd * t) + ((zeta * omega) / wd) * Math.sin(wd * t))
   );
 }
 
@@ -140,11 +138,12 @@ export const there = (
   /** @type {number} */ a,
   /** @type {number} */ peak,
   /** @type {number} */ at = 0.5,
-) => /** @type {Array<[number, number]>} */ ([
-  [0, a],
-  [at, peak],
-  [1, a],
-]);
+) =>
+  /** @type {Array<[number, number]>} */ ([
+    [0, a],
+    [at, peak],
+    [1, a],
+  ]);
 
 /** Zoom is a ratio: interpolate it in log space so a push-in feels even. */
 export const logZoom = (/** @type {Channel} */ c) => {

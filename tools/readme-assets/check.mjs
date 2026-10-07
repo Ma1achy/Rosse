@@ -43,14 +43,20 @@ for (const f of walk(join(ROOT, 'docs/img'))) {
   const name = relative(ROOT, f);
   total += size;
   if (ext === '.gif' && size > BUDGET.gifMB * 1024 * 1024)
-    problems.push(`${name}: ${(size / 1048576).toFixed(2)} MB is over the GIF budget (${String(BUDGET.gifMB)} MB)`);
+    problems.push(
+      `${name}: ${(size / 1048576).toFixed(2)} MB is over the GIF budget (${String(BUDGET.gifMB)} MB)`,
+    );
   if ((ext === '.jpg' || ext === '.png') && size > BUDGET.stillMB * 1024 * 1024)
-    problems.push(`${name}: ${(size / 1048576).toFixed(2)} MB is over the still budget (${String(BUDGET.stillMB)} MB)`);
+    problems.push(
+      `${name}: ${(size / 1048576).toFixed(2)} MB is over the still budget (${String(BUDGET.stillMB)} MB)`,
+    );
   if (['.gif', '.jpg', '.png'].includes(ext) && !used.has(f) && !name.includes('cutouts'))
     problems.push(`${name}: not used by the README`);
 }
 if (total > BUDGET.totalMB * 1024 * 1024)
-  problems.push(`docs/img is ${(total / 1048576).toFixed(1)} MB, over ${String(BUDGET.totalMB)} MB`);
+  problems.push(
+    `docs/img is ${(total / 1048576).toFixed(1)} MB, over ${String(BUDGET.totalMB)} MB`,
+  );
 
 console.log(`${String(links.size)} image links, docs/img ${(total / 1048576).toFixed(1)} MB`);
 if (problems.length) {

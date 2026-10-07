@@ -65,7 +65,22 @@
       "bytes": 1305147
     }
   },
-  "gifs": {},
+  "gifs": {
+    "spiral-orbit": {
+      "file": "docs/img/gifs/spiral-orbit.gif",
+      "bytes": 1550189,
+      "frames": 90,
+      "fps": 18,
+      "encoded": "384 px, 16 colours, every 2nd frame"
+    },
+    "merger-mice": {
+      "file": "docs/img/gifs/merger-mice.gif",
+      "bytes": 3037181,
+      "frames": 146,
+      "fps": 18,
+      "encoded": "384 px, 24 colours"
+    }
+  },
   "gz2": {
     "smooth": {
       "objid": "587739608639209641",

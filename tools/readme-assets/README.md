@@ -46,7 +46,7 @@ Each stage re-draws only its own outputs. `docs/img/manifest.json` records what 
 
 - A **plate** is one shot drawn at 720 px (films at 600) and composited on Paper or Chalkboard. Plates are cached in `.cache/readme-assets/plates/` under a hash of the shot and of `git rev-parse HEAD:src`, so a new engine commit re-draws everything and an unchanged one re-draws nothing.
 - A **figure** is plates laid on the poster grid (hairlines, Heros titles, IBM Plex Mono captions) and screenshotted at 2x, then saved as a JPEG.
-- A **film** is frames along a camera path, encoded with ffmpeg's two-pass palette (`palettegen` and `paletteuse`, Bayer dither) and, if it is over 3 MB, again with fewer colours, then a smaller size, then every second frame, until it is under. What it settled on is in the script's output and in `manifest.json`.
+- A **film** is frames along a camera path, drawn at 520 px, encoded as a GIF with ffmpeg's two-pass palette (`palettegen` and `paletteuse`, Bayer dither) and, if it is over 1.8 MB (the budget; 3 MB is the hard limit `readme:check` enforces), again with fewer colours, then a smaller size, then every second frame, until it is under. What it settled on is in the script's output and in `manifest.json`. A full-size H.264 MP4 of each film is written beside its GIF (`docs/img/gifs/*.mp4`): the GIF is the README's fallback, the MP4 is the film at its full frame rate and size. `--keep` keeps the frames in `.cache/readme-assets/frames/` and `--reencode` re-encodes from them.
 - The engine's camera is `az`, `incl`, `pa` and `zoom`, looking at the galaxy's centre (there is no pan), as the page's orbit has it. A "push in" is the zoom.
 
 ## Galaxy Zoo 2 and the SDSS cutouts

@@ -61,7 +61,11 @@ const flag = (/** @type {string} */ n) => args.find((a) => a.startsWith(`--${n}=
 const FRESH = args.includes('--fresh');
 const ONLY = flag('only')?.split(',');
 const want = (/** @type {string} */ s) =>
-  stages.length === 0 ? s !== 'fetch-gz2' : stages.includes('all') ? s !== 'fetch-gz2' : stages.includes(s);
+  stages.length === 0
+    ? s !== 'fetch-gz2'
+    : stages.includes('all')
+      ? s !== 'fetch-gz2'
+      : stages.includes(s);
 
 const PLATES = join(CACHE, 'plates');
 const FIGS = join(CACHE, 'figs');
@@ -152,7 +156,9 @@ async function plate(
   const t0 = Date.now();
   const info = await r.shot(arg);
   if (!info) throw new Error('no shot');
-  console.log(`plate ${key} ${arg.preset || 'params'} ${String(css)} px ${String(Date.now() - t0)} ms`);
+  console.log(
+    `plate ${key} ${arg.preset || 'params'} ${String(css)} px ${String(Date.now() - t0)} ms`,
+  );
   for (const s of /** @type {const} */ (['paper', 'chalk'])) {
     const f = join(PLATES, `${key}.${s}.png`);
     if (s === surface || !existsSync(f))
@@ -173,10 +179,14 @@ async function figureJobs(/** @type {Array<{id: string, html: string, dir: strin
     writeFileSync(page, j.html);
     todo.push({ html: rel(page), out: join(FIGS, `${j.id.replace(/\//g, '-')}.png`), j });
   }
-  await figures(todo.map((t) => ({ html: t.html, out: t.out })), WIDTH, 2);
+  await figures(
+    todo.map((t) => ({ html: t.html, out: t.out })),
+    WIDTH,
+    1.5,
+  );
   for (const t of todo) {
     const out = join(t.j.dir, `${t.j.id.split('/').pop()}.jpg`);
-    jpeg(t.out, out, 82);
+    jpeg(t.out, out, 80);
     console.log(`wrote ${rel(out)} (${String(kb(out))} KB)`);
   }
 }
@@ -191,18 +201,33 @@ async function banner() {
     const info = await r.shot(pageShot(b.shot));
     if (!info) throw new Error('no shot');
     for (const k of b.keep) {
-      if (k === 'ink') writeFileSync(join(dir, `${b.id}.ink.png`), alphaPng(await r.alpha(), info.width));
+      if (k === 'ink')
+        writeFileSync(join(dir, `${b.id}.ink.png`), alphaPng(await r.alpha(), info.width));
       else {
         const s = k === 'plate-chalk' ? 'chalk' : 'paper';
-        writeFileSync(join(dir, `${b.id}.${s}.png`), rgbaPng(await r.plate(s), info.width, info.width));
+        writeFileSync(
+          join(dir, `${b.id}.${s}.png`),
+          rgbaPng(await r.plate(s), info.width, info.width),
+        );
       }
     }
     console.log(`${b.id}: ${String(info.width)} px`);
   }
-  for (const [theme, file] of [['light', 'banner.png'], ['dark', 'banner-dark.png']]) {
+  for (const [theme, file] of [
+    ['light', 'banner.png'],
+    ['dark', 'banner-dark.png'],
+  ]) {
     const tmp = join(CACHE, `banner-${theme}.png`);
     await screenshot(`tools/readme-assets/poster/banner.html?theme=${theme}`, tmp, 1100, 380, 2);
-    sh('convert', [tmp, '-strip', '-colors', '192', '-define', 'png:compression-level=9', join(IMG, file)]);
+    sh('convert', [
+      tmp,
+      '-strip',
+      '-colors',
+      '192',
+      '-define',
+      'png:compression-level=9',
+      join(IMG, file),
+    ]);
     console.log(`wrote docs/img/${file}`);
   }
 }
@@ -217,7 +242,11 @@ async function gallery() {
       const css = f.cols === 1 ? 1100 : PLATE_CSS;
       cells.push({ img: url(await plate(shot, css, surface ?? 'paper')), label, sub, surface });
     }
-    jobs.push({ id: f.id, dir: OUT.figures, html: strip({ fig: f.fig, title: f.title, cols: f.cols, cells, note: f.note }) });
+    jobs.push({
+      id: f.id,
+      dir: OUT.figures,
+      html: strip({ fig: f.fig, title: f.title, cols: f.cols, cells, note: f.note }),
+    });
   }
   // the pen-weight figure: one plate at three zooms
   {
@@ -226,9 +255,18 @@ async function gallery() {
       cells.push({
         img: url(await plate({ ...ZOOM_FIG.shot, zoom: z }, PLATE_CSS)),
         label: `x${String(z)}`,
-        sub: z === 1.5 ? 'the whole galaxy' : z === 4 ? 'strokes keep their weight' : 'the core drawings resolve',
+        sub:
+          z === 1.5
+            ? 'the whole galaxy'
+            : z === 4
+              ? 'strokes keep their weight'
+              : 'the core drawings resolve',
       });
-    jobs.push({ id: 'pen', dir: OUT.figures, html: strip({ fig: ZOOM_FIG.fig, title: 'The pen up close', cols: 3, cells }) });
+    jobs.push({
+      id: 'pen',
+      dir: OUT.figures,
+      html: strip({ fig: ZOOM_FIG.fig, title: 'The pen up close', cols: 3, cells }),
+    });
   }
   // the contact sheet of every preset
   {
@@ -239,10 +277,16 @@ async function gallery() {
     const cells = [];
     for (const n of names)
       cells.push({
-        img: url(await plate({ preset: n, seed: SHEET.seed, over: {}, zoom: SHEET.zoom }, SHEET.plate)),
+        img: url(
+          await plate({ preset: n, seed: SHEET.seed, over: {}, zoom: SHEET.zoom }, SHEET.plate),
+        ),
         label: n,
       });
-    jobs.push({ id: 'presets', dir: OUT.figures, html: sheet({ fig: SHEET.fig, title: 'Every preset', cols: SHEET.cols, cells }) });
+    jobs.push({
+      id: 'presets',
+      dir: OUT.figures,
+      html: sheet({ fig: SHEET.fig, title: 'Every preset', cols: SHEET.cols, cells }),
+    });
   }
   await figureJobs(jobs);
   for (const j of jobs) {
@@ -260,7 +304,11 @@ async function anatomyFigure() {
     cells.push({ img: url(await plate(shot, PLATE_CSS)), label: st.label, sub: st.sub });
   }
   await figureJobs([
-    { id: 'anatomy', dir: OUT.figures, html: strip({ fig: ANATOMY.fig, title: 'The same galaxy, by layers', cols: 3, cells }) },
+    {
+      id: 'anatomy',
+      dir: OUT.figures,
+      html: strip({ fig: ANATOMY.fig, title: 'The same galaxy, by layers', cols: 3, cells }),
+    },
   ]);
   const f = join(OUT.figures, 'anatomy.jpg');
   manifest.figures.anatomy = { file: rel(f), bytes: statSync(f).size };
@@ -273,7 +321,11 @@ const PICKS = join(import.meta.dirname, 'gz2-picks.json');
 async function gz2Picks() {
   const r = await renderer();
   const picks = /** @type {any[]} */ (
-    await r.op('gz2', '/assets/data/rosse/gz2-catalogue.json', GZ2_RULES.map(({ id, type, fields }) => ({ id, type, fields })))
+    await r.op(
+      'gz2',
+      '/assets/data/rosse/gz2-catalogue.json',
+      GZ2_RULES.map(({ id, type, fields }) => ({ id, type, fields })),
+    )
   );
   writeFileSync(PICKS, JSON.stringify(picks, null, 1) + '\n');
   return picks;
@@ -311,17 +363,33 @@ async function gz2() {
           ['ra, dec', `${c.ra.toFixed(4)}, ${c.dec.toFixed(4)}`],
           ['seed', String(c.seed)],
         ],
-        bars: GZ2_BARS.map((k) => /** @type {[string, number]} */ ([k === 'feat' ? 'features' : k, c.votes[k] ?? 0])),
+        bars: GZ2_BARS.map(
+          (k) => /** @type {[string, number]} */ ([k === 'feat' ? 'features' : k, c.votes[k] ?? 0]),
+        ),
         credit: `Highest ${rule.label.toLowerCase()} vote fraction of ${String(p.matches)} galaxies of the type. Galaxy Zoo 2 votes (Willett et al. 2013), CC BY 4.0${photo ? '; photograph: SDSS' : ''}.`,
       }),
     });
     overview.push({ img: drawing, label: rule.label, sub: `${pct(p.score)} · ${c.objid}` });
-    manifest.gz2[p.id] = { objid: c.objid, ra: c.ra, dec: c.dec, score: p.score, seed: c.seed, matches: p.matches, cutout: photo ? rel(cut) : null };
+    manifest.gz2[p.id] = {
+      objid: c.objid,
+      ra: c.ra,
+      dec: c.dec,
+      score: p.score,
+      seed: c.seed,
+      matches: p.matches,
+      cutout: photo ? rel(cut) : null,
+    };
   }
   jobs.push({
     id: 'gz2/overview',
     dir: OUT.gz2,
-    html: strip({ fig: '01', title: 'Galaxy Zoo 2: the clearest of each kind', cols: 5, cells: overview, note: 'The galaxy with the highest vote fraction in each category; Rosse draws it from the votes alone.' }),
+    html: strip({
+      fig: '01',
+      title: 'Galaxy Zoo 2: the clearest of each kind',
+      cols: 5,
+      cells: overview,
+      note: 'The galaxy with the highest vote fraction in each category; Rosse draws it from the votes alone.',
+    }),
   });
   // the real galaxies: photograph | drawing
   const reals = /** @type {any[]} */ (await (await renderer()).op('reals'));
@@ -345,8 +413,11 @@ async function gz2() {
           ['ra, dec', `${g.ra.toFixed(4)}, ${g.dec.toFixed(4)}`],
           ['seed', String(g.params.seed)],
         ],
-        bars: GZ2_BARS.map((k) => /** @type {[string, number]} */ ([k === 'feat' ? 'features' : k, g.votes[k] ?? 0])),
-        credit: 'Photograph: SDSS. Votes: Galaxy Zoo 2 (Willett et al. 2013), CC BY 4.0. The drawing is Rosse\'s.',
+        bars: GZ2_BARS.map(
+          (k) => /** @type {[string, number]} */ ([k === 'feat' ? 'features' : k, g.votes[k] ?? 0]),
+        ),
+        credit:
+          "Photograph: SDSS. Votes: Galaxy Zoo 2 (Willett et al. 2013), CC BY 4.0. The drawing is Rosse's.",
       }),
     });
     manifest.real[String(rp.i)] = { objid: g.id, category: rp.cat, seed: g.params.seed };
@@ -357,14 +428,19 @@ async function gz2() {
     const key = j.id.split('/')[0] === 'gz2' ? 'gz2' : 'real';
     const id = j.id.split('/').pop() ?? '';
     const base = key === 'gz2' ? 'gz2' : 'real';
-    manifest[base][id === 'overview' ? 'overview' : id] = { ...(manifest[base][id] ?? {}), file: rel(f), bytes: statSync(f).size };
+    manifest[base][id === 'overview' ? 'overview' : id] = {
+      ...(manifest[base][id] ?? {}),
+      file: rel(f),
+      bytes: statSync(f).size,
+    };
   }
   saveManifest();
 }
 
 /** `fetch-gz2`: the SDSS cutout of each GZ2 pick, once, into the repository. Needs the network. */
 function fetchGz2() {
-  if (!existsSync(PICKS)) throw new Error('run `npm run readme:assets -- gz2` first: it writes gz2-picks.json');
+  if (!existsSync(PICKS))
+    throw new Error('run `npm run readme:assets -- gz2` first: it writes gz2-picks.json');
   const picks = JSON.parse(readFileSync(PICKS, 'utf8'));
   const dir = join(ROOT, GZ2_CUTOUTS);
   mkdirSync(dir, { recursive: true });
@@ -382,7 +458,11 @@ function fetchGz2() {
     const u = SDSS_CUTOUT(c.ra, c.dec);
     const tmp = join(CACHE, `cutout-${c.objid}.jpg`);
     // curl honours HTTPS_PROXY and the CA bundle; TLS verification stays on
-    const res = spawnSync('curl', ['-sS', '--fail', '-m', '90', '-o', tmp, '-w', '%{http_code}', u], { encoding: 'utf8' });
+    const res = spawnSync(
+      'curl',
+      ['-sS', '--fail', '-m', '90', '-o', tmp, '-w', '%{http_code}', u],
+      { encoding: 'utf8' },
+    );
     const head = existsSync(tmp) ? readFileSync(tmp).subarray(0, 3) : Buffer.alloc(0);
     const isJpeg = head[0] === 0xff && head[1] === 0xd8;
     if (res.status !== 0 || !isJpeg) {
@@ -406,13 +486,15 @@ function fetchGz2() {
   }
   writeFileSync(mf, JSON.stringify(rows, null, 2) + '\n');
   if (failed) {
-    console.error(`${String(failed)} cutouts could not be fetched. Is the network blocked? (read /root/.ccr/README.md or your proxy's policy)`);
+    console.error(
+      `${String(failed)} cutouts could not be fetched. Is the network blocked? (read /root/.ccr/README.md or your proxy's policy)`,
+    );
     process.exitCode = 1;
   } else console.log('done: commit docs/img/gz2/cutouts/, then run `npm run readme:assets -- gz2`');
 }
 
 // ---- GIFs ------------------------------------------------------------------------------------
-const FILM_PLATE = 600;
+const FILM_PLATE = 520;
 
 /** blend two RGBA buffers: a*(1-w) + b*w */
 function mix(/** @type {Buffer} */ a, /** @type {Buffer} */ b, /** @type {number} */ w) {
@@ -486,7 +568,8 @@ async function frameOf(/** @type {any} */ g, /** @type {number} */ i, /** @type 
         const d = Math.hypot(c - w / 2, y - w / 2);
         const m = 1 - smooth(Math.min(1, Math.max(0, (d - (R - feather)) / (2 * feather))));
         const o = (y * w + c) * 4;
-        for (let q = 0; q < 4; q++) rgba[o + q] = Math.round((prev[o + q] ?? 0) * (1 - m) + (cur[o + q] ?? 0) * m);
+        for (let q = 0; q < 4; q++)
+          rgba[o + q] = Math.round((prev[o + q] ?? 0) * (1 - m) + (cur[o + q] ?? 0) * m);
       }
     return { w, rgba };
   }
@@ -494,7 +577,7 @@ async function frameOf(/** @type {any} */ g, /** @type {number} */ i, /** @type 
 }
 
 function encode(/** @type {any} */ g, /** @type {string} */ dir, /** @type {string} */ out) {
-  const budget = (g.budgetMB ?? 3) * 1024 * 1024 * 0.97;
+  const budget = (g.budgetMB ?? 1.8) * 1024 * 1024 * 0.97;
   // attempts, from the best to the leanest: [size, colours, frame step, dither]
   const attempts = [
     [g.size, g.colours, 1, 'bayer:bayer_scale=5'],
@@ -509,10 +592,25 @@ function encode(/** @type {any} */ g, /** @type {string} */ dir, /** @type {stri
   for (const [size, colours, step, dither] of attempts) {
     const sel = step === 1 ? '' : `select='not(mod(n\\,${String(step)}))',setpts=N/FRAME_RATE/TB,`;
     const filter = `${sel}scale=${String(size)}:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=${String(colours)}:stats_mode=diff[p];[b][p]paletteuse=dither=${String(dither)}:diff_mode=rectangle`;
-    sh('ffmpeg', ['-y', '-loglevel', 'error', '-framerate', String(g.fps), '-i', join(dir, 'f%04d.png'), '-vf', filter, '-loop', '0', out]);
+    sh('ffmpeg', [
+      '-y',
+      '-loglevel',
+      'error',
+      '-framerate',
+      String(g.fps),
+      '-i',
+      join(dir, 'f%04d.png'),
+      '-vf',
+      filter,
+      '-loop',
+      '0',
+      out,
+    ]);
     used = `${String(size)} px, ${String(colours)} colours${step > 1 ? ', every 2nd frame' : ''}`;
     if (statSync(out).size <= budget) break;
-    console.log(`  ${String(Math.round(statSync(out).size / 1024))} KB is over the budget at ${used}; trying leaner`);
+    console.log(
+      `  ${String(Math.round(statSync(out).size / 1024))} KB is over the budget at ${used}; trying leaner`,
+    );
   }
   return used;
 }
@@ -522,9 +620,10 @@ async function gifs(/** @type {(g: any) => boolean} */ pick) {
     if (!pick(g)) continue;
     if (ONLY && !ONLY.includes(g.id)) continue;
     const dir = join(CACHE, 'frames', g.id);
-    rmSync(dir, { recursive: true, force: true });
+    const redo = args.includes('--reencode') && existsSync(dir);
+    if (!redo) rmSync(dir, { recursive: true, force: true });
     mkdirSync(dir, { recursive: true });
-    const n = Math.round(g.seconds * g.fps);
+    const n = redo ? 0 : Math.round(g.seconds * g.fps);
     const t0 = Date.now();
     let k = 0;
     const [h0, h1] = g.hold ?? [0, 0];
@@ -541,11 +640,46 @@ async function gifs(/** @type {(g: any) => boolean} */ pick) {
       if (i === n - 1) for (let j = 0; j < h1; j++) writeFileSync(name(k++), png);
     }
     void first;
+    if (redo) k = readdirSync(dir).length;
     const out = join(OUT.gifs, `${g.id}.gif`);
     const used = encode(g, dir, out);
-    rmSync(dir, { recursive: true, force: true });
-    console.log(`wrote ${rel(out)} (${String(kb(out))} KB; ${String(k)} frames, ${used}; ${String(Math.round((Date.now() - t0) / 1000))} s)`);
-    manifest.gifs[g.id] = { file: rel(out), bytes: statSync(out).size, frames: k, fps: g.fps, encoded: used };
+    // a full-size MP4 beside the GIF (the GIF is the README's fallback, the MP4 is the film)
+    const mp4 = join(OUT.gifs, `${g.id}.mp4`);
+    sh('ffmpeg', [
+      '-y',
+      '-loglevel',
+      'error',
+      '-framerate',
+      String(g.fps),
+      '-i',
+      join(dir, 'f%04d.png'),
+      '-vf',
+      'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+      '-c:v',
+      'libx264',
+      '-crf',
+      '28',
+      '-preset',
+      'slow',
+      '-pix_fmt',
+      'yuv420p',
+      '-movflags',
+      '+faststart',
+      mp4,
+    ]);
+    if (!args.includes('--keep')) rmSync(dir, { recursive: true, force: true });
+    console.log(
+      `wrote ${rel(out)} (${String(kb(out))} KB; ${String(k)} frames, ${used}; ${String(Math.round((Date.now() - t0) / 1000))} s)`,
+    );
+    manifest.gifs[g.id] = {
+      file: rel(out),
+      bytes: statSync(out).size,
+      mp4: rel(mp4),
+      mp4Bytes: statSync(mp4).size,
+      frames: k,
+      fps: g.fps,
+      encoded: used,
+    };
     saveManifest();
   }
 }

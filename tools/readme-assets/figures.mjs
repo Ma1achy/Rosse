@@ -111,7 +111,10 @@ export function pair(f) {
     ? `<div class="cell"><div class="pl"><img src="${esc(f.photo)}" alt="" style="image-rendering:auto"></div><div class="cap mono"><span><b>Photograph</b><br><span class="dim">${esc(f.photoNote ?? '')}</span></span></div></div>`
     : '';
   const lines = f.lines
-    .map(([k, v]) => `<div class="row mono"><span class="dim">${esc(k)}</span><span>${esc(v)}</span></div>`)
+    .map(
+      ([k, v]) =>
+        `<div class="row mono"><span class="dim">${esc(k)}</span><span>${esc(v)}</span></div>`,
+    )
     .join('');
   const bars = (f.bars ?? [])
     .map(
