@@ -32,6 +32,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0020](adr/0020-m4-acceptance-overrides.md) | _Proposed:_ the overrides of the M4 acceptance captures (`starMix`, `field`, `fgstars`, `bubbles`, `whole`, `envelope`; `barStyle` and `ringStyle` for `Barred spiral`), and the line-work-only `lines` captures with their held-out seeds. |
 | [0021](adr/0021-goldens-drawn-with-v21s-part-picks.md) | _Proposed:_ the goldens draw the parts with v21's part picks, replayed from `mulberry32(seed · 57 + 3)` and checked against v21's own `parts()`; the engine's own picks are tested by their distributions. Extends 0015 item 5. |
 | [0022](adr/0022-m5-acceptance-overrides.md) | _Proposed:_ the overrides of the M5 acceptance captures (`starMix`, `field`, `fgstars`; the drawn shells for `Shell galaxy`). |
+| [0026](adr/0026-per-preset-bands-widen-only.md) | _Proposed:_ per-preset bands for the radii, the position angle and the axis ratio: the larger of the current band and 1.5 × the preset's largest re-draw spread (the owner's decision of 2026-10-07). |
 
 ## Modules
 
