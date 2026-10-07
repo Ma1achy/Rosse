@@ -14,6 +14,8 @@ import { wgslImports } from './tools/vite-wgsl.js';
 export default defineConfig({
   plugins: [wgslImports()],
   build: { target: 'es2022' },
+  // the CPU engine's worker (src/fallback/worker.ts) is an ES module
+  worker: { format: 'es' },
   publicDir: 'assets-built',
   test: {
     include: ['tests/unit/**/*.test.ts'],

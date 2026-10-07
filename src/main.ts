@@ -24,12 +24,11 @@
  * URL parameters: `preset`, `seed`, `variant=stipple` (the M2 golden overrides: no lines, knots,
  * envelope, drawn stars, deep field or foreground stars), `variant=ribbons` (the M4 overrides),
  * `variant=vectors` (the M5 overrides), `az`, `incl`, `pa`, `zoom`, `backend=cpu|webgpu`,
- * `present=copy`.
+ * `present=copy`, `cpuworker=off` (the CPU engine on the main thread, for profiling).
  */
 import type { Params } from './core/params';
 import { PRESET_NAMES, presetParams } from './core/presets';
-import { CpuRenderer } from './fallback';
-import { CpuStippleTiers } from './fallback/stipple';
+import { LocalCpu, WorkerCpu, type CpuBackend } from './fallback/client';
 import { Gpu, awaitLoss, detectBackend, type Backend } from './gpu/device';
 import { readTexture } from './gpu/readback';
 import { BuiltAssets, type AtlasData, type AtlasName, type ImageData8 } from './marks/atlas';
@@ -37,8 +36,8 @@ import { VECTOR_ATLASES, type VectorLibrary } from './marks/vector';
 import { drawingsMeta, markCounts, type MarkCounts } from './model/scene';
 import type { DrawingsMeta } from './model/variation';
 import { GpuRenderer, type FrameSize } from './render/frame';
-import { PALETTES } from './render/palette';
-import type { InkLook, Plates } from './render/plates';
+import { inkKey, inkLook } from './render/ink-look';
+import type { Plates } from './render/plates';
 import { GpuStipple } from './render/stipple';
 import { SURFACES, type SurfaceName } from './render/surface';
 import { attachOrbit, type OrbitState } from './ui/orbit';
@@ -153,18 +152,6 @@ interface Engine {
   destroy(): void;
 }
 
-/**
- * What the ink target is printed with for a plates mode on a surface. Only the coloured plates
- * depend on the surface's palette; the `ink` plate is the same on both (the composite colours it).
- */
-function inkLook(plates: Plates, surface: SurfaceName): InkLook {
-  return { plates, palette: surface === 'chalk' ? PALETTES.dark : PALETTES.light };
-}
-
-/** A key that changes when the printed ink target must be redone. */
-const inkKey = (look: InkLook) =>
-  look.plates === 'ink' ? 'ink' : `${look.plates}|${look.palette.ink.join()}`;
-
 function plateCanvas(): HTMLCanvasElement {
   const c = document.getElementById('plate');
   if (!(c instanceof HTMLCanvasElement)) throw new Error('#plate is missing');
@@ -193,48 +180,69 @@ function freshCanvas(): HTMLCanvasElement {
   return c;
 }
 
-function cpuEngine(scene: Scene, size: FrameSize): Engine {
+/**
+ * The CPU engine's backend: a worker (ADR 0071), so that no frame blocks the page, or the page's
+ * own thread where a worker cannot be made or `?cpuworker=off` is given.
+ */
+async function cpuBackend(scene: Scene, size: FrameSize): Promise<CpuBackend> {
+  const off = new URLSearchParams(location.search).get('cpuworker') === 'off';
+  if (!off && typeof Worker !== 'undefined') {
+    try {
+      return await WorkerCpu.create(import.meta.env.BASE_URL, size);
+    } catch (e) {
+      console.warn('The CPU worker failed, drawing on the main thread:', e);
+    }
+  }
+  return new LocalCpu(scene.atlases, scene.paper, scene.meta, size);
+}
+
+async function cpuEngine(scene: Scene, size: FrameSize): Promise<Engine> {
+  const backend = await cpuBackend(scene, size);
   const canvas = freshCanvas();
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('no 2D canvas');
-  const r = new CpuRenderer(size, scene.paper);
-  scene.atlases.forEach((a) => {
-    r.addAtlas(a);
-  });
-  /** the key of the look the ink buffer holds; null when it is stale */
-  let inked: string | null = null;
-  const ink = (look: InkLook) => {
-    const key = inkKey(look);
-    if (key === inked) return;
-    r.drawInk(look);
-    canvas.width = canvas.height = r.width;
-    inked = key;
-  };
-  let counts: MarkCounts = markCounts([]);
-  const stipple = new CpuStippleTiers(scene.meta);
+  let current = size;
+  /** the last draw, which a present waits for (the backend handles requests in order) */
+  let pending: Promise<unknown> = Promise.resolve();
+  let counts: Promise<MarkCounts> = Promise.resolve(markCounts([]));
+  let tiers = { model: 0, view: 0 };
+  document.documentElement.dataset.cpuWhere = backend.where;
   return {
     backend: 'cpu',
-    size: () => r.size,
+    size: () => current,
     draw(P, zoom) {
-      const { view, work } = stipple.frame(P, zoom);
-      if (work.view) r.setLayers(view.layers);
-      inked = null;
-      counts = view.counts;
+      const drawn = backend.draw(P, zoom);
+      pending = drawn;
+      counts = drawn.then((d) => d.counts);
+      counts.catch(() => undefined);
+      drawn.then(
+        (d) => {
+          tiers = d.tiers;
+        },
+        () => undefined,
+      );
     },
-    tierRuns: () => ({ ...stipple.tiers.runs }),
-    counts: () => Promise.resolve(counts),
-    present(surface, plates) {
-      ink(inkLook(plates, surface));
-      const out = r.present(SURFACES[surface]);
-      ctx.putImageData(new ImageData(out, r.width, r.height), 0, 0);
-      return Promise.resolve();
+    tierRuns: () => ({ ...tiers }),
+    counts: () => counts,
+    async present(surface, plates) {
+      await pending;
+      const f = await backend.present(surface, plates);
+      if (canvas.width !== f.width || canvas.height !== f.height) {
+        canvas.width = f.width;
+        canvas.height = f.height;
+      }
+      ctx.putImageData(new ImageData(f.pixels, f.width, f.height), 0, 0);
     },
     resize(s) {
-      r.resize(s);
-      inked = null;
+      current = s;
+      const r = backend.resize(s);
+      pending = r;
+      r.catch(() => undefined);
     },
     recovering: () => Promise.resolve(false),
-    destroy: () => undefined,
+    destroy: () => {
+      backend.destroy();
+    },
   };
 }
 
@@ -476,9 +484,12 @@ async function start(): Promise<void> {
   const toCpu = (why: unknown) => {
     console.warn('Switching to the CPU engine:', why);
     engine?.destroy();
-    engine = cpuEngine(scene, wantedSize);
-    bindOrbit();
-    schedule();
+    engine = undefined;
+    cpuEngine(scene, wantedSize).then((e) => {
+      engine = e;
+      bindOrbit();
+      schedule();
+    }, report);
   };
   const show = async () => {
     queued--;
@@ -660,7 +671,7 @@ async function start(): Promise<void> {
           console.warn('WebGPU failed, using the CPU engine:', e);
           return cpuEngine(scene, wantedSize);
         })
-      : cpuEngine(scene, wantedSize);
+      : await cpuEngine(scene, wantedSize);
   bindOrbit();
   schedule();
   await queue;
