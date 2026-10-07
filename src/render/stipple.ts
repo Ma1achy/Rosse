@@ -275,7 +275,8 @@ export class GpuStipple {
     const culls = buf(CULLS_LAYOUT.size, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'culls');
     this.ribbons.load(scene.ribbons, view, pool, dotBase, noise);
     this.vectors.load(scene.vectors, pool, dotBase, noise, this.tide?.buffer);
-    const scan = res.data(new Uint32Array([n, cap, blocks, 0]), GPUBufferUsage.UNIFORM, 'scan');
+    // rewritten each view (the sample count, M7's star slots): a scratch buffer, not a shared upload
+    const scan = res.init(new Uint32Array([n, cap, blocks, 0]), GPUBufferUsage.UNIFORM, 'scan');
     const projected = buf(
       nTot * INSTANCE_LAYOUT.size,
       STORAGE | GPUBufferUsage.COPY_SRC,
