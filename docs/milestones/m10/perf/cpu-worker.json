@@ -1,0 +1,29 @@
+{
+  "kind": "cpu-worker",
+  "label": "CPU engine on the page: worker against main thread (headless Chromium)",
+  "date": "2026-10-07",
+  "preset": "Grand design",
+  "loadAfter": [3.62, 3.52, 6.95],
+  "rows": {
+    "worker": {
+      "where": "worker",
+      "moves": 60,
+      "driveMs": 2021,
+      "framesDrawn": 15,
+      "maxFrameGapMs": 27,
+      "longTasks": 0,
+      "longTaskMs": 0,
+      "animationFrames": 218
+    },
+    "main thread": {
+      "where": "main thread",
+      "moves": 60,
+      "driveMs": 9752,
+      "framesDrawn": 60,
+      "maxFrameGapMs": 211,
+      "longTasks": 60,
+      "longTaskMs": 7551,
+      "animationFrames": 299
+    }
+  }
+}

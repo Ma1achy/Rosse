@@ -8,7 +8,7 @@ Measured 2026-10-07, 141.0.7390.37, 16 cases against the CPU engine (Node).
 
 - L1 (strict thresholds): **16 of 16** cases pass.
 - L0 on this adapter (two renders identical): 16 of 16.
-- Bit-identical to the engine's SwiftShader goldens: 15 of 16.
+- Bit-identical to the engine's SwiftShader goldens (tests/golden/engine-hashes.json): 15 of 15 cases that have a golden hash.
 
 | measure    | worst over the cases | strict threshold |
 | ---------- | -------------------- | ---------------- |

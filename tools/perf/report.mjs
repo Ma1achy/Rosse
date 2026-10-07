@@ -95,7 +95,7 @@ for (const b of BUDGET) {
   }
   if (!any && Array.isArray(b.scenarios))
     lines.push(
-      `| ${b.row} | ${b.budget} | - | - | deferred: ${b.scenarios.join(', ')} land with M7, M8 and M9 |`,
+      `| ${b.row} | ${b.budget} | - | - | deferred: ${b.scenarios.join(', ')} land with M7 and M9 |`,
     );
   if (b.id !== 'cpu-orbit' && !gpu.some((f) => /^(?!.*swiftshader)/i.test(f.adapterChoice)))
     lines.push(

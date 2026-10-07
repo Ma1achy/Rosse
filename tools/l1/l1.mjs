@@ -245,7 +245,7 @@ async function markdown() {
       '',
       `- L1 (strict thresholds): **${String(a.l1Pass)} of ${String(a.l1Compared)}** cases pass.`,
       `- L0 on this adapter (two renders identical): ${String(a.l0Identical)} of ${String(a.l1Compared)}.`,
-      `- Bit-identical to the engine's SwiftShader goldens: ${String(a.sameAsSwiftShaderGolden)} of ${String(a.l1Compared)}${/swiftshader/i.test(a.adapterChoice) ? '' : ' (not expected on another adapter; L1 is what is promised)'}.`,
+      `- Bit-identical to the engine's SwiftShader goldens (tests/golden/engine-hashes.json): ${String(a.sameAsSwiftShaderGolden)} of ${String(a.results.filter((/** @type {any} */ c) => c.sameAsSwiftShaderGolden !== null && c.sameAsSwiftShaderGolden !== undefined).length)} cases that have a golden hash${/swiftshader/i.test(a.adapterChoice) ? '' : ' (not expected on another adapter; L1 is what is promised)'}.`,
       '',
       '| measure | worst over the cases | strict threshold |',
       '| --- | --- | --- |',
