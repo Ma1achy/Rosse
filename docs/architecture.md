@@ -34,8 +34,9 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0022](adr/0022-m5-acceptance-overrides.md) | _Proposed:_ the overrides of the M5 acceptance captures (`starMix`, `field`, `fgstars`; the drawn shells for `Shell galaxy`). |
 | [0030](adr/0030-overlays-take-an-explicit-home-orientation.md) | Overlays (a foreground star, an artefact) take an explicit home orientation, the camera they are placed at, in place of v21's `homeFor`: the open question Q3, option (b). |
 | [0031](adr/0031-m7-golden-cases-and-retired-overrides.md) | M7's golden cases (stars, artefacts, layered scenes, the deep field, no overrides), and the retirement of the `starMix`, `field` and `fgstars` overrides of M2 to M5, whose captures are made again. |
-| [0032](adr/0032-stars-artefacts-and-the-sky-on-the-gpu.md) | The drawn stars are a dynamic vector set fed by the stipple's compaction; the marks of a star or an artefact are slots appended to the stipple's; the sky's catalogue is the model tier and its view is culled, drawn and bounded per view. |
-| [0033](adr/0033-v21-parity-in-the-stars-and-the-sky.md) | The loops, quirks and limits of `starSprites` and `buildSky` that are reproduced (`// v21 parity`). |
+| [0032](adr/0032-the-sky-is-a-catalogue-built-on-the-gpu.md) | The sky is a model-tier catalogue (deep-field galaxies, foreground stars, companions), culled, drawn and bounded per view by GPU passes. |
+| [0033](adr/0033-stars-and-sky-follow-v21s-draws.md) | The loops, quirks and limits of `starSprites` and `buildSky` that are reproduced (`// v21 parity`). |
+| [0034](adr/0034-m7-checks-after-the-merge-with-m5.md) | _Proposed:_ four changes to checks and cases when M7 met M5's line-work set (the `lines` cases keep their overrides; the orbit check and the stars' raster check; the GPU page time limit). |
 
 ## Modules
 
