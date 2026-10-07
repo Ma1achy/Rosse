@@ -152,7 +152,9 @@ if (want('gifs')) {
             for (let c = 0; c < w; c++) {
               const o = (y * w + c) * 4;
               (c < x ? chalk : paper).copy(rgba, o, o, o + 4);
-              if (Math.abs(c - x) <= 1) rgba.set([184, 15, 94, 255], o);
+              // a hairline of two pixels, cream against the chalk and ink against the paper
+              if (c === x - 1) rgba.set([239, 233, 220, 255], o);
+              else if (c === x) rgba.set([29, 27, 25, 255], o);
             }
         } else rgba = await r.plate(g.surface);
         writeFileSync(join(dir, `f${String(i).padStart(3, '0')}.png`), rgbaPng(rgba, w, w));
