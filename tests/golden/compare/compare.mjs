@@ -821,14 +821,18 @@ async function calibrate(G, node) {
     const c = JSON.parse(readFileSync(cPath, 'utf8'));
     Object.assign(t.parity, parity);
     Object.assign(c.families, numbers);
+    // the other families' configurations keep their order; this family's are added after them
+    const have = new Set(c.configurations);
     c.configurations = [
-      ...new Set([
-        ...c.configurations,
-        ...cases.map((x) => `${x.preset} s${x.params.seed} incl ${x.params.incl}`),
-      ]),
-    ].sort();
-    writeFileSync(tPath, JSON.stringify(t, null, 2) + '\n');
-    writeFileSync(cPath, JSON.stringify(c, null, 2) + '\n');
+      ...c.configurations,
+      ...new Set(
+        cases
+          .map((x) => `${x.preset} s${x.params.seed} incl ${x.params.incl}`)
+          .filter((x) => !have.has(x)),
+      ),
+    ];
+    await writeJson(tPath, t);
+    await writeJson(cPath, c);
     console.log(JSON.stringify(parity, null, 1));
     return;
   }

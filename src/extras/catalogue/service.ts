@@ -34,10 +34,12 @@ export interface GalaxyCard {
 /** What the decode cost, for the phone concern (docs/milestones/m12/README.md). */
 export interface LoadStats {
   n: number;
-  /** Milliseconds: fetch and JSON parse, base64, gunzip, column decode, and the sum. */
-  ms: { parse: number; base64: number; gunzip: number; decode: number; total: number };
+  /** Milliseconds: fetch, JSON parse and base64 (`parse`), gunzip, column decode, and the sum. */
+  ms: { parse: number; gunzip: number; decode: number; total: number };
   /** Bytes held by the decoded catalogue (columns, RA, Dec, ids). */
   heldBytes: number;
+  /** the JS heap in use after the load, where the browser says (Chromium's `performance.memory`) */
+  heapBytes?: number;
 }
 
 /** The requests of the worker protocol (`id` is the caller's, echoed in the reply). */
@@ -51,6 +53,17 @@ export type Request =
 export type Reply =
   { id: number; ok: true; result: unknown } | { id: number; ok: false; error: string };
 
+/** The packed file's header and its bytes (base64 decoded); the text is not kept. */
+function unpack(text: string): { hdr: PackedCatalogue['hdr']; bytes: Uint8Array } {
+  const packed = JSON.parse(text) as PackedCatalogue;
+  return { hdr: packed.hdr, bytes: base64ToBytes(packed.b64) };
+}
+
+function heapNow(): { heapBytes?: number } {
+  const m = (performance as unknown as { memory?: { usedJSHeapSize: number } }).memory;
+  return m ? { heapBytes: m.usedJSHeapSize } : {};
+}
+
 export class CatalogueService {
   cat: Catalogue | null = null;
 
@@ -59,18 +72,17 @@ export class CatalogueService {
     const t0 = performance.now();
     const res = await fetcher(url);
     if (!res.ok) throw new Error(`the catalogue did not load (${String(res.status)})`);
-    const text = await res.text();
-    const packed = JSON.parse(text) as PackedCatalogue;
+    // the text and the parsed object die inside `unpack`, before the gunzip allocates
+    const { hdr, bytes } = unpack(await res.text());
     const t1 = performance.now();
-    const bytes = base64ToBytes(packed.b64);
-    const t2 = performance.now();
     const raw = await gunzip(bytes);
     const t3 = performance.now();
-    this.cat = decodeCatalogueBytes(raw, packed.hdr);
+    this.cat = decodeCatalogueBytes(raw, hdr);
     const t4 = performance.now();
     return {
       n: this.cat.n,
-      ms: { parse: t1 - t0, base64: t2 - t1, gunzip: t3 - t2, decode: t4 - t3, total: t4 - t0 },
+      ms: { parse: t1 - t0, gunzip: t3 - t1, decode: t4 - t3, total: t4 - t0 },
+      ...heapNow(),
       heldBytes: heldBytes(this.cat),
     };
   }
