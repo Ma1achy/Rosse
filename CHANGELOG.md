@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- M8, mergers:
+  - `sim/merger`: the core track in f64 (v21's `coreTrack` bit for bit, `tests/vectors/merger.json`), the timeline plan, the snapshots as f16 positions relative to the nearer core with a 64 MiB budget, `mTime` and the horizon (ADR 0040); the test stars on the GPU (`compute/merger.wgsl`, KDK at dt 0.012, in chunks) with a CPU twin and the model tier's one 12 kB read-back for `frameOf`.
+  - A merging galaxy built as a single galaxy and carried by the tidal map (`compute/tide.wgsl`, `tide-apply.wgsl`, twin `fallback/kernels/tide.ts`): the 4-nearest-star warp grid, `post` warps on the vector kernels, tearing at v21's 22 px and 1.8× (ADR 0041); `mWarp`'s whole drawings torn through the tidal map itself.
+  - The debris as marks (`compute/merger-sprites.wgsl`, twin `fallback/kernels/merger-sprites.ts`): classified on the counter RNG and thinned as v21 thins it; what v21 builds and never draws is not built (ADR 0042).
+  - Shell galaxies: the satellite on the GPU, its shells detected by integer atomics and a bisection, the arcs as ribbons through a face-on camera (ADR 0043).
+  - `ROSSE_WEBGPU_ADAPTER` (`default`, `discrete`, `integrated`, `swiftshader`) for the GPU tests, so the test stars' drift can be measured on a real GPU.
+  - Goldens: v21 captures of the eight `Merger: …` presets, `Sketches, torn apart` and the lensed merger (lens off) at seeds 7 and 4242, home, orbit and zoom, the Mice at two other moments of the timeline, `Shell galaxy` with its simulated shells and 12 held-out captures of it (ADR 0044, proposed). The merger and shell families are calibrated (K = 6); the comparison draws with v21's galaxy-level draws, `mWarp`'s drawings and the shells v21 found.
+
 - M5, vector marks:
   - `marks/vector`: the whole vector library (12 sheets, 429 drawings, 23,431 segments, 6,038 dots, 328 blobs) packed once into shared tables with a per-drawing range table and a densified-piece prefix (packer 4 copies every sheet with its metadata).
   - `model/parts`: v21's `parts()` as scene description. The model tier picks envelopes, whole drawings by type (with the rewind warp), drawn arms by tightness, bars, rings, the nuclear spiral, arcs, shells, the tail, trails and cosmic rays, the arrow, bubbles at the clumps, the jet and the streams, each part on its own index of the `parts` stream. The view tier lays out v21's rows for a camera (`vectorRows`), in the `MAGNIFIED` order. `model/vectors` packs them for the GPU.
