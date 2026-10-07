@@ -74,18 +74,18 @@ for (const b of BUDGET) {
     const rs = scen.map((n) => gres(f, n)).filter(Boolean);
     if (!rs.length) continue;
     any = true;
-    const vals =
-      b.id.startsWith('orbit')
-        ? rs.map((/** @type {any} */ r) => (r.orbit.gpuMs ?? r.orbit.latencyMs).median)
-        : rs.map((/** @type {any} */ r) => r.model.firstFrameMs.median);
-    const what =
-      b.id.startsWith('orbit') && rs[0].orbit.gpuMs ? 'GPU timestamps' : 'wall clock';
+    const vals = b.id.startsWith('orbit')
+      ? rs.map((/** @type {any} */ r) => (r.orbit.gpuMs ?? r.orbit.latencyMs).median)
+      : rs.map((/** @type {any} */ r) => r.model.firstFrameMs.median);
+    const what = b.id.startsWith('orbit') && rs[0].orbit.gpuMs ? 'GPU timestamps' : 'wall clock';
     lines.push(
       `| ${b.row} | ${b.budget} | ${f.label} | ${range(vals)} ms (${what}) | indicative only: ${/swiftshader/i.test(f.adapterChoice) ? 'software rasteriser, not a GPU' : 'not a reference machine'} |`,
     );
   }
   if (b.id === 'cpu-orbit' && cpu) {
-    const rs = scen.map((n) => cpu.results.find((/** @type {any} */ r) => r.name === n)).filter(Boolean);
+    const rs = scen
+      .map((n) => cpu.results.find((/** @type {any} */ r) => r.name === n))
+      .filter(Boolean);
     const vals = rs.map((/** @type {any} */ r) => r.orbitFrameMs.median);
     any = true;
     const over = vals.filter((v) => v >= b.limitMs).length;
@@ -121,6 +121,22 @@ for (const f of gpu) {
     );
   }
   lines.push('');
+  const mergers = f.results.filter((/** @type {any} */ r) => r.merger);
+  if (mergers.length) {
+    lines.push(
+      `Mergers on ${f.label}: the model tier is the test-star integration in chunks of 200 steps per submit (src/render/merger-stars.ts); "orbit" is scrubbing the timeline (mTime).`,
+      '',
+      '| scenario | model tier to first frame ms | build ms | chunks | wall ms per chunk (median / p95) | long tasks on the page (>= 50 ms) | their total ms | timeline frame ms |',
+      '| --- | --- | --- | --- | --- | --- | --- | --- |',
+    );
+    for (const r of mergers) {
+      const m = r.merger;
+      lines.push(
+        `| ${r.name} | ${ms(r.model.firstFrameMs.median)} | ${ms(m.buildMs.median)} | ${String(m.chunks)} | ${ms(m.chunkMs.median)} / ${ms(m.chunkMs.p95)} | ${String(m.longTasks)} | ${String(m.longTaskMs)} | ${ms(r.orbit.latencyMs.median)} |`,
+      );
+    }
+    lines.push('');
+  }
 }
 if (cpu) {
   lines.push(

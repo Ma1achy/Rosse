@@ -22,7 +22,7 @@ import { cpus, loadavg, platform, release } from 'node:os';
 import { join } from 'node:path';
 import { format, resolveConfig } from 'prettier';
 import { ADAPTER_CHOICE, ROOT, launch, prepareAssets, startServer } from '../gpu-test/browser.mjs';
-import { LATER, SINGLE_GALAXY } from './scenarios.mjs';
+import { LATER, MERGER, SINGLE_GALAXY } from './scenarios.mjs';
 
 const args = process.argv.slice(2);
 const flag = (/** @type {string} */ f) => args.includes(f);
@@ -70,7 +70,7 @@ function machine() {
 prepareAssets();
 const server = await startServer();
 /** @type {import('./scenarios.mjs').Scenario[]} */
-let scenarios = [...SINGLE_GALAXY, ...(flag('--later') ? LATER : [])];
+let scenarios = [...SINGLE_GALAXY, ...MERGER, ...(flag('--later') ? LATER : [])];
 try {
   /** @type {typeof import('../../src/core/presets')} */
   const presets = await server.vite.ssrLoadModule('/src/core/presets.ts');

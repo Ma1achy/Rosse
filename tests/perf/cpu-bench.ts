@@ -54,6 +54,8 @@ export function benchCpu(
   const paper = { width: 512, height: 512, data: new Uint8Array(512 * 512 * 4).fill(236) };
   const out: CpuScenarioResult[] = [];
   for (const sc of scenarios) {
+    // the merger's simulation has no CPU path in this bench (its twin is checked in tests/gpu/merger.ts)
+    if (presetParams(sc.preset, 7, sc.overrides ?? {}).merger) continue;
     const renderer = new CpuRenderer({ plateCss: opts.plateCss, dpr: opts.dpr }, paper);
     for (const a of atlases) renderer.addAtlas(a);
     const seed0 = sc.seed ?? 7;

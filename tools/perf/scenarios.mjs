@@ -18,6 +18,16 @@ export const SINGLE_GALAXY = /** @type {Scenario[]} */ ([
   { name: 'Stellar streams', preset: 'Stellar streams' },
 ]);
 
+/** M8: the Mice at the default horizon, and at a horizon of 30 (the long-horizon chunking). */
+export const MERGER = /** @type {Scenario[]} */ ([
+  { name: 'Merger: the Mice', preset: 'Merger: the Mice' },
+  {
+    name: 'Merger: the Mice, horizon 30',
+    preset: 'Merger: the Mice',
+    overrides: { mHorizon: 30 },
+  },
+]);
+
 /**
  * Scenarios of later milestones, listed when their presets exist in this tree (the harness skips
  * the ones it cannot build and says so in the report).
@@ -25,7 +35,6 @@ export const SINGLE_GALAXY = /** @type {Scenario[]} */ ([
 export const LATER = /** @type {Scenario[]} */ ([
   { name: 'Deep field', preset: 'Deep field' },
   { name: 'Lens: cluster', preset: 'Lens: cluster' },
-  { name: 'Merger: the Mice', preset: 'Merger: the Mice' },
 ]);
 
 /**

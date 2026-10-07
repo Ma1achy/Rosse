@@ -27,6 +27,7 @@ import { BuiltAssets, type AtlasName } from '../../src/marks/atlas';
 import { VECTOR_ATLASES, type VectorLibrary } from '../../src/marks/vector';
 import { buildScene, drawingsMeta, type MarkCounts } from '../../src/model/scene';
 import { GpuRenderer } from '../../src/render/frame';
+import { GpuMerger } from '../../src/render/merger';
 import { GpuStipple } from '../../src/render/stipple';
 import { SURFACES } from '../../src/render/surface';
 import { cameraOf } from '../../src/view/camera';
@@ -95,6 +96,19 @@ export interface ScenarioResult {
     alloc: Alloc;
     /** the model tier did not run during the orbit */
     modelRuns: number;
+  };
+  /**
+   * A merger (M8): its model tier is the integration of the test stars, in chunks of CHUNK_STEPS
+   * steps per submit with a wait between (the longest stretch of JS a chunk cost the page, the
+   * wall time per chunk, and the long tasks the page saw while it ran); its "orbit" is scrubbing
+   * the timeline (`mTime`), the view tier's input.
+   */
+  merger?: {
+    chunks: number;
+    chunkMs: Stat;
+    buildMs: Stat;
+    longTasks: number;
+    longTaskMs: number;
   };
   /** buffers and textures alive after the last frame, bytes */
   memory: { buffers: number; textures: number; ink: number };
@@ -253,6 +267,142 @@ async function main(): Promise<void> {
   const profiler = GpuProfiler.create(device);
   const info = adapter.info;
 
+  /** long tasks the page saw (the page's main thread blocked for 50 ms or more) */
+  const longTasks = { n: 0, ms: 0 };
+  new PerformanceObserver((l) => {
+    for (const e of l.getEntries()) {
+      longTasks.n++;
+      longTasks.ms += e.duration;
+    }
+  }).observe({ entryTypes: ['longtask'] });
+
+  const runMerger = async (
+    sc: Scenario,
+    config: PerfConfig,
+    renderer: GpuRenderer,
+    outView: GPUTextureView,
+    params: (seed: number) => Params,
+    seed0: number,
+  ): Promise<ScenarioResult> => {
+    const merger = GpuMerger.create(device);
+    const wait = () => device.queue.onSubmittedWorkDone();
+    const format: GPUTextureFormat = 'rgba8unorm';
+    const surface = SURFACES.paper;
+    const chunkMs: number[] = [];
+    const buildMs: number[] = [];
+    const firstMs: number[] = [];
+    let chunks = 0;
+    const lt0 = { ...longTasks };
+    const build = async (P: Params) => {
+      let last = performance.now();
+      chunks = 0;
+      await merger.build(P, meta, {}, () => {
+        const now = performance.now();
+        chunkMs.push(now - last);
+        last = now;
+        chunks++;
+      });
+    };
+    // warm up (pipelines)
+    await build(params(seed0));
+    merger.view(1);
+    renderer.setLayers(merger.inkLayers());
+    renderer.drawInk();
+    renderer.present(outView, format, surface);
+    await wait();
+    chunkMs.length = 0;
+    meter.take();
+    for (let k = 0; k < config.modelRuns; k++) {
+      const P = params(seed0 + 1 + k);
+      const t0 = performance.now();
+      await build(P);
+      const t1 = performance.now();
+      merger.view(1);
+      renderer.setLayers(merger.inkLayers());
+      renderer.drawInk();
+      renderer.present(outView, format, surface);
+      await wait();
+      buildMs.push(t1 - t0);
+      firstMs.push(performance.now() - t0);
+    }
+    const modelAlloc = perFrame(meter.take(), config.modelRuns);
+    const lt1 = { ...longTasks };
+    // the timeline scrubbed: the view tier at another mTime
+    const latency: number[] = [];
+    const cpuSide: number[] = [];
+    const gpu: number[] = [];
+    const byPass: Record<string, number[]> = {};
+    const frame = (k: number) => {
+      merger.view(1, 0.1 + 1.6 * ((k % 12) / 12));
+      renderer.setLayers(merger.inkLayers());
+      renderer.drawInk();
+      renderer.present(outView, format, surface);
+    };
+    meter.take();
+    for (let k = 0; k < config.orbitFrames; k++) {
+      profiler?.reset();
+      const t0 = performance.now();
+      frame(k);
+      cpuSide.push(performance.now() - t0);
+      await wait();
+      latency.push(performance.now() - t0);
+      if (profiler) {
+        const t = await profiler.collect();
+        gpu.push(t.totalMs);
+        for (const [label, ms] of Object.entries(t.byLabel)) (byPass[label] ??= []).push(ms);
+      }
+    }
+    const orbitAlloc = perFrame(meter.take(), config.orbitFrames);
+    const n = Math.min(10, Math.max(3, config.orbitFrames));
+    const tp = performance.now();
+    for (let k = 0; k < n; k++) frame(config.orbitFrames + k);
+    await wait();
+    const pipelinedMs = (performance.now() - tp) / n;
+    const counts = await merger.readCounts().then(
+      (r) => r.counts,
+      () => null,
+    );
+    const result: ScenarioResult = {
+      name: sc.name,
+      preset: sc.preset,
+      counts,
+      model: {
+        sceneMs: stat([0]),
+        uploadMs: stat([0]),
+        firstFrameMs: stat(firstMs),
+        gpuMs: null,
+        alloc: modelAlloc,
+      },
+      orbit: {
+        latencyMs: stat(latency),
+        cpuSideMs: stat(cpuSide),
+        pipelinedMs,
+        // only the ink and the composite are timed for a merger (the view's passes live in the
+        // galaxies and the debris, which carry no profiler)
+        gpuMs: gpu.length ? stat(gpu) : null,
+        gpuByPass: gpu.length
+          ? Object.fromEntries(Object.entries(byPass).map(([k, v]) => [k, stat(v).median]))
+          : null,
+        alloc: orbitAlloc,
+        modelRuns: 0,
+      },
+      merger: {
+        chunks,
+        chunkMs: stat(chunkMs.length ? chunkMs : [0]),
+        buildMs: stat(buildMs),
+        longTasks: lt1.n - lt0.n,
+        longTaskMs: Math.round(lt1.ms - lt0.ms),
+      },
+      memory: {
+        buffers: meter.liveBuffers,
+        textures: meter.liveTextures,
+        ink: renderer.width * renderer.height * 8,
+      },
+    };
+    merger.destroy();
+    return result;
+  };
+
   window.__perf = {
     adapter: {
       description: info.description,
@@ -287,6 +437,13 @@ async function main(): Promise<void> {
         const params = (seed: number) => presetParams(sc.preset, seed, sc.overrides ?? {});
         const wait = () => device.queue.onSubmittedWorkDone();
         const surface = SURFACES.paper;
+        if (params(seed0).merger) {
+          results.push(await runMerger(sc, config, renderer, outView, params, seed0));
+          stipple.destroy();
+          renderer.destroy();
+          out.destroy();
+          continue;
+        }
 
         // warm up: pipelines, the first atlas upload, shader compilation
         {
