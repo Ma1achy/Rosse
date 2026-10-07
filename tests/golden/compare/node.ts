@@ -204,7 +204,10 @@ export class GoldenNode {
     if (!t) throw new Error(`no parity thresholds for ${preset}`);
     // the family's thresholds, with the preset's own where calibrated (axis ratios)
     const { byPreset, ...family } = t;
-    return { ...family, ...(byPreset?.[preset] ?? {}) };
+    // the dots' count spread is not a matter of the zoom: a zoom family with too few pairs of its
+    // own to measure it takes the family's (ADR 0035)
+    const countsBy = family.countsBy ?? this.thresholds.parity[f]?.countsBy;
+    return { ...family, ...(countsBy ? { countsBy } : {}), ...(byPreset?.[preset] ?? {}) };
   }
 
   writeReport(

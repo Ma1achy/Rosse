@@ -67,6 +67,8 @@ const opt = (/** @type {string} */ k) => {
   const i = args.indexOf(k);
   return i >= 0 ? args[i + 1] : undefined;
 };
+/** The calibration's multiple of the 95th percentile of the re-draw spread (ADR 0018: 1.5; `--factor`, ADR 0035). */
+const FAC = Number(opt('--factor') ?? 1.5);
 const dir = resolve(import.meta.dirname, '../reference');
 const manifestPath = join(dir, 'manifest.json');
 if (!existsSync(manifestPath)) {
@@ -453,7 +455,7 @@ async function compareAll(G, node) {
 function countTolerances(G, items, floor) {
   const CLASSES = ['dots'];
   const tol = (/** @type {number[]} */ xs) => {
-    const w = Math.ceil(1.5 * G.summary(xs).p95 * 1000) / 1000;
+    const w = Math.ceil(FAC * G.summary(xs).p95 * 1000) / 1000;
     return w > floor ? w : null;
   };
   /** @type {Record<string, number[]>} */
@@ -764,10 +766,13 @@ async function calibrate(G, node) {
       KEYS.map(([k, f]) => [k, G.summary(list.map(f).filter((x) => !Number.isNaN(x)))]),
     );
   const floor2 = (/** @type {number} */ x) => Math.floor(x * 100) / 100;
+  /** the 5th percentile less 0.02, and, for a factor over 1.5, as much of the median's distance to it again as FAC/1.5 − 1 */
+  const ssimBound = (/** @type {{ p5: number, median: number }} */ s) =>
+    floor2(s.p5 - (FAC / 1.5 - 1) * (s.median - s.p5) - 0.02);
   const ceil3 = (/** @type {number} */ x) => Math.ceil(x * 1000) / 1000;
   /** 1.5 × p95 of the re-draw spread, and at least `min` */
   const spread = (/** @type {any} */ s, /** @type {string} */ k, /** @type {number} */ min) =>
-    Math.max(min, ceil3(1.5 * s[k].p95));
+    Math.max(min, ceil3(FAC * s[k].p95));
   /** @type {Record<string, any>} */
   const parity = {};
   /** @type {Record<string, any>} */
@@ -811,10 +816,10 @@ async function calibrate(G, node) {
       return {
         // the ADR's ±5% and ±10% stay as floors: they also cover the renderers' deliberate
         // differences (per-drawing mipmaps, no MSAA, f16 accumulation), which re-draw pairs do not
-        ink: Math.max(ADR.ink, ceil3(1.5 * s.inkAbs.p95)),
-        ssimCoarse: floor2(s.ssimCoarse.p5 - 0.02),
-        median: Math.max(ADR.median, ceil3(1.5 * s.medianAbs.p95)),
-        p90: Math.max(ADR.p90, ceil3(1.5 * s.p90Abs.p95)),
+        ink: Math.max(ADR.ink, ceil3(FAC * s.inkAbs.p95)),
+        ssimCoarse: ssimBound(s.ssimCoarse),
+        median: Math.max(ADR.median, ceil3(FAC * s.medianAbs.p95)),
+        p90: Math.max(ADR.p90, ceil3(FAC * s.p90Abs.p95)),
         // the moment and extent test: 1.5 × the p95 of the re-draw spread, with small floors for
         // a quantity's resolution (half a radial bin of 0.25 px is 0.1% of a 100 px radius)
         r25: spread(s, 'r25Abs', 0.01),
@@ -868,20 +873,26 @@ async function calibrate(G, node) {
       if (mine.length < 8) continue;
       const ps = stats(mine);
       const pa = positionAngle(mine);
+      const fam = /** @type {Record<string, number>} */ (parity[family]);
+      // ADR 0035: the moment and extent measures and the SSIM have a preset's own tolerance where
+      // that is wider than the family's (a cigar's position angle, a ring's inner axis ratio), by
+      // the same rule; a calmer preset keeps the family's, as fewer pairs would give it a band
+      // that a draw of v21's would too easily leave
+      const wider = {
+        ssimCoarse: Math.min(ssimBound(ps.ssimCoarse), fam.ssimCoarse ?? 1),
+        r25: Math.max(spread(ps, 'r25Abs', 0.01), fam.r25 ?? 0),
+        r50: Math.max(spread(ps, 'r50Abs', 0.01), fam.r50 ?? 0),
+        r90: Math.max(spread(ps, 'r90Abs', 0.01), fam.r90 ?? 0),
+        outer: Math.max(spread(ps, 'outerAbs', 0.003), fam.outer ?? 0),
+        paA: Math.max(pa.paA, fam.paA ?? 0),
+      };
       byPreset[preset] = {
-        // ADR 0035: the moment and extent measures and the SSIM likewise, by the same rule: a
-        // preset's own re-draw spread, where the family's pooled one is wider or narrower than it
-        ssimCoarse: floor2(ps.ssimCoarse.p5 - 0.02),
-        r25: spread(ps, 'r25Abs', 0.01),
-        r50: spread(ps, 'r50Abs', 0.01),
-        r90: spread(ps, 'r90Abs', 0.01),
-        outer: spread(ps, 'outerAbs', 0.003),
-        paA: pa.paA,
+        ...wider,
         q: spread(ps, 'qAbs', 0.005),
         qInner: spread(ps, 'qInnerAbs', 0.005),
         // the preset's own noise floor of the ellipticity (a smooth Sérsic profile is far quieter
         // than a galaxy with a sparse halo); the family's paA
-        paEps0: Math.max(0.01, positionAngle(mine).paEps0),
+        paEps0: Math.max(0.01, pa.paEps0),
         // ADR 0035, where this preset's own count spread is wider than the ADR's tolerance
         ...(Object.values(counted.byPreset[preset] ?? {}).some((w) => w > ADR.counts)
           ? { countsBy: counted.byPreset[preset] }
@@ -908,6 +919,7 @@ async function calibrate(G, node) {
       };
     }
     numbers[family] = {
+      factor: FAC,
       engineRekey: stats(list),
       ...(Object.keys(spreadOf).length
         ? {
@@ -1003,10 +1015,10 @@ function positionAngle(list) {
     return s[Math.max(0, Math.ceil(0.95 * s.length) - 1)] ?? 0;
   };
   const ceil3 = (/** @type {number} */ x) => Math.ceil(x * 1000) / 1000;
-  const paEps0 = ceil3(1.5 * p95(list.map((c) => Math.abs(eps(c.render.q) - eps(c.ref.q)))));
+  const paEps0 = ceil3(FAC * p95(list.map((c) => Math.abs(eps(c.render.q) - eps(c.ref.q)))));
   const above = list.filter((c) => eps(c.ref.q) > paEps0);
   const paA = ceil3(
-    Math.max(0.5, 1.5 * p95(above.map((c) => Math.abs(c.paDiff) * (eps(c.ref.q) - paEps0)))),
+    Math.max(0.5, FAC * p95(above.map((c) => Math.abs(c.paDiff) * (eps(c.ref.q) - paEps0)))),
   );
   return { paA, paEps0 };
 }

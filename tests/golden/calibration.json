@@ -344,6 +344,7 @@
   ],
   "families": {
     "spiral": {
+      "factor": 3,
       "engineRekey": {
         "ssim": {
           "n": 264,
@@ -562,7 +563,7 @@
             {
               "config": "Ringed s7 incl 30",
               "failed": true,
-              "by": ["coarse ssim 0.7872", "position angle -83.25°"]
+              "by": ["coarse ssim 0.7872"]
             },
             {
               "config": "Barred spiral (vectors) s4242 incl 30",
@@ -716,8 +717,15 @@
         },
         "RMAX 4.2": {
           "applicable": 14,
-          "detected": 14,
-          "missed": [],
+          "detected": 8,
+          "missed": [
+            "Barred spiral (vectors) s4242 incl 30",
+            "Barred spiral (vectors) s4242 incl 50",
+            "Grand design s7 incl 50",
+            "Grand design (ribbons) s7 incl 50",
+            "Grand design s4242 incl 30",
+            "Barred spiral (vectors) s7 incl 30"
+          ],
           "ssim": {
             "n": 14,
             "min": 0.4098,
@@ -818,35 +826,28 @@
             {
               "config": "Grand design s7 incl 30",
               "failed": true,
-              "by": ["coarse ssim 0.8769", "r50 -2.91%", "r90 -10.86%", "outer ink -3.49%"]
+              "by": ["coarse ssim 0.8769", "outer ink -3.49%"]
             },
             {
               "config": "Ringed s7 incl 30",
               "failed": true,
-              "by": ["r25 -2.95%", "r90 -11.35%", "outer ink -3.36%"]
+              "by": ["r90 -11.35%", "outer ink -3.36%"]
             },
             {
               "config": "Barred spiral (vectors) s4242 incl 30",
-              "failed": true,
-              "by": ["r90 -7.78%", "outer ink -2.38%"]
+              "failed": false,
+              "by": []
             },
             {
               "config": "Loose, open arms (ribbons) s7 incl 50",
               "failed": true,
-              "by": [
-                "coarse ssim 0.8579",
-                "p90 width 10.19%",
-                "r25 -3.10%",
-                "r50 -3.81%",
-                "r90 -13.63%",
-                "outer ink -3.40%"
-              ]
+              "by": ["coarse ssim 0.8579", "r90 -13.63%", "outer ink -3.40%"]
             }
           ]
         },
         "thick ×3": {
           "applicable": 14,
-          "detected": 2,
+          "detected": 1,
           "missed": [
             "Grand design s7 incl 30",
             "Ringed s7 incl 30",
@@ -856,6 +857,7 @@
             "Disc, no arms (vectors) s7 incl 45",
             "Grand design (ribbons) s7 incl 30",
             "Grand design s7 incl 50",
+            "Ringed s7 incl 50",
             "Grand design (ribbons) s7 incl 50",
             "Grand design s4242 incl 30",
             "Ringed s4242 incl 30",
@@ -1090,36 +1092,23 @@
                 "median width 18.45%",
                 "p90 width 21.12%",
                 "r25 8.08%",
-                "r50 6.03%",
-                "outer ink 1.62%"
+                "r50 6.03%"
               ]
             },
             {
               "config": "Ringed s7 incl 30",
               "failed": true,
-              "by": [
-                "ink 29.52%",
-                "coarse ssim 0.8520",
-                "median width 21.49%",
-                "p90 width 17.87%",
-                "r25 4.02%",
-                "r50 2.80%",
-                "r90 6.93%",
-                "outer ink 1.92%"
-              ]
+              "by": ["ink 29.52%", "coarse ssim 0.8520", "median width 21.49%", "p90 width 17.87%"]
             },
             {
               "config": "Barred spiral (vectors) s4242 incl 30",
               "failed": true,
               "by": [
                 "ink 26.64%",
-                "coarse ssim 0.8830",
                 "median width 23.24%",
                 "p90 width 19.61%",
                 "r25 7.96%",
-                "r50 5.81%",
-                "r90 7.33%",
-                "outer ink 1.91%"
+                "r50 5.81%"
               ]
             },
             {
@@ -1130,19 +1119,19 @@
                 "coarse ssim 0.8733",
                 "median width 21.15%",
                 "p90 width 29.43%",
-                "r25 6.98%",
-                "r50 5.31%"
+                "r25 6.98%"
               ]
             }
           ]
         },
         "bulgeFlat +0.15": {
           "applicable": 5,
-          "detected": 1,
+          "detected": 0,
           "missed": [
             "Ringed s7 incl 30",
             "Disc, no arms (vectors) s7 incl 45",
             "Ringed s7 incl 50",
+            "Disc, no arms (vectors) s7 incl 65",
             "Ringed s4242 incl 30"
           ],
           "ssim": {
@@ -1259,8 +1248,8 @@
             },
             {
               "config": "Disc, no arms (vectors) s7 incl 65",
-              "failed": true,
-              "by": ["axis ratio 0.0202"]
+              "failed": false,
+              "by": []
             }
           ]
         },
@@ -1395,11 +1384,12 @@
         },
         "bulgeSize ×1.5": {
           "applicable": 5,
-          "detected": 1,
+          "detected": 0,
           "missed": [
             "Ringed s7 incl 30",
             "Disc, no arms (vectors) s7 incl 45",
             "Ringed s7 incl 50",
+            "Disc, no arms (vectors) s7 incl 65",
             "Ringed s4242 incl 30"
           ],
           "ssim": {
@@ -1516,8 +1506,8 @@
             },
             {
               "config": "Disc, no arms (vectors) s7 incl 65",
-              "failed": true,
-              "by": ["axis ratio 0.0203"]
+              "failed": false,
+              "by": []
             }
           ]
         },
@@ -1640,7 +1630,7 @@
             {
               "config": "Ringed s7 incl 50",
               "failed": true,
-              "by": ["coarse ssim 0.7240", "outer ink -0.71%", "position angle 29.66°"]
+              "by": ["coarse ssim 0.7240", "position angle 29.66°"]
             }
           ]
         },
@@ -1753,7 +1743,7 @@
             {
               "config": "Barred spiral (vectors) s4242 incl 50",
               "failed": true,
-              "by": ["coarse ssim 0.6992", "r90 -7.04%", "position angle -30.31°"]
+              "by": ["coarse ssim 0.6992", "position angle -30.31°"]
             },
             {
               "config": "Grand design s7 incl 50",
@@ -1878,8 +1868,7 @@
                 "r25 -15.88%",
                 "r50 -14.97%",
                 "axis ratio -0.2546",
-                "inner axis ratio -0.2366",
-                "position angle 3.23°"
+                "inner axis ratio -0.2366"
               ]
             },
             {
@@ -1892,7 +1881,6 @@
                 "r25 -19.31%",
                 "r50 -7.83%",
                 "r90 -10.46%",
-                "outer ink -3.22%",
                 "axis ratio -0.2144",
                 "inner axis ratio -0.2401"
               ]
@@ -1918,8 +1906,6 @@
                 "coarse ssim 0.7011",
                 "r25 -21.31%",
                 "r50 -8.34%",
-                "r90 -6.76%",
-                "outer ink -1.93%",
                 "axis ratio -0.1801",
                 "inner axis ratio -0.2836"
               ]
@@ -1930,6 +1916,7 @@
       "v21Reroll": null
     },
     "smooth": {
+      "factor": 3,
       "engineRekey": {
         "ssim": {
           "n": 132,
@@ -2143,22 +2130,12 @@
             {
               "config": "Cigar-shaped s7 incl 88",
               "failed": true,
-              "by": [
-                "coarse ssim 0.6405",
-                "r50 -4.92%",
-                "outer ink -1.79%",
-                "position angle 28.90°"
-              ]
+              "by": ["coarse ssim 0.6405", "position angle 28.90°"]
             },
             {
               "config": "Cigar-shaped s7 incl 108",
               "failed": true,
-              "by": [
-                "coarse ssim 0.8011",
-                "r90 -8.26%",
-                "outer ink -2.01%",
-                "position angle 27.73°"
-              ]
+              "by": ["coarse ssim 0.8011", "position angle 27.73°"]
             },
             {
               "config": "Cigar-shaped s4242 incl 88",
@@ -2276,12 +2253,7 @@
             {
               "config": "Cigar-shaped s7 incl 108",
               "failed": true,
-              "by": [
-                "coarse ssim 0.7835",
-                "r90 -8.90%",
-                "outer ink -2.20%",
-                "position angle -32.20°"
-              ]
+              "by": ["coarse ssim 0.7835", "position angle -32.20°"]
             },
             {
               "config": "Cigar-shaped s4242 incl 88",
@@ -2399,7 +2371,7 @@
             {
               "config": "Smooth, round (stipple) s11 incl 10",
               "failed": true,
-              "by": ["coarse ssim 0.7824", "position angle -87.18°"]
+              "by": ["coarse ssim 0.7824"]
             },
             {
               "config": "Smooth, round (stipple) s11 incl 30",
@@ -2415,8 +2387,12 @@
         },
         "bulgeFlat +0.1": {
           "applicable": 5,
-          "detected": 5,
-          "missed": [],
+          "detected": 2,
+          "missed": [
+            "Cigar-shaped s7 incl 108",
+            "Radio jet (stipple) s4242 incl 88",
+            "Radio jet (stipple) s4242 incl 108"
+          ],
           "ssim": {
             "n": 5,
             "min": 0.4859,
@@ -2517,22 +2493,22 @@
             {
               "config": "Cigar-shaped s7 incl 88",
               "failed": true,
-              "by": ["ink 7.40%", "r50 -4.90%", "inner axis ratio 0.0805"]
+              "by": ["ink 7.40%", "inner axis ratio 0.0805"]
             },
             {
               "config": "Cigar-shaped s7 incl 108",
-              "failed": true,
-              "by": ["inner axis ratio 0.0560"]
+              "failed": false,
+              "by": []
             },
             {
               "config": "Radio jet (stipple) s4242 incl 88",
-              "failed": true,
-              "by": ["axis ratio 0.0463", "position angle 17.48°"]
+              "failed": false,
+              "by": []
             },
             {
               "config": "Cigar-shaped s4242 incl 88",
               "failed": true,
-              "by": ["ink 6.80%", "axis ratio 0.0893", "inner axis ratio 0.0672"]
+              "by": ["inner axis ratio 0.0672"]
             }
           ]
         },
@@ -2640,18 +2616,12 @@
             {
               "config": "Cigar-shaped s7 incl 88",
               "failed": true,
-              "by": [
-                "ink 10.03%",
-                "r50 -5.42%",
-                "axis ratio 0.0668",
-                "inner axis ratio 0.1170",
-                "position angle -3.69°"
-              ]
+              "by": ["ink 10.03%", "inner axis ratio 0.1170"]
             },
             {
               "config": "Cigar-shaped s7 incl 108",
               "failed": true,
-              "by": ["ink 6.44%", "axis ratio 0.0712", "inner axis ratio 0.0769"]
+              "by": ["inner axis ratio 0.0769"]
             },
             {
               "config": "Cigar-shaped s4242 incl 88",
@@ -2774,7 +2744,7 @@
             {
               "config": "Smooth, round (stipple) s11 incl 30",
               "failed": true,
-              "by": ["ink 12.11%", "r25 7.19%", "r50 7.41%", "r90 7.58%", "outer ink 1.71%"]
+              "by": ["ink 12.11%", "r25 7.19%"]
             },
             {
               "config": "Cigar-shaped s7 incl 108",
@@ -2785,9 +2755,11 @@
         },
         "halo off": {
           "applicable": 9,
-          "detected": 2,
+          "detected": 0,
           "missed": [
             "Cigar-shaped s7 incl 88",
+            "Smooth, round (stipple) s11 incl 10",
+            "Smooth, round (stipple) s11 incl 30",
             "Cigar-shaped s7 incl 108",
             "Radio jet (stipple) s4242 incl 88",
             "Smooth, round (stipple) s3 incl 10",
@@ -2899,13 +2871,13 @@
             },
             {
               "config": "Smooth, round (stipple) s11 incl 10",
-              "failed": true,
-              "by": ["ink -5.77%", "r25 -3.84%"]
+              "failed": false,
+              "by": []
             },
             {
               "config": "Smooth, round (stipple) s11 incl 30",
-              "failed": true,
-              "by": ["ink -6.53%", "r25 -4.10%"]
+              "failed": false,
+              "by": []
             },
             {
               "config": "Cigar-shaped s7 incl 108",
@@ -2916,14 +2888,16 @@
         },
         "RMAX 4.2": {
           "applicable": 9,
-          "detected": 2,
+          "detected": 0,
           "missed": [
             "Cigar-shaped s7 incl 88",
             "Smooth, round (stipple) s11 incl 10",
             "Smooth, round (stipple) s11 incl 30",
             "Cigar-shaped s7 incl 108",
+            "Radio jet (stipple) s4242 incl 88",
             "Smooth, round (stipple) s3 incl 10",
             "Cigar-shaped s4242 incl 88",
+            "Radio jet (stipple) s4242 incl 108",
             "Smooth, round (stipple) s3 incl 30"
           ],
           "ssim": {
@@ -3154,9 +3128,7 @@
                 "coarse ssim 0.9026",
                 "median width 19.63%",
                 "p90 width 23.66%",
-                "r25 13.65%",
-                "r50 7.00%",
-                "inner axis ratio 0.0408"
+                "r25 13.65%"
               ]
             },
             {
@@ -3167,9 +3139,7 @@
                 "coarse ssim 0.8786",
                 "median width 20.25%",
                 "p90 width 20.91%",
-                "r25 14.30%",
-                "r50 10.92%",
-                "outer ink 1.33%"
+                "r25 14.30%"
               ]
             },
             {
@@ -3180,10 +3150,7 @@
                 "coarse ssim 0.8811",
                 "median width 22.41%",
                 "p90 width 20.68%",
-                "r25 13.79%",
-                "r50 11.13%",
-                "r90 9.54%",
-                "outer ink 2.01%"
+                "r25 13.79%"
               ]
             },
             {
@@ -3195,8 +3162,7 @@
                 "median width 25.01%",
                 "p90 width 23.81%",
                 "r25 15.66%",
-                "r50 14.83%",
-                "inner axis ratio 0.0317"
+                "r50 14.83%"
               ]
             }
           ]
@@ -3323,10 +3289,8 @@
               "by": [
                 "ink 11.16%",
                 "coarse ssim 0.8442",
-                "r90 -5.65%",
                 "axis ratio 0.1975",
-                "inner axis ratio 0.1401",
-                "position angle -3.37°"
+                "inner axis ratio 0.1401"
               ]
             },
             {
@@ -3464,7 +3428,7 @@
             {
               "config": "Radio jet (stipple) s4242 incl 88",
               "failed": true,
-              "by": ["r50 -4.42%", "axis ratio -0.0608", "inner axis ratio -0.0769"]
+              "by": ["inner axis ratio -0.0769"]
             },
             {
               "config": "Smooth, round (stipple) s3 incl 10",
@@ -3483,6 +3447,7 @@
       "v21Reroll": null
     },
     "star": {
+      "factor": 3,
       "engineRekey": {
         "ssim": {
           "n": 24,
@@ -3701,12 +3666,7 @@
             {
               "config": "Star: bright, with spikes (stars) s7 incl 50",
               "failed": true,
-              "by": [
-                "coarse ssim 0.7458",
-                "axis ratio 0.0599",
-                "inner axis ratio 0.0339",
-                "position angle 70.80°"
-              ]
+              "by": ["coarse ssim 0.7458"]
             }
           ]
         },
@@ -4168,9 +4128,7 @@
                 "median width 23.70%",
                 "p90 width 21.05%",
                 "r25 15.68%",
-                "r50 8.56%",
-                "r90 9.36%",
-                "outer ink 1.51%"
+                "r50 8.56%"
               ]
             },
             {
@@ -4191,6 +4149,7 @@
       "v21Reroll": null
     },
     "artefact": {
+      "factor": 3,
       "engineRekey": {
         "ssim": {
           "n": 36,
@@ -4870,10 +4829,7 @@
                 "coarse ssim 0.9173",
                 "median width 21.93%",
                 "p90 width 31.52%",
-                "r25 11.76%",
-                "r50 12.42%",
-                "axis ratio -0.0328",
-                "inner axis ratio 0.0625"
+                "r25 11.76%"
               ]
             },
             {
@@ -4884,8 +4840,7 @@
                 "coarse ssim 0.9179",
                 "median width 21.77%",
                 "p90 width 25.43%",
-                "r25 10.57%",
-                "axis ratio -0.0312"
+                "r25 10.57%"
               ]
             }
           ]
@@ -4894,6 +4849,7 @@
       "v21Reroll": null
     },
     "spiral@zoom": {
+      "factor": 3,
       "engineRekey": {
         "ssim": {
           "n": 120,
@@ -5117,7 +5073,7 @@
             {
               "config": "Grand design (zoom 2) s7 incl 30 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.4525", "position angle 89.60°"]
+              "by": ["coarse ssim 0.4525"]
             },
             {
               "config": "Ringed (zoom 2) s7 incl 30 zoom 2",
@@ -5372,9 +5328,10 @@
         },
         "bulgeSize ×1.5": {
           "applicable": 3,
-          "detected": 1,
+          "detected": 0,
           "missed": [
             "Disc, no arms (vectors) s4242 incl 45 zoom 2",
+            "Ringed (zoom 2) s7 incl 30 zoom 2",
             "Disc, no arms (vectors) s7 incl 45 zoom 2"
           ],
           "ssim": {
@@ -5481,8 +5438,8 @@
             },
             {
               "config": "Ringed (zoom 2) s7 incl 30 zoom 2",
-              "failed": true,
-              "by": ["r25 -3.12%"]
+              "failed": false,
+              "by": []
             },
             {
               "config": "Disc, no arms (vectors) s7 incl 45 zoom 2",
@@ -5625,13 +5582,15 @@
         },
         "RMAX 4.2": {
           "applicable": 8,
-          "detected": 2,
+          "detected": 0,
           "missed": [
+            "Disc, no arms (vectors) s4242 incl 45 zoom 2",
             "Grand design (ribbons) s4242 incl 30 zoom 2",
             "Grand design (zoom 2) s7 incl 30 zoom 2",
             "Ringed (zoom 2) s7 incl 30 zoom 2",
             "Loose, open arms (ribbons) s7 incl 30 zoom 2",
             "Barred spiral (vectors) s4242 incl 30 zoom 2",
+            "Disc, no arms (vectors) s7 incl 45 zoom 2",
             "Grand design (ribbons) s7 incl 30 zoom 2"
           ],
           "ssim": {
@@ -5733,8 +5692,8 @@
           "firstFailures": [
             {
               "config": "Disc, no arms (vectors) s4242 incl 45 zoom 2",
-              "failed": true,
-              "by": ["ink 5.96%"]
+              "failed": false,
+              "by": []
             },
             {
               "config": "Grand design (ribbons) s4242 incl 30 zoom 2",
@@ -5755,11 +5714,12 @@
         },
         "thick ×3": {
           "applicable": 8,
-          "detected": 1,
+          "detected": 0,
           "missed": [
             "Disc, no arms (vectors) s4242 incl 45 zoom 2",
             "Grand design (ribbons) s4242 incl 30 zoom 2",
             "Grand design (zoom 2) s7 incl 30 zoom 2",
+            "Ringed (zoom 2) s7 incl 30 zoom 2",
             "Loose, open arms (ribbons) s7 incl 30 zoom 2",
             "Barred spiral (vectors) s4242 incl 30 zoom 2",
             "Disc, no arms (vectors) s7 incl 45 zoom 2",
@@ -5879,8 +5839,8 @@
             },
             {
               "config": "Ringed (zoom 2) s7 incl 30 zoom 2",
-              "failed": true,
-              "by": ["axis ratio 0.0221"]
+              "failed": false,
+              "by": []
             }
           ]
         },
@@ -5988,54 +5948,22 @@
             {
               "config": "Disc, no arms (vectors) s4242 incl 45 zoom 2",
               "failed": true,
-              "by": [
-                "ink 35.74%",
-                "coarse ssim 0.7965",
-                "median width 19.38%",
-                "p90 width 24.60%",
-                "r25 5.09%",
-                "r50 4.11%",
-                "outer ink 0.54%"
-              ]
+              "by": ["ink 35.74%", "median width 19.38%", "p90 width 24.60%"]
             },
             {
               "config": "Grand design (ribbons) s4242 incl 30 zoom 2",
               "failed": true,
-              "by": [
-                "ink 28.76%",
-                "median width 15.88%",
-                "p90 width 18.82%",
-                "r25 4.61%",
-                "r50 4.34%",
-                "r90 2.28%",
-                "outer ink 1.42%"
-              ]
+              "by": ["ink 28.76%", "median width 15.88%", "p90 width 18.82%"]
             },
             {
               "config": "Grand design (zoom 2) s7 incl 30 zoom 2",
               "failed": true,
-              "by": [
-                "ink 28.50%",
-                "coarse ssim 0.8131",
-                "median width 14.92%",
-                "p90 width 17.84%",
-                "r25 6.15%",
-                "r50 2.82%",
-                "r90 1.95%",
-                "outer ink 1.28%"
-              ]
+              "by": ["ink 28.50%", "median width 14.92%", "p90 width 17.84%"]
             },
             {
               "config": "Ringed (zoom 2) s7 incl 30 zoom 2",
               "failed": true,
-              "by": [
-                "ink 25.25%",
-                "coarse ssim 0.8620",
-                "median width 18.69%",
-                "p90 width 18.55%",
-                "r25 3.07%",
-                "axis ratio 0.0174"
-              ]
+              "by": ["ink 25.25%", "median width 18.69%", "p90 width 18.55%"]
             }
           ]
         }
@@ -6043,6 +5971,7 @@
       "v21Reroll": null
     },
     "smooth@zoom": {
+      "factor": 3,
       "engineRekey": {
         "ssim": {
           "n": 54,
@@ -6256,7 +6185,7 @@
             {
               "config": "Cigar-shaped (zoom 2) s7 incl 88 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.6403", "r25 2.89%", "outer ink 1.79%", "position angle 29.63°"]
+              "by": ["coarse ssim 0.6403", "position angle 29.63°"]
             }
           ]
         },
@@ -7122,13 +7051,10 @@
               "failed": true,
               "by": [
                 "ink 36.44%",
-                "coarse ssim 0.8684",
                 "median width 24.85%",
                 "p90 width 23.46%",
                 "r25 15.66%",
-                "r50 11.89%",
-                "axis ratio 0.0314",
-                "inner axis ratio 0.0400"
+                "r50 11.89%"
               ]
             }
           ]
@@ -7237,15 +7163,7 @@
             {
               "config": "Cigar-shaped (zoom 2) s7 incl 88 zoom 2",
               "failed": true,
-              "by": [
-                "coarse ssim 0.8434",
-                "r25 -4.75%",
-                "r50 -10.53%",
-                "r90 6.57%",
-                "outer ink 1.78%",
-                "axis ratio 0.0547",
-                "inner axis ratio 0.0933"
-              ]
+              "by": ["coarse ssim 0.8434", "r50 -10.53%", "inner axis ratio 0.0933"]
             }
           ]
         }
@@ -7453,6 +7371,7 @@
       "v21Reroll": null
     },
     "layered": {
+      "factor": 3,
       "engineRekey": {
         "ssim": {
           "n": 48,
@@ -7666,12 +7585,12 @@
             {
               "config": "Layered: barred spiral, satellite trail (layered) s7 incl 30",
               "failed": true,
-              "by": ["coarse ssim 0.6550", "inner axis ratio 0.0466", "position angle -73.74°"]
+              "by": ["coarse ssim 0.6550", "position angle -73.74°"]
             },
             {
               "config": "Layered: barred spiral, satellite trail (layered) s7 incl 50",
               "failed": true,
-              "by": ["coarse ssim 0.4781", "axis ratio 0.0324", "position angle -75.22°"]
+              "by": ["coarse ssim 0.4781", "position angle -75.22°"]
             }
           ]
         },
@@ -7895,12 +7814,12 @@
             {
               "config": "Layered: barred spiral, satellite trail (layered) s7 incl 30",
               "failed": true,
-              "by": ["r50 -4.30%", "r90 -9.82%", "outer ink -3.11%"]
+              "by": ["outer ink -3.11%"]
             },
             {
               "config": "Layered: barred spiral, satellite trail (layered) s7 incl 50",
               "failed": true,
-              "by": ["r25 -2.27%", "r90 -12.58%", "outer ink -2.76%"]
+              "by": ["r90 -12.58%", "outer ink -2.76%"]
             }
           ]
         },
@@ -8129,8 +8048,7 @@
                 "coarse ssim 0.8692",
                 "median width 20.34%",
                 "p90 width 24.18%",
-                "r25 8.87%",
-                "outer ink 1.51%"
+                "r25 8.87%"
               ]
             },
             {
@@ -8250,7 +8168,7 @@
             {
               "config": "Layered: barred spiral, satellite trail (layered) s7 incl 50",
               "failed": true,
-              "by": ["coarse ssim 0.6639", "axis ratio 0.0538", "position angle 31.49°"]
+              "by": ["coarse ssim 0.6639", "position angle 31.49°"]
             }
           ]
         },
@@ -8472,10 +8390,8 @@
                 "p90 width 16.83%",
                 "r25 -14.64%",
                 "r50 -17.33%",
-                "outer ink -1.49%",
                 "axis ratio -0.2679",
-                "inner axis ratio -0.2103",
-                "position angle -3.64°"
+                "inner axis ratio -0.2103"
               ]
             }
           ]
@@ -8484,6 +8400,7 @@
       "v21Reroll": null
     },
     "deepfield": {
+      "factor": 3,
       "engineRekey": {
         "ssim": {
           "n": 12,
@@ -8596,6 +8513,7 @@
       "v21Reroll": null
     },
     "artefact@zoom": {
+      "factor": 3,
       "engineRekey": {
         "ssim": {
           "n": 18,
@@ -8809,15 +8727,7 @@
             {
               "config": "Artefact: cosmic rays (stars) s4242 incl 30 zoom 2",
               "failed": true,
-              "by": [
-                "p90 width 10.69%",
-                "r25 4.13%",
-                "r50 3.12%",
-                "r90 22.42%",
-                "outer ink 4.69%",
-                "axis ratio -0.0265",
-                "inner axis ratio -0.0346"
-              ]
+              "by": ["r50 3.12%", "r90 22.42%", "outer ink 4.69%"]
             }
           ]
         },
@@ -9033,7 +8943,7 @@
             {
               "config": "Artefact: cosmic rays (stars) s4242 incl 30 zoom 2",
               "failed": true,
-              "by": ["axis ratio -0.0589", "inner axis ratio -0.0466"]
+              "by": ["axis ratio -0.0589"]
             },
             {
               "config": "Artefact: cosmic rays (stars) s7 incl 30 zoom 2",
@@ -9494,15 +9404,7 @@
             {
               "config": "Artefact: cosmic rays (stars) s4242 incl 30 zoom 2",
               "failed": true,
-              "by": [
-                "ink 32.47%",
-                "coarse ssim 0.9297",
-                "median width 23.56%",
-                "p90 width 24.98%",
-                "r25 3.91%",
-                "r50 3.87%",
-                "inner axis ratio 0.0407"
-              ]
+              "by": ["ink 32.47%", "median width 23.56%", "p90 width 24.98%", "r50 3.87%"]
             },
             {
               "config": "Artefact: cosmic rays (stars) s7 incl 30 zoom 2",
@@ -9513,9 +9415,7 @@
                 "median width 18.66%",
                 "p90 width 22.53%",
                 "r25 9.47%",
-                "r50 9.78%",
-                "inner axis ratio 0.0588",
-                "position angle 7.94°"
+                "r50 9.78%"
               ]
             }
           ]
@@ -9624,12 +9524,7 @@
             {
               "config": "Artefact: cosmic rays (stars) s4242 incl 30 zoom 2",
               "failed": true,
-              "by": [
-                "r90 5.08%",
-                "outer ink 2.02%",
-                "axis ratio -0.0603",
-                "inner axis ratio -0.0474"
-              ]
+              "by": ["axis ratio -0.0603"]
             }
           ]
         }
@@ -9637,6 +9532,7 @@
       "v21Reroll": null
     },
     "layered@zoom": {
+      "factor": 3,
       "engineRekey": {
         "ssim": {
           "n": 24,
@@ -9861,8 +9757,11 @@
         },
         "halo off": {
           "applicable": 2,
-          "detected": 2,
-          "missed": [],
+          "detected": 0,
+          "missed": [
+            "Layered: barred spiral, satellite trail (layered) s4242 incl 30 zoom 2",
+            "Layered: barred spiral, satellite trail (layered) s7 incl 30 zoom 2"
+          ],
           "ssim": {
             "n": 2,
             "min": 0.3528,
@@ -9962,20 +9861,23 @@
           "firstFailures": [
             {
               "config": "Layered: barred spiral, satellite trail (layered) s4242 incl 30 zoom 2",
-              "failed": true,
-              "by": ["r50 2.12%"]
+              "failed": false,
+              "by": []
             },
             {
               "config": "Layered: barred spiral, satellite trail (layered) s7 incl 30 zoom 2",
-              "failed": true,
-              "by": ["r25 5.25%"]
+              "failed": false,
+              "by": []
             }
           ]
         },
         "RMAX 4.2": {
           "applicable": 2,
-          "detected": 1,
-          "missed": ["Layered: barred spiral, satellite trail (layered) s4242 incl 30 zoom 2"],
+          "detected": 0,
+          "missed": [
+            "Layered: barred spiral, satellite trail (layered) s4242 incl 30 zoom 2",
+            "Layered: barred spiral, satellite trail (layered) s7 incl 30 zoom 2"
+          ],
           "ssim": {
             "n": 2,
             "min": 0.3509,
@@ -10080,15 +9982,18 @@
             },
             {
               "config": "Layered: barred spiral, satellite trail (layered) s7 incl 30 zoom 2",
-              "failed": true,
-              "by": ["r25 4.08%"]
+              "failed": false,
+              "by": []
             }
           ]
         },
         "thick ×3": {
           "applicable": 2,
-          "detected": 2,
-          "missed": [],
+          "detected": 0,
+          "missed": [
+            "Layered: barred spiral, satellite trail (layered) s4242 incl 30 zoom 2",
+            "Layered: barred spiral, satellite trail (layered) s7 incl 30 zoom 2"
+          ],
           "ssim": {
             "n": 2,
             "min": 0.3511,
@@ -10188,13 +10093,13 @@
           "firstFailures": [
             {
               "config": "Layered: barred spiral, satellite trail (layered) s4242 incl 30 zoom 2",
-              "failed": true,
-              "by": ["inner axis ratio 0.0396"]
+              "failed": false,
+              "by": []
             },
             {
               "config": "Layered: barred spiral, satellite trail (layered) s7 incl 30 zoom 2",
-              "failed": true,
-              "by": ["outer ink -0.91%"]
+              "failed": false,
+              "by": []
             }
           ]
         },
@@ -10304,13 +10209,10 @@
               "failed": true,
               "by": [
                 "ink 25.55%",
-                "coarse ssim 0.8385",
                 "median width 14.75%",
                 "p90 width 18.20%",
                 "r25 7.41%",
-                "r50 5.03%",
-                "outer ink 1.00%",
-                "inner axis ratio 0.0333"
+                "r50 5.03%"
               ]
             },
             {
@@ -10318,7 +10220,6 @@
               "failed": true,
               "by": [
                 "ink 27.74%",
-                "coarse ssim 0.8161",
                 "median width 12.86%",
                 "p90 width 17.50%",
                 "r25 11.19%",
@@ -10431,12 +10332,7 @@
             {
               "config": "Layered: barred spiral, satellite trail (layered) s7 incl 30 zoom 2",
               "failed": true,
-              "by": [
-                "coarse ssim 0.5549",
-                "r25 3.63%",
-                "axis ratio 0.0446",
-                "position angle 26.96°"
-              ]
+              "by": ["coarse ssim 0.5549", "position angle 26.96°"]
             }
           ]
         },
@@ -10654,7 +10550,6 @@
               "failed": true,
               "by": [
                 "coarse ssim 0.4874",
-                "r25 -5.81%",
                 "r90 -7.43%",
                 "outer ink -4.41%",
                 "inner axis ratio -0.1038",
@@ -10667,6 +10562,7 @@
       "v21Reroll": null
     },
     "star@zoom": {
+      "factor": 3,
       "engineRekey": {
         "ssim": {
           "n": 12,
@@ -11111,7 +11007,7 @@
             {
               "config": "Star: bright, with spikes (stars) s7 incl 30 zoom 2",
               "failed": true,
-              "by": ["coarse ssim 0.9193", "position angle -3.88°"]
+              "by": ["coarse ssim 0.9193"]
             }
           ]
         },
@@ -11573,8 +11469,7 @@
                 "median width 21.79%",
                 "p90 width 24.75%",
                 "r25 8.85%",
-                "r50 12.12%",
-                "outer ink 1.31%"
+                "r50 12.12%"
               ]
             },
             {
@@ -11708,6 +11603,7 @@
       "v21Reroll": null
     },
     "deepfield@zoom": {
+      "factor": 3,
       "engineRekey": {
         "ssim": {
           "n": 6,
