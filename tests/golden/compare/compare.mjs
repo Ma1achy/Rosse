@@ -867,7 +867,16 @@ async function calibrate(G, node) {
       const mine = list.filter((c) => c.preset === preset);
       if (mine.length < 8) continue;
       const ps = stats(mine);
+      const pa = positionAngle(mine);
       byPreset[preset] = {
+        // ADR 0035: the moment and extent measures and the SSIM likewise, by the same rule: a
+        // preset's own re-draw spread, where the family's pooled one is wider or narrower than it
+        ssimCoarse: floor2(ps.ssimCoarse.p5 - 0.02),
+        r25: spread(ps, 'r25Abs', 0.01),
+        r50: spread(ps, 'r50Abs', 0.01),
+        r90: spread(ps, 'r90Abs', 0.01),
+        outer: spread(ps, 'outerAbs', 0.003),
+        paA: pa.paA,
         q: spread(ps, 'qAbs', 0.005),
         qInner: spread(ps, 'qInnerAbs', 0.005),
         // the preset's own noise floor of the ellipticity (a smooth Sérsic profile is far quieter

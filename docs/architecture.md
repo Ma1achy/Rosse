@@ -37,6 +37,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0032](adr/0032-the-sky-is-a-catalogue-built-on-the-gpu.md) | The sky is a model-tier catalogue (deep-field galaxies, foreground stars, companions), culled, drawn and bounded per view by GPU passes. |
 | [0033](adr/0033-stars-and-sky-follow-v21s-draws.md) | The loops, quirks and limits of `starSprites` and `buildSky` that are reproduced (`// v21 parity`). |
 | [0034](adr/0034-m7-checks-after-the-merge-with-m5.md) | _Proposed:_ four changes to checks and cases when M7 met M5's line-work set (the `lines` cases keep their overrides; the orbit check and the stars' raster check; the GPU page time limit). |
+| [0035](adr/0035-m7-calibration-with-the-stars-on-and-the-dots-count-spread.md) | _Proposed:_ the dots' count tolerance from the engine's own re-draw spread; M7's families and `spiral` and `smooth` calibrated with the stars on (`Edge-on with dust` keeps M5's thresholds); the engine's own goldens made again. |
 
 ## Modules
 
