@@ -1,6 +1,6 @@
 # M12: the extras
 
-Roadmap row: the Galaxy Zoo 2 catalogue browser, `fromVotes`, the 42 real galaxies, SVG export for pen plotters, and GIF export. Everything is in new modules under `src/extras/`. M11's page (PR #12) needs hooks from its side to call them: "What M12 needs from M11" below says which, and what M11 provides. **Status: 19 of the 20 real-galaxy goldens pass (`Real galaxy 6` at home fails its r50 band, by 0.06 points; see 3), the quasar-flare GIF is deferred to M9 (accepted by the owner), and everything else listed below is done.** No output changed: `tests/golden/engine-hashes.json` is untouched, and no existing test, case or threshold was changed (the only edits outside `src/extras/` are listed under "What else changed").
+Roadmap row: the Galaxy Zoo 2 catalogue browser, `fromVotes`, the 42 real galaxies, SVG export for pen plotters, and GIF export. Everything is in new modules under `src/extras/`. M11's page is merged and provides the hooks (`ExportSource`, `Page.addExport`, `Page.timeline`, `?from=`); **wiring the buttons and panels into it is a follow-up** ("what is still missing" below). **Status: 19 of the 20 real-galaxy goldens pass (`Real galaxy 6` at home fails its r50 band, by 0.06 points; see 3), the quasar-flare GIF is deferred to M9 (accepted by the owner), and everything else listed below is done.** No output changed: `tests/golden/engine-hashes.json` gains only the 20 new cases' hashes (the existing ones are identical), and no existing test, case or threshold was changed (the only edits outside `src/extras/` are listed under "What else changed").
 
 **Attribution the page must carry** (docs/open-questions.md Q1), in `src/extras/attribution.ts` and carried by every `GalaxyCard` and `RealCard` (`card.attribution`: `credit`, `licence` with its link, `changes`, `sdss`, and `text` for one line), so a page that shows a card has it. Galaxy Zoo 2 is CC BY 4.0: the credit (the project and Willett et al. 2013, Hart et al. 2016), the licence link (https://creativecommons.org/licenses/by/4.0/) and the indication of changes (the votes quantised to a byte and re-packed, parameters derived from them). **The SDSS acknowledgement is not the published wording:** the pack (assets/) holds none, and I could not check SDSS's text from here, so `SDSS_ACKNOWLEDGEMENT` points to https://www.sdss.org/collaboration/citing-sdss/. **The owner must check what SDSS requires for the imagery and paste the wording in.**
 
@@ -14,7 +14,7 @@ Roadmap row: the Galaxy Zoo 2 catalogue browser, `fromVotes`, the 42 real galaxi
 | SVG export | `src/extras/export/svg.ts`, `read-layers.ts`, `capsule-roles.ts`, `engine.ts` | `tests/unit/svg.test.ts` against `tests/vectors/svg-v21.json`, `tests/gpu/svg.ts` |
 | GIF export | `src/extras/export/gif.ts`, `gif-worker.ts`, `gif-frames.ts`, `record.ts` | `tests/unit/gif.test.ts`, `tests/gpu/gif.ts` |
 
-### Integration surface, and what M12 needs from M11
+### Integration surface, and what is still missing from M11's side
 
 ```ts
 // the catalogue (a worker; load on first use, close to free 16 MiB)
@@ -38,15 +38,15 @@ const bytes = await recordGif(timelineSource(w, h, P, drawInk), { frames, end, s
 
 To draw a catalogue or real galaxy, the page uses `card.mapping.p` / `cards[i].params` as it uses a preset's parameters. Overlays the engine places at the view where it first sees them follow the engine's rule (ADR 0030), not v21's `homeFor`.
 
-**What M12 needs from M11, read from `origin/claude/m11-page-and-ui` (PR #12) on 2026-10-07, and what it provides today.** M12's modules are not wired into M11's page; the page's `Engine` interface (src/ui/page.ts, main.ts) is private and its export is PNG only (`snapshot(): Promise<Pixels>`), so each of these is a change on M11's side (the M11 agent is adding the first two):
+**What M12 has from M11, and what is still missing** (M11 is merged, 246000d; its docs/milestones/m11/README.md, "Integration points for M12"). Provided and real: `ExportSource` (`backend()`, `snapshot()` as pixels, `layers()` the last drawing's ink layers, `device()` the GPU device or null) passed to `Page.addExport({ id, label, run(source, page) })`; `Page.timeline()` (`end`, `speed`, `loop`, `playing`), with `P.mTime` and `mHorizon` in `Page.state()`; `PageState.preset` may be `null` with `PageState.from` naming the galaxy (`gz2:<id>`, `real:<n>`), written as `?from=` (and every parameter that differs from the defaults) and returned by `parseUrlState`; and `writeUrl` no longer fails silently.
 
-| M12 needs | M11 today | to do |
+**Not wired in this PR: the buttons, the catalogue panel and the real-galaxy gallery are a follow-up**, because `ExportSource` is not quite enough for the modules as they are, and the panels are a page of UI (HTML, CSS, a hand-lettered tab, the print and post-it artwork) that M11 designed around. What the follow-up needs:
+
+| for | what is missing | change |
 | --- | --- | --- |
-| an engine export hook: the current `GpuStipple` and the last `CpuStipple` and view, run inside the frame queue as `snapshot` is | none (`Engine` is not exported; `snapshot` returns pixels) | M11 adds the hook (being added); the page calls `exportSvgGpu` / `exportSvgCpu` through it, and `gpuInkFrame` / `cpuInkFrame` for GIF frames |
-| the timeline's end and speed (and whether it is a merger or a quasar timeline) as page state | `TimelineState` lives in a closure in `page.ts`, not on `Page` | M11 adds accessors (being added) |
-| a galaxy source that is not a preset, in the URL | `PageState.preset` must be a `PRESETS` name; `writeUrl` swallows the error for others; the URL is preset-plus-differences | M11 stops `writeUrl` failing silently (being added); a catalogue or real galaxy needs a URL form (an object id, `?gz2=<objid>` or `?real=<i>`, resolved to `Params` through `catalogueSeed`/`fromVotes`, then the usual differences), which is M11's `urlstate.ts` to define: until then a link to such a galaxy cannot be shared |
-| Export SVG and Export GIF buttons, a Galaxy Zoo panel (types, search, find) and the real-galaxy gallery | PNG export only (`export.ts`'s `pngBlob`, `downloadBlob`, reusable for the blobs) | M11 builds the panel and buttons against this surface |
-| attribution shown with a catalogue or real galaxy | none | show `card.attribution` |
+| Export SVG | `ExportSource.layers()` gives the layers and `device()` the device, which `readInkLayers` takes; but `buildSvg` also needs the drawing's `seed` (page state has it) and the drawings' metadata (`meta.dots.size`, `meta.strokes`), and the placed drawings' capsule roles need the scene and the last view's camera | give `ExportSource` the engine's `DrawingsMeta`, or let `exportSvgGpu` / `exportSvgCpu` take what `main.ts` already holds (its `GpuStipple` or its `CpuStipple` and view). Without the roles the placed capsules all go to `drawings` (none is `stars` until M7 draws them) |
+| Export GIF | `snapshot()` is the plate composited over the surface (the paper's grain), and a GIF wants the ink alone, at the GIF's size, at several `mTime`s | an `ink(size)` on `ExportSource` (the engine's ink target as RGBA8: `cpuInkFrame` / `gpuInkFrame`, drawn at the GIF's size), and the button sets `mTime` through the page, awaits the frame, restores it (`recordGif`'s `done`) and reads `Page.timeline()` for `end` and `speed` |
+| the galaxy panel and the gallery | the panel itself: types and Find over `CatalogueClient`, the print gallery over `realCards()`; on choosing one, `Page` takes `from` (`gz2:<objid>` or `real:<n>`) with `preset: null` and the parameters from `card.mapping.p` / `cards[i].params`; `main.ts` resolves `from` at load (`parseUrlState().from`) | M11's artwork for the taped print is there (`.print`); `card.attribution` must be shown with it |
 
 ## Results
 
@@ -164,5 +164,5 @@ Still open:
 - The SVG export of a merger, shells or lens: `readInkLayers` and `buildSvg` take any frame's layers, but the capsule roles (hatching against placed drawings) are known only for a single galaxy's frame, so those frames would put every capsule in `drawings`. Not tested; not wired.
 - The real galaxies that are mergers, lensed or have shells (indices 34 to 36, 39) as goldens: M8 and M9 families.
 - Engine hashes: written for the 20 new cases only (`--only real-galaxy --update-engine`); the existing hashes are unchanged.
-- Wiring into M11's page: see "What M12 needs from M11".
+- Wiring into M11's page (the export buttons, the catalogue panel, the real-galaxy gallery): a follow-up, see above.
 - Measurements on a phone.
