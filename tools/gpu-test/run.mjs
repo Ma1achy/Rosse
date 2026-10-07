@@ -7,10 +7,11 @@
  *
  * Also runs the surface check of ./surface-css.mjs (the composite against Chromium's own
  * rendering of the reference CSS), the orbit check of ./orbit.mjs (the page, dragged with the
- * mouse) and the plates check of ./plates-page.mjs (the page's Plates menu).
+ * mouse) the plates check of ./plates-page.mjs (the page's Plates choice) and the UI smoke test of
+ * ./ui-smoke.mjs (the page's controls, tabs, URL state, themes, PNG export and accessible names).
  *
  * Usage: node tools/gpu-test/run.mjs [page …]   (default: every tests/gpu/*.html, surface-css,
- * orbit and plates-page)
+ * orbit, plates-page and ui-smoke)
  */
 import { mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -18,6 +19,7 @@ import { ROOT, launch, prepareAssets, startServer } from './browser.mjs';
 import { orbitCheck } from './orbit.mjs';
 import { platesPageCheck } from './plates-page.mjs';
 import { surfaceCssCheck } from './surface-css.mjs';
+import { uiSmokeCheck } from './ui-smoke.mjs';
 
 // a page test waits this long: the tier hash test takes about 100 s alone on SwiftShader and over 3 min on
 // a machine shared with other jobs
@@ -27,9 +29,12 @@ const requested = process.argv.slice(2).filter((a) => !a.startsWith('-'));
 const withCss = !requested.length || requested.includes('surface-css');
 const withOrbit = !requested.length || requested.includes('orbit');
 const withPlatesPage = !requested.length || requested.includes('plates-page');
+const withUiSmoke = !requested.length || requested.includes('ui-smoke');
 const pages = requested.length
   ? requested
-      .filter((p) => p !== 'surface-css' && p !== 'orbit' && p !== 'plates-page')
+      .filter(
+        (p) => p !== 'surface-css' && p !== 'orbit' && p !== 'plates-page' && p !== 'ui-smoke',
+      )
       .map((p) => (p.endsWith('.html') ? p : `${p}.html`))
   : readdirSync(join(ROOT, 'tests/gpu'))
       .filter((f) => f.endsWith('.html'))
@@ -103,6 +108,18 @@ try {
     } catch (e) {
       results.push({ page: 'plates-page', pass: false, lines: [String(e)], errors: [] });
       console.log(`FAIL  plates-page: ${String(e)}`);
+    }
+  }
+  if (withUiSmoke) {
+    const t0 = Date.now();
+    try {
+      const r = await uiSmokeCheck(browser, server.url);
+      results.push({ page: 'ui-smoke', ...r, errors: [] });
+      console.log(`${r.pass ? 'PASS' : 'FAIL'}  ${r.name}  (${String(Date.now() - t0)} ms)`);
+      for (const l of r.lines) console.log(`      ${l}`);
+    } catch (e) {
+      results.push({ page: 'ui-smoke', pass: false, lines: [String(e)], errors: [] });
+      console.log(`FAIL  ui-smoke: ${String(e)}`);
     }
   }
 } finally {
