@@ -91,7 +91,11 @@ run('star and artefact marks (GPU = CPU, L1)', async () => {
       for (let c = 0; c < CLASS_COUNT; c++) {
         const gk = gCounts.perClass[c] ?? 0;
         const ck = cv.perClass[c] ?? 0;
-        if (gk !== ck) bad.push(`class ${String(c)}: ${String(gk)} ≠ ${String(ck)}`);
+        // L1 (ADR 0004): counts within 0.1%. The occlusion cull (ADR 0074) is a hard decision on a
+        // 2-unit cell edge, so a mark within the engines' position error (~3e-4 px) of an edge can
+        // land in the other cell on one engine: a flip of a mark or two is not a difference.
+        if (Math.abs(gk - ck) > Math.max(2, 1e-3 * Math.max(gk, ck)))
+          bad.push(`class ${String(c)}: ${String(gk)} ≠ ${String(ck)}`);
       }
       let sizeBad = 0;
       let classBad = 0;
@@ -115,7 +119,7 @@ run('star and artefact marks (GPU = CPU, L1)', async () => {
         const cs = Math.hypot(cv.projected[oc + 4] ?? 0, cv.projected[oc + 5] ?? 0);
         if (cs > 0 && Math.abs(gs - cs) / cs > 1e-3) sizeBad++;
       }
-      if (classBad) bad.push(`${String(classBad)} class differences`);
+      if (classBad > Math.max(4, 1e-3 * g.n)) bad.push(`${String(classBad)} class differences`);
       if (cam === 'behind the disc') {
         // the galaxy in front of the star takes marks from it: the CPU, grid on against grid off
         cpu.occlusion = false;

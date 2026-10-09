@@ -3,9 +3,9 @@
 // the viewer that fall in it (halo included), 0 for nothing. View-space z points TOWARDS THE
 // VIEWER (common/camera.wgsl), so a larger z is nearer and a larger key is nearer.
 
-const OCC_GRID: i32 = 128;
-// 128 / 800 rounded to f32
-const OCC_INV: f32 = 0.16;
+const OCC_GRID: i32 = 400;
+// 400 / 800 rounded to f32 (exact)
+const OCC_INV: f32 = 0.5;
 const OCC_PLATE: f32 = 800.0;
 const OCC_HALO: i32 = 1;
 const OCC_Z_RANGE: f32 = 64.0;

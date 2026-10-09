@@ -23,8 +23,8 @@ import { PLATE } from '../view/camera';
 const f = Math.fround;
 
 /** Cells along one side of the grid over the plate. */
-export const OCC_GRID = 128;
-/** Cells per plate unit, rounded to f32 (800 / 128 = 6.25 units a cell): the multiplier of `gridCell`. */
+export const OCC_GRID = 400;
+/** Cells per plate unit, rounded to f32 (800 / 400 = 2 units a cell, a mark's own size): the multiplier of `gridCell`. */
 export const OCC_INV = f(OCC_GRID / PLATE);
 /** A mark also stamps the cells this many cells away on each side (1: its 3 × 3 block). */
 export const OCC_HALO = 1;

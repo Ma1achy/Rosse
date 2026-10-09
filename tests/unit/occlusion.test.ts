@@ -90,9 +90,9 @@ describe('the grid helpers (src/model/occlusion.ts = common/occlusion.wgsl)', ()
     for (const [z, k] of keys) expect(quantZ(z), `quantZ(${String(z)})`).toBe(k);
     const cells: [number, number, number][] = [
       [0, 0, 0],
-      [403, 401, 64 * 128 + 64],
-      [10, 790, 126 * 128 + 1],
-      [799.99, 799.99, 127 * 128 + 127],
+      [403, 401, 200 * 400 + 201],
+      [10, 790, 395 * 400 + 5],
+      [799.99, 799.99, 399 * 400 + 399],
       [-0.5, 10, -1],
       [10, 800, -1],
       [Number.NaN, 10, -1],
@@ -106,7 +106,7 @@ describe('the grid helpers (src/model/occlusion.ts = common/occlusion.wgsl)', ()
     const b = new Uint32Array(OCC_CELLS);
     const marks: [number, number, number][] = [
       [100, 100, 5],
-      [104, 100, 9],
+      [101, 100, 9],
       [140, 100, 7],
       [0, 0, 3],
       [799, 799, 4],
