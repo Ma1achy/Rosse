@@ -31,6 +31,7 @@ import { Stream } from '../core/streams';
 import type { StructLayout } from '../marks/instance';
 import {
   PLATE,
+  UNIT_SCALE,
   ZOOM_MAX,
   rotationOf,
   sceneGalaxyPoint,
@@ -180,6 +181,8 @@ export function ownCtxPicks(
   overlay: boolean,
   starBright: number,
   key: number,
+  /** `cosmicAuto` (ADR 0078): fewer cosmic rays, spread over the whole plate */
+  spread = false,
 ): StarCtxPicks {
   const pool = corePool(meta);
   const at = (k: number) => new Draws(key, Stream.stars, descIndex(ctx, k));
@@ -228,10 +231,14 @@ export function ownCtxPicks(
     // 60)`, L433): 70 hits are certain, then a test stops with probability 1/60, 2/60 …
     const r = at(5);
     const hits: CosmicPick[] = [];
-    for (let c = 0; c < 70 + Math.floor(r.f32() * 60); c++) {
+    // ADR 0078: 40 to 70 hits, anywhere on the plate (v21: 70 to 130 in a box of 5.2 units round
+    // the star, so they read as part of it)
+    const nSpread = 40 + Math.floor(r.f32() * 31);
+    const reach = f(f(PLATE) / f(UNIT_SCALE));
+    for (let c = 0; spread ? c < nSpread : c < 70 + Math.floor(r.f32() * 60); c++) {
       const q = at(1000 + c);
-      const ux = f(f(q.f32() - f(0.5)) * f(5.2));
-      const uy = f(f(q.f32() - f(0.5)) * f(5.2));
+      const ux = f(f(q.f32() - f(0.5)) * (spread ? reach : f(5.2)));
+      const uy = f(f(q.f32() - f(0.5)) * (spread ? reach : f(5.2)));
       const ha = f(q.f32() * f(TAU));
       const u = q.f32();
       const hl = f(f(3) + f(f(u * u) * f(30)));
@@ -278,7 +285,17 @@ export function describeStars(
       artefact: art,
       picks:
         given?.subject ??
-        ownCtxPicks(V, meta, StarCtx.subject, subject, art, false, P.starBright, key),
+        ownCtxPicks(
+          V,
+          meta,
+          StarCtx.subject,
+          subject,
+          art,
+          false,
+          P.starBright,
+          key,
+          P.cosmicAuto > 0,
+        ),
     });
   }
   if (P.ovStar > 0.02) {
@@ -289,7 +306,8 @@ export function describeStars(
       subject: 'star',
       artefact: art,
       picks:
-        given?.ovStar ?? ownCtxPicks(V, meta, StarCtx.ovStar, 'star', art, true, P.ovStar, key),
+        given?.ovStar ??
+        ownCtxPicks(V, meta, StarCtx.ovStar, 'star', art, true, P.ovStar, key, P.cosmicAuto > 0),
       place: { x: P.ovStarD * Math.cos(a), y: P.ovStarD * Math.sin(a), depth: 1.4 },
     });
   }
@@ -298,7 +316,8 @@ export function describeStars(
     const ga =
       given?.ovGhostAngle ?? new Draws(key, Stream.stars, descIndex(StarCtx.ovArt, 7)).f32() * TAU;
     const picks =
-      given?.ovArt ?? ownCtxPicks(V, meta, StarCtx.ovArt, 'artefact', oa, true, 0.8, key);
+      given?.ovArt ??
+      ownCtxPicks(V, meta, StarCtx.ovArt, 'artefact', oa, true, 0.8, key, P.cosmicAuto > 0);
     ctxs.push({
       id: StarCtx.ovArt,
       overlay: true,

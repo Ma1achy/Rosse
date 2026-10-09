@@ -160,7 +160,7 @@ export const COMPONENTS: readonly Component[] = [
     icon: ['sstars', 'plus'],
     show: (P) => P.subject === 'star' || P.subject === 'artefact',
     main: ['starBright', 'spikes'],
-    more: ['starRings', 'bleed', 'artefact'],
+    more: ['starRings', 'bleed', 'artefact', 'cosmicAuto'],
     summary: (P) =>
       P.subject === 'artefact'
         ? optionLabel('artefact', P.artefact)
@@ -433,6 +433,7 @@ export const OPTION_LABELS: Partial<Record<ParamKey, Record<string, string>>> = 
   dustAuto: ONOFF,
   bulgeAuto: ONOFF,
   starsAuto: ONOFF,
+  cosmicAuto: ONOFF,
   jet: ONOFF,
   mWarp: ONOFF,
   lensCluster: ONOFF,

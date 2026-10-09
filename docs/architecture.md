@@ -62,6 +62,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0075](adr/0075-disc-galaxies-carry-a-natural-dust-layer.md) | _Proposed:_ on the page, disc galaxies carry a natural dust layer (`dustAuto`, `effectiveDust = max(dust, naturalDust)` by type and bulge, none for ellipticals) in v21's own smooth slab; off in the core (a deliberate divergence from v21, where `dust` is 0 unless set). |
 | [0076](adr/0076-bulges-follow-a-sersic-law.md) | _Proposed:_ on the page, a bulge's stars follow a deprojected Sérsic law whose index follows the galaxy (`bulgeAuto`, n 1 for a pseudo-bulge to 4 for a big round one) instead of v21's one Hernquist sphere (boxy-peanut when barred); same size, off in the core. |
 | [0077](adr/0077-drawn-stars-spread-smoothly.md) | _Proposed:_ on the page, the drawn stars' weight and brightness follow the arm profile smoothly and the outer fall-off is a taper (`starsAuto`) instead of v21's steps and cut; off in the core. |
+| [0078](adr/0078-cosmic-rays-are-sparse-and-everywhere.md) | _Proposed:_ on the page, cosmic rays are 40 to 70 streaks spread over the whole plate (`cosmicAuto`) instead of v21's 70 to 130 round the star; off in the core. |
 
 ## Modules
 
@@ -121,6 +122,7 @@ These are intended changes in behaviour, each confirmed or rejected by the owner
 7. **Disc galaxies carry a natural dust layer.** v21's `dust` is 0 unless a preset sets it; with `dustAuto` (on in the page, off in the core) every reader of the dust takes `max(dust, naturalDust)`: a spiral about 0.35 face-on optical depth, an elliptical none (ADR 0075).
 8. **Bulges follow a Sérsic law.** v21 draws every bulge as one flattened Hernquist sphere; with `bulgeAuto` (on in the page, off in the core) the stipple draws the radius from a deprojected Sérsic law, index by type and flatness, at the same half-mass radius (ADR 0076).
 9. **Drawn stars spread smoothly.** v21's star weights step at an arm profile of 0.55 and at R 2.1 and are cut at 2.7; with `starsAuto` (on in the page, off in the core) they are smooth in the arm profile and taper out to R 3 (ADR 0077).
+10. **Cosmic rays are sparse and everywhere.** v21 draws 70 to 130 hits in a box round the star; with `cosmicAuto` (on in the page, off in the core) they are 40 to 70 over the whole plate (ADR 0078).
 
 ## Performance budget
 

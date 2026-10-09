@@ -69,6 +69,7 @@ describe('the 42 real galaxies', () => {
         dustAuto: undefined,
         bulgeAuto: undefined,
         starsAuto: undefined,
+        cosmicAuto: undefined,
       };
       if (home) expect(rec.params, c.name).toEqual(want);
       else expect({ ...rec.params, az: 0, incl: 0 }, c.name).toEqual({ ...want, az: 0, incl: 0 });
