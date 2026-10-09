@@ -101,3 +101,25 @@ describe('the merger sky', () => {
     expect(sstars(P)).toBeGreaterThan(sstars({ ...P, ovStar: 0 }));
   });
 });
+
+describe('a star behind a merger (ADR 0086)', () => {
+  const P = { ...base, ovStar: 1, occlAuto: 1 } as typeof base;
+  it('is dimmed by the two discs: set up on every view, more behind than in front', () => {
+    const m = new CpuMerger(P, node.cpu.meta, node.referenceOptions(P, 1, NAME).merger);
+    m.view(1);
+    const occ = m.skyHost?.occluder;
+    expect(occ).toBeTruthy();
+    if (!occ) return;
+    const behind = occ(0, 0, -3);
+    const front = occ(0, 0, 3);
+    expect(behind).toBeGreaterThan(0.3);
+    expect(behind).toBeGreaterThan(front);
+  });
+
+  it("is not set without occlAuto, and the star then has v21's keep", () => {
+    const Q = { ...P, occlAuto: 0 } as typeof base;
+    const m = new CpuMerger(Q, node.cpu.meta, node.referenceOptions(Q, 1, NAME).merger);
+    m.view(1);
+    expect(m.skyHost?.occluder ?? null).toBeNull();
+  });
+});

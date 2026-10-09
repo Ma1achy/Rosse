@@ -152,7 +152,8 @@ const TAU = 2 * Math.PI;
  * brightness pick (0.06 to 0.26 maps to -0.8 to 0.8), so that a cluster is a constellation and
  * not a flat disc, with no new draw (the picks, and v21's replayed ones, stay as they are).
  */
-export const satelliteDepth = (s: StarPick): number => f(f(s.B - f(0.16)) * f(8));
+export const satelliteDepth = (s: StarPick, spread = 1): number =>
+  f(f(f(s.B - f(0.16)) * f(8)) * f(spread));
 
 /** Stream indices of the descriptors: above the marks' (bit 31), one range per context. */
 const descIndex = (ctx: number, k: number) => (0x80000000 | (ctx << 16) | k) >>> 0;
@@ -516,6 +517,12 @@ export function starJobs(
   home: Orientation,
   /** the galaxy's dust (`GalaxyDesc.dust`): 0 where there is no galaxy to dim the overlay star */
   dust = 0,
+  /**
+   * More optical depth for an overlay star placed at a scene point (x, y, depth): a merger's two
+   * discs, which the star's own phantom galaxy cannot give (ADR 0086). When given it replaces the
+   * galaxy's own dimming.
+   */
+  extraTau?: (sx: number, sy: number, depth: number) => number,
 ): { jobs: StarJob[]; nSlots: number } {
   const U = f(viewScale(cam.zoom));
   // the zoom-1 scale: an overlay's trail and cosmic rays are fixed to the camera, the screen, and
@@ -537,11 +544,12 @@ export function starJobs(
     // the dust in front of an overlay star: tau of its place in the galaxy's frame along the line of
     // sight (the galaxy marks' own dustTau), 1 for a star with nothing to dim it (ADR 0074)
     const occludes = P.occlAuto > 0;
-    const dims = (dust > 0 || occludes) && ctx.overlay && ctx.subject === 'star';
+    const dims = (dust > 0 || occludes || !!extraTau) && ctx.overlay && ctx.subject === 'star';
     const cosI = f(rotationOf(cam).ci);
     const toViewer = rotInv([0, 0, 1], rotationOf(cam));
     const keepAt = (sx: number, sy: number, depth: number) => {
       if (!dims) return 1;
+      if (extraTau) return f(Math.max(Math.exp(-extraTau(sx, sy, depth)), DISC_KEEP_FLOOR));
       const g = sceneGalaxyPoint(home, sx, sy, depth);
       const tau = dustTau(g[0], g[1], g[2], cosI, dust);
       if (!occludes) return f(Math.exp(-tau));
@@ -565,7 +573,9 @@ export function starJobs(
         // a satellite is a point in the scene beside its primary, at a depth near the primary's,
         // so the cluster is a constellation under orbit and zoom (ADR 0055)
         const o = ctx.place ?? { x: 0, y: 0, depth: 0 };
-        const depth = o.depth + satelliteDepth(s);
+        // with natural occlusion the cluster is spread twice as deep, and centred nearer the disc
+        // plane, so that some of its stars lie behind the disc and some in front (ADR 0086)
+        const depth = occludes ? o.depth * 0.4 + satelliteDepth(s, 2) : o.depth + satelliteDepth(s);
         const p = scenePoint(home, o.x + s.ux, o.y + s.uy, depth, cam);
         x = p[0];
         y = p[1];

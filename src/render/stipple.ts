@@ -123,6 +123,8 @@ interface ModelBuffers {
 
 export class GpuStipple {
   private model: ModelBuffers | null = null;
+  /** a merger's discs, for the overlay star's dimming (ADR 0086); set by the merger engine each view */
+  occluder: ((sx: number, sy: number, depth: number) => number) | null = null;
   /** the lens (M9), made when a lensed scene is first loaded; its sources are sampled by `scratch` */
   private lens: GpuLens | null = null;
   private scratch: GpuStipple | null = null;
@@ -528,7 +530,14 @@ export class GpuStipple {
     this.sky.setView(params, cam);
     // the marks of a star or an artefact for this view, after the samples (M7)
     const sj = this.scene.stars
-      ? starJobs(this.scene.stars, params, cam, this.scene.home, galaxy.g.dust)
+      ? starJobs(
+          this.scene.stars,
+          params,
+          cam,
+          this.scene.home,
+          galaxy.g.dust,
+          this.occluder ?? undefined,
+        )
       : null;
     const nStar = sj?.nSlots ?? 0;
     const nTot = m.n + nStar;

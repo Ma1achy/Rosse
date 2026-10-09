@@ -21,7 +21,18 @@ import { Draws } from '../core/rng';
 import { Stream } from '../core/streams';
 import { MVIEW_LAYOUT, KEEP } from '../fallback/kernels/merger-sprites';
 import { DRAWING_WORDS } from '../marks/vector';
-import { PLATE, UNIT_SCALE, cameraOf, rotationOf, viewDesc, type Camera } from '../view/camera';
+import {
+  PLATE,
+  UNIT_SCALE,
+  cameraOf,
+  rotInv,
+  rotationOf,
+  sceneGalaxyPoint,
+  viewDesc,
+  type Camera,
+  type Orientation,
+} from '../view/camera';
+import { discTau } from './stars';
 import {
   blendCores,
   describeMerger,
@@ -274,6 +285,42 @@ export function mergerFraming(
     };
   }) as [GalaxyFraming, GalaxyFraming];
   return { sel, frame, cores, sc, fcx, fcy, scale: sc * 0.3, galaxies };
+}
+
+/**
+ * The optical depth of a merger's two discs between an overlay star and the viewer (ADR 0086), for
+ * the sky host's star. The star's scene point is placed in the merger's frame by the framing's scale,
+ * and each disc is the plane through its core with its own spin normal, seen in its own units
+ * (a galaxy drawn at `rmax / 4.2` merger units per unit): `discTau` of each, summed.
+ */
+export function mergerOccluder(
+  scene: MergerScene,
+  fr: MergerFraming,
+  cam: Camera,
+  home: Orientation,
+): (sx: number, sy: number, depth: number) => number {
+  const toViewer = rotInv([0, 0, 1], rotationOf(cam));
+  const k = (UNIT_SCALE * cam.zoom) / fr.sc;
+  const c = fr.frame.c;
+  const dot = (a: readonly number[], b: readonly number[]) =>
+    (a[0] ?? 0) * (b[0] ?? 0) + (a[1] ?? 0) * (b[1] ?? 0) + (a[2] ?? 0) * (b[2] ?? 0);
+  return (sx, sy, depth) => {
+    const g0 = sceneGalaxyPoint(home, sx, sy, depth);
+    const w = [c[0] + k * g0[0], c[1] + k * g0[1], c[2] + k * g0[2]];
+    let tau = 0;
+    for (let g = 0; g < 2; g++) {
+      const G = scene.desc.gals[g];
+      const core = fr.cores[g as 0 | 1];
+      if (!G) continue;
+      const u = G.rmax / 4.2;
+      const rel = [(w[0] ?? 0) - core[0], (w[1] ?? 0) - core[1], (w[2] ?? 0) - core[2]];
+      tau += discTau(
+        [dot(rel, G.e1) / u, dot(rel, G.e2) / u, dot(rel, G.n) / u],
+        [dot(toViewer, G.e1), dot(toViewer, G.e2), dot(toViewer, G.n)],
+      );
+    }
+    return tau;
+  };
 }
 
 /** The values of the `MView` uniform of compute/merger-sprites.wgsl. */

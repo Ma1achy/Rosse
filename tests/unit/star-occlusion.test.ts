@@ -49,3 +49,12 @@ describe('the disc in front of a star', () => {
     expect(below).toBeGreaterThan(inside);
   });
 });
+
+describe('the satellites of a star', () => {
+  it('spread twice as deep with the natural occlusion, so some lie behind the disc', async () => {
+    const { satelliteDepth } = await import('../../src/model/stars');
+    const s = { B: 0.5 } as Parameters<typeof satelliteDepth>[0];
+    expect(satelliteDepth(s, 2)).toBeCloseTo(2 * satelliteDepth(s), 5);
+    expect(satelliteDepth({ B: 0.05 } as Parameters<typeof satelliteDepth>[0], 2)).toBeLessThan(0);
+  });
+});

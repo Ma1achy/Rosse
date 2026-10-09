@@ -35,6 +35,7 @@ import {
   type MergerFraming,
   type MergerScene,
   type MergerSceneOptions,
+  mergerOccluder,
 } from '../model/merger';
 import { cameraOf } from '../view/camera';
 import { markCounts, STIPPLE_LAYERS, type MarkCounts } from '../model/scene';
@@ -335,6 +336,13 @@ export class GpuMerger {
     });
     if (this.shellsOn) this.shells.view(zoom);
     this.lensHost?.setView(cameraOf(scene.P, zoom), scene.P.mTime);
+    if (this.skyHost && scene.skyHost && scene.P.occlAuto > 0)
+      this.skyHost.occluder = mergerOccluder(
+        scene,
+        fr,
+        cameraOf(scene.P, zoom),
+        scene.skyHost.home,
+      );
     this.skyHost?.setView(cameraOf(scene.P, zoom), scene.P.mTime);
     if (this.mwarpOn) {
       const MW = mwarpDesc(scene);

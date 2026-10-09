@@ -197,6 +197,8 @@ export class CpuStipple {
   readonly lines: RibbonModel;
   /** the lens (M9): its sources are galaxies of their own, sampled and projected like this one */
   readonly lens: CpuLens | null;
+  /** a merger's discs, for the overlay star's dimming (ADR 0086); set by the merger engine each view */
+  occluder: ((sx: number, sy: number, depth: number) => number) | null = null;
 
   constructor(
     readonly scene: GalaxyScene,
@@ -219,7 +221,14 @@ export class CpuStipple {
     const { P, galaxy, ribbons: R } = this.scene;
     // the marks of a star or an artefact follow the stipple's samples (M7)
     const sj = this.scene.stars
-      ? starJobs(this.scene.stars, P, cam, this.scene.home, galaxy.g.dust)
+      ? starJobs(
+          this.scene.stars,
+          P,
+          cam,
+          this.scene.home,
+          galaxy.g.dust,
+          this.occluder ?? undefined,
+        )
       : null;
     const nStar = sj?.nSlots ?? 0;
     const nTot = n + nStar;

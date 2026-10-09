@@ -19,6 +19,7 @@ import {
   type MergerFraming,
   type MergerScene,
   type MergerSceneOptions,
+  mergerOccluder,
 } from '../model/merger';
 import { STIPPLE_LAYERS, markCounts, type MarkCounts } from '../model/scene';
 import type { DrawingsMeta } from '../model/variation';
@@ -169,6 +170,13 @@ export class CpuMerger {
       tail.push(...LL.cores);
     }
     // the main parameters' own sky, trails, arrow and overlays: the background goes under all
+    if (this.skyHost && scene.skyHost && scene.P.occlAuto > 0)
+      this.skyHost.occluder = mergerOccluder(
+        scene,
+        fr,
+        cameraOf(scene.P, zoom),
+        scene.skyHost.home,
+      );
     const host = this.skyHost?.view(cameraOf(scene.P, zoom), scene.P.mTime);
     const hostBack = host?.layers.slice(0, host.nBack) ?? [];
     const hostFront = host?.layers.slice(host.nBack) ?? [];
