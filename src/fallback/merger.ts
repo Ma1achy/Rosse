@@ -157,14 +157,16 @@ export class CpuMerger {
       );
       mw.push(...vectorLayers(vo, MW.nDots, MW.nBlobs));
     }
+    // after the debris, as the GPU's (src/render/merger.ts inkLayers): the shells, then the lens
+    // over the merged scene
+    const tail: InkLayer[] = [];
     const sh = this.shells?.view(zoom);
-    if (sh) mw.push(...sh.layers);
-    // the lens, over the merged scene
+    if (sh) tail.push(...sh.layers);
     const lens = this.lensHost?.view(cameraOf(scene.P, zoom), scene.P.mTime).lens;
     if (lens) {
       const LL = lens.layers;
-      mw.push(...LL.line, ...LL.vectors, ...LL.pieces, ...LL.dots, ...LL.knots, ...LL.stars);
-      mw.push(...LL.cores);
+      tail.push(...LL.line, ...LL.vectors, ...LL.pieces, ...LL.dots, ...LL.knots, ...LL.stars);
+      tail.push(...LL.cores);
     }
     // the main parameters' own sky, trails, arrow and overlays: the background goes under all
     const host = this.skyHost?.view(cameraOf(scene.P, zoom), scene.P.mTime);
@@ -195,7 +197,14 @@ export class CpuMerger {
     ] as const)
       total[k] = sum(k);
     return {
-      layers: [...hostBack, ...views.flatMap((v) => v.layers), ...mw, ...debris, ...hostFront],
+      layers: [
+        ...hostBack,
+        ...views.flatMap((v) => v.layers),
+        ...mw,
+        ...debris,
+        ...tail,
+        ...hostFront,
+      ],
       counts: total,
       perClass,
       framing: fr,

@@ -14,6 +14,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Fixed
 
+- The CPU merger drew its shells and lens before the debris; the GPU merger, and v21's order, draw them after it. The CPU now matches (`src/fallback/merger.ts`), and `tests/gpu/merger-sky.ts` holds the two engines to one another for a merger's sky and overlays: the same layers in the same order, the sky's own layers within 1/255 on SwiftShader, and the whole picture's ink within 1%.
 - Lensing broke under orbit (an Einstein ring became arcs or one image): the lensed source is now fixed in the lens frame, not in 3D behind it. A deliberate divergence from v21's `srcNow`; the home pose is unchanged (ADR 0072, `tests/unit/lens-orbit.test.ts`).
 - The golden harness crashed on the real galaxies (`unknown preset "Real galaxy 0"`): a case's home is now `fromReal`'s parameters for `Real galaxy N` (`tests/unit/golden-real.test.ts`).
 - A camera move built new ink batches again on M7's scenes (`tests/gpu/reuse.ts` failed): the dynamic vector and deep-field sprite layers bind their capacity, not the view's live count (ADR 0070).
