@@ -34,6 +34,8 @@ export const CurveIndex = {
   tail: 5,
   /** the 3D dust lane's arcs (ADR 0081): arc k uses `laneRing + k` */
   laneRing: 300,
+  /** the natural arm's companion strokes (ADR 0082): arm k, stroke i uses `armFibre + 16k + i` */
+  armFibre: 400,
   /** arm k uses index `arms + k` */
   arms: 100,
   /** spur i uses index `spurs + i` */
@@ -83,6 +85,7 @@ export interface Curve {
   role:
     | 'arm'
     | 'arm-piece'
+    | 'arm-fibre'
     | 'spur'
     | 'ring'
     | 'bar'
@@ -135,6 +138,7 @@ export function curves(
   if (P.arms >= 1 && P.bulge < 0.95 && P.armStyle === 'ribbons' && !P.ringOnlyLines) {
     // v21 parity: the arm curves start at barLen (not max(0.2, barLen) as armPhase does)
     const r0 = P.bar > 0.05 ? P.barLen : 0.25;
+    const fibres: Curve[] = [];
     for (let k = 0; k < P.arms; k++) {
       const r = at(CurveIndex.arms + k);
       const pts: Vec3[] = [];
@@ -146,6 +150,7 @@ export function curves(
         const th = armPhaseCpu(P, V, R, k) + off;
         pts.push([R * Math.cos(th) + lx * R, R * Math.sin(th) + ly * R, 0]);
       }
+      if (P.strokesAuto > 0) fibres.push(...armFibres(P, pts, k, at, pick));
       if (P.flocc > 0.3) {
         // flocculent: the arm breaks where the noise is low; pieces of more than 6 points stay
         let seg: Vec3[] = [];
@@ -184,6 +189,7 @@ export function curves(
           role: 'arm',
         });
     }
+    C.push(...fibres);
     V.spurs.forEach((sp, i) => {
       const r = at(CurveIndex.spurs + i);
       const keep = r.f32() <= 0.6;
@@ -367,4 +373,68 @@ function laneRings(
     }
   }
   return out;
+}
+
+/**
+ * The natural arm's companion strokes (ADR 0082): the arm is drawn as a few overlapping strokes
+ * of different length, offset and width, not one line. Thick where the arm joins the bar or bulge
+ * and thin toward its tip; each arm has its own thickness, so some are fine and some are broad.
+ */
+function armFibres(
+  P: Params,
+  pts: Vec3[],
+  k: number,
+  at: (i: number) => Draws,
+  pick: (kind: string, r: Draws) => number,
+): Curve[] {
+  const out: Curve[] = [];
+  const n = pts.length - 1;
+  const rr = at(CurveIndex.armFibre + 16 * k);
+  const body = 0.6 + 0.9 * rr.f32();
+  const count = 2 + Math.round(2 * clamp(P.lines, 0, 1)) + Math.floor(2 * rr.f32());
+  const slice = (a: number, b: number, off: number, z: number): Vec3[] => {
+    const q: Vec3[] = [];
+    for (let j = Math.floor(a * n); j <= Math.ceil(b * n); j++) {
+      const p = pts[clamp(j, 0, n)];
+      const p0 = pts[clamp(j - 1, 0, n)];
+      const p1 = pts[clamp(j + 1, 0, n)];
+      if (!p || !p0 || !p1) continue;
+      const tx = p1[0] - p0[0];
+      const ty = p1[1] - p0[1];
+      const l = Math.hypot(tx, ty) || 1;
+      const R = Math.hypot(p[0], p[1]);
+      q.push([p[0] - (ty / l) * off * R, p[1] + (tx / l) * off * R, z]);
+    }
+    return q;
+  };
+  // the root, where the arm leaves the bar or the bulge: one broad stroke over its first third
+  out.push({
+    pts: slice(0, 0.34, 0, 0),
+    w: 2.1 * body,
+    k: pick(P.stroke, rr),
+    a: 0.85,
+    taper: true,
+    stretch: false,
+    edgeAlpha: false,
+    role: 'arm-fibre',
+  });
+  for (let i = 1; i <= count; i++) {
+    const r = at(CurveIndex.armFibre + 16 * k + i);
+    const len = 0.22 + 0.4 * r.f32();
+    const a = (1 - len) * r.f32() * 0.85;
+    const mid = a + len / 2;
+    const off = (r.f32() * 2 - 1) * (0.02 + 0.05 * (1 - mid));
+    const z = (r.f32() * 2 - 1) * 0.02;
+    out.push({
+      pts: slice(a, a + len, off, z),
+      w: body * (0.45 + 1.5 * (1 - mid) ** 1.5),
+      k: pick(P.stroke, r),
+      a: 0.8,
+      taper: true,
+      stretch: false,
+      edgeAlpha: false,
+      role: 'arm-fibre',
+    });
+  }
+  return out.filter((c) => c.pts.length > 3);
 }

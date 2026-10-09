@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- Natural arm strokes (ADR 0082, proposed): a new parameter `strokesAuto` ("Natural arm strokes", 0 in the core, 1 on the page) draws each ribbon arm with a broad root stroke and a few offset companion strokes that thin toward the tip, each arm with its own thickness.
 - Line-work in 3D (ADR 0081, proposed): a new parameter `lineWorld` ("Line-work in 3D", 0 in the core, off on the page for now) fixes the structure the curves are described at and draws dust lanes as ring arcs in the disc plane, so tilting the camera pops nothing. Experimental.
 
 ### Changed
