@@ -16,6 +16,7 @@ A model-tier parameter `thinAuto` ("Thin disc", 0 in the core), carried as the g
 
 - The disc's height comes from the same single draw, split: 85% fall in a sharp layer (scale 0.4 `thick`), 15% in a thicker one (scale 1.5 `thick`), each stopped at -ln 0.03 scale lengths and flaring 15% of the radius outward. The plane is dense, the fall-off sharp, and a few marks still wander well off it.
 - The bulge's Sérsic tail is cut at 8 scale lengths instead of 20.
+- The arms weigh 1.25 times more in picking disc samples (at most 0.95) and the disc draws half as many stars again (`proposalCount`), so the structure carries more of the picture.
 
 Both kernels apply it (compute/stipple.wgsl, fallback/kernels/stipple.ts); the draw count is unchanged, so no other sample moves.
 

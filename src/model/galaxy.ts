@@ -208,7 +208,9 @@ export function sampleCount(G: GalaxyDesc): number {
 
 /** Number of stipple proposals: `round(stars · stipple · (1 + 0.28 · starMix))` (app23.js:L176). */
 export function proposalCount(P: Params): number {
-  return Math.round(P.stars * P.stipple * (1 + 0.28 * (P.starMix || 0)));
+  const n = Math.round(P.stars * P.stipple * (1 + 0.28 * (P.starMix || 0)));
+  // a thin disc draws half as many stars again: they are denser in the plane (ADR 0083)
+  return P.thinAuto > 0 ? Math.round(n * 1.5) : n;
 }
 
 /**

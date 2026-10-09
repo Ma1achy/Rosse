@@ -431,7 +431,11 @@ fn sample(i: u32) {
     var th2 = 0.0;
     let patchy = galaxy.patchy;
     let arms_on = (flags & FLAG_ARMS_ON) != 0u;
-    let as_ = galaxy.arm_strength;
+    // a thin disc packs more of its stars into the arms (ADR 0083)
+    var as_ = galaxy.arm_strength;
+    if ((flags & FLAG_THIN_DISC) != 0u) {
+      as_ = min(as_ * 1.25, 0.95);
+    }
     var tries = 0;
     loop {
       if (tries >= 30) {

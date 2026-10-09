@@ -12,7 +12,7 @@ Each spiral arm is one pen line of one width. The owner asked for more brush and
 
 ## Decision
 
-A model-tier parameter `strokesAuto` ("Natural arm strokes", 0 in the core). With it on, each ribbon arm also gets companion strokes (`armFibres`, role `arm-fibre`, src/model/curves.ts): one broad root stroke over the first third of the arm, and 2 to 6 strokes of 22 to 62% of its length, offset sideways by a few percent of the radius, with a small z jitter, and a width that falls from the root to the tip. Each arm has its own body width (0.6 to 1.5), so some are fine and some broad. The draws are counter-indexed (`CurveIndex.armFibre`), so adding strokes moves no other draw. They are ordinary ribbons: no kernel changes, CPU and GPU alike.
+A model-tier parameter `strokesAuto` ("Natural arm strokes", 0 in the core). With it on, each ribbon arm also gets companion strokes (`armFibres`, role `arm-fibre`, src/model/curves.ts): one broad root stroke over the first third of the arm, and 2 to 6 strokes of 22 to 62% of its length, offset sideways by a few percent of the radius, with a height out of the plane and a slope along the stroke (up to 0.05 and 0.12 near the root, less toward the tip), so seen edge-on the arm has thickness, and a width that falls from the root to the tip. Each arm has its own body width (0.6 to 1.5), so some are fine and some broad. The draws are counter-indexed (`CurveIndex.armFibre`), so adding strokes moves no other draw. They are ordinary ribbons: no kernel changes, CPU and GPU alike.
 
 ## Consequences
 

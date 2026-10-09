@@ -392,7 +392,7 @@ function armFibres(
   const rr = at(CurveIndex.armFibre + 16 * k);
   const body = 0.6 + 0.9 * rr.f32();
   const count = 2 + Math.round(2 * clamp(P.lines, 0, 1)) + Math.floor(2 * rr.f32());
-  const slice = (a: number, b: number, off: number, z: number): Vec3[] => {
+  const slice = (a: number, b: number, off: number, z: number, dz = 0): Vec3[] => {
     const q: Vec3[] = [];
     for (let j = Math.floor(a * n); j <= Math.ceil(b * n); j++) {
       const p = pts[clamp(j, 0, n)];
@@ -403,7 +403,7 @@ function armFibres(
       const ty = p1[1] - p0[1];
       const l = Math.hypot(tx, ty) || 1;
       const R = Math.hypot(p[0], p[1]);
-      q.push([p[0] - (ty / l) * off * R, p[1] + (tx / l) * off * R, z]);
+      q.push([p[0] - (ty / l) * off * R, p[1] + (tx / l) * off * R, z + dz * (j / n - a)]);
     }
     return q;
   };
@@ -424,9 +424,11 @@ function armFibres(
     const a = (1 - len) * r.f32() * 0.85;
     const mid = a + len / 2;
     const off = (r.f32() * 2 - 1) * (0.02 + 0.05 * (1 - mid));
-    const z = (r.f32() * 2 - 1) * 0.02;
+    // out of the plane: a height and a slope along the stroke, so edge-on the arm has thickness
+    const z = (r.f32() * 2 - 1) * 0.05 * (1 - mid);
+    const dz = (r.f32() * 2 - 1) * 0.12 * (1 - 0.6 * mid);
     out.push({
-      pts: slice(a, a + len, off, z),
+      pts: slice(a, a + len, off, z, dz),
       w: body * (0.45 + 1.5 * (1 - mid) ** 1.5),
       k: pick(P.stroke, r),
       a: 0.8,

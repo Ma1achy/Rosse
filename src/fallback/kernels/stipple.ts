@@ -403,7 +403,8 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
     let th2 = 0;
     const patchy = g.patchy;
     const armsOn = (flags & GalaxyFlag.armsOn) !== 0;
-    const as = g.arm_strength;
+    const as =
+      flags & GalaxyFlag.thinDisc ? Math.min(f(g.arm_strength * f(1.25)), f(0.95)) : g.arm_strength;
     for (let tries = 0; tries < 30;) {
       const u1 = r.next();
       const u2 = r.next();
