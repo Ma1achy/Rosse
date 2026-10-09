@@ -212,6 +212,7 @@ export const SCHEMA: { readonly [K in ParamKey]: ParamSpec } = {
   shellStars: num('Stars', 1000, 12000, 250),
   dustAuto: choice('Natural dust', ONOFF),
   bulgeAuto: choice('Natural bulge', ONOFF),
+  starsAuto: choice('Natural star spread', ONOFF),
 };
 
 /** The tier a parameter belongs to. */

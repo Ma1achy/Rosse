@@ -187,6 +187,14 @@ describe('tier invalidation (ADR 0010)', () => {
     expect(tierWork({ P, zoom: 1 }, { P: { ...P, dustAuto: 1 }, zoom: 1 }).model).toBe(true);
   });
 
+  it('the natural star spread is model data: orbit and zoom leave it alone, switching it rebuilds (ADR 0077)', () => {
+    const P = presetParams('Grand design', 7, { starsAuto: 1, starMix: 1 });
+    const h0 = sceneHash(P);
+    for (const m of moves(P)) expect(sceneHash(m.P), m.what).toBe(h0);
+    expect(sceneHash({ ...P, starsAuto: 0 })).not.toBe(h0);
+    expect(tierWork({ P, zoom: 1 }, { P: { ...P, starsAuto: 0 }, zoom: 1 }).model).toBe(true);
+  });
+
   it('the natural bulge is model data: orbit and zoom leave it alone, switching it rebuilds (ADR 0076)', () => {
     const P = presetParams('Grand design', 7, { bulgeAuto: 1 });
     const h0 = sceneHash(P);

@@ -375,6 +375,7 @@ export const COMPONENTS: readonly Component[] = [
     name: 'Stars and dust',
     icon: ['sstars', 'asterisk'],
     main: ['starMix', 'dustScribble'],
+    more: ['starsAuto'],
     summary: (P) => `drawn stars ${pct(P.starMix)}, hatching ${pct(P.dustScribble)}`,
   },
   {
@@ -431,6 +432,7 @@ export const OPTION_LABELS: Partial<Record<ParamKey, Record<string, string>>> = 
   rewind: ONOFF,
   dustAuto: ONOFF,
   bulgeAuto: ONOFF,
+  starsAuto: ONOFF,
   jet: ONOFF,
   mWarp: ONOFF,
   lensCluster: ONOFF,

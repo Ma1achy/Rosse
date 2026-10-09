@@ -58,6 +58,11 @@ const CASES: [string, Params][] = [
     `${n} s7, natural bulge`,
     presetParams(n, 7, { bulgeAuto: 1, dustAuto: 1 }),
   ]),
+  // the natural star spread (ADR 0077): the smooth arm weight and the outer taper, drawn stars on
+  ...['Grand design', 'Ringed', 'Flocculent'].map((n): [string, Params] => [
+    `${n} s7, natural star spread`,
+    presetParams(n, 7, { starsAuto: 1, starMix: 1 }),
+  ]),
   [
     'every branch: patchy, irregular, flocculent, dusty, ringed, barred',
     presetParams('Grand design', 99, {

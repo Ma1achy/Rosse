@@ -160,6 +160,7 @@ export function withoutGalaxy(P: Params): Params {
     dust: 0,
     dustAuto: 0,
     bulgeAuto: 0,
+    starsAuto: 0,
     dustLines: 0,
     dustScribble: 0,
     outline: 0,

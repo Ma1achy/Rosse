@@ -140,8 +140,13 @@ describe('the peanut of a barred bulge', () => {
         if (!s.u32[i * 8 + 3]) continue;
         const x = Math.abs(s.f32[i * 8] ?? 0);
         const z = Math.abs(s.f32[i * 8 + 2] ?? 0);
-        if (x < 0.08) ((zc += z), nc++);
-        else if (x > 0.2 && x < 0.3) ((zo += z), no++);
+        if (x < 0.08) {
+          zc += z;
+          nc++;
+        } else if (x > 0.2 && x < 0.3) {
+          zo += z;
+          no++;
+        }
         xmax = Math.max(xmax, x);
       }
       return { ratio: zo / no / (zc / nc), xmax };

@@ -162,6 +162,12 @@ export function armProfile(G: GalaxyDesc, R: number, th: number): number {
   return fv;
 }
 
+/** smoothstep as the polynomial on f32 steps, the twin of `ss` in stipple.wgsl */
+function ss(e0: number, e1: number, x: number): number {
+  const t = Math.min(1, Math.max(0, f(f(x - e0) / f(e1 - e0))));
+  return f(f(t * t) * f(3 - f(2 * t)));
+}
+
 /**
  * Marsaglia and Tsang's gamma sampler (`gammaS`, app23.js:L76), bounded at 64 tries (the
  * acceptance rate is above 95%, so the bound is never reached in practice; if it were, the mode
@@ -199,6 +205,7 @@ export function drawStar(
   G: GalaxyDesc,
   young: boolean,
   forced: boolean,
+  pBright: number = young ? f(0.18) : f(0.05),
 ): { tile: number; size: number; rot: number; bright: boolean } {
   const g = G.g;
   const ns = g.n_ss_small;
@@ -206,7 +213,7 @@ export function drawStar(
   // without an `sstars` sheet the star is classified (and counted) but has nothing to draw
   if (ns === 0) return { tile: 0, size: 0, rot: 0, bright: false };
   let br = forced;
-  if (!br) br = r.next() < (young ? f(0.18) : f(0.05));
+  if (!br) br = r.next() < pBright;
   const off = KNOT_POOL + g.n_dot_pool;
   let tile: number;
   let asterisk = false;
@@ -473,9 +480,24 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
   const starMix = g.star_mix;
   if (starMix > f(0.01) && comp !== 1) {
     const Rg = sqrt(f(f(px * px) + f(py * py)));
-    const kc = comp === 0 ? f(0.4) : comp === 3 ? f(1.6) : arm > f(0.55) ? f(1.35) : f(0.85);
-    if (Rg < f(2.7) && r.next() < f(f(f(f(0.34) * starMix) * kc) * (Rg > f(2.1) ? f(0.55) : 1))) {
-      const st = drawStar(r, G, comp === 3 || (comp === 4 && arm > f(0.55)), false);
+    let kc = comp === 0 ? f(0.4) : comp === 3 ? f(1.6) : arm > f(0.55) ? f(1.35) : f(0.85);
+    // ADR 0077: the arms' share of the stars, and of the bright ones, rises smoothly with the arm
+    // profile, and the outer fall-off is a taper rather than two steps
+    const smooth = (flags & GalaxyFlag.starsSmooth) !== 0;
+    let outer = Rg > f(2.1) ? f(0.55) : 1;
+    let yw = 0;
+    if (smooth) {
+      if (comp === 3) yw = 1;
+      else if (comp === 4) {
+        yw = ss(f(0.3), f(0.8), arm);
+        kc = f(f(0.85) + f(f(0.5) * yw));
+      }
+      outer = f(f(1 - f(f(0.45) * ss(f(1.7), f(2.5), Rg))) * f(1 - ss(f(2.5), f(3), Rg)));
+    }
+    if ((smooth || Rg < f(2.7)) && r.next() < f(f(f(f(0.34) * starMix) * kc) * outer)) {
+      const st = smooth
+        ? drawStar(r, G, false, false, f(f(0.05) + f(f(0.13) * yw)))
+        : drawStar(r, G, comp === 3 || (comp === 4 && arm > f(0.55)), false);
       put(
         px,
         py,

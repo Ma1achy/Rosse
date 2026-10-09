@@ -91,6 +91,7 @@ const FLAG_ARMS_ON: u32 = 1u;
 const FLAG_SERSIC: u32 = 2u;
 const FLAG_BULGE_SERSIC: u32 = 4u;
 const FLAG_BULGE_PEANUT: u32 = 8u;
+const FLAG_STARS_SMOOTH: u32 = 16u;
 
 // noise salts (NoiseSalt in src/core/noise.ts)
 const SALT_FLOCC: u32 = 1u;
@@ -243,6 +244,21 @@ struct Star {
 }
 
 fn draw_star(young: bool, forced: bool) -> Star {
+  var p = 0.05;
+  if (young) {
+    p = 0.18;
+  }
+  return draw_star_p(p, forced);
+}
+
+// smoothstep as the polynomial, so the CPU twin computes the same f32 steps
+fn ss(e0: f32, e1: f32, x: f32) -> f32 {
+  let t = clamp((x - e0) / (e1 - e0), 0.0, 1.0);
+  return (t * t) * (3.0 - 2.0 * t);
+}
+
+// a star whose chance of being a bright one is `p` (0.05 old, 0.18 young: v21's two values)
+fn draw_star_p(p_bright: f32, forced: bool) -> Star {
   let ns = galaxy.n_ss_small;
   let nb = galaxy.n_ss_bright;
   if (ns == 0u) {
@@ -250,11 +266,7 @@ fn draw_star(young: bool, forced: bool) -> Star {
   }
   var br = forced;
   if (!br) {
-    var p = 0.05;
-    if (young) {
-      p = 0.18;
-    }
-    br = next() < p;
+    br = next() < p_bright;
   }
   let off = KNOT_POOL + galaxy.n_dot_pool;
   var tile = 0u;
@@ -514,7 +526,22 @@ fn sample(i: u32) {
     if (Rg > 2.1) {
       outer = 0.55;
     }
-    if (Rg < 2.7) {
+    if ((flags & FLAG_STARS_SMOOTH) != 0u) {
+      // ADR 0077: the arms' share of the stars, and of the bright ones, rises smoothly with the
+      // arm profile, and the outer fall-off is a taper rather than two steps
+      var yw = 0.0;
+      if (comp == 3u) {
+        yw = 1.0;
+      } else if (comp == 4u) {
+        yw = ss(0.3, 0.8, arm);
+        kc = 0.85 + 0.5 * yw;
+      }
+      outer = (1.0 - 0.45 * ss(1.7, 2.5, Rg)) * (1.0 - ss(2.5, 3.0, Rg));
+      if (next() < ((0.34 * star_mix) * kc) * outer) {
+        put_star(i, p, flags_out, u_tau, draw_star_p(0.05 + 0.13 * yw, false));
+        return;
+      }
+    } else if (Rg < 2.7) {
       if (next() < ((0.34 * star_mix) * kc) * outer) {
         put_star(i, p, flags_out, u_tau, draw_star(comp == 3u || (comp == 4u && arm > 0.55), false));
         return;
