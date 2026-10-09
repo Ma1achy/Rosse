@@ -65,6 +65,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0078](adr/0078-cosmic-rays-are-sparse-and-everywhere.md) | _Proposed:_ on the page, cosmic rays are 40 to 70 streaks spread over the whole plate (`cosmicAuto`) instead of v21's 70 to 130 round the star; off in the core. |
 | [0079](adr/0079-the-core-is-one-opaque-drawing.md) | _Proposed:_ the drawn core is one opaque drawing, its style from the galaxy and never the camera, kept edge-on (supersedes 0073's cross-fade); a merger's sky host has no core. |
 | [0080](adr/0080-the-dust-lane-dims-it-does-not-empty.md) | _Proposed:_ with `dustAuto`, the dust cull keeps at least half the stars (`tau_floor`), so an edge-on lane dims and the strokes thicken the disc. |
+| [0081](adr/0081-line-work-in-three-dimensions.md) | _Proposed:_ `lineWorld` (off by default) describes line-work at a fixed inclination and draws dust lanes as ring arcs in the disc plane, so tilt pops nothing. |
 
 ## Modules
 

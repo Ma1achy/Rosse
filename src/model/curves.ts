@@ -22,6 +22,7 @@ import type { Variation } from './variation';
 export type Vec3 = [number, number, number];
 
 const DEG = Math.PI / 180;
+const TAU = 2 * Math.PI;
 const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
 
 /** Indices on the `curves` stream, one per curve. Fixed forever (ADR 0004). */
@@ -31,6 +32,8 @@ export const CurveIndex = {
   edgeOn: 3,
   outline: 4,
   tail: 5,
+  /** the 3D dust lane's arcs (ADR 0081): arc k uses `laneRing + k` */
+  laneRing: 300,
   /** arm k uses index `arms + k` */
   arms: 100,
   /** spur i uses index `spurs + i` */
@@ -77,7 +80,17 @@ export interface Curve {
    */
   screen?: boolean;
   /** what it is (tests, statistics) */
-  role: 'arm' | 'arm-piece' | 'spur' | 'ring' | 'bar' | 'edge-on' | 'outline' | 'tail' | 'shell';
+  role:
+    | 'arm'
+    | 'arm-piece'
+    | 'spur'
+    | 'ring'
+    | 'bar'
+    | 'edge-on'
+    | 'lane-ring'
+    | 'outline'
+    | 'tail'
+    | 'shell';
 }
 
 /**
@@ -227,6 +240,7 @@ export function curves(
       edgeAlpha: false,
       role: 'bar',
     });
+  if (P.lineWorld > 0 && P.kind !== 'merger' && P.bulge < 0.95) C.push(...laneRings(P, at, pick));
   if (incE(incl) > 80 && P.kind !== 'merger' && P.bulge < 0.95)
     C.push({
       pts: [
@@ -306,4 +320,51 @@ export function curves(
  */
 export function edgeOnAlpha(lines: number, incl: number): number {
   return lines * clamp((incE(incl) - 72) / 18, 0, 1);
+}
+
+/**
+ * The dust lane in 3D (ADR 0081): a few broken arcs of rings in the disc plane, tapered like a
+ * pen stroke, laid inside the arms. They are ordinary curves in the galaxy frame, so the camera
+ * simply looks at them: edge-on they flatten into the dark midplane band, at 80° they are the
+ * crescent that crosses the bulge, face-on they are faint rings in the disc. No inclination
+ * switch, no screen-space line. Only a dusty disc has them.
+ */
+function laneRings(
+  P: Params,
+  at: (i: number) => Draws,
+  pick: (kind: string, r: Draws) => number,
+): Curve[] {
+  const dust = effectiveDust(P);
+  if (!(dust > 0.15)) return [];
+  const out: Curve[] = [];
+  const rings = dust > 0.5 ? 3 : 2;
+  for (let i = 0; i < rings; i++) {
+    const r0 = at(CurveIndex.laneRing + 10 * i);
+    const R = 0.45 + 0.42 * i + 0.12 * r0.f32();
+    const arcs = 2 + (r0.f32() < 0.5 ? 1 : 0);
+    const a0 = r0.f32() * TAU;
+    for (let a = 0; a < arcs; a++) {
+      const r = at(CurveIndex.laneRing + 10 * i + 1 + a);
+      const span = 1.1 + 1.2 * r.f32();
+      const t0 = a0 + (a * TAU) / arcs + 0.3 * r.f32();
+      const ph = r.f32() * TAU;
+      const pts: Vec3[] = [];
+      for (let j = 0; j <= 36; j++) {
+        const t = t0 + (span * j) / 36;
+        const Rr = R * (1 + 0.04 * Math.sin(3 * t + ph));
+        pts.push([Rr * Math.cos(t), Rr * Math.sin(t), 0.012 * Math.sin(2 * t + ph)]);
+      }
+      out.push({
+        pts,
+        w: 0.55,
+        k: pick(dust > 0.3 ? 'faint' : P.stroke, r),
+        a: 1,
+        taper: true,
+        stretch: false,
+        edgeAlpha: false,
+        role: 'lane-ring',
+      });
+    }
+  }
+  return out;
 }

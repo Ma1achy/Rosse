@@ -437,7 +437,8 @@ export function inclBucket(incl: number): number {
 // Inclination and structure: the model tier's key (ADR 0010, ADR 0017)
 
 /** What a structure predicate reads besides the inclination. */
-export type StructureParams = Pick<Params, 'incl' | 'kind' | 'bulge' | 'bulgeFlat'>;
+export type StructureParams = Pick<Params, 'incl' | 'kind' | 'bulge' | 'bulgeFlat'> &
+  Partial<Pick<Params, 'lineWorld'>>;
 
 /**
  * A discrete switch of structure on the inclination that does not go through `incE()`. v21 has
@@ -470,12 +471,25 @@ export const CI_PREDICATES: readonly InclPredicate[] = [
 ];
 
 /**
+ * The inclination the model's structure is built for: the camera's, or, with `lineWorld`, the
+ * face-on one: every buckets-by-inclination switch of v21 is then off, and the line-work is real
+ * geometry in the disc's frame that the camera looks at (ADR 0081).
+ */
+export function structuralIncl(
+  P: Pick<Params, 'incl'> & Partial<Pick<Params, 'lineWorld'>>,
+): number {
+  return (P.lineWorld ?? 0) > 0 ? 0 : P.incl;
+}
+
+/**
  * The structure signature of an inclination for these parameters: the answer of every discrete
  * inclination switch in v21 (`INCE_USES` and `CI_PREDICATES`). The model tier is rebuilt when it
  * changes (`dirtyTier`). Everything else the inclination does is continuous and belongs to the
  * view tier (`INCL_CONTINUOUS`).
  */
 export function structureKey(P: StructureParams): string {
+  // line-work in 3D (ADR 0081): the structure does not depend on the camera at all
+  if ((P.lineWorld ?? 0) > 0) return 'world';
   const e = incE(P.incl);
   const bits: string[] = INCE_USES.map((u) => (u.test(e) ? '1' : '0'));
   for (const c of CI_PREDICATES) {

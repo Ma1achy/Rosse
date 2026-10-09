@@ -22,7 +22,7 @@ import { describeGalaxy, rstarBound, type GalaxyDesc } from './galaxy';
 import { sheetStrides, type DynSpec } from './dynvec';
 import { describeStars, starSlotCapacity, type StarPicks, type StarsDesc } from './stars';
 import { describeSky, type SkyCatalogue, type SkyDesc } from './sky';
-import { cameraOf, orientationOf, type Orientation } from '../view/camera';
+import { cameraOf, orientationOf, structuralIncl, type Orientation } from '../view/camera';
 import { describeRibbons, type RibbonDesc } from './ribbons';
 import { describeLens, type LensOptions, type LensScene } from '../sim/lens';
 import { makeVariation, type DrawingsMeta, type Variation } from './variation';
@@ -196,7 +196,7 @@ export function buildScene(P0: Params, meta: DrawingsMeta, opts: SceneOptions = 
     variation,
     meta.strokes,
     meta.penlines,
-    P.incl,
+    structuralIncl(P),
     opts.curvePicks,
     galaxy.noise,
     key,
@@ -208,7 +208,7 @@ export function buildScene(P0: Params, meta: DrawingsMeta, opts: SceneOptions = 
     Pg,
     variation,
     meta,
-    P.incl,
+    structuralIncl(P),
     opts.partPicks,
     sky?.catalogue.companions,
     opts.tide,

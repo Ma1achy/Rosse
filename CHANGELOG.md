@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- Line-work in 3D (ADR 0081, proposed): a new parameter `lineWorld` ("Line-work in 3D", 0 in the core, off on the page for now) fixes the structure the curves are described at and draws dust lanes as ring arcs in the disc plane, so tilting the camera pops nothing. Experimental.
+
 ### Changed
 
 - The drawn core is one opaque drawing (ADR 0079, proposed): alpha 1 (v21: 0.9, and ADR 0073's cross-fade left it half transparent), its style picked from the galaxy (dotted for a stipple-only one, line otherwise) and never swapped by the camera, and it stays edge-on, flattened by `bulgeFlat` (v21 dropped it from incE 80). No core fades or flicks between types under orbit.
