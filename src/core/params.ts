@@ -127,13 +127,14 @@ export const DEF = {
   thinAuto: 0,
   depthAuto: 0,
   lensLock: 0,
+  occlAuto: 0,
 } as const;
 
 type Widen<T> = T extends number ? number : T extends string ? string : T;
 
 /**
  * A full parameter set. Keys are the reference's `DEF`, and the keys the port adds after them
- * (`dustAuto`, ADR 0075; `bulgeAuto`, ADR 0076; `starsAuto`, ADR 0077; `cosmicAuto`, ADR 0078; `lineWorld`, ADR 0081; `strokesAuto`, ADR 0082; `thinAuto`, ADR 0083; `depthAuto`, ADR 0084; `lensLock`, ADR 0072), whose defaults leave v21's behaviour as it is.
+ * (`dustAuto`, ADR 0075; `bulgeAuto`, ADR 0076; `starsAuto`, ADR 0077; `cosmicAuto`, ADR 0078; `lineWorld`, ADR 0081; `strokesAuto`, ADR 0082; `thinAuto`, ADR 0083; `depthAuto`, ADR 0084; `lensLock`, ADR 0072; `occlAuto`, ADR 0086), whose defaults leave v21's behaviour as it is.
  */
 export type Params = { -readonly [K in keyof typeof DEF]: Widen<(typeof DEF)[K]> };
 

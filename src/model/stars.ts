@@ -33,6 +33,7 @@ import {
   PLATE,
   UNIT_SCALE,
   ZOOM_MAX,
+  rotInv,
   rotationOf,
   sceneGalaxyPoint,
   scenePoint,
@@ -420,6 +421,31 @@ const round = (x: number) => Math.floor(x + 0.5);
 
 /** A job before its slots and stream index are assigned. */
 type JobIn = Omit<StarJob, 'first' | 'index' | 'n'>;
+/**
+ * The optical depth of the disc itself between a star and the viewer (ADR 0086). `g` is the star's
+ * place in the galaxy's frame and `d` the direction to the viewer in that frame. The disc is a thin
+ * sheet of surface density `exp(-R / 1.6)`: a star behind its plane looks through the sheet where
+ * the line of sight crosses it, `DISC_TAU` times the density there, over the cosine of the angle to
+ * the plane's normal (a shallow line of sight crosses more of the sheet), so the star dims strongly
+ * through the bright inner disc and not at all in front of it or far outside it.
+ */
+export const DISC_TAU = 4;
+export function discTau(g: readonly number[], d: readonly number[]): number {
+  const c = d[2] ?? 0;
+  const gz = g[2] ?? 0;
+  const s = -gz * Math.sign(c || 1);
+  const t = Math.abs(c) > 1e-3 ? Math.min(Math.max(-gz / c, 0), 6) : 0;
+  if (Math.abs(c) <= 1e-3 && Math.abs(gz) > 0.12) return 0;
+  const R = Math.hypot((g[0] ?? 0) + t * (d[0] ?? 0), (g[1] ?? 0) + t * (d[1] ?? 0));
+  if (R > 3.2) return 0;
+  const u = Math.min(Math.max((s + 0.1) / 0.2, 0), 1);
+  const front = u * u * (3 - 2 * u);
+  return Math.min(7, ((DISC_TAU * Math.exp(-R / 1.6)) / Math.max(Math.abs(c), 0.12)) * front);
+}
+
+/** The least a star behind a disc keeps: faint, never wiped out (ADR 0086). */
+export const DISC_KEEP_FLOOR = 0.04;
+
 /** A job of a star: `starJobsOf` gives it the star's keep. */
 type JobOf = Omit<JobIn, 'keep'>;
 
@@ -510,12 +536,17 @@ export function starJobs(
       : null;
     // the dust in front of an overlay star: tau of its place in the galaxy's frame along the line of
     // sight (the galaxy marks' own dustTau), 1 for a star with nothing to dim it (ADR 0074)
-    const dims = dust > 0 && ctx.overlay && ctx.subject === 'star';
+    const occludes = P.occlAuto > 0;
+    const dims = (dust > 0 || occludes) && ctx.overlay && ctx.subject === 'star';
     const cosI = f(rotationOf(cam).ci);
+    const toViewer = rotInv([0, 0, 1], rotationOf(cam));
     const keepAt = (sx: number, sy: number, depth: number) => {
       if (!dims) return 1;
       const g = sceneGalaxyPoint(home, sx, sy, depth);
-      return f(Math.exp(-dustTau(g[0], g[1], g[2], cosI, dust)));
+      const tau = dustTau(g[0], g[1], g[2], cosI, dust);
+      if (!occludes) return f(Math.exp(-tau));
+      // the disc itself, as well as its dust: dramatic, and present face-on too (ADR 0086)
+      return f(Math.max(Math.exp(-(tau + discTau(g, toViewer))), DISC_KEEP_FLOOR));
     };
     const pk = ctx.picks;
     const UA = ctx.overlay ? U1 : U;

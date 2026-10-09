@@ -688,6 +688,7 @@ async function start(): Promise<void> {
                 thinAuto: 1,
                 depthAuto: 1,
                 lensLock: 2,
+                occlAuto: 1,
               };
   const makeParams = (name: string, sd: number) => presetParams(name, sd, variantOverrides(name));
 
