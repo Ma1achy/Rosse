@@ -435,14 +435,7 @@ export function ribUniform(R: RibbonDesc, cam: Camera, P: Params, nDotPool: numb
 }
 
 /** The stipple's dust culls for a view (project.wgsl `Culls`), without the points. */
-export function cullsUniform(
-  R: RibbonDesc | null,
-  cam: Camera,
-  P: Params,
-  key: number,
-  /** the view has a star whose marks the samples occlude (the occluder grid, ADR 0074) */
-  occ = false,
-) {
+export function cullsUniform(R: RibbonDesc | null, cam: Camera, P: Params, key: number) {
   const lr = R ? f(R.laneR * cam.zoom) : 0;
   const cw = R ? f(R.carveW) : 0;
   return {
@@ -456,7 +449,7 @@ export function cullsUniform(
     carve_p: R ? f(R.carveP) : 0,
     wobble: wobbleAmplitude(P.distort),
     pen_dot: f(penWeights(P.pen).dot),
-    occ: occ ? 1 : 0,
+    pad1: 0,
     pad2: 0,
   };
 }

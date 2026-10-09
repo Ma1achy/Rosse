@@ -5,8 +5,8 @@
 // so a zoom that adds marks keeps the ones it had (ADR 0004). A mark the reference would have
 // rejected is class CLS_NONE. Output: the stipple's `projected` and `classes` at out_base + slot,
 // so the marks are compacted with the stipple's and drawn in the same layers (v21 `merge`, L456).
-// A mark whose cell of the occluder grid holds something nearer than its job's z is class CLS_NONE
-// too (ADR 0074; v21 draws the star over everything).
+// A mark whose draw DRAW_KEEP is not below its job's keep (exp(-tau) of the dust in front of the
+// star, ADR 0074) is class CLS_NONE too: the whole star thins evenly (v21 never dims the star).
 //
 // Every mark is a bitmap sprite (a dot or a knot) of alpha 1 through the hand wobble (app23.js:L171),
 // except the drawn star at the core, a vector drawing (class CLS_RSTAR): its alpha is its pen
@@ -18,7 +18,6 @@
 // #import "common/rng.wgsl"
 // #import "common/math.wgsl"
 // #import "common/noise-table.wgsl"
-// #import "common/occlusion.wgsl"
 // #import "common/stipple-types.wgsl"
 // #import "common/warp.wgsl"
 
@@ -36,8 +35,8 @@ struct StarJob {
   n: u32,
   index: u32,
   q: u32,
-  // the star's view-space z (towards the viewer), or OCC_Z_RANGE for a mark nothing occludes
-  z: f32,
+  // the share of the star's marks the dust in front of it lets through, exp(-tau); 1 for none
+  keep: f32,
   pad1: u32,
   pad2: u32,
 }
@@ -77,6 +76,8 @@ const SALT_STAR_GHOST: u32 = 13u;
 
 const STREAM_STARS: u32 = 9u;
 const KNOT_POOL: u32 = 24u;
+// the draw that decides whether the dust passes a mark: after every draw the marks make (0 to 4)
+const DRAW_KEEP: u32 = 5u;
 
 @group(0) @binding(0) var<uniform> su: StarU;
 @group(0) @binding(1) var<storage, read> jobs: array<StarJob>;
@@ -84,12 +85,10 @@ const KNOT_POOL: u32 = 24u;
 @group(0) @binding(3) var<storage, read> dot_base: array<f32>;
 @group(0) @binding(4) var<storage, read_write> projected: array<Instance>;
 @group(0) @binding(5) var<storage, read_write> classes: array<u32>;
-// the occluder grid the projection filled (common/occlusion.wgsl); all zero when it was not stamped
-@group(0) @binding(6) var<storage, read> occ: array<u32>;
 
 var<private> idx: u32;
-// the z of the job the mark being made belongs to
-var<private> job_z: f32;
+// the keep of the job the mark being made belongs to
+var<private> job_keep: f32;
 
 fn r(d: u32) -> f32 {
   return rand_f32(su.key, STREAM_STARS, idx, d);
@@ -140,7 +139,7 @@ fn make(slot: u32, i: u32) -> u32 {
   let J = jobs[job_of(slot)];
   let local = slot - J.first;
   idx = J.index + local;
-  job_z = J.z;
+  job_keep = J.keep;
   let c = J.c;
   let a = J.a;
   let b = J.b;
@@ -285,12 +284,9 @@ fn star_marks(@builtin(global_invocation_id) id: vec3<u32>) {
   let i = su.out_base + slot;
   projected[i] = Instance(vec2<f32>(0.0), 0u, 0.0, vec4<f32>(0.0));
   var cls = make(slot, i);
-  if (cls != CLS_NONE) {
-    // something nearer than the star is drawn at the mark's cell: leave the mark out (ADR 0074)
-    let cell = occ_cell(projected[i].pos);
-    if (cell >= 0 && occ[u32(cell)] > occ_key(job_z) + OCC_EPS) {
-      cls = CLS_NONE;
-    }
+  // the dust in front of the star thins all its marks by the same share (ADR 0074)
+  if (cls != CLS_NONE && !(r(DRAW_KEEP) < job_keep)) {
+    cls = CLS_NONE;
   }
   classes[i] = cls;
 }

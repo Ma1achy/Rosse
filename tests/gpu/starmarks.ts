@@ -11,11 +11,11 @@
  * - the per-class counts of the compacted lists agree, and the drawn stars' capsules (the dynamic
  *   set) agree with the CPU's.
  *
- * Depth occlusion (ADR 0074): the overlay star's marks are left out where a nearer mark of the
- * galaxy is drawn (the occluder grid the projection fills and the star marks read). The slot by
- * slot classes above are the culled ones, so they must be EXACTLY the CPU's; the extra camera
- * 'behind the disc' (the disc seen from below, in front of the star) has the galaxy cover the
- * star, and the case also asks that the CPU lost marks to it (against its own run with the grid off).
+ * Dust extinction (ADR 0074): the overlay star's marks survive with the probability exp(−tau) of
+ * the dust in front of it, one draw per mark (a job's `keep`, computed once on the CPU). The slot by
+ * slot classes above are the thinned ones, so they must be EXACTLY the CPU's. The extra cases are
+ * the dusty galaxies (dust 0.9) seen from below, with the star behind the disc: they must
+ * lose marks, and the fraction lost is printed.
  */
 import { presetParams } from '../../src/core/presets';
 import type { Params } from '../../src/core/params';
@@ -32,6 +32,9 @@ import { adapterName, device, run } from './harness';
 
 const POS_TOL = 0.05;
 
+/** the overlay-star presets that get a dusty variant, seen so that the star is behind the disc */
+const DUSTY = ['Layered: spiral beside a bright star', 'Layered: edge-on, star on top'];
+
 const NAMES = [
   'Star: bright, with spikes',
   'Star: faint',
@@ -43,9 +46,6 @@ const NAMES = [
   'Layered: edge-on, star on top',
   'Layered: ringed galaxy, ghost reflection',
 ];
-
-/** the cases with an overlay star on a galaxy: the galaxy can be in front of the star */
-const OCCLUDED = ['Layered: spiral beside a bright star', 'Layered: edge-on, star on top'];
 
 run('star and artefact marks (GPU = CPU, L1)', async () => {
   const { adapter, device: dev } = await device();
@@ -69,11 +69,12 @@ run('star and artefact marks (GPU = CPU, L1)', async () => {
       ['home', 0, 0, 1],
       ['orbit', 35, 20, 1],
       ['zoom 2.5', 0, 0, 2.5],
-      ...(OCCLUDED.includes(name)
-        ? [['behind the disc', 0, 90, 1] as [string, number, number, number]]
+      ...(DUSTY.includes(name)
+        ? [['dusty, behind the disc', 0, 90, 1] as [string, number, number, number]]
         : []),
     ] as [string, number, number, number][]) {
-      const P0 = presetParams(name, 7);
+      const dusty = cam === 'dusty, behind the disc';
+      const P0 = { ...presetParams(name, 7), ...(dusty ? { dust: 0.9 } : {}) };
       const P: Params = { ...P0, az: P0.az + dAz, incl: Math.min(180, P0.incl + dIncl) };
       const home = orientationOf(cameraOf(P0));
       const scene = buildScene(P, meta, { home });
@@ -91,11 +92,7 @@ run('star and artefact marks (GPU = CPU, L1)', async () => {
       for (let c = 0; c < CLASS_COUNT; c++) {
         const gk = gCounts.perClass[c] ?? 0;
         const ck = cv.perClass[c] ?? 0;
-        // L1 (ADR 0004): counts within 0.1%. The occlusion cull (ADR 0074) is a hard decision on a
-        // 2-unit cell edge, so a mark within the engines' position error (~3e-4 px) of an edge can
-        // land in the other cell on one engine: a flip of a mark or two is not a difference.
-        if (Math.abs(gk - ck) > Math.max(2, 1e-3 * Math.max(gk, ck)))
-          bad.push(`class ${String(c)}: ${String(gk)} ≠ ${String(ck)}`);
+        if (gk !== ck) bad.push(`class ${String(c)}: ${String(gk)} ≠ ${String(ck)}`);
       }
       let sizeBad = 0;
       let classBad = 0;
@@ -119,17 +116,16 @@ run('star and artefact marks (GPU = CPU, L1)', async () => {
         const cs = Math.hypot(cv.projected[oc + 4] ?? 0, cv.projected[oc + 5] ?? 0);
         if (cs > 0 && Math.abs(gs - cs) / cs > 1e-3) sizeBad++;
       }
-      if (classBad > Math.max(4, 1e-3 * g.n)) bad.push(`${String(classBad)} class differences`);
-      if (cam === 'behind the disc') {
-        // the galaxy in front of the star takes marks from it: the CPU, grid on against grid off
-        cpu.occlusion = false;
-        const off = cpu.view(camera);
-        const live = (c: Uint32Array) => c.subarray(n).filter((x) => x < 4).length;
-        const lost = live(off.classes) - live(cv.classes);
+      if (classBad) bad.push(`${String(classBad)} class differences`);
+      if (dusty) {
+        // the same scene without dust: the star's marks it would have made, and the share the dust took
+        const clear = new CpuStipple(buildScene({ ...P, dust: 0 }, meta, { home })).view(camera);
+        const live = (c: Uint32Array) => c.subarray(n).filter((x) => x < CLASS_COUNT).length;
+        const lost = live(clear.classes) - live(cv.classes);
         data[`${name}, ${cam} lost`] = lost;
-        if (lost <= 0) bad.push(`no star mark was occluded (lost ${String(lost)})`);
+        if (lost <= 0) bad.push(`no star mark was dimmed (lost ${String(lost)})`);
         lines.push(
-          `     ${name}: ${String(lost)} of ${String(live(off.classes))} star marks occluded`,
+          `     ${name}: dust took ${String(lost)} of ${String(live(clear.classes))} star marks (${((100 * lost) / Math.max(1, live(clear.classes))).toFixed(1)}%)`,
         );
       }
       if (sizeBad) bad.push(`${String(sizeBad)} sizes differ`);

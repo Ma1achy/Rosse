@@ -197,8 +197,6 @@ export class CpuStipple {
   readonly lines: RibbonModel;
   /** the lens (M9): its sources are galaxies of their own, sampled and projected like this one */
   readonly lens: CpuLens | null;
-  /** the star's marks are left out where the samples are nearer (the occluder grid, ADR 0074); tests switch it off */
-  public occlusion = true;
 
   constructor(
     readonly scene: GalaxyScene,
@@ -220,13 +218,15 @@ export class CpuStipple {
     const n = this.samples.n;
     const { P, galaxy, ribbons: R } = this.scene;
     // the marks of a star or an artefact follow the stipple's samples (M7)
-    const sj = this.scene.stars ? starJobs(this.scene.stars, P, cam, this.scene.home) : null;
+    const sj = this.scene.stars
+      ? starJobs(this.scene.stars, P, cam, this.scene.home, galaxy.g.dust)
+      : null;
     const nStar = sj?.nSlots ?? 0;
     const nTot = n + nStar;
     const V = viewDesc(cam, galaxy.g.dust, n, classCapacity(nTot));
     const rv = runRibbons(this.lines, V, ribUniform(R, cam, P, galaxy.g.n_dot_pool));
     const culls = {
-      c: cullsUniform(R, cam, P, galaxy.g.key, nStar > 0 && this.occlusion),
+      c: cullsUniform(R, cam, P, galaxy.g.key),
       points: rv.points,
       carve: R.carve,
       noise: galaxy.noise,
@@ -250,7 +250,6 @@ export class CpuStipple {
           pool: galaxy.pool,
           dotBase: galaxy.dotBase,
           noise: galaxy.noise,
-          ...(p.occ ? { occ: p.occ } : {}),
         },
         p.classes,
         p.f32,

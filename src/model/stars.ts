@@ -32,13 +32,15 @@ import type { StructLayout } from '../marks/instance';
 import {
   PLATE,
   ZOOM_MAX,
-  scenePointZ,
+  rotationOf,
+  sceneGalaxyPoint,
+  scenePoint,
   viewScale,
   type Camera,
   type Orientation,
 } from '../view/camera';
+import { dustTau } from '../fallback/kernels/project';
 import { starPools } from './galaxy';
-import { OCC_NEVER_Z } from './occlusion';
 import type { DrawingsMeta, Variation } from './variation';
 
 const f = Math.fround;
@@ -332,7 +334,7 @@ export const STAR_JOB_LAYOUT: StructLayout = (() => {
     ['n', 'u32'],
     ['index', 'u32'],
     ['q', 'u32'],
-    ['z', 'f32'],
+    ['keep', 'f32'],
     ['pad1', 'u32'],
     ['pad2', 'u32'],
   ];
@@ -388,19 +390,19 @@ export interface StarJob {
   index: number;
   q: number;
   /**
-   * The star's view-space z, towards the viewer (larger is nearer; src/model/occlusion.ts): its
-   * marks are left out where a nearer mark of the galaxy is drawn. `OCC_NEVER_Z` for what nothing
-   * occludes (an artefact's lines, a cosmic ray, the ghost).
+   * The share of the star's marks the dust in front of it lets through, exp(−tau) (ADR 0074): each
+   * mark survives when its draw is below it, so the whole star thins evenly. 1 for what no dust
+   * dims (the subject star, a merger's overlay, an artefact's lines, a cosmic ray, the ghost).
    */
-  z: number;
+  keep: number;
 }
 
 const round = (x: number) => Math.floor(x + 0.5);
 
 /** A job before its slots and stream index are assigned. */
 type JobIn = Omit<StarJob, 'first' | 'index' | 'n'>;
-/** A job of a star: `starJobsOf` gives it the star's z. */
-type JobOf = Omit<JobIn, 'z'>;
+/** A job of a star: `starJobsOf` gives it the star's keep. */
+type JobOf = Omit<JobIn, 'keep'>;
 
 /** The numbers of an `aStar` (L405–418), at this zoom, as jobs. */
 function starJobsOf(
@@ -409,14 +411,14 @@ function starJobsOf(
   cx: number,
   cy: number,
   U: number,
-  z: number,
+  keep: number,
   push: (j: JobIn, n: number) => void,
 ): void {
   const B = s.B;
   const core = f(f(f(0.1) + f(f(0.2) * B)) * U);
   const c: [number, number] = [f(cx), f(cy)];
   const job = (kind: number, n: number, extra: Partial<JobOf>) => {
-    push({ c, a: core, b: 0, p0: 0, p1: 0, p2: 0, p3: 0, kind, q: 0, z: f(z), ...extra }, n);
+    push({ c, a: core, b: 0, p0: 0, p1: 0, p2: 0, p3: 0, kind, q: 0, keep: f(keep), ...extra }, n);
   };
   job(StarKind.heart, round(20 + 90 * B), {});
   job(StarKind.glare, round((1500 + 7500 * B) * (s.full ? 1 : 0.22)), {
@@ -460,6 +462,8 @@ export function starJobs(
   P: Params,
   cam: Camera,
   home: Orientation,
+  /** the galaxy's dust (`GalaxyDesc.dust`): 0 where there is no galaxy to dim the overlay star */
+  dust = 0,
 ): { jobs: StarJob[]; nSlots: number } {
   const U = f(viewScale(cam.zoom));
   // the zoom-1 scale: an overlay's trail and cosmic rays are fixed to the camera, the screen, and
@@ -476,32 +480,41 @@ export function starJobs(
       slot += n;
     };
     const place = ctx.place
-      ? scenePointZ(home, ctx.place.x, ctx.place.y, ctx.place.depth, cam)
+      ? scenePoint(home, ctx.place.x, ctx.place.y, ctx.place.depth, cam)
       : null;
+    // the dust in front of an overlay star: tau of its place in the galaxy's frame along the line of
+    // sight (the galaxy marks' own dustTau), 1 for a star with nothing to dim it (ADR 0074)
+    const dims = dust > 0 && ctx.overlay && ctx.subject === 'star';
+    const cosI = f(rotationOf(cam).ci);
+    const keepAt = (sx: number, sy: number, depth: number) => {
+      if (!dims) return 1;
+      const g = sceneGalaxyPoint(home, sx, sy, depth);
+      return f(Math.exp(-dustTau(g[0], g[1], g[2], cosI, dust)));
+    };
     const pk = ctx.picks;
     const UA = ctx.overlay ? U1 : U;
     // the stars: at the plate centre plus their offset, or (an overlay) at the scene point
     pk.stars.forEach((s, i) => {
       let x = cx0 + s.ux * U;
       let y = cx0 + s.uy * U;
-      // at the galaxy's centre plane, unless placed in the scene
-      let z = 0;
+      let keep = 1;
       // the overlay star sits at the scene point; an overlay ghost's star too (its offset is the
       // angle on 1.1 units)
       if (place && (ctx.subject === 'star' || ctx.artefact === 'ghost') && i === 0) {
         x = place[0];
         y = place[1];
-        z = place[2];
+        keep = keepAt(ctx.place?.x ?? 0, ctx.place?.y ?? 0, ctx.place?.depth ?? 0);
       } else if (ctx.subject === 'star' && i > 0) {
         // a satellite is a point in the scene beside its primary, at a depth near the primary's,
         // so the cluster is a constellation under orbit and zoom (ADR 0055)
         const o = ctx.place ?? { x: 0, y: 0, depth: 0 };
-        const p = scenePointZ(home, o.x + s.ux, o.y + s.uy, o.depth + satelliteDepth(s), cam);
+        const depth = o.depth + satelliteDepth(s);
+        const p = scenePoint(home, o.x + s.ux, o.y + s.uy, depth, cam);
         x = p[0];
         y = p[1];
-        z = p[2];
+        keep = keepAt(o.x + s.ux, o.y + s.uy, depth);
       }
-      starJobsOf(P, s, x, y, U, z, push);
+      starJobsOf(P, s, x, y, U, keep, push);
     });
     if (pk.trail) {
       const t = pk.trail;
@@ -522,7 +535,7 @@ export function starJobs(
             p3: 0,
             kind: StarKind.trail,
             q: li,
-            z: OCC_NEVER_Z,
+            keep: 1,
           },
           round(half * 2.2 * (li ? 0.55 : 1)),
         );
@@ -551,7 +564,7 @@ export function starJobs(
         p2: 0,
         p3: 0,
         q: 0,
-        z: OCC_NEVER_Z,
+        keep: 1,
       };
       push({ ...g0, kind: StarKind.ghostDisc }, 2600);
       push({ ...g0, kind: StarKind.ghostRing }, 500);
@@ -569,7 +582,7 @@ export function starJobs(
           p3: 0,
           kind: StarKind.cosmic,
           q: n,
-          z: OCC_NEVER_Z,
+          keep: 1,
         },
         n + 1,
       );
@@ -604,7 +617,7 @@ export function packStarJobs(jobs: readonly StarJob[]): ArrayBuffer {
     u[o + 10] = j.n;
     u[o + 11] = j.index;
     u[o + 12] = j.q;
-    fl[o + 13] = f(j.z);
+    fl[o + 13] = f(j.keep);
   });
   return buf;
 }

@@ -260,22 +260,6 @@ export function scenePoint(
   depth: number,
   cam: Camera,
 ): Vec2 {
-  const p = scenePointZ(home, sx, sy, depth, cam);
-  return [p[0], p[1]];
-}
-
-/**
- * `scenePoint` with the point's view-frame z as the third component: towards the viewer, so a
- * larger z is nearer the camera (`rotFwd`; the occluder grid, src/model/occlusion.ts), in galaxy
- * units like the samples' own.
- */
-export function scenePointZ(
-  home: Orientation,
-  sx: number,
-  sy: number,
-  depth: number,
-  cam: Camera,
-): Vec3 {
   const pa0 = rad(home.pa);
   const lx = sx * Math.cos(pa0) + sy * Math.sin(pa0);
   const ly = -sx * Math.sin(pa0) + sy * Math.cos(pa0);
@@ -286,8 +270,18 @@ export function scenePointZ(
   return [
     PLATE / 2 + (v[0] * Math.cos(pa) - v[1] * Math.sin(pa)) * sc,
     PLATE / 2 + (v[0] * Math.sin(pa) + v[1] * Math.cos(pa)) * sc,
-    v[2],
   ];
+}
+
+/**
+ * The galaxy-frame point of `scenePoint`'s scene point: where the overlay sits in the galaxy's own
+ * frame (the samples'), which the camera does not move. Its dust optical depth (ADR 0074).
+ */
+export function sceneGalaxyPoint(home: Orientation, sx: number, sy: number, depth: number): Vec3 {
+  const pa0 = rad(home.pa);
+  const lx = sx * Math.cos(pa0) + sy * Math.sin(pa0);
+  const ly = -sx * Math.sin(pa0) + sy * Math.cos(pa0);
+  return rotInv([lx, ly, depth], rotation(home));
 }
 
 /**
