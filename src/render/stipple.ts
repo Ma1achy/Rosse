@@ -42,7 +42,7 @@ import {
 } from '../model/scene';
 import type { Params } from '../core/params';
 import type { DrawingsMeta } from '../model/variation';
-import { ZOOM_MAX, cameraOf, packView, viewDesc, type Camera } from '../view/camera';
+import { ZOOM_MAX, cameraOf, packView, perspOf, viewDesc, type Camera } from '../view/camera';
 import { TierState, type TierWork } from './tiers';
 import { SAMPLE_LAYOUT } from '../fallback/kernels/stipple';
 import { STAR_JOB_LAYOUT, STAR_UNIFORM_LAYOUT, packStarJobs, starJobs } from '../model/stars';
@@ -534,7 +534,11 @@ export class GpuStipple {
     const nTot = m.n + nStar;
     this.nStarSlots = nStar;
     if (nTot > m.nTot) throw new Error('star marks beyond their capacity');
-    d.queue.writeBuffer(m.view, 0, packView(viewDesc(cam, galaxy.g.dust, m.n, m.cap)));
+    d.queue.writeBuffer(
+      m.view,
+      0,
+      packView(viewDesc(cam, galaxy.g.dust, m.n, m.cap, perspOf(params))),
+    );
     d.queue.writeBuffer(m.scan, 0, new Uint32Array([nTot, m.cap, blockCount(nTot), 0]));
     if (sj && nStar) {
       d.queue.writeBuffer(m.starJobs, 0, packStarJobs(sj.jobs));

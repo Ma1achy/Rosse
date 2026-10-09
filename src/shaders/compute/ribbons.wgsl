@@ -160,7 +160,8 @@ fn project_points(@builtin(global_invocation_id) id: vec3<u32>) {
     points[i] = to_plate(view, vec2<f32>(p.x * view.winding, p.y));
     return;
   }
-  points[i] = to_plate(view, rot_fwd(view, p.xyz).xy);
+  let rv = rot_fwd(view, p.xyz);
+  points[i] = to_plate(view, rv.xy * select(1.0, persp_k(view, rv.z), view.persp > 0.0));
 }
 
 @compute @workgroup_size(1)

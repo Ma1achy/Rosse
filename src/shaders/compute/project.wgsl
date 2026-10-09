@@ -138,8 +138,11 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     }
   }
   var q = s.pos.xy;
+  var pk = 1.0;
   if ((s.cls & FLAG_SERSIC2D) == 0u) {
-    q = rot_fwd(view, s.pos).xy;
+    let rv = rot_fwd(view, s.pos);
+    pk = persp_k(view, rv.z);
+    q = rv.xy * select(1.0, pk, view.persp > 0.0);
   }
   let pre = to_plate(view, q);
   if ((s.cls & FLAG_CARVE) != 0u && culls.n_carve > 0u) {
@@ -157,7 +160,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     // its centre (a vector mark, app23.js:L171); the size grows with the zoom, ZL (app23.js:L183)
     let pd = culls.pen_dot;
     let zl = pow(view.scale / 84.0, 0.45);
-    let sz = max(3.2 * pd, min((20.0 * pd) * zl, s.size * zl));
+    let sz = max(3.2 * pd, min((20.0 * pd) * zl, (s.size * pk) * zl));
     var ps = min(max(0.3 + 0.03 * sz, 0.36), 0.5);
     if ((s.cls & FLAG_BRIGHT) != 0u) {
       ps = 0.58;
@@ -171,6 +174,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
   let pos = sm_warp(pre, culls.wobble);
   let c = cos_f(s.rot);
   let sn = sin_f(s.rot);
-  projected[i] = Instance(pos, s.tile, 1.0, vec4<f32>(c * s.size, sn * s.size, -(sn * s.size), c * s.size));
+  let msz = (s.size * pk) * persp_zoom(view);
+  projected[i] = Instance(pos, s.tile, 1.0, vec4<f32>(c * msz, sn * msz, -(sn * msz), c * msz));
   classes[i] = cls;
 }

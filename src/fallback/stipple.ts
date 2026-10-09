@@ -28,7 +28,7 @@ import {
 import type { Params } from '../core/params';
 import type { DrawingsMeta } from '../model/variation';
 import { TierState, type TierWork } from '../render/tiers';
-import { cameraOf, viewDesc, type Camera } from '../view/camera';
+import { cameraOf, perspOf, viewDesc, type Camera } from '../view/camera';
 import { INSTANCE_WORDS, runProject } from './kernels/project';
 import { breatheRoom } from './kernels/breathe';
 import { dynView, rstarRows } from '../model/dynvec';
@@ -223,7 +223,7 @@ export class CpuStipple {
       : null;
     const nStar = sj?.nSlots ?? 0;
     const nTot = n + nStar;
-    const V = viewDesc(cam, galaxy.g.dust, n, classCapacity(nTot));
+    const V = viewDesc(cam, galaxy.g.dust, n, classCapacity(nTot), perspOf(P));
     const rv = runRibbons(this.lines, V, ribUniform(R, cam, P, galaxy.g.n_dot_pool));
     const culls = {
       c: cullsUniform(R, cam, P, galaxy.g.key),

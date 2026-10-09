@@ -26,7 +26,7 @@ import {
 import { buildScene, drawingsMeta } from '../../src/model/scene';
 import { GpuRenderer } from '../../src/render/frame';
 import { GpuStipple } from '../../src/render/stipple';
-import { cameraOf, viewDesc } from '../../src/view/camera';
+import { cameraOf, perspOf, viewDesc } from '../../src/view/camera';
 import { classCapacity } from '../../src/fallback/kernels/scan';
 import { sampleCount } from '../../src/model/galaxy';
 import { adapterName, device, halfToFloat, readTexture, run } from './harness';
@@ -127,7 +127,7 @@ run('line-work kernels and raster (GPU = CPU, L1)', async () => {
       const G = scene.galaxy;
       const R = scene.ribbons;
       const n = sampleCount(G);
-      const V = viewDesc(camera, G.g.dust, n, classCapacity(n));
+      const V = viewDesc(camera, G.g.dust, n, classCapacity(n), perspOf(P));
       const M = ribbonModel(R, G.pool, G.dotBase);
       const c = runRibbons(M, V, ribUniform(R, camera, P, G.g.n_dot_pool));
       const bad: string[] = [];

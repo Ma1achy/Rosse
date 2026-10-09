@@ -39,7 +39,7 @@ import { HATCH_FLAT, HATCH_PEN } from '../../model/lanes';
 import type { ViewDesc } from '../../view/camera';
 import { smWarp } from '../../view/warp';
 import type { NoiseField } from '../../core/noise';
-import { INSTANCE_WORDS } from './project';
+import { INSTANCE_WORDS, perspK } from './project';
 
 const f = Math.fround;
 const sqrt = (x: number) => f(Math.sqrt(x));
@@ -92,9 +92,15 @@ export function projectPoint(i: number, V: ViewDesc, p3: Float32Array, out: Floa
   const x0 = f(x * (V.winding ?? 1));
   const X = f(f(x0 * cz) - f(y * sz));
   const ya = f(f(x0 * sz) + f(y * cz));
-  const Y = f(f(ya * (V.cos_i ?? 1)) - f(z * (V.sin_i ?? 0)));
-  out[i * 2] = f((V.cx ?? 400) + f(f(f(X * ca) - f(Y * sa)) * sc));
-  out[i * 2 + 1] = f((V.cy ?? 400) + f(f(f(X * sa) + f(Y * ca)) * sc));
+  let Y = f(f(ya * (V.cos_i ?? 1)) - f(z * (V.sin_i ?? 0)));
+  let Xp = X;
+  const pk = perspK(V, f(f(ya * (V.sin_i ?? 0)) + f(z * (V.cos_i ?? 1))));
+  if (pk !== 1 && (V.persp ?? 0) > 0) {
+    Xp = f(X * pk);
+    Y = f(Y * pk);
+  }
+  out[i * 2] = f((V.cx ?? 400) + f(f(f(Xp * ca) - f(Y * sa)) * sc));
+  out[i * 2 + 1] = f((V.cy ?? 400) + f(f(f(Xp * sa) + f(Y * ca)) * sc));
 }
 
 /** 2. Arc lengths and per-curve state; returns the number of pieces (the indirect count). */

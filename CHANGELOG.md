@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- The galaxy has perspective (ADR 0084, proposed): a new view-tier parameter `depthAuto` ("Depth", 0 flat in the core, 1 on the page, 2 full perspective) scales each mark's size by its depth, and shrinks the marks as the view zooms out; 2 also scales the offsets. The orthographic positions stay at 1. CPU and GPU agree; with 0 the projection is v21's, bit for bit.
 - A thin disc (ADR 0083, proposed): a new parameter `thinAuto` ("Thin disc", 0 in the core, 1 on the page) puts 85% of the disc's marks in a sharp layer and 15% in a thicker one, and cuts the Sérsic bulge's tail at 8 scale lengths, so the plane is dense and a few marks still wander off it.
 - The page draws with `lineWorld` on (ADR 0081): the edge-on midplane stroke, the hatch rows and the inclination buckets that popped in and out under tilt are gone from the page; the disc's edge-on look is the stars, the natural dust and the 3D lane arcs. `lineWorld=0` in a link is v21's drawing.
 - Natural arm strokes (ADR 0082, proposed): a new parameter `strokesAuto` ("Natural arm strokes", 0 in the core, 1 on the page) draws each ribbon arm with a broad root stroke and a few offset companion strokes that thin toward the tip, each arm with its own thickness.

@@ -68,6 +68,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0081](adr/0081-line-work-in-three-dimensions.md) | _Proposed:_ `lineWorld` (off by default) describes line-work at a fixed inclination and draws dust lanes as ring arcs in the disc plane, so tilt pops nothing. |
 | [0082](adr/0082-natural-arm-strokes.md) | _Proposed:_ `strokesAuto` adds a broad root stroke and offset companion strokes to each ribbon arm, thinning toward the tip. |
 | [0083](adr/0083-a-thin-disc-with-a-few-wanderers.md) | _Proposed:_ `thinAuto` gives the disc a sharp layer (85%) and a thicker one (15%) and cuts the bulge tail, so the plane is dense. |
+| [0084](adr/0084-the-galaxy-has-perspective.md) | _Proposed:_ `depthAuto` (view tier) scales each mark's offset and size by its depth through the View uniform's `persp`, so a tilted disc has a near and a far side. |
 
 ## Modules
 

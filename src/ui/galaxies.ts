@@ -61,6 +61,7 @@ const PAGE_DUST = {
   strokesAuto: 1,
   lineWorld: 1,
   thinAuto: 1,
+  depthAuto: 1,
 } as const;
 
 /** What a catalogue galaxy is drawn as, from its card. */

@@ -581,7 +581,7 @@ export const VIEW_LAYOUT: StructLayout = {
     'cx',
     'cy',
     'dust',
-    'pad0',
+    'persp',
     'n',
     'cap',
     'pad1',
@@ -597,7 +597,12 @@ export const VIEW_LAYOUT: StructLayout = {
 export type ViewDesc = Record<string, number>;
 
 /** The camera's numbers, rounded to f32. `dust` is the galaxy's extinction (for the τ cull). */
-export function viewDesc(cam: Camera, dust: number, n: number, cap: number): ViewDesc {
+/** The galaxy's own perspective (ADR 0084): 1 / camera distance in galaxy units; negative scales only the marks. */
+export const GALAXY_PERSP = 0.075;
+export const perspOf = (P: { depthAuto?: number }) =>
+  (P.depthAuto ?? 0) >= 2 ? GALAXY_PERSP : (P.depthAuto ?? 0) >= 1 ? -GALAXY_PERSP : 0;
+
+export function viewDesc(cam: Camera, dust: number, n: number, cap: number, persp = 0): ViewDesc {
   const R = rotationOf(cam);
   return {
     cos_i: f(R.ci),
@@ -611,7 +616,7 @@ export function viewDesc(cam: Camera, dust: number, n: number, cap: number): Vie
     cx: PLATE / 2,
     cy: PLATE / 2,
     dust: f(dust),
-    pad0: 0,
+    persp: f(persp),
     n,
     cap,
     pad1: 0,

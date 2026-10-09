@@ -127,6 +127,19 @@ export function inLane(qx: number, qy: number, C: CullsDesc): boolean {
  * The reference's `dustTau(p, c)` (app23.js:L145–152): the path length through the slab |z| < 0.06
  * along the line of sight, capped at 6, times 9 · dust · exp(−R / 1.6), zero beyond R 3.2.
  */
+/** The galaxy's own perspective factor for a view-frame depth (ADR 0084): exactly 1 when `persp` is 0. */
+export function perspK(V: ViewDesc, depth: number): number {
+  const p = V.persp ?? 0;
+  if (p === 0) return 1;
+  return f(1 / Math.max(f(1 - f(depth * Math.abs(p))), f(0.3)));
+}
+
+/** The marks' shrink as the view zooms out (ADR 0084): 1 at zoom 1 and above, and with `persp` 0. */
+export function perspZoom(V: ViewDesc): number {
+  if ((V.persp ?? 0) === 0) return 1;
+  return Math.min(1, f(Math.pow(f((V.scale ?? 84) / f(84)), f(0.35))));
+}
+
 export function dustTau(x: number, y: number, z: number, cosI: number, dust: number): number {
   if (dust <= 0) return 0;
   const zd = f(0.06);
@@ -177,6 +190,7 @@ export function projectSample(
   const sc = V.scale ?? 84;
   let X: number;
   let Y: number;
+  let pk = 1;
   if (flags & SampleFlag.sersic2d) {
     X = x;
     Y = y;
@@ -187,6 +201,11 @@ export function projectSample(
     X = f(f(x0 * cz) - f(y * sz));
     const ya = f(f(x0 * sz) + f(y * cz));
     Y = f(f(ya * ci) - f(z * (V.sin_i ?? 0)));
+    pk = perspK(V, f(f(ya * (V.sin_i ?? 0)) + f(z * ci)));
+    if (pk !== 1 && (V.persp ?? 0) > 0) {
+      X = f(X * pk);
+      Y = f(Y * pk);
+    }
   }
   const qx = f((V.cx ?? 400) + f(f(f(X * ca) - f(Y * sa)) * sc));
   const qy = f((V.cy ?? 400) + f(f(f(X * sa) + f(Y * ca)) * sc));
@@ -212,7 +231,7 @@ export function projectSample(
     // on its centre (a vector mark, app23.js:L171); the size grows with the zoom, `ZL` (L183)
     const pd = C.c.pen_dot ?? 1;
     const zl = f(Math.pow(f(sc / f(84)), f(0.45)));
-    const sz = Math.max(f(f(3.2) * pd), Math.min(f(f(f(20) * pd) * zl), f(size * zl)));
+    const sz = Math.max(f(f(3.2) * pd), Math.min(f(f(f(20) * pd) * zl), f(f(size * pk) * zl)));
     const ps =
       flags & SampleFlag.bright
         ? f(0.58)
@@ -236,10 +255,11 @@ export function projectSample(
   instF[io + 3] = 1;
   const c = cosF(rot);
   const s = sinF(rot);
-  instF[io + 4] = f(c * size);
-  instF[io + 5] = f(s * size);
-  instF[io + 6] = f(-f(s * size));
-  instF[io + 7] = f(c * size);
+  const msz = f(f(size * pk) * perspZoom(V));
+  instF[io + 4] = f(c * msz);
+  instF[io + 5] = f(s * msz);
+  instF[io + 6] = f(-f(s * msz));
+  instF[io + 7] = f(c * msz);
   return cls;
 }
 
