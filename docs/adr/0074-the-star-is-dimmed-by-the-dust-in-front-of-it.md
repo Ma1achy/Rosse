@@ -19,6 +19,8 @@ v21 never dims the overlay star: it is drawn last, over everything (`scene()`, a
 3. **The thinning.** compute/star-marks.wgsl (CPU: `starMark`): each mark survives iff a per-mark uniform draw `u < keep`. `u` is the kernel's counter RNG at a new draw index, `DRAW_KEEP` = 5, after the last draw any mark makes (0 to 4), so no existing draw changes and v21-replayed picks and goldens are untouched. A mark that does not survive is class `CLS_NONE`. The drawn core is one mark of its own job and is kept or dropped whole by its own draw. The draw is deterministic and identical on both engines, so the classes are bit-identical GPU against CPU.
 4. **What has `keep = 1`.** A subject star (no galaxy); the artefacts (trail, ghost, cosmic rays); a merger's overlay star (below); `P.dust = 0`; a star on the near side of the disc, and one far enough out (R > 3.2) or edge-on and outside the slab, where `dustTau` is 0.
 
+4a. **The reach shrinks too.** A dimmer star also reaches less far: the core radius, the glare's radius, the spikes' length and the bleed column's length are scaled by `sqrt(keep)` (`starJobsOf`). Each job keeps its mark count, so the slots and buffers do not move; the marks are then thinned by `keep` as above. So a star seen through a lot of dust has shorter spikes and a smaller bloom as well as fewer marks. A star with `keep = 1` is as before.
+
 ## Not modelled
 
 - Nothing opaque hides a star. The galaxy's stars, gas and lines do not cut the star's marks: the light is additive.

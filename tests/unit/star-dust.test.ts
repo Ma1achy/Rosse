@@ -163,4 +163,36 @@ describe('the marks the dust leaves, by kind', () => {
       ).toBeLessThan(4 * sd);
     }
   });
+
+  it('shrinks the core, the glare, the spikes and the bleed by sqrt(keep), with the counts as they were', () => {
+    const jobsOf = (P: Params, dust: number) => {
+      const scene = buildScene(P, META, { home: S.home, variation: S.variation });
+      if (!scene.stars) throw new Error('no stars');
+      return starJobs(scene.stars, P, cameraOf(P), S.home, dust).jobs;
+    };
+    const dusty = primaryOf(jobsOf(S.behind, 0.9));
+    const clear = primaryOf(jobsOf({ ...S.behind, dust: 0 }, 0));
+    const keep = dusty[0]?.keep ?? 1;
+    expect(keep).toBeLessThan(0.5);
+    const r = f(Math.sqrt(keep));
+    expect(dusty.length).toBe(clear.length);
+    dusty.forEach((d, k) => {
+      const c = clear[k];
+      if (!c) throw new Error('layouts differ');
+      // the slots do not move: the marks of a job and where it starts are the same
+      expect(d.n, `job ${String(k)} n`).toBe(c.n);
+      expect(d.first, `job ${String(k)} first`).toBe(c.first);
+      expect(d.c).toEqual(c.c);
+      expect(d.a, `kind ${String(d.kind)} a`).toBeCloseTo(
+        c.a * (d.kind === StarKind.bleed ? r : r),
+        3,
+      );
+      if (d.kind === StarKind.glare || d.kind === StarKind.spike)
+        expect(d.b, `kind ${String(d.kind)} b`).toBeCloseTo(c.b * r, 3);
+    });
+    // a clear star is not shrunk
+    const spike = clear.find((j) => j.kind === StarKind.spike);
+    const dim = dusty.find((j) => j.kind === StarKind.spike);
+    expect((dim?.b ?? 0) / (spike?.b ?? 1)).toBeCloseTo(r, 3);
+  });
 });

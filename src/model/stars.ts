@@ -434,19 +434,26 @@ function starJobsOf(
   push: (j: JobIn, n: number) => void,
 ): void {
   const B = s.B;
-  const core = f(f(f(0.1) + f(f(0.2) * B)) * U);
+  // the star's light that reaches the camera sets its reach (ADR 0074): dust in front dims it, so
+  // the core, the glare, the spikes and the bleed column are drawn shorter, by sqrt(keep). The
+  // marks of each job keep their counts (so the slots and buffers do not move) and are thinned by
+  // `keep` as well. 1 for a star with nothing in front of it, so v21's picture is unchanged.
+  const r = f(Math.sqrt(keep));
+  const Ur = f(U * r);
+  const core = f(f(f(0.1) + f(f(0.2) * B)) * Ur);
   const c: [number, number] = [f(cx), f(cy)];
   const job = (kind: number, n: number, extra: Partial<JobOf>) => {
     push({ c, a: core, b: 0, p0: 0, p1: 0, p2: 0, p3: 0, kind, q: 0, keep: f(keep), ...extra }, n);
   };
   job(StarKind.heart, round(20 + 90 * B), {});
   job(StarKind.glare, round((1500 + 7500 * B) * (s.full ? 1 : 0.22)), {
-    b: f(U * f(1.3 + 2.3 * B)),
+    b: f(Ur * f(1.3 + 2.3 * B)),
   });
   if (s.full && P.spikes > 0.02) {
-    const L = f(U * f(0.9 + 3.4 * P.spikes * B));
+    const L0 = f(U * f(0.9 + 3.4 * P.spikes * B));
+    const L = f(L0 * r);
     for (let q = 0; q < 4; q++)
-      job(StarKind.spike, round(L / 0.8), {
+      job(StarKind.spike, round(L0 / 0.8), {
         b: L,
         q,
         p0: f(s.spikeA + (q * Math.PI) / 2 + (q % 2 ? 0 : 0.004)),
@@ -461,8 +468,8 @@ function starJobsOf(
       });
   }
   if (s.full && P.bleed > 0.02 && B > 0.45) {
-    const bl = f(U * f(2.6 * P.bleed * B));
-    job(StarKind.bleed, round(bl * 1.4), { a: bl });
+    const bl0 = f(U * f(2.6 * P.bleed * B));
+    job(StarKind.bleed, round(bl0 * 1.4), { a: f(bl0 * r) });
   }
   job(StarKind.drawn, 1, {
     a: f(core * f(2.6 + 2.4 * B)),
