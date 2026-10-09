@@ -217,6 +217,7 @@ export const SCHEMA: { readonly [K in ParamKey]: ParamSpec } = {
   lineWorld: choice('Line-work in 3D', ONOFF),
   strokesAuto: choice('Natural arm strokes', ONOFF),
   thinAuto: choice('Thin disc', ONOFF),
+  lensLock: choice('Lensed source follows the orbit', [0, 1, 2]),
   depthAuto: choice('Depth', [0, 1, 2], { tier: 'view' }),
 };
 

@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- The lensed source follows the orbit again (ADR 0072 amended): a new parameter `lensLock` ("Lensed source follows the orbit": 0 fully, v21's and the core's; 1 not at all, the previous behaviour, which made the lens a static picture; 2 a little, the page's) so that orbiting a lens changes its images, a ring breaking into arcs and then separate images, at a third of v21's rate on the page.
 - A surprise merger lands at a random moment in the encounter: a quarter are still approaching (two galaxies skipping past each other), the rest run from the closest approach to late in the merger (`mStage` -1.2 to 4.5; v21's 0.3 to 3.8 was never before contact). The real-galaxy cards and the presets are unchanged.
 - The galaxy has perspective (ADR 0084, proposed): a new view-tier parameter `depthAuto` ("Depth", 0 flat in the core, 1 on the page, 2 full perspective) scales each mark's size by its depth, and shrinks the marks as the view zooms out; 2 also scales the offsets. The orthographic positions stay at 1. CPU and GPU agree; with 0 the projection is v21's, bit for bit.
 - A thin disc (ADR 0083, proposed): a new parameter `thinAuto` ("Thin disc", 0 in the core, 1 on the page) puts 85% of the disc's marks in a sharp layer and 15% in a thicker one, and cuts the Sérsic bulge's tail at 8 scale lengths, so the plane is dense and a few marks still wander off it.

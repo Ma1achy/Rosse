@@ -29,7 +29,7 @@ import { coreInstances, vectorRows, type VectorRow } from '../model/parts';
 import type { RibbonDesc } from '../model/ribbons';
 import type { GalaxyScene, SceneOptions } from '../model/scene';
 import type { DrawingsMeta } from '../model/variation';
-import { PLATE, UNIT_SCALE, project, viewScale, type Camera } from '../view/camera';
+import { PLATE, UNIT_SCALE, project, srcNow, viewScale, type Camera } from '../view/camera';
 
 const f = Math.fround;
 const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
@@ -375,6 +375,8 @@ export interface LensScene {
   home: LensHome;
   /** thE, the Einstein radius */
   thE: number;
+  /** how far a source slides across the lens as the camera orbits: 1 v21's, 0 none (ADR 0072) */
+  ease: number;
   models: LensModel[];
   solvers: SolverDesc[];
   sources: LensSource[];
@@ -424,14 +426,26 @@ export interface LensOptions {
 export type SceneBuilder = (P: Params, meta: DrawingsMeta, opts: SceneOptions) => GalaxyScene;
 
 /**
- * Where a source sits in the lens frame: its offset (bx, by), whatever the orbit. v21's `srcNow`
- * (app23.js:L450) keeps the source fixed in 3D a depth D behind a lens that lies in the screen
- * plane, so an orbit by delta slides it ~D sin(delta) across the lens and breaks the ring into
- * arcs. Here the source follows the lens frame (ADR 0072): at the home pose this is exactly
- * `srcNow`'s result, since `rotFwd(rotInv([bx, by, -D], home), home)` is [bx, by].
+ * Where a source sits in the lens plane as the camera sees it. v21's `srcNow` (app23.js:L450)
+ * keeps the source fixed in 3D a depth D behind a lens that lies in the screen plane, so orbiting
+ * slides it across the lens: a ring breaks into arcs and then into separate images, which is what
+ * a lens does when the alignment is lost. With `lensLock` (ADR 0072) the source instead follows
+ * the lens frame and stays centred, so a ring stays a ring but nothing about the lens changes
+ * with the camera, and `lensLock` 2 eases it, sliding at a third of the rate, so a ring survives a
+ * small orbit and breaks into arcs and images over a large one. At the home pose all agree.
  */
-export function sourceOffset(bx: number, by: number): [number, number] {
-  return [bx, by];
+export const lensEase = (lock: number) => (lock >= 2 ? 0.35 : lock >= 1 ? 0 : 1);
+
+export function sourceOffset(
+  L: Pick<LensScene, 'home' | 'ease'>,
+  cam: Camera,
+  s: Pick<LensSource, 'bx' | 'by' | 'depth'>,
+): [number, number] {
+  if (L.ease === 0) return [s.bx, s.by];
+  const h = L.home;
+  const now = srcNow({ incl: h.incl, az: h.az, w: h.w, pa: 0 }, s.bx, s.by, s.depth, cam);
+  if (L.ease === 1) return now;
+  return [s.bx + L.ease * (now[0] - s.bx), s.by + L.ease * (now[1] - s.by)];
 }
 
 /** The depths of v21's sources (`srcNow`'s third argument). */
@@ -760,6 +774,7 @@ export function describeLens(
   }
   return {
     home,
+    ease: lensEase(P.lensLock),
     thE,
     models,
     solvers,
@@ -791,7 +806,7 @@ export function lensView(L: LensScene, cam: Camera): LensView {
   const pa = cam.pa * DEG;
   return {
     bc: L.sources.map((s) => {
-      const [x, y] = sourceOffset(s.bx, s.by);
+      const [x, y] = sourceOffset(L, cam, s);
       return [f(x), f(y)];
     }),
     U: f(viewScale(cam.zoom)),

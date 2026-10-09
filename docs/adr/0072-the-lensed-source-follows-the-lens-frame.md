@@ -4,7 +4,7 @@ Date: 2026-10-09
 
 ## Status
 
-Proposed. A deliberate divergence from v21, decided by the owner; it refines [0050](0050-the-lens-marks-slots-and-explicit-home.md) (explicit home) and keeps [0017](0017-model-tier-key-is-a-structure-signature.md)'s tiers.
+Proposed, and now optional (see the amendment at the end). A deliberate divergence from v21, decided by the owner; it refines [0050](0050-the-lens-marks-slots-and-explicit-home.md) (explicit home) and keeps [0017](0017-model-tier-key-is-a-structure-signature.md)'s tiers.
 
 ## Context
 
@@ -22,3 +22,7 @@ v21's lens mass model lies in the screen plane (rotated only by the roll `pa`), 
 - Orbiting no longer moves the lensed images relative to the lens, except through the plate projection of the lens itself (the roll `pa`, zoom).
 - Goldens: lens cases captured at the home pose do not shift. Cases whose camera differs from the home (an orbit applied) now differ from v21's capture; the oracle comparisons run at the home pose.
 - Tests: tests/unit/lens-orbit.test.ts (offsets at 5, 15 and 30 degrees of orbit equal the home pose's; equal to `srcNow` at the home pose).
+
+## Amendment: it is a choice, `lensLock`, and not the default
+
+Locked, the lens did not respond to the camera at all: the owner found it "static drawings over everything" and remembered that it had once worked. It is now the parameter `lensLock`: 0 is v21's source fixed in 3D behind the lens (the default, the goldens', and the behaviour the owner remembers: orbiting slides the source across the lens, a ring breaks into arcs and then into separate images); 1 is this ADR's lock; 2 eases it, sliding the source at 0.35 of v21's rate, so a ring survives a small orbit and breaks over a large one (`lensEase`, src/sim/lens.ts). The page uses 2. `LensScene.ease` carries it (1, 0 or 0.35), so the model tier does not read the camera and the GPU and CPU twins are unchanged.
