@@ -648,34 +648,19 @@ export function smoothstep(a: number, b: number, x: number): number {
   return t * t * (3 - 2 * t);
 }
 
-/** The drawn core fades out over `incE` 66–80 instead of vanishing at 80 (ADR 0073). */
-export const CORE_FADE = [66, 80] as const;
-/** The core's style (line to dotted) is swapped over `incE` 66–74, centred on v21's 70. */
-export const CORE_STYLE = [66, 74] as const;
-
-/** The drawn core's alpha factor at an inclination: 1 up to 66°, 0 from 80° (smoothstep). */
-export function coreFade(e: number): number {
-  return 1 - smoothstep(CORE_FADE[0], CORE_FADE[1], e);
-}
-
-/** The weight of the dotted core drawing over the line one: 1 when the style is always dotted. */
-export function coreDottedMix(P: Params, e: number): number {
-  return P.stipple > 0.5 && P.lines < 0.5 ? 1 : smoothstep(CORE_STYLE[0], CORE_STYLE[1], e);
-}
-
 /**
- * The drawn core (app23.js:L1028–1035): for a bulge between 0.03 and 0.97, not a Sérsic galaxy,
- * and not edge-on past 80°. The core drawing is picked by bulge strength among the `core` kind,
- * preferring the dotted style for stipple-heavy or steep views, scaled by bulge size and flattened
- * by max(bulgeFlat, |cos incl|), at alpha 0.9. With `nuclear`, the nuclear spiral (a `cores`
+ * The drawn core (app23.js:L1028–1035): for a bulge between 0.03 and 0.97 and not a Sérsic galaxy.
+ * The core drawing is picked by bulge strength among the `core` kind, flattened by
+ * max(bulgeFlat, |cos incl|), scaled by bulge size. With `nuclear`, the nuclear spiral (a `cores`
  * drawing of that kind, picked by the parts) laid on the disc at 0.9 of the core's size.
  *
- * Deviations from v21 (ADR 0073): the flattening uses |cos i| (v21's signed `ci()` squashed a core
- * seen from below), and the core fades out over `incE` 66–80 (`coreFade`) instead of vanishing at
- * 80°, while the line drawing hands over to the dotted one with complementary alphas over 66–74
- * (`coreDottedMix`) instead of swapping at 70°. The alternate drawing is emitted whenever the
- * styles differ and `incE` < 80, at alpha 0 outside the overlap, so the instance count (at most
- * core, alternate and nuclear: 3) does not change with the camera inside a structure bucket.
+ * Deviations from v21 (ADR 0073, 0079): the flattening uses |cos i| (v21's signed `ci()` squashed a
+ * core seen from below), and the core is **one opaque drawing that does not depend on the camera
+ * but for its flattening**: v21 drew it at alpha 0.9, swapped its line drawing for the dotted one
+ * at incE 70, and dropped it from 80 (ADR 0073 cross-faded both, which left it half transparent
+ * over a range of angles). Here it is at full alpha, its style is the dotted one when the galaxy is
+ * stipple-only (`stipple > 0.5 && lines < 0.5`) and the line one otherwise, whatever the view, and
+ * it stays, flattened by `bulgeFlat`, edge-on.
  */
 export function coreInstances(
   P: Params,
@@ -684,11 +669,9 @@ export function coreInstances(
   field?: NoiseField | null,
   nuclear?: number | null,
 ): Instance[] {
-  const e = incE(cam.incl);
   // a star or an artefact has no galaxy, so no core (render(), app23.js:L1230 empties them)
   if (P.subject !== 'galaxy') return [];
-  if (!(P.bulge > 0.03 && P.bulge < 0.97) || (P.sersicN > 0 && P.bulge >= 0.95) || e >= 80)
-    return [];
+  if (!(P.bulge > 0.03 && P.bulge < 0.97) || (P.sersicN > 0 && P.bulge >= 0.95)) return [];
   const n = meta.cores.kind.filter((k) => k === 'core').length;
   if (n < 1) return [];
   const start = Math.min(n - 1, Math.floor(Math.pow(P.bulge, 0.6) * n));
@@ -710,18 +693,11 @@ export function coreInstances(
   // a bitmap mark's centre goes through the hand wobble (inst, app23.js:L171)
   const [x, y] = smWarp(PLATE / 2, PLATE / 2, wobbleAmplitude(P.distort), field);
   const m: Instance['m'] = [c * s, sn * s, -sn * sy, c * sy];
-  const alpha = 0.9 * coreFade(e);
-  const dotted = coreDottedMix(P, e);
-  const iLine = styled('line');
-  const iDot = styled('dotted');
-  const out: Instance[] = [];
-  if (iLine === iDot) out.push({ x, y, layer: iLine, alpha, m });
-  else if (P.stipple > 0.5 && P.lines < 0.5) out.push({ x, y, layer: iDot, alpha, m });
-  else {
-    out.push({ x, y, layer: iLine, alpha: alpha * (1 - dotted), m });
-    out.push({ x, y, layer: iDot, alpha: alpha * dotted, m });
-  }
+  const dotted = P.stipple > 0.5 && P.lines < 0.5;
+  const out: Instance[] = [
+    { x, y, layer: dotted ? styled('dotted') : styled('line'), alpha: 1, m },
+  ];
   if (nuclear !== undefined && nuclear !== null && P.nuclear)
-    out.push({ x, y, layer: nuclear, alpha, m: chain(discM(cam), Sm(s * 0.9, s * 0.9)) });
+    out.push({ x, y, layer: nuclear, alpha: 1, m: chain(discM(cam), Sm(s * 0.9, s * 0.9)) });
   return out;
 }

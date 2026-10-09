@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { presetParams } from '../../src/core/presets';
 import { CpuMerger } from '../../src/fallback/merger';
 import { Cls } from '../../src/model/classes';
+import { coreInstances } from '../../src/model/parts';
 import { buildMergerScene } from '../../src/model/merger';
 import type { InkLayer } from '../../src/render/layers';
 import { starJobs } from '../../src/model/stars';
@@ -28,6 +29,23 @@ describe('the merger sky', () => {
     expect(buildMergerScene(base, node.cpu.meta).skyHost?.sky).toBeTruthy();
     const bare = { ...base, field: 0, fgstars: 0, trails: 0, arrow: 0, jet: 0, streams: 0 };
     expect(buildMergerScene(bare, node.cpu.meta).skyHost).toBeUndefined();
+  });
+
+  it('draws no core of its own: a merger has no third bulge at the middle of the plate', () => {
+    const host = buildMergerScene(base, node.cpu.meta).skyHost;
+    if (!host) throw new Error('no sky host');
+    // the merger's main parameters have a bulge; the host has no galaxy
+    expect(base.bulge).toBeGreaterThan(0.03);
+    expect(host.P.bulge).toBe(0);
+    expect(coreInstances(host.P, host.meta, cameraOf(host.P, 1), host.galaxy.noise)).toEqual([]);
+    // and the picture's layers carry no instance at the plate centre from it
+    const { skyHost } = new CpuMerger(
+      base,
+      node.cpu.meta,
+      node.referenceOptions(base, 1, NAME).merger,
+    );
+    const v = skyHost?.view(cameraOf(base, 1), base.mTime);
+    expect(v?.counts.drawings ?? 0).toBe(0);
   });
 
   it('starts with the sky background and ends with the foreground stars', () => {

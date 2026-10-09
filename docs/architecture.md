@@ -63,6 +63,8 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0076](adr/0076-bulges-follow-a-sersic-law.md) | _Proposed:_ on the page, a bulge's stars follow a deprojected Sérsic law whose index follows the galaxy (`bulgeAuto`, n 1 for a pseudo-bulge to 4 for a big round one) instead of v21's one Hernquist sphere (boxy-peanut when barred); same size, off in the core. |
 | [0077](adr/0077-drawn-stars-spread-smoothly.md) | _Proposed:_ on the page, the drawn stars' weight and brightness follow the arm profile smoothly and the outer fall-off is a taper (`starsAuto`) instead of v21's steps and cut; off in the core. |
 | [0078](adr/0078-cosmic-rays-are-sparse-and-everywhere.md) | _Proposed:_ on the page, cosmic rays are 40 to 70 streaks spread over the whole plate (`cosmicAuto`) instead of v21's 70 to 130 round the star; off in the core. |
+| [0079](adr/0079-the-core-is-one-opaque-drawing.md) | _Proposed:_ the drawn core is one opaque drawing, its style from the galaxy and never the camera, kept edge-on (supersedes 0073's cross-fade); a merger's sky host has no core. |
+| [0080](adr/0080-the-dust-lane-dims-it-does-not-empty.md) | _Proposed:_ with `dustAuto`, the dust cull keeps at least half the stars (`tau_floor`), so an edge-on lane dims and the strokes thicken the disc. |
 
 ## Modules
 

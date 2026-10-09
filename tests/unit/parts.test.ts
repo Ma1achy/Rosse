@@ -8,6 +8,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import type { Params } from '../../src/core/params';
+import type { Instance } from '../../src/marks/instance';
 import { presetParams } from '../../src/core/presets';
 import { DRAWING_WORDS, VECTOR_ATLASES, densifyCount, packVectors } from '../../src/marks/vector';
 import {
@@ -225,36 +226,33 @@ describe('the core and the whole drawing flatten with |cos i| (ADR 0073)', () =>
   });
 });
 
-describe('the core cross-fades instead of popping (ADR 0073)', () => {
+describe('the core is one opaque drawing that the camera does not change (ADR 0079)', () => {
   const P = presetParams('Grand design', 7, { bulge: 0.5, nuclear: 0, stipple: 0.2, lines: 0.8 });
-  const at = (incl: number) => coreInstances(P, META, cameraOf({ ...P, incl }));
-  const total = (incl: number) => at(incl).reduce((s, c) => s + c.alpha, 0);
-  it('keeps the instance count constant below incE 80 and none from it', () => {
-    const n = at(0).length;
-    for (const d of [10, 40, 66, 68, 70, 72, 75, 79.9]) expect(at(d)).toHaveLength(n);
-    expect(at(80)).toHaveLength(0);
-    expect(at(100)).toHaveLength(0);
-  });
-  it('fades the core out smoothly: 0.9 up to 66, 0 at 80, no jump at 70', () => {
-    expect(total(60)).toBeCloseTo(0.9, 9);
-    expect(total(66)).toBeCloseTo(0.9, 9);
-    expect(total(79.999)).toBeLessThan(1e-4);
-    let prev = total(60);
-    for (let d = 60.1; d < 80; d += 0.1) {
-      const t = total(d);
-      expect(t).toBeLessThanOrEqual(prev + 1e-12);
-      expect(prev - t).toBeLessThan(0.02);
-      prev = t;
+  const at = (incl: number, over: Partial<typeof P> = {}) =>
+    coreInstances({ ...P, ...over }, META, cameraOf({ ...P, ...over, incl }));
+  it('is at full alpha, one instance, at every inclination, edge-on and from below included', () => {
+    for (const d of [0, 30, 66, 70, 75, 80, 85, 90, 95, 110, 150, 180]) {
+      const c = at(d);
+      expect(c, `incl ${String(d)}`).toHaveLength(1);
+      expect(c[0]?.alpha).toBe(1);
     }
   });
-  it('hands the line drawing over to the dotted one with complementary alphas', () => {
-    const styles = (d: number) => at(d).map((c) => [META.cores.style[c.layer], c.alpha] as const);
-    const line = (d: number) => styles(d).find(([s]) => s === 'line')?.[1] ?? 0;
-    const dot = (d: number) => styles(d).find(([s]) => s === 'dotted')?.[1] ?? 0;
-    expect(dot(60)).toBe(0);
-    expect(line(60)).toBeCloseTo(0.9, 9);
-    expect(line(70)).toBeCloseTo(dot(70), 9);
-    expect(line(74)).toBe(0);
-    expect(dot(74)).toBeGreaterThan(0);
+  it('is the same drawing at every inclination: the camera only flattens it', () => {
+    const layer = at(0)[0]?.layer;
+    for (const d of [10, 40, 60, 70, 72, 78, 80, 88, 120]) expect(at(d)[0]?.layer).toBe(layer);
+  });
+  it('is the line drawing, or the dotted one when the galaxy is stipple-only, never both', () => {
+    expect(META.cores.style[at(30)[0]?.layer ?? 0]).toBe('line');
+    expect(META.cores.style[at(85)[0]?.layer ?? 0]).toBe('line');
+    const dotted = { stipple: 0.9, lines: 0 };
+    expect(META.cores.style[at(30, dotted)[0]?.layer ?? 0]).toBe('dotted');
+    expect(META.cores.style[at(85, dotted)[0]?.layer ?? 0]).toBe('dotted');
+  });
+  it('is flattened by bulgeFlat edge-on and stays on screen', () => {
+    const edge = at(90)[0];
+    const face = at(0)[0];
+    if (!edge || !face) throw new Error('no core');
+    const h = (m: Instance['m']) => Math.hypot(m[2], m[3]);
+    expect(h(edge.m) / h(face.m)).toBeCloseTo(P.bulgeFlat, 3);
   });
 });

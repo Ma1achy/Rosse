@@ -37,7 +37,8 @@ struct Culls {
   wobble: f32,
   // PEN.dot, for the drawn stars' size limits
   pen_dot: f32,
-  pad1: f32,
+  // the least share of a sample the dust lets through (ADR 0080): 0 is v21's, a lane that can empty
+  tau_floor: f32,
   pad2: f32,
 }
 
@@ -132,7 +133,7 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
   }
   if ((s.cls & FLAG_TAU) != 0u) {
     let tau = dust_tau(s.pos, view.cos_i, view.dust);
-    if (s.u_tau > exp(-tau)) {
+    if (s.u_tau > max(exp(-tau), culls.tau_floor)) {
       return;
     }
   }

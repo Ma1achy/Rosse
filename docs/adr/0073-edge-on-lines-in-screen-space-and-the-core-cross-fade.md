@@ -4,7 +4,7 @@ Date: 2026-10-09
 
 ## Status
 
-Proposed. A deliberate divergence from v21, decided by the owner; it keeps [0017](0017-model-tier-key-is-a-structure-signature.md)'s tiers (no new structure switch).
+The cross-fade of the core is superseded by [0079](0079-the-core-is-one-opaque-drawing.md). Proposed. A deliberate divergence from v21, decided by the owner; it keeps [0017](0017-model-tier-key-is-a-structure-signature.md)'s tiers (no new structure switch).
 
 ## Context
 

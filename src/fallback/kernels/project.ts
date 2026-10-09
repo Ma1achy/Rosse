@@ -46,7 +46,7 @@ export const CULLS_LAYOUT: StructLayout = {
     ['carve_p', 'f32'],
     ['wobble', 'f32'],
     ['pen_dot', 'f32'],
-    ['pad1', 'f32'],
+    ['tau_floor', 'f32'],
     ['pad2', 'f32'],
   ].map(([name, type], i) => ({
     name: name as string,
@@ -81,7 +81,7 @@ export function noCulls(key = 0): CullsDesc {
       carve_p: 0,
       wobble: 0,
       pen_dot: 1,
-      pad1: 0,
+      tau_floor: 0,
       pad2: 0,
     },
     points: new Float32Array(2),
@@ -170,7 +170,7 @@ export function projectSample(
   const ci = V.cos_i ?? 1;
   if (flags & SampleFlag.tau) {
     const tau = dustTau(x, y, z, ci, V.dust ?? 0);
-    if ((sf[o + 7] ?? 0) > f(Math.exp(-tau))) return Cls.none;
+    if ((sf[o + 7] ?? 0) > Math.max(f(Math.exp(-tau)), C.c.tau_floor ?? 0)) return Cls.none;
   }
   const ca = V.cos_pa ?? 1;
   const sa = V.sin_pa ?? 0;

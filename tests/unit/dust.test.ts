@@ -4,7 +4,7 @@
  * what the galaxy uniform, the edge-on lane and the whole-drawing type read.
  */
 import { describe, expect, it } from 'vitest';
-import { DEF } from '../../src/core/params';
+import { DEF, type Params } from '../../src/core/params';
 import { PRESET_NAMES, presetParams } from '../../src/core/presets';
 import { SCHEMA, sanitise } from '../../src/core/schema';
 import { dustTau } from '../../src/fallback/kernels/project';
@@ -16,6 +16,9 @@ import {
   naturalDust,
 } from '../../src/model/dust';
 import { wholeTypeOf } from '../../src/model/parts';
+import { NATURAL_TAU_FLOOR, cullsUniform } from '../../src/model/ribbons';
+import { CpuStipple } from '../../src/fallback/stipple';
+import { cameraOf } from '../../src/view/camera';
 import { buildScene } from '../../src/model/scene';
 import { mergerGalaxyParams } from '../../src/sim/merger';
 import { buildQuery, parseUrlState } from '../../src/ui/urlstate';
@@ -151,5 +154,37 @@ describe('the address', () => {
     // v21's drawing: the base with the override laid on it has no natural dust
     const P = { ...base, ...parseUrlState(off, features).overrides };
     expect(effectiveDust(P)).toBe(P.dust);
+  });
+});
+
+describe('the natural dust lane dims, it does not empty (ADR 0080)', () => {
+  const live = (P: Params) => {
+    const scene = buildScene(P, META);
+    const v = new CpuStipple(scene).view(cameraOf(P));
+    let n = 0;
+    for (let i = 0; i < scene.galaxy.g.n; i++) if ((v.classes[i] ?? 255) < 255) n++;
+    return { n, tau: scene.galaxy.g.dust };
+  };
+  const edge = (over: object = {}) =>
+    presetParams('Edge-on with dust', 7, { ...NO_SKY, incl: 90, dustLines: 0, ...over });
+
+  it('sets the floor with dustAuto, and not without', () => {
+    const R = buildScene(edge({ dustAuto: 1 }), META).ribbons;
+    expect(cullsUniform(R, cameraOf(edge()), edge({ dustAuto: 1 }), 1).tau_floor).toBe(
+      NATURAL_TAU_FLOOR,
+    );
+    expect(cullsUniform(R, cameraOf(edge()), edge(), 1).tau_floor).toBe(0);
+  });
+
+  it('keeps at least half of what the dust cull touches, edge-on, with dustAuto', () => {
+    const none = live(edge({ dust: 0 })).n;
+    const v21 = live(edge()).n;
+    const auto = live(edge({ dustAuto: 1 })).n;
+    // v21's lane empties the midplane; the floored one loses at most half of what v21's loses...
+    // more exactly the floor keeps more than v21's does
+    expect(v21).toBeLessThan(none);
+    expect(auto).toBeGreaterThan(v21);
+    // and what it keeps is at least half of the samples v21's cull removes, plus those it kept
+    expect(auto - v21).toBeGreaterThanOrEqual(0.5 * (none - v21) - 0.02 * none);
   });
 });

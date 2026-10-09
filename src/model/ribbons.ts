@@ -435,6 +435,13 @@ export function ribUniform(R: RibbonDesc, cam: Camera, P: Params, nDotPool: numb
 }
 
 /** The stipple's dust culls for a view (project.wgsl `Culls`), without the points. */
+/**
+ * The least share of a galaxy's stars the dust lets through when `dustAuto` is on (ADR 0080): the
+ * natural dust lane dims the midplane, it does not empty it, so the strokes drawn along an edge-on
+ * disc thicken it. 0 (a lane that can empty, v21's) when `dustAuto` is off.
+ */
+export const NATURAL_TAU_FLOOR = 0.5;
+
 export function cullsUniform(R: RibbonDesc | null, cam: Camera, P: Params, key: number) {
   const lr = R ? f(R.laneR * cam.zoom) : 0;
   const cw = R ? f(R.carveW) : 0;
@@ -449,7 +456,7 @@ export function cullsUniform(R: RibbonDesc | null, cam: Camera, P: Params, key: 
     carve_p: R ? f(R.carveP) : 0,
     wobble: wobbleAmplitude(P.distort),
     pen_dot: f(penWeights(P.pen).dot),
-    pad1: 0,
+    tau_floor: P.dustAuto > 0 ? NATURAL_TAU_FLOOR : 0,
     pad2: 0,
   };
 }

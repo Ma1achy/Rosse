@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- The drawn core is one opaque drawing (ADR 0079, proposed): alpha 1 (v21: 0.9, and ADR 0073's cross-fade left it half transparent), its style picked from the galaxy (dotted for a stipple-only one, line otherwise) and never swapped by the camera, and it stays edge-on, flattened by `bulgeFlat` (v21 dropped it from incE 80). No core fades or flicks between types under orbit.
+- The natural dust lane dims the midplane and does not empty it (ADR 0080, proposed): with `dustAuto` the extinction keeps at least half of the stars, so the strokes along an edge-on disc thicken it. v21's own dust (`dustAuto` 0) is unchanged.
 - A star dimmed by dust also reaches less far (ADR 0074): its core, glare, spikes and bleed column are drawn `sqrt(keep)` as long, on top of the thinning, so spikes and bloom shrink with how much of its light gets through. A star with nothing in front of it is unchanged.
 - Cosmic rays are sparse and spread over the whole picture on the page (ADR 0078, proposed): a new parameter `cosmicAuto` ("Natural cosmic rays", 0 in the core, so the goldens and vectors are v21's, 1 on the page) draws 40 to 70 hits anywhere on the plate instead of v21's 70 to 130 in a box round the star, where they read as part of the star's effect. A deliberate divergence from v21; `cosmicAuto=0` in a link is v21's drawing.
 - Drawn stars spread smoothly on the page (ADR 0077, proposed): a new parameter `starsAuto` ("Natural star spread", 0 in the core, so the goldens and vectors are v21's, 1 on the page and for the catalogue and real galaxies) makes the stars' weight and their chance of being a bright one rise smoothly with the arm profile (v21 steps at 0.55), and the outer fall-off a taper from R 1.7 to 3 (v21 steps at 2.1 and cuts at 2.7). Both kernels use the same f32 smoothstep polynomial. A deliberate divergence from v21; `starsAuto=0` in a link is v21's drawing.
@@ -17,6 +19,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Fixed
 
+- A merger drew a third core at the middle of the plate, between the two galaxies: its sky host kept the merger's full parameters and both engines drew a drawn core from them (ADR 0079).
 - The CPU merger drew its shells and lens before the debris; the GPU merger, and v21's order, draw them after it. The CPU now matches (`src/fallback/merger.ts`), and `tests/gpu/merger-sky.ts` holds the two engines to one another for a merger's sky and overlays: the same layers in the same order, the sky's own layers within 1/255 on SwiftShader, and the whole picture's ink within 1%.
 - Lensing broke under orbit (an Einstein ring became arcs or one image): the lensed source is now fixed in the lens frame, not in 3D behind it. A deliberate divergence from v21's `srcNow`; the home pose is unchanged (ADR 0072, `tests/unit/lens-orbit.test.ts`).
 - The golden harness crashed on the real galaxies (`unknown preset "Real galaxy 0"`): a case's home is now `fromReal`'s parameters for `Real galaxy N` (`tests/unit/golden-real.test.ts`).

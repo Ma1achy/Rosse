@@ -240,7 +240,9 @@ export function buildScene(P0: Params, meta: DrawingsMeta, opts: SceneOptions = 
         })
       : undefined;
   return {
-    P,
+    // a sky host (a merger's own sky and overlays) has no galaxy: its parameters are the galaxyless
+    // ones, so nothing draws a drawn core, a nuclear spiral or the like at its plate centre
+    P: opts.skyHost ? Pg : P,
     variation,
     galaxy,
     ribbons,
