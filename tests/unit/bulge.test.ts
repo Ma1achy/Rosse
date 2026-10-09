@@ -114,3 +114,41 @@ describe('the bulge samples', () => {
     expect(radii(P)).toEqual(radii(P));
   });
 });
+
+describe('the peanut of a barred bulge', () => {
+  const flag = (P: Params) => buildScene(P, META).galaxy.g.flags & GalaxyFlag.bulgePeanut;
+
+  it('is set for a barred galaxy with the natural bulge, and only then', () => {
+    const barred = presetParams('Barred spiral', 7, { bulgeAuto: 1 });
+    expect(barred.bar).toBeGreaterThan(0.05);
+    expect(flag(barred)).not.toBe(0);
+    expect(flag({ ...barred, bulgeAuto: 0 })).toBe(0);
+    expect(flag({ ...barred, bar: 0 })).toBe(0);
+    expect(flag(presetParams('Grand design', 7, { bulgeAuto: 1, bar: 0 }))).toBe(0);
+  });
+
+  it('makes the bulge taller either side of the centre than at it, and longer along the bar', () => {
+    const base = pureBulge({ bulgeAuto: 1, bulge: 0.9, bulgeFlat: 0.8, bar: 0.6, barLen: 0.5 });
+    const stats = (P: Params) => {
+      const s = runStipple(buildScene(P, META).galaxy);
+      let zc = 0;
+      let nc = 0;
+      let zo = 0;
+      let no = 0;
+      let xmax = 0;
+      for (let i = 0; i < s.n; i++) {
+        if (!s.u32[i * 8 + 3]) continue;
+        const x = Math.abs(s.f32[i * 8] ?? 0);
+        const z = Math.abs(s.f32[i * 8 + 2] ?? 0);
+        if (x < 0.08) ((zc += z), nc++);
+        else if (x > 0.2 && x < 0.3) ((zo += z), no++);
+        xmax = Math.max(xmax, x);
+      }
+      return { ratio: zo / no / (zc / nc), xmax };
+    };
+    const plain = stats({ ...base, bar: 0 });
+    const peanut = stats(base);
+    // the height at the arm of the bar, against the centre's, grows
+    expect(peanut.ratio).toBeGreaterThan(plain.ratio * 1.15);
+  });
+});

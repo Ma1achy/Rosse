@@ -60,7 +60,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0072](adr/0072-the-lensed-source-follows-the-lens-frame.md) | _Proposed:_ the lensed source follows the lens frame under orbit (a deliberate divergence from v21's `srcNow`), so an Einstein ring stays a ring. |
 | [0074](adr/0074-the-star-is-dimmed-by-the-dust-in-front-of-it.md) | _Proposed:_ an overlay star behind a dusty galaxy is dimmed by the galaxy's own dust extinction `exp(-tau)`, all its marks thinned by the same share (a deliberate divergence: v21 never dims it). |
 | [0075](adr/0075-disc-galaxies-carry-a-natural-dust-layer.md) | _Proposed:_ on the page, disc galaxies carry a natural dust layer (`dustAuto`, `effectiveDust = max(dust, naturalDust)` by type and bulge, none for ellipticals) in v21's own smooth slab; off in the core (a deliberate divergence from v21, where `dust` is 0 unless set). |
-| [0076](adr/0076-bulges-follow-a-sersic-law.md) | _Proposed:_ on the page, a bulge's stars follow a deprojected Sérsic law whose index follows the galaxy (`bulgeAuto`, n 1 for a pseudo-bulge to 4 for a big round one) instead of v21's one Hernquist sphere; same size, off in the core. |
+| [0076](adr/0076-bulges-follow-a-sersic-law.md) | _Proposed:_ on the page, a bulge's stars follow a deprojected Sérsic law whose index follows the galaxy (`bulgeAuto`, n 1 for a pseudo-bulge to 4 for a big round one) instead of v21's one Hernquist sphere (boxy-peanut when barred); same size, off in the core. |
 
 ## Modules
 

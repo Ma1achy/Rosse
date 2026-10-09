@@ -346,6 +346,15 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
     px = f(f(rr * sz) * cos(ph));
     py = f(f(rr * sz) * sin(ph));
     pz = f(f(rr * cz) * g.bulge_flat);
+    if (flags & GalaxyFlag.bulgePeanut) {
+      // the bulge of a barred galaxy is boxy-peanut (ADR 0076): longer along the bar, thinner across
+      // it, and taller either side of the centre than at it
+      const t = Math.min(f(Math.abs(px) / f(f(1.1) * g.bar_len)), 1);
+      const w = f(1 - t);
+      px = f(px * f(1 + f(f(0.4) * w)));
+      py = f(py * f(1 - f(f(0.25) * w)));
+      pz = f(pz * f(1 + f(f(f(3.6) * t) * w)));
+    }
   } else if (comp === 1) {
     // −1.4 ln(1 − u) rather than −1.4 ln(u): the same distribution, finite at u = 0
     const rh = f(f(-1.4) * log(f(1 - r.next())));

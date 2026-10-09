@@ -90,6 +90,7 @@ const KNOT_POOL: u32 = 24u;
 const FLAG_ARMS_ON: u32 = 1u;
 const FLAG_SERSIC: u32 = 2u;
 const FLAG_BULGE_SERSIC: u32 = 4u;
+const FLAG_BULGE_PEANUT: u32 = 8u;
 
 // noise salts (NoiseSalt in src/core/noise.ts)
 const SALT_FLOCC: u32 = 1u;
@@ -367,6 +368,13 @@ fn sample(i: u32) {
     let ph = TAU * next();
     let sz = sqrt(1.0 - cz * cz);
     p = vec3<f32>((rr * sz) * cos_f(ph), (rr * sz) * sin_f(ph), (rr * cz) * galaxy.bulge_flat);
+    if ((flags & FLAG_BULGE_PEANUT) != 0u) {
+      // the bulge of a barred galaxy is boxy-peanut (ADR 0076): longer along the bar, thinner across
+      // it, and taller either side of the centre than at it
+      let t = min(abs(p.x) / (1.1 * galaxy.bar_len), 1.0);
+      let w = 1.0 - t;
+      p = vec3<f32>(p.x * (1.0 + 0.4 * w), p.y * (1.0 - 0.25 * w), p.z * (1.0 + 3.6 * t * w));
+    }
   } else if (comp == 1u) {
     // -1.4 ln(1 - u) rather than -1.4 ln(u): the same distribution, finite at u = 0
     let rh = -1.4 * log(1.0 - next());
