@@ -664,7 +664,11 @@ async function start(): Promise<void> {
       vectors,
     ),
   };
-  /** the golden variants' overrides (`?variant=`), which the page applies to every preset */
+  /**
+   * What the page lays over every preset: the golden variants' overrides (`?variant=`), or, on the
+   * page proper, the natural dust of disc galaxies (`dustAuto`, ADR 0075). A link that says
+   * `dustAuto=0` is v21's drawing.
+   */
   const variantOverrides = (name: string): Partial<Params> =>
     variant === 'stipple'
       ? STIPPLE_ONLY
@@ -674,7 +678,7 @@ async function start(): Promise<void> {
           ? vectorsOnly(name)
           : variant === 'lens'
             ? LENS_ONLY
-            : {};
+            : { dustAuto: 1 };
   const makeParams = (name: string, sd: number) => presetParams(name, sd, variantOverrides(name));
 
   /** the surface the toggle asks for; the plate catches up with it in show() */

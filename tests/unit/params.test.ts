@@ -27,12 +27,18 @@ function literal(name: string, close: string): unknown {
   return new Function(`return ${m[1]};`)() as unknown;
 }
 
+/**
+ * The keys the port adds to v21's `DEF`, after v21's own, each with a default that leaves v21's
+ * behaviour as it is. `dustAuto`: the natural dust of disc galaxies, on only on the page (ADR 0075).
+ */
+const EXTRA_KEYS = { dustAuto: 0 };
+
 describe('DEF', () => {
-  it('has every key of the reference, with the same defaults, in order', () => {
+  it('has every key of the reference, with the same defaults, in order, then the extra keys', () => {
     const ref = literal('DEF', '\\};') as Record<string, unknown>;
-    expect(Object.keys(DEF)).toEqual(Object.keys(ref));
-    expect({ ...DEF }).toEqual(ref);
-    expect(PARAM_KEYS.length).toBe(109);
+    expect(Object.keys(DEF)).toEqual([...Object.keys(ref), ...Object.keys(EXTRA_KEYS)]);
+    expect({ ...DEF }).toEqual({ ...ref, ...EXTRA_KEYS });
+    expect(PARAM_KEYS.length).toBe(109 + Object.keys(EXTRA_KEYS).length);
   });
 
   it('withDefaults rejects unknown keys', () => {

@@ -12,6 +12,7 @@ import type { StructLayout } from '../marks/instance';
 import { dotSprite, penWeights, type DrawingsMeta, type Variation } from './variation';
 import { GROUP_STRIDE, markGroups, type MarkGroup, type RingKnotPick } from './clumps';
 import { packNoise, type NoiseField } from '../core/noise';
+import { effectiveDust } from './dust';
 
 const f = Math.fround;
 
@@ -258,7 +259,7 @@ export function describeGalaxy(
     sersic_n: f(P.sersicN),
     sersic_b: f(2 * P.sersicN - 1 / 3),
     re: f(P.re),
-    dust: f(P.dust),
+    dust: f(effectiveDust(P)),
     star_mix: f(P.starMix || 0),
     knots: f(P.knots),
     sparkle: f(P.sparkle),

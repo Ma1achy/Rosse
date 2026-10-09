@@ -52,6 +52,7 @@ import {
 import type { CompanionPick } from './sky';
 import { smWarp, wobbleAmplitude } from '../view/warp';
 import { armPhaseCpu } from './curves';
+import { effectiveDust } from './dust';
 import type { DrawingsMeta, Variation } from './variation';
 
 const DEG = Math.PI / 180;
@@ -202,7 +203,11 @@ export function wholeTypeOf(P: Params, incl: number): string {
       ? 'smooth:elongated'
       : 'smooth';
   if (e > 78)
-    return P.dust > 0.3 ? 'edge-on:dust-lane' : P.bulge < 0.08 ? 'edge-on:thick' : 'edge-on';
+    return effectiveDust(P) > 0.3
+      ? 'edge-on:dust-lane'
+      : P.bulge < 0.08
+        ? 'edge-on:thick'
+        : 'edge-on';
   if (P.flocc > 0.5) return 'galaxy:flocculent';
   if (P.bar > 0.3) return 'galaxy:barred-spiral';
   return P.arms >= 1 ? 'galaxy:spiral' : 'smooth';

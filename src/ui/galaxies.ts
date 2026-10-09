@@ -52,11 +52,14 @@ function closeCatalogue(): void {
   });
 }
 
+/** The page draws a disc galaxy with its natural dust (`dustAuto`, ADR 0075), as it does a preset. */
+const PAGE_DUST = { dustAuto: 1 } as const;
+
 /** What a catalogue galaxy is drawn as, from its card. */
 function choiceOfCard(card: GalaxyCard): GalaxyChoice {
   return {
     from: `gz2:${card.galaxy.objid}`,
-    P: card.mapping.p,
+    P: { ...card.mapping.p, ...PAGE_DUST },
     label: `${card.caption.shortType}, ${card.galaxy.objid}`,
   };
 }
@@ -64,7 +67,7 @@ function choiceOfCard(card: GalaxyCard): GalaxyChoice {
 function choiceOfReal(card: RealCard): GalaxyChoice {
   return {
     from: `real:${String(card.index)}`,
-    P: card.params,
+    P: { ...card.params, ...PAGE_DUST },
     label: card.caption,
     thumb: card.photoUrl,
   };

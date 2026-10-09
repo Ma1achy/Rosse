@@ -210,6 +210,7 @@ export const SCHEMA: { readonly [K in ParamKey]: ParamSpec } = {
   shellTime: num('Time since infall', 20, 140, 1),
   shellAxis: num('Infall direction', 0, 180, 1, { unit: '°' }),
   shellStars: num('Stars', 1000, 12000, 250),
+  dustAuto: choice('Natural dust', ONOFF),
 };
 
 /** The tier a parameter belongs to. */

@@ -233,6 +233,7 @@ export const COMPONENTS: readonly Component[] = [
     on: { key: 'dust', onVal: 0.5, offVal: 0 },
     show: (P) => P.subject === 'galaxy',
     main: ['dust', 'dustLines'],
+    more: ['dustAuto'],
     summary: (P) =>
       `${P.dust > 0.6 ? 'heavy' : 'light'}${P.dustLines > 0.1 ? ', with dust lanes' : ''}`,
   },
@@ -428,6 +429,7 @@ export const OPTION_LABELS: Partial<Record<ParamKey, Record<string, string>>> = 
   merger: ONOFF,
   nuclear: ONOFF,
   rewind: ONOFF,
+  dustAuto: ONOFF,
   jet: ONOFF,
   mWarp: ONOFF,
   lensCluster: ONOFF,

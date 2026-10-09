@@ -257,6 +257,8 @@ export function sourceParams(P: Params, seed: number, o: SourceOpts): Params {
     arrow: 0,
     jet: 0,
     rewind: 0,
+    // a source is far, and its dust is not modelled (ADR 0075): v21's, whatever the page asks
+    dustAuto: 0,
     unwrap: 0,
     distort: 0,
     ring: 0,

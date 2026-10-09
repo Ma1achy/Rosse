@@ -16,6 +16,7 @@ import { Draws } from '../core/rng';
 import { Stream } from '../core/streams';
 import { strokeIndex, strokePools, type StrokesMeta } from '../marks/strokes';
 import { incE } from '../view/camera';
+import { effectiveDust } from './dust';
 import type { Variation } from './variation';
 
 export type Vec3 = [number, number, number];
@@ -234,7 +235,7 @@ export function curves(
         [3.2, 0, 0],
       ],
       w: w * 0.8,
-      k: pick(P.dust > 0.3 ? 'faint' : P.stroke, at(CurveIndex.edgeOn)),
+      k: pick(effectiveDust(P) > 0.3 ? 'faint' : P.stroke, at(CurveIndex.edgeOn)),
       // the alpha is the view tier's (ribUniform): the model holds no continuous inclination
       a: 1,
       taper: false,
