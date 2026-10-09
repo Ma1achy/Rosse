@@ -49,6 +49,7 @@ export const GalaxyFlag = {
   bulgeSersic: 4,
   bulgePeanut: 8,
   starsSmooth: 16,
+  thinDisc: 32,
 } as const;
 
 /** The fields of the `Galaxy` uniform of stipple.wgsl, in order: scalars only. */
@@ -249,7 +250,8 @@ export function describeGalaxy(
       (sersic ? GalaxyFlag.sersic : 0) |
       (bulgeSersic ? GalaxyFlag.bulgeSersic : 0) |
       (bulgeSersic && barred ? GalaxyFlag.bulgePeanut : 0) |
-      (P.starsAuto > 0 ? GalaxyFlag.starsSmooth : 0),
+      (P.starsAuto > 0 ? GalaxyFlag.starsSmooth : 0) |
+      (P.thinAuto > 0 ? GalaxyFlag.thinDisc : 0),
     key,
     n_groups: 0,
     c_bulge: f(wb),

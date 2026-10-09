@@ -678,7 +678,15 @@ async function start(): Promise<void> {
           ? vectorsOnly(name)
           : variant === 'lens'
             ? LENS_ONLY
-            : { dustAuto: 1, bulgeAuto: 1, starsAuto: 1, cosmicAuto: 1, strokesAuto: 1, lineWorld: 1 };
+            : {
+                dustAuto: 1,
+                bulgeAuto: 1,
+                starsAuto: 1,
+                cosmicAuto: 1,
+                strokesAuto: 1,
+                lineWorld: 1,
+                thinAuto: 1,
+              };
   const makeParams = (name: string, sd: number) => presetParams(name, sd, variantOverrides(name));
 
   /** the surface the toggle asks for; the plate catches up with it in show() */

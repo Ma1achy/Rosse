@@ -63,6 +63,11 @@ const CASES: [string, Params][] = [
     `${n} s7, natural star spread`,
     presetParams(n, 7, { starsAuto: 1, starMix: 1 }),
   ]),
+  // the thin disc (ADR 0083): the mixed vertical layer and the shorter bulge tail
+  ...['Grand design', 'Barred spiral', 'Smooth, round'].map((n): [string, Params] => [
+    `${n} s7, thin disc`,
+    presetParams(n, 7, { thinAuto: 1, bulgeAuto: 1 }),
+  ]),
   [
     'every branch: patchy, irregular, flocculent, dusty, ringed, barred',
     presetParams('Grand design', 99, {

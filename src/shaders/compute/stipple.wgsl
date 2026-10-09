@@ -92,6 +92,7 @@ const FLAG_SERSIC: u32 = 2u;
 const FLAG_BULGE_SERSIC: u32 = 4u;
 const FLAG_BULGE_PEANUT: u32 = 8u;
 const FLAG_STARS_SMOOTH: u32 = 16u;
+const FLAG_THIN_DISC: u32 = 32u;
 
 // noise salts (NoiseSalt in src/core/noise.ts)
 const SALT_FLOCC: u32 = 1u;
@@ -371,7 +372,9 @@ fn sample(i: u32) {
       let nB = galaxy.sersic_n;
       let pB = 1.0 - 0.6097 / nB + 0.05463 / (nB * nB);
       let re3 = 1.788 * a; // the projected half-light radius: the 3D half-mass radius is 1.35 of it
-      rr = min(re3 * pow(gamma_s(nB * (3.0 - pB)) / galaxy.sersic_b, nB), 20.0 * a);
+      // the cut: 20 scale lengths, or 8 for a thin disc's bulge (ADR 0083)
+      let cut = select(20.0, 8.0, (flags & FLAG_THIN_DISC) != 0u);
+      rr = min(re3 * pow(gamma_s(nB * (3.0 - pB)) / galaxy.sersic_b, nB), cut * a);
     } else {
       let sq = sqrt(min(next(), 0.985));
       rr = (a * sq) / (1.0 - sq);
@@ -468,7 +471,16 @@ fn sample(i: u32) {
         return;
       }
     }
-    var z = -galaxy.thick * log(1.0 - next());
+    let uz = next();
+    var z = -galaxy.thick * log(1.0 - uz);
+    if ((flags & FLAG_THIN_DISC) != 0u) {
+      // a thin disc (ADR 0083): a tighter scale that flares a little outward, and a tail that stops
+      // 85% in a sharp layer, 15% in a thicker one, from the one draw
+      let sharp = uz < 0.85;
+      let uu = select((uz - 0.85) / 0.15, uz / 0.85, sharp);
+      let sc = select(1.5, 0.4, sharp);
+      z = -(galaxy.thick * sc * (1.0 + 0.15 * R2)) * log(1.0 - 0.97 * uu);
+    }
     if (next() < 0.5) {
       z = -z;
     }

@@ -342,7 +342,8 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
       const pB = f(f(f(1 - f(f(0.6097) / nB)) + f(f(0.05463) / f(nB * nB))));
       const re3 = f(f(1.788) * a);
       const k = f(nB * f(3 - pB));
-      rr = Math.min(f(re3 * pow(f(gammaS(k, r) / g.sersic_b), nB)), f(f(20) * a));
+      const cut = flags & GalaxyFlag.thinDisc ? f(8) : f(20);
+      rr = Math.min(f(re3 * pow(f(gammaS(k, r) / g.sersic_b), nB)), f(cut * a));
     } else {
       const sq = sqrt(Math.min(r.next(), f(0.985)));
       rr = f(f(a * sq) / f(1 - sq));
@@ -442,7 +443,15 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
         return;
       }
     }
-    let z = f(f(-g.thick) * log(f(1 - r.next())));
+    const uz = r.next();
+    let z = f(f(-g.thick) * log(f(1 - uz)));
+    if (flags & GalaxyFlag.thinDisc) {
+      // 85% in a sharp layer, 15% in a thicker one, from the one draw
+      const sharp = uz < f(0.85);
+      const uu = sharp ? f(uz / f(0.85)) : f(f(uz - f(0.85)) / f(0.15));
+      const sc = sharp ? f(0.4) : f(1.5);
+      z = f(f(-f(f(g.thick * sc) * f(f(1) + f(f(0.15) * R2)))) * log(f(f(1) - f(f(0.97) * uu))));
+    }
     if (r.next() < f(0.5)) z = f(-z);
     const warp = g.warp;
     if (warp > 0 && R2 > f(1.8)) {

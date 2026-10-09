@@ -384,7 +384,7 @@ export const COMPONENTS: readonly Component[] = [
     name: 'The drawings',
     icon: ['whole', 'galaxy:spiral'],
     main: ['lines', 'whole', 'envelope', 'outline'],
-    more: ['stroke', 'nuclear', 'rewind', 'lineWorld', 'strokesAuto'],
+    more: ['stroke', 'nuclear', 'rewind', 'lineWorld', 'strokesAuto', 'thinAuto'],
     summary: () => 'which kinds of drawing are used',
   },
   {
@@ -436,6 +436,7 @@ export const OPTION_LABELS: Partial<Record<ParamKey, Record<string, string>>> = 
   cosmicAuto: ONOFF,
   lineWorld: ONOFF,
   strokesAuto: ONOFF,
+  thinAuto: ONOFF,
   jet: ONOFF,
   mWarp: ONOFF,
   lensCluster: ONOFF,

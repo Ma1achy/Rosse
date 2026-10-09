@@ -67,6 +67,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0080](adr/0080-the-dust-lane-dims-it-does-not-empty.md) | _Proposed:_ with `dustAuto`, the dust cull keeps at least half the stars (`tau_floor`), so an edge-on lane dims and the strokes thicken the disc. |
 | [0081](adr/0081-line-work-in-three-dimensions.md) | _Proposed:_ `lineWorld` (off by default) describes line-work at a fixed inclination and draws dust lanes as ring arcs in the disc plane, so tilt pops nothing. |
 | [0082](adr/0082-natural-arm-strokes.md) | _Proposed:_ `strokesAuto` adds a broad root stroke and offset companion strokes to each ribbon arm, thinning toward the tip. |
+| [0083](adr/0083-a-thin-disc-with-a-few-wanderers.md) | _Proposed:_ `thinAuto` gives the disc a sharp layer (85%) and a thicker one (15%) and cuts the bulge tail, so the plane is dense. |
 
 ## Modules
 

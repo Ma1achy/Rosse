@@ -216,6 +216,7 @@ export const SCHEMA: { readonly [K in ParamKey]: ParamSpec } = {
   cosmicAuto: choice('Natural cosmic rays', ONOFF),
   lineWorld: choice('Line-work in 3D', ONOFF),
   strokesAuto: choice('Natural arm strokes', ONOFF),
+  thinAuto: choice('Thin disc', ONOFF),
 };
 
 /** The tier a parameter belongs to. */

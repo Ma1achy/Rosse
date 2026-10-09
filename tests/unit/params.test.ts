@@ -38,6 +38,7 @@ const EXTRA_KEYS = {
   cosmicAuto: 0,
   lineWorld: 0,
   strokesAuto: 0,
+  thinAuto: 0,
 };
 
 describe('DEF', () => {
