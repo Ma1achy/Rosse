@@ -82,6 +82,8 @@ export const PartIndex = {
   jet: 12,
   /** stream q uses index `streams + q` */
   streams: 20,
+  /** stream q's tilt out of the galaxy plane (ADR 0085) uses `streamTilt + q` */
+  streamTilt: 40,
 } as const;
 
 /**
@@ -425,6 +427,14 @@ export function ownPartPicks(P: Params, V: Variation, meta: DrawingsMeta, incl: 
   return picks;
 }
 
+/**
+ * How far stream q's orbit is tilted out of the galaxy's plane, radians (ADR 0085): drawn on the
+ * stream's own counter, so a stream keeps its plane whatever else changes.
+ */
+export function streamTilt(seed: number, q: number): number {
+  return 0.35 + 0.95 * new Draws(seed, Stream.parts, PartIndex.streamTilt + q).f32();
+}
+
 /** The streams' pen lines bent round the galaxy (L1072–1075), in galaxy units about the centre. */
 export function streamPolylines(picks: PartPicks, penlines: VectorSheet | undefined) {
   const out: [number, number][][] = [];
@@ -610,7 +620,36 @@ export function vectorRows(
       add('rings', { x, y, alpha: 1, ps: 0.6, tile: b.tile, m: chain(D, Rm(b.spin), Sm(bs, bs)) });
     }
   }
-  if (pk.jet) {
+  if (pk.jet && P.lineWorld > 0) {
+    // the jet is a real thing along the galaxy's own axis, a little off it (ADR 0085): the two
+    // lobes run out from the centre in 3D and are projected, so a face-on jet points at the
+    // viewer (short, a blob) and an edge-on one stands up out of the disc
+    const tilt = 0.14;
+    const dir: [number, number, number] = [
+      Math.sin(tilt) * Math.cos(pk.jet.ang),
+      Math.sin(tilt) * Math.sin(pk.jet.ang),
+      Math.cos(tilt),
+    ];
+    const base = project([0, 0, 0], cam);
+    const Lg = 3 + 1.0 * pk.jet.u;
+    for (const s2 of [1, -1]) {
+      const len = Lg * (s2 > 0 ? 1 : 0.65);
+      const tip = project([dir[0] * s2 * len, dir[1] * s2 * len, dir[2] * s2 * len], cam);
+      const dx = tip[0] - base[0];
+      const dy = tip[1] - base[1];
+      const w = 0.2 * len * sc;
+      const L = Math.max(Math.hypot(dx, dy), 1.4 * w);
+      const ang = Math.atan2(dy, dx);
+      add('misc', {
+        x: base[0] + Math.cos(ang) * L * 0.5,
+        y: base[1] + Math.sin(ang) * L * 0.5,
+        alpha: 1,
+        ps: 1.1,
+        tile: 0,
+        m: chain(Rm(ang), Sm(L, w)),
+      });
+    }
+  } else if (pk.jet) {
     const ja = pk.jet.ang;
     const jl = (3.6 + 1.0 * pk.jet.u) * sc;
     for (const s2 of [1, -1]) {

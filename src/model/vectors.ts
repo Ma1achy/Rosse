@@ -22,7 +22,14 @@ import {
 import { PLATE, UNIT_SCALE, project, type Camera } from '../view/camera';
 import type { RibbonDesc } from './ribbons';
 import { wobbleAmplitude } from '../view/warp';
-import { describeParts, vectorRows, type PartPicks, type PartsDesc, type VectorRow } from './parts';
+import {
+  describeParts,
+  streamTilt,
+  vectorRows,
+  type PartPicks,
+  type PartsDesc,
+  type VectorRow,
+} from './parts';
 import type { CompanionPick } from './sky';
 import { penWeights, type DrawingsMeta, type Variation } from './variation';
 
@@ -330,6 +337,7 @@ export interface VectorView {
 export function streamSegments(
   parts: PartsDesc,
   zoom: number,
+  world?: { cam: Camera; seed: number },
 ): { buf: ArrayBuffer; nSegs: number; nSlots: number } {
   const sc = UNIT_SCALE * zoom;
   const c = PLATE / 2;
@@ -338,8 +346,19 @@ export function streamSegments(
     for (let j = 1; j < pts.length; j++) {
       const a = pts[j - 1] ?? [0, 0];
       const b = pts[j] ?? [0, 0];
-      const p0: [number, number] = [c + a[0] * sc, c + a[1] * sc];
-      const p1: [number, number] = [c + b[0] * sc, c + b[1] * sc];
+      let p0: [number, number] = [c + a[0] * sc, c + a[1] * sc];
+      let p1: [number, number] = [c + b[0] * sc, c + b[1] * sc];
+      if (world) {
+        // a stream is on an orbit tilted out of the galaxy's plane (ADR 0085): in 3D, projected
+        const t = streamTilt(world.seed, q);
+        const lift = (p: readonly number[]): [number, number, number] => [
+          p[0] ?? 0,
+          (p[1] ?? 0) * Math.cos(t),
+          (p[1] ?? 0) * Math.sin(t),
+        ];
+        p0 = project(lift(a), world.cam);
+        p1 = project(lift(b), world.cam);
+      }
       const n = Math.max(1, Math.round(Math.hypot(p1[0] - p0[0], p1[1] - p0[1]) / 2.4));
       segs.push({ p0, p1, n: Math.min(n, 4096), index: streamMarkIndex(q, j, 0) });
     }
@@ -400,7 +419,7 @@ export function vectorView(
     u[o + 19] = D.dotFirst[i] ?? 0;
     u[o + 20] = D.blobFirst[i] ?? 0;
   });
-  const st = streamSegments(D.parts, cam.zoom);
+  const st = streamSegments(D.parts, cam.zoom, P.lineWorld > 0 ? { cam, seed: P.seed } : undefined);
   return {
     rows,
     inst,
