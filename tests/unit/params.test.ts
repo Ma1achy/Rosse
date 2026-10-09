@@ -31,7 +31,7 @@ function literal(name: string, close: string): unknown {
  * The keys the port adds to v21's `DEF`, after v21's own, each with a default that leaves v21's
  * behaviour as it is. `dustAuto`: the natural dust of disc galaxies, on only on the page (ADR 0075).
  */
-const EXTRA_KEYS = { dustAuto: 0 };
+const EXTRA_KEYS = { dustAuto: 0, bulgeAuto: 0 };
 
 describe('DEF', () => {
   it('has every key of the reference, with the same defaults, in order, then the extra keys', () => {

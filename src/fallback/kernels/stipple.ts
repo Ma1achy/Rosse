@@ -328,8 +328,18 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
   let arm = 0;
   if (comp === 0) {
     const a = g.bulge_a;
-    const sq = sqrt(Math.min(r.next(), f(0.985)));
-    const rr = f(f(a * sq) / f(1 - sq));
+    let rr: number;
+    if (flags & GalaxyFlag.bulgeSersic) {
+      // a deprojected Sérsic bulge (ADR 0076): the mass inside r is a gamma of shape n (3 − p)
+      const nB = g.sersic_n;
+      const pB = f(f(f(1 - f(f(0.6097) / nB)) + f(f(0.05463) / f(nB * nB))));
+      const re3 = f(f(1.788) * a);
+      const k = f(nB * f(3 - pB));
+      rr = Math.min(f(re3 * pow(f(gammaS(k, r) / g.sersic_b), nB)), f(f(20) * a));
+    } else {
+      const sq = sqrt(Math.min(r.next(), f(0.985)));
+      rr = f(f(a * sq) / f(1 - sq));
+    }
     const cz = f(f(2 * r.next()) - 1);
     const ph = f(TAU * r.next());
     const sz = sqrt(f(1 - f(cz * cz)));

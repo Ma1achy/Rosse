@@ -174,7 +174,7 @@ export const COMPONENTS: readonly Component[] = [
     on: { key: 'bulge', onVal: 0.5, offVal: 0 },
     show: isGalaxy,
     main: ['bulge', 'bulgeSize'],
-    more: ['bulgeFlat'],
+    more: ['bulgeFlat', 'bulgeAuto'],
     summary: (P) =>
       `${P.bulge > 0.7 ? 'dominant' : P.bulge > 0.35 ? 'prominent' : 'modest'}, ${P.bulgeFlat < 0.6 ? 'flattened' : 'round'}`,
   },
@@ -430,6 +430,7 @@ export const OPTION_LABELS: Partial<Record<ParamKey, Record<string, string>>> = 
   nuclear: ONOFF,
   rewind: ONOFF,
   dustAuto: ONOFF,
+  bulgeAuto: ONOFF,
   jet: ONOFF,
   mWarp: ONOFF,
   lensCluster: ONOFF,

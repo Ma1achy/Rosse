@@ -53,6 +53,11 @@ const CASES: [string, Params][] = [
     'Hand wobble',
     'Tightly wound',
   ].map((n): [string, Params] => [`${n} s7`, presetParams(n, 7)]),
+  // the natural bulge (ADR 0076): the Sérsic radius of the bulge, its gamma sampler on both engines
+  ...['Grand design', 'Barred spiral', 'Edge-on with dust'].map((n): [string, Params] => [
+    `${n} s7, natural bulge`,
+    presetParams(n, 7, { bulgeAuto: 1, dustAuto: 1 }),
+  ]),
   [
     'every branch: patchy, irregular, flocculent, dusty, ringed, barred',
     presetParams('Grand design', 99, {

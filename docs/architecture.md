@@ -60,6 +60,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0072](adr/0072-the-lensed-source-follows-the-lens-frame.md) | _Proposed:_ the lensed source follows the lens frame under orbit (a deliberate divergence from v21's `srcNow`), so an Einstein ring stays a ring. |
 | [0074](adr/0074-the-star-is-dimmed-by-the-dust-in-front-of-it.md) | _Proposed:_ an overlay star behind a dusty galaxy is dimmed by the galaxy's own dust extinction `exp(-tau)`, all its marks thinned by the same share (a deliberate divergence: v21 never dims it). |
 | [0075](adr/0075-disc-galaxies-carry-a-natural-dust-layer.md) | _Proposed:_ on the page, disc galaxies carry a natural dust layer (`dustAuto`, `effectiveDust = max(dust, naturalDust)` by type and bulge, none for ellipticals) in v21's own smooth slab; off in the core (a deliberate divergence from v21, where `dust` is 0 unless set). |
+| [0076](adr/0076-bulges-follow-a-sersic-law.md) | _Proposed:_ on the page, a bulge's stars follow a deprojected Sérsic law whose index follows the galaxy (`bulgeAuto`, n 1 for a pseudo-bulge to 4 for a big round one) instead of v21's one Hernquist sphere; same size, off in the core. |
 
 ## Modules
 
@@ -117,6 +118,7 @@ These are intended changes in behaviour, each confirmed or rejected by the owner
 5. **Integer-lattice value noise** replaces the `sin`-hash noise, so flocculence, patchiness and dust gaps are the same on every machine. The patterns differ from v21's, but their statistics do not.
 6. **The star is dimmed by the dust in front of it.** v21 never dims the overlay star; here, behind a dusty galaxy, all its marks thin by the same `exp(-tau)` of the galaxy's own dust model (ADR 0074).
 7. **Disc galaxies carry a natural dust layer.** v21's `dust` is 0 unless a preset sets it; with `dustAuto` (on in the page, off in the core) every reader of the dust takes `max(dust, naturalDust)`: a spiral about 0.35 face-on optical depth, an elliptical none (ADR 0075).
+8. **Bulges follow a Sérsic law.** v21 draws every bulge as one flattened Hernquist sphere; with `bulgeAuto` (on in the page, off in the core) the stipple draws the radius from a deprojected Sérsic law, index by type and flatness, at the same half-mass radius (ADR 0076).
 
 ## Performance budget
 

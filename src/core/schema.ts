@@ -211,6 +211,7 @@ export const SCHEMA: { readonly [K in ParamKey]: ParamSpec } = {
   shellAxis: num('Infall direction', 0, 180, 1, { unit: '°' }),
   shellStars: num('Stars', 1000, 12000, 250),
   dustAuto: choice('Natural dust', ONOFF),
+  bulgeAuto: choice('Natural bulge', ONOFF),
 };
 
 /** The tier a parameter belongs to. */

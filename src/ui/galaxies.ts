@@ -53,7 +53,7 @@ function closeCatalogue(): void {
 }
 
 /** The page draws a disc galaxy with its natural dust (`dustAuto`, ADR 0075), as it does a preset. */
-const PAGE_DUST = { dustAuto: 1 } as const;
+const PAGE_DUST = { dustAuto: 1, bulgeAuto: 1 } as const;
 
 /** What a catalogue galaxy is drawn as, from its card. */
 function choiceOfCard(card: GalaxyCard): GalaxyChoice {

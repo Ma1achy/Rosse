@@ -89,6 +89,7 @@ const KNOT_POOL: u32 = 24u;
 
 const FLAG_ARMS_ON: u32 = 1u;
 const FLAG_SERSIC: u32 = 2u;
+const FLAG_BULGE_SERSIC: u32 = 4u;
 
 // noise salts (NoiseSalt in src/core/noise.ts)
 const SALT_FLOCC: u32 = 1u;
@@ -351,8 +352,17 @@ fn sample(i: u32) {
   var arm = 0.0;
   if (comp == 0u) {
     let a = galaxy.bulge_a;
-    let sq = sqrt(min(next(), 0.985));
-    let rr = (a * sq) / (1.0 - sq);
+    var rr = 0.0;
+    if ((flags & FLAG_BULGE_SERSIC) != 0u) {
+      // a deprojected Sersic bulge (ADR 0076): the mass inside r is a gamma of shape n (3 - p)
+      let nB = galaxy.sersic_n;
+      let pB = 1.0 - 0.6097 / nB + 0.05463 / (nB * nB);
+      let re3 = 1.788 * a; // the projected half-light radius: the 3D half-mass radius is 1.35 of it
+      rr = min(re3 * pow(gamma_s(nB * (3.0 - pB)) / galaxy.sersic_b, nB), 20.0 * a);
+    } else {
+      let sq = sqrt(min(next(), 0.985));
+      rr = (a * sq) / (1.0 - sq);
+    }
     let cz = 2.0 * next() - 1.0;
     let ph = TAU * next();
     let sz = sqrt(1.0 - cz * cz);

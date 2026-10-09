@@ -12,6 +12,7 @@ import type { StructLayout } from '../marks/instance';
 import { dotSprite, penWeights, type DrawingsMeta, type Variation } from './variation';
 import { GROUP_STRIDE, markGroups, type MarkGroup, type RingKnotPick } from './clumps';
 import { packNoise, type NoiseField } from '../core/noise';
+import { bulgeIndex, bulgeIsSersic, psB } from './bulge';
 import { effectiveDust } from './dust';
 
 const f = Math.fround;
@@ -42,7 +43,7 @@ export const SHAPE = {
 } as const;
 
 /** Galaxy flags. */
-export const GalaxyFlag = { armsOn: 1, sersic: 2 } as const;
+export const GalaxyFlag = { armsOn: 1, sersic: 2, bulgeSersic: 4 } as const;
 
 /** The fields of the `Galaxy` uniform of stipple.wgsl, in order: scalars only. */
 const GALAXY_FIELDS = [
@@ -221,6 +222,8 @@ export function describeGalaxy(
   const wd = Math.max(0, 1 - wb - wh - wbar - wring);
   const armsOn = P.arms >= 1 && P.bulge < 0.98;
   const sersic = P.sersicN > 0 && P.bulge >= 0.95;
+  const bulgeSersic = bulgeIsSersic(P);
+  const nB = bulgeSersic ? bulgeIndex(P) : P.sersicN;
   const barred = P.bar > 0.05;
   const penDot = penWeights(P.pen).dot;
   const nVar = Math.min(MAX_ARMS, V.arms.length);
@@ -235,7 +238,10 @@ export function describeGalaxy(
     n_dot_pool: V.dotPool.length,
     n_knot_pool: KNOT_POOL,
     n_star_tiles: meta.stars.count,
-    flags: (armsOn ? GalaxyFlag.armsOn : 0) | (sersic ? GalaxyFlag.sersic : 0),
+    flags:
+      (armsOn ? GalaxyFlag.armsOn : 0) |
+      (sersic ? GalaxyFlag.sersic : 0) |
+      (bulgeSersic ? GalaxyFlag.bulgeSersic : 0),
     key,
     n_groups: 0,
     c_bulge: f(wb),
@@ -256,8 +262,8 @@ export function describeGalaxy(
     arm_inner: f(barred ? P.barLen : 0.3),
     patchy: f(P.patchy),
     irr: f(P.irr),
-    sersic_n: f(P.sersicN),
-    sersic_b: f(2 * P.sersicN - 1 / 3),
+    sersic_n: f(nB),
+    sersic_b: f(bulgeSersic ? psB(nB) : 2 * P.sersicN - 1 / 3),
     re: f(P.re),
     dust: f(effectiveDust(P)),
     star_mix: f(P.starMix || 0),

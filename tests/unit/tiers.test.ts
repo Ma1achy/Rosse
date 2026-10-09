@@ -186,6 +186,14 @@ describe('tier invalidation (ADR 0010)', () => {
     expect(sceneHash({ ...P, dustAuto: 1 })).not.toBe(sceneHash(P));
     expect(tierWork({ P, zoom: 1 }, { P: { ...P, dustAuto: 1 }, zoom: 1 }).model).toBe(true);
   });
+
+  it('the natural bulge is model data: orbit and zoom leave it alone, switching it rebuilds (ADR 0076)', () => {
+    const P = presetParams('Grand design', 7, { bulgeAuto: 1 });
+    const h0 = sceneHash(P);
+    for (const m of moves(P)) expect(sceneHash(m.P), m.what).toBe(h0);
+    expect(sceneHash({ ...P, bulgeAuto: 0 })).not.toBe(h0);
+    expect(tierWork({ P, zoom: 1 }, { P: { ...P, bulgeAuto: 0 }, zoom: 1 }).model).toBe(true);
+  });
 });
 
 describe('the CPU engine: orbiting changes no model buffer (hashes)', () => {
@@ -200,6 +208,11 @@ describe('the CPU engine: orbiting changes no model buffer (hashes)', () => {
     [
       'Grand design s7, natural dust (incl 35)',
       presetParams('Grand design', 7, { dustAuto: 1, incl: 35 }),
+    ],
+    // the natural bulge (ADR 0076) is model data too
+    [
+      'Grand design s7, natural bulge and dust (incl 60)',
+      presetParams('Grand design', 7, { bulgeAuto: 1, dustAuto: 1, incl: 60 }),
     ],
     [
       'Barred spiral s7, natural dust, edge-on (lane, carving, the cull)',
