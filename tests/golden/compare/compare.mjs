@@ -53,6 +53,8 @@
  *   --only a,b        only the cases whose name contains one of these (for working on a few; the
  *                     run then checks fewer than the required set)
  *   --report-all      a report for every case, not only failing ones
+ *   --gallery         tests/golden/actual/gallery: v21 | WebGPU | CPU | difference for every case, and an
+ *                     index sorted worst-first by the local (16 px block) ink error
  *   --update-engine   write ../engine-hashes.json from this run (the engine's own goldens)
  */
 import { createHash } from 'node:crypto';
@@ -287,6 +289,9 @@ async function compareAll(G, node) {
   const newHashes = {};
   /** @type {any[]} */
   const results = [];
+  /** @type {any[]} */
+  const galleryRows = [];
+  const galleryDir = join(ROOT, 'tests/golden/actual/gallery');
   let fails = 0;
   console.log(
     `\n${'case'.padEnd(44)} ${'engine'.padEnd(9)} ${'ink'.padStart(7)} ${'(b)'.padStart(6)} ${"(b')".padStart(6)} ${'median'.padStart(7)} ${'p90'.padStart(7)} ${'r50'.padStart(7)} ${'r90'.padStart(7)} ${'outer'.padStart(7)} ${'Δq'.padStart(7)} ${'Δpa°'.padStart(6)}  counts (dots knots stars rstars)  result`,
@@ -413,7 +418,25 @@ async function compareAll(G, node) {
     row.pass = pass;
     results.push(row);
     if (!pass && isRequired) fails++;
+    if (flag('--gallery')) {
+      const w = gpu ? engines[0] : undefined;
+      const render = (w ?? engines[engines.length - 1])?.alpha;
+      const p = row[`parity_${gpu ? 'webgpu' : 'cpu'}`];
+      galleryRows.push({
+        name: c.name,
+        image: G.writeGalleryImage(galleryDir, c.name, ref, w?.alpha, cpu.alpha),
+        ink: p.inkRel,
+        ssimCoarse: p.ssimCoarse,
+        local: G.localError(ref, render),
+        cpuLocal: w ? G.localError(w.alpha, cpu.alpha) : 0,
+        pass: p.pass,
+      });
+    }
   }
+  if (flag('--gallery'))
+    console.log(
+      `gallery: ${galleryRows.length} cases, ${G.writeGalleryIndex(galleryDir, galleryRows)}`,
+    );
 
   // 4. drawn-star count gate on the full captures of the acceptance presets
   console.log('\ndrawn stars (rstars) on the full presets, CPU engine with v21 variation:');

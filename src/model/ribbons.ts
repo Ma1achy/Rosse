@@ -6,7 +6,9 @@
  *
  * Every 3D point the view tier projects is in one array (`points3`), in this order: the curves'
  * control points, the lane points, the carving lines' points, then each hatch's two anchors. One
- * projection pass serves the ribbons, the pieces, the hatches and the stipple's dust culls.
+ * projection pass serves the ribbons, the pieces, the hatches and the stipple's dust culls. A
+ * point whose fourth float is 1 is a screen-space offset (the edge-on midplane's lines, ADR 0073):
+ * the projection only mirrors it by the winding, rolls it by `pa` and scales it.
  */
 import type { Params } from '../core/params';
 import { packNoise, type NoiseField } from '../core/noise';
@@ -222,7 +224,7 @@ export interface RibbonDesc {
   curves: Curve[];
   lanes: DustLanes;
   nPoints: number;
-  /** 4 floats per point (x, y, z, 0), galaxy frame */
+  /** 4 floats per point (x, y, z, screen): galaxy frame, or (x, y, 0, 1) in screen space */
   points3: Float32Array<ArrayBuffer>;
   nCurves: number;
   curveBuf: ArrayBuffer;
@@ -279,6 +281,8 @@ export function describeRibbons(
   const sheetH = strokes?.h ?? 64;
 
   const pts: Vec3[] = [];
+  // the points that are screen-space offsets, by index in `pts` (ADR 0073)
+  const screen = new Set<number>();
   const curveBuf = new ArrayBuffer(Math.max(1, C.length) * CURVE_LAYOUT.size);
   const cu = new Uint32Array(curveBuf);
   const cf = new Float32Array(curveBuf);
@@ -318,15 +322,18 @@ export function describeRibbons(
     cu[o + 11] = pieceCap;
     if (!pieces) nSegs += Math.max(0, c.pts.length - 1);
     else pieceCap += capReps * np;
+    if (c.screen) for (let j = 0; j < c.pts.length; j++) screen.add(pts.length + j);
     pts.push(...c.pts);
   });
 
   const laneFirst = pts.length;
+  if (lanes.screenPts) for (let j = 0; j < lanes.pts.length; j++) screen.add(pts.length + j);
   pts.push(...lanes.pts);
   const carve: number[] = [];
   for (const line of lanes.lines) {
     const first = pts.length;
     for (let j = 0; j + 1 < line.length; j++) carve.push(first + j);
+    if (lanes.screenLines) for (let j = 0; j < line.length; j++) screen.add(first + j);
     pts.push(...line);
   }
 
@@ -340,6 +347,10 @@ export function describeRibbons(
     const o = i * HATCH_WORDS;
     hu[o] = pts.length;
     hu[o + 1] = pts.length + 1;
+    if (h.screen) {
+      screen.add(pts.length);
+      screen.add(pts.length + 1);
+    }
     pts.push(h.a, h.b);
     hu[o + 2] = h.tile;
     hu[o + 3] = nCaps;
@@ -359,7 +370,7 @@ export function describeRibbons(
 
   const points3 = new Float32Array(Math.max(1, pts.length) * 4);
   pts.forEach((p, i) => {
-    points3.set([p[0], p[1], p[2], 0], i * 4);
+    points3.set([p[0], p[1], p[2], screen.has(i) ? 1 : 0], i * 4);
   });
   return {
     curves: C,
@@ -412,9 +423,9 @@ export function ribUniform(R: RibbonDesc, cam: Camera, P: Params, nDotPool: numb
     pen_line: f(R.penLine),
     wobble: wobbleAmplitude(P.distort),
     zoom: f(cam.zoom),
-    // v21 parity: the edge-on stroke's alpha is lines·(incl − 72)/18 from the RAW inclination
-    // (app23.js:L788), continuous and asymmetric about 90° (1.5·lines at 99°, 0.5·lines at 81°,
-    // one incE bucket), so it is a view-tier number; whether the stroke exists is the bucket's
+    // the edge-on stroke's alpha, lines·clamp((incE − 72)/18, 0, 1), is continuous inside an incE
+    // bucket, so it is a view-tier number; whether the stroke exists is the bucket's. v21 used
+    // the raw incl, unclamped (app23.js:L788): a deliberate deviation, ADR 0073
     edge_alpha: f(edgeOnAlpha(R.lines, cam.incl)),
     sheet_w: R.sheetW,
     sheet_h: R.sheetH,
@@ -424,7 +435,14 @@ export function ribUniform(R: RibbonDesc, cam: Camera, P: Params, nDotPool: numb
 }
 
 /** The stipple's dust culls for a view (project.wgsl `Culls`), without the points. */
-export function cullsUniform(R: RibbonDesc | null, cam: Camera, P: Params, key: number) {
+export function cullsUniform(
+  R: RibbonDesc | null,
+  cam: Camera,
+  P: Params,
+  key: number,
+  /** the view has a star whose marks the samples occlude (the occluder grid, ADR 0074) */
+  occ = false,
+) {
   const lr = R ? f(R.laneR * cam.zoom) : 0;
   const cw = R ? f(R.carveW) : 0;
   return {
@@ -438,7 +456,7 @@ export function cullsUniform(R: RibbonDesc | null, cam: Camera, P: Params, key: 
     carve_p: R ? f(R.carveP) : 0,
     wobble: wobbleAmplitude(P.distort),
     pen_dot: f(penWeights(P.pen).dot),
-    pad1: 0,
+    occ: occ ? 1 : 0,
     pad2: 0,
   };
 }

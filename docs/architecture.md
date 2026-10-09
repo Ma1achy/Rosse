@@ -57,6 +57,8 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0061](adr/0061-real-galaxies-with-the-sky-on-and-two-more-cases-against-v21s-mean.md) | _Proposed:_ the real galaxies drawn with the sky on (captures without the overrides): the `real` family's dots tolerance calibrated again (ADR 0035's procedure, factor 2; no other threshold), and `Real galaxy 6` and `barred-spiral--knob-ring-lines` (s7 home) compared with the mean of v21's 8 draws (ADR 0036). |
 | [0070](adr/0070-pooled-scratch-shared-uploads-and-kept-batches.md) | _Proposed:_ pooled scratch buffers (cleared on reuse), content-addressed shared uploads and kept ink batches, so a model rebuild and an orbit frame create almost no resources. Output unchanged. |
 | [0071](adr/0071-the-cpu-engine-runs-in-a-worker.md) | _Proposed:_ the CPU engine runs in a worker behind messages (`fallback/core.ts`, `worker.ts`, `client.ts`), so a CPU frame never blocks the page. |
+| [0072](adr/0072-the-lensed-source-follows-the-lens-frame.md) | _Proposed:_ the lensed source follows the lens frame under orbit (a deliberate divergence from v21's `srcNow`), so an Einstein ring stays a ring. |
+| [0074](adr/0074-the-star-is-occluded-by-what-is-nearer.md) | _Proposed:_ a star's marks are left out where a nearer mark of the galaxy is drawn (a deliberate divergence: v21 draws the star over everything), by a coarse occluder depth grid. |
 
 ## Modules
 
@@ -112,6 +114,7 @@ These are intended changes in behaviour, each confirmed or rejected by the owner
 3. **No mip bleed.** Each drawing has its own mip chain, so small dots no longer pick up ink from neighbouring cells.
 4. **Round pen ends.** Vector drawings other than pen lines are drawn as capsules, with round caps and joins; v21's quads extend 0.9 of the width past each end and rely on MSAA. The spike measured capsules as closer to a real pen stroke (ADR 0006). Pen lines (the dust hatching) are not a divergence: M4 draws them as v21's own quads, 0.9 w past each end, unioned at v21's four MSAA sample positions, because capsules composited per pixel inked 18–41% more than v21 at the joins (ADR 0019, proposed).
 5. **Integer-lattice value noise** replaces the `sin`-hash noise, so flocculence, patchiness and dust gaps are the same on every machine. The patterns differ from v21's, but their statistics do not.
+6. **The star is occluded by what is nearer.** v21 draws the star last, over the galaxy; here its marks are dropped where a nearer galaxy mark is drawn (ADR 0074).
 
 ## Performance budget
 

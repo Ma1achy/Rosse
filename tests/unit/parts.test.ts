@@ -14,10 +14,11 @@ import {
   coreInstances,
   describeParts,
   rewind,
+  wholeTypeOf,
   vectorRows,
   type VectorRow,
 } from '../../src/model/parts';
-import { cameraOf } from '../../src/view/camera';
+import { cameraOf, incE } from '../../src/view/camera';
 import { v21Variation } from '../golden/compare/v21';
 import { v21PartPicks, v21PartsRows } from '../golden/compare/v21-parts';
 import { LIBRARY as lib, META, ROOT } from './support/vectors';
@@ -107,6 +108,18 @@ describe("the parts against v21's own parts()", () => {
     for (const [cam, view, zoom] of CAMERAS)
       it(`${name}, ${cam}`, () => {
         const P = view(P0);
+        // ADR 0073: a smooth galaxy seen from below takes the whole drawing |cos i| asks for, not
+        // v21's signed cos i (which made it elongated); that case is not v21's
+        const e = incE(P.incl);
+        const v21Elongated =
+          P.bulgeFlat * Math.max(Math.cos((P.incl * Math.PI) / 180), 0.05) < 0.5 ||
+          (e > 70 && P.bulgeFlat < 0.6);
+        if (
+          P.kind === 'auto' &&
+          P.bulge >= 0.95 &&
+          v21Elongated !== (wholeTypeOf(P, P.incl) === 'smooth:elongated')
+        )
+          return;
         const V = v21Variation(P, META);
         const picks = v21PartPicks(P, V, META, zoom);
         const v21 = v21PartsRows(ROOT, P, V, META, zoom);
@@ -140,16 +153,24 @@ describe("the parts against v21's own parts()", () => {
             }
           }
         });
-        // the core and the nuclear spiral
+        // the core and the nuclear spiral. v21's, where the port does not deviate from it on
+        // purpose (ADR 0073): below incE 66 (past it the core fades and hands over its style), and
+        // with |cos i| for the flattening, so the second column is compared for cos i >= 0 only
         const cores = coreInstances(P, META, cameraOf(P, zoom), null, picks.nuclear);
         const vc = v21.L.cores ?? [];
-        expect(cores.length).toBe(vc.length);
-        cores.forEach((c, i) => {
-          const t = vc[i] ?? [];
-          expect(c.layer).toBe(t[2]);
-          expect(close(c.x, t[0] ?? NaN) && close(c.y, t[1] ?? NaN)).toBe(true);
-          for (let k = 0; k < 4; k++) expect(close(c.m[k] ?? 0, t[4 + k] ?? NaN)).toBe(true);
-        });
+        if (incE(P.incl) < 66) {
+          // the alternate style's drawing is emitted at alpha 0 outside the overlap
+          const shown = cores.filter((c) => c.alpha > 0);
+          expect(shown.length).toBe(vc.length);
+          shown.forEach((c, i) => {
+            const t = vc[i] ?? [];
+            expect(c.layer).toBe(t[2]);
+            expect(close(c.x, t[0] ?? NaN) && close(c.y, t[1] ?? NaN)).toBe(true);
+            const signed = Math.cos((P.incl * Math.PI) / 180) >= 0;
+            for (let k = 0; k < 4; k++)
+              if (signed || i > 0 || k < 2) expect(close(c.m[k] ?? 0, t[4 + k] ?? NaN)).toBe(true);
+          });
+        }
         // the streams: every v21 mark within 4.5 σ (6.3 px) of the engine's stream at this zoom,
         // so the replay's picks (and the marks' draws between them) are v21's
         const sc = 84 * zoom;
@@ -179,4 +200,61 @@ describe("the parts against v21's own parts()", () => {
           expect(best).toBeLessThan(6.3);
         }
       });
+});
+
+describe('the core and the whole drawing flatten with |cos i| (ADR 0073)', () => {
+  const P = presetParams('Grand design', 7, { bulge: 0.5, bulgeFlat: 0.4, nuclear: 0 });
+  const cam = (incl: number) => cameraOf({ ...P, incl, pa: 0 });
+  const col2 = (incl: number) => {
+    const c = coreInstances(P, META, cam(incl))[0];
+    return Math.hypot(c?.m[2] ?? 0, c?.m[3] ?? 0);
+  };
+  it('is symmetric about 90 degrees: v21 squashed a core seen from below to bulgeFlat', () => {
+    for (const d of [0, 20, 45, 60]) {
+      expect(col2(d)).toBeCloseTo(col2(180 - d), 9);
+      expect(col2(d)).toBeCloseTo(col2(180 + d), 9);
+      expect(col2(d)).toBeCloseTo(col2(360 - d), 9);
+    }
+    // face-on from below is round, not squashed to bulgeFlat
+    expect(col2(180) / col2(0)).toBeCloseTo(1, 9);
+    expect(col2(160)).toBeGreaterThan(col2(0) * 0.9);
+  });
+  it('picks the same whole-drawing type below the disc as above it', () => {
+    const S = presetParams('Smooth, round', 7, { bulgeFlat: 0.9 });
+    for (const d of [0, 30, 56, 70]) expect(wholeTypeOf(S, 180 - d)).toBe(wholeTypeOf(S, d));
+  });
+});
+
+describe('the core cross-fades instead of popping (ADR 0073)', () => {
+  const P = presetParams('Grand design', 7, { bulge: 0.5, nuclear: 0, stipple: 0.2, lines: 0.8 });
+  const at = (incl: number) => coreInstances(P, META, cameraOf({ ...P, incl }));
+  const total = (incl: number) => at(incl).reduce((s, c) => s + c.alpha, 0);
+  it('keeps the instance count constant below incE 80 and none from it', () => {
+    const n = at(0).length;
+    for (const d of [10, 40, 66, 68, 70, 72, 75, 79.9]) expect(at(d)).toHaveLength(n);
+    expect(at(80)).toHaveLength(0);
+    expect(at(100)).toHaveLength(0);
+  });
+  it('fades the core out smoothly: 0.9 up to 66, 0 at 80, no jump at 70', () => {
+    expect(total(60)).toBeCloseTo(0.9, 9);
+    expect(total(66)).toBeCloseTo(0.9, 9);
+    expect(total(79.999)).toBeLessThan(1e-4);
+    let prev = total(60);
+    for (let d = 60.1; d < 80; d += 0.1) {
+      const t = total(d);
+      expect(t).toBeLessThanOrEqual(prev + 1e-12);
+      expect(prev - t).toBeLessThan(0.02);
+      prev = t;
+    }
+  });
+  it('hands the line drawing over to the dotted one with complementary alphas', () => {
+    const styles = (d: number) => at(d).map((c) => [META.cores.style[c.layer], c.alpha] as const);
+    const line = (d: number) => styles(d).find(([s]) => s === 'line')?.[1] ?? 0;
+    const dot = (d: number) => styles(d).find(([s]) => s === 'dotted')?.[1] ?? 0;
+    expect(dot(60)).toBe(0);
+    expect(line(60)).toBeCloseTo(0.9, 9);
+    expect(line(70)).toBeCloseTo(dot(70), 9);
+    expect(line(74)).toBe(0);
+    expect(dot(74)).toBeGreaterThan(0);
+  });
 });

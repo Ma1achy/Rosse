@@ -70,6 +70,8 @@ export interface CpuStippleView {
   skyDrawings: VectorOut | null;
   /** the sky's layers alone: the background, then the foreground stars */
   skyLayers: InkLayer[];
+  /** how many of the first `layers` are the sky's background (a merger's host draws it under the rest) */
+  nBack: number;
   /** the lens's view tier (M9), when the scene is lensed */
   lens?: CpuLensView;
 }
@@ -195,6 +197,8 @@ export class CpuStipple {
   readonly lines: RibbonModel;
   /** the lens (M9): its sources are galaxies of their own, sampled and projected like this one */
   readonly lens: CpuLens | null;
+  /** the star's marks are left out where the samples are nearer (the occluder grid, ADR 0074); tests switch it off */
+  public occlusion = true;
 
   constructor(
     readonly scene: GalaxyScene,
@@ -222,7 +226,7 @@ export class CpuStipple {
     const V = viewDesc(cam, galaxy.g.dust, n, classCapacity(nTot));
     const rv = runRibbons(this.lines, V, ribUniform(R, cam, P, galaxy.g.n_dot_pool));
     const culls = {
-      c: cullsUniform(R, cam, P, galaxy.g.key),
+      c: cullsUniform(R, cam, P, galaxy.g.key, nStar > 0 && this.occlusion),
       points: rv.points,
       carve: R.carve,
       noise: galaxy.noise,
@@ -246,6 +250,7 @@ export class CpuStipple {
           pool: galaxy.pool,
           dotBase: galaxy.dotBase,
           noise: galaxy.noise,
+          ...(p.occ ? { occ: p.occ } : {}),
         },
         p.classes,
         p.f32,
@@ -487,6 +492,7 @@ export class CpuStipple {
       sky: skyOut,
       skyDrawings: skyVec,
       skyLayers: [...bgLayers, ...fgLayers],
+      nBack: bgLayers.length,
     };
   }
 }

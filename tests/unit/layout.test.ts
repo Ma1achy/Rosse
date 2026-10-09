@@ -8,6 +8,7 @@ import { SPRITE_UNIFORMS_LAYOUT } from '../../src/render/sprites';
 import { COMPOSITE_UNIFORMS_LAYOUT } from '../../src/render/composite';
 import { GALAXY_LAYOUT, GROUP_LAYOUT } from '../../src/model/galaxy';
 import { CULLS_LAYOUT } from '../../src/fallback/kernels/project';
+import { STAR_JOB_LAYOUT } from '../../src/model/stars';
 import {
   CAPSULE_LAYOUT,
   CURVE_LAYOUT,
@@ -88,6 +89,7 @@ describe('struct layouts (WGSL = TS)', () => {
   it('M4: ring knots and clumps, dust culls', () => {
     checkLayout('compute/stipple.wgsl', GROUP_LAYOUT);
     checkLayout('compute/project.wgsl', CULLS_LAYOUT);
+    checkLayout('compute/star-marks.wgsl', STAR_JOB_LAYOUT);
   });
 
   it('M4: the line-work kernels and render pipelines', () => {

@@ -4,7 +4,8 @@
 //
 // Entry points, in dispatch order:
 //   project_points  every scene point (curves, lane points, carving lines, hatch anchors) to the
-//                   plate, as project (app23.js:L153);
+//                   plate, as project (app23.js:L153); a point flagged by w = 1 is a
+//                   screen-space offset instead: mirrored and rolled, not orbited (ADR 0073);
 //   measure         ONE invocation, sequential and so deterministic: per curve the arc-length
 //                   prefix sum, the total, cw = clamp(PEN.line * w * h / thick, 6, 90), kpx,
 //                   reps = max(1, round(tot / (1.4 * 512 * kpx))) (1 when stretched), the first
@@ -153,7 +154,13 @@ fn project_points(@builtin(global_invocation_id) id: vec3<u32>) {
   if (i >= rib.n_points) {
     return;
   }
-  points[i] = to_plate(view, rot_fwd(view, points3[i].xyz).xy);
+  let p = points3[i];
+  if (p.w != 0.0) {
+    // a screen-space offset (the edge-on midplane's lines, ADR 0073): mirrored, rolled, not orbited
+    points[i] = to_plate(view, vec2<f32>(p.x * view.winding, p.y));
+    return;
+  }
+  points[i] = to_plate(view, rot_fwd(view, p.xyz).xy);
 }
 
 @compute @workgroup_size(1)

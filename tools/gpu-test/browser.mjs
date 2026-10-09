@@ -61,6 +61,12 @@ export async function startServer() {
   };
 }
 
+/**
+ * `ROSSE_CHROMIUM_PATH` runs a browser other than Playwright's pinned build (for example the
+ * system Chrome, to reach the Metal GPU on a Mac). The goldens and engine hashes are SwiftShader
+ * on the pinned build; a run with another browser is informational against those.
+ */
 export async function launch() {
-  return chromium.launch({ headless: true, args: CHROMIUM_ARGS });
+  const executablePath = process.env.ROSSE_CHROMIUM_PATH?.trim() || undefined;
+  return chromium.launch({ headless: true, args: CHROMIUM_ARGS, executablePath });
 }

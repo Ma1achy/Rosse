@@ -243,3 +243,87 @@ describe('overlays: an explicit home orientation (open question Q3, option b)', 
     expect(cpu.perClass[Cls.rstar]).toBeGreaterThan(0);
   });
 });
+
+describe('overlay artefacts stay on the screen; star satellites are in the scene (ADR 0055)', () => {
+  const geometry = (name: string, ov: 'trail' | 'cosmic' | 'ghost', zoom: number) => {
+    const P = { ...presetParams(name, 7, NO_SKY), ovArtefact: ov, ovStar: 0 };
+    const home = orientationOf(cameraOf(P));
+    const D = buildScene(P, META, { home }).stars;
+    if (!D) throw new Error('no stars');
+    const cam = { ...cameraOf(P), zoom };
+    return starJobs(D, P, cam, home).jobs.filter((j) => j.kind >= 6);
+  };
+
+  it('an overlay trail and cosmic rays are the same at zoom 0.5 and 2', () => {
+    for (const ov of ['trail', 'cosmic'] as const) {
+      const a = geometry('Layered: spiral beside a bright star', ov, 0.5);
+      const b = geometry('Layered: spiral beside a bright star', ov, 2);
+      expect(a.length).toBeGreaterThan(0);
+      expect(b).toEqual(a);
+    }
+  });
+
+  it('a subject trail still grows with the zoom', () => {
+    const P = presetParams('Artefact: satellite trail', 7, NO_SKY);
+    const home = orientationOf(cameraOf(P));
+    const D = buildScene(P, META, { home }).stars;
+    if (!D) throw new Error('no stars');
+    const half = (zoom: number) =>
+      starJobs(D, P, { ...cameraOf(P), zoom }, home).jobs.find((j) => j.kind === 6)?.a ?? 0;
+    expect(half(2) / half(0.5)).toBeCloseTo(4, 4);
+  });
+
+  describe.each([
+    ['a subject star', 'Star: bright, with spikes', 0],
+    ['an overlay star', 'Layered: spiral beside a bright star', 1],
+  ])('%s', (_n, preset, ctxId) => {
+    const P = presetParams(preset, 7, NO_SKY);
+    const home = orientationOf(cameraOf(P));
+    const D = buildScene(P, META, { home }).stars;
+    const ctx = D?.ctxs.find((c) => c.id === ctxId);
+    const drawn = (cam: ReturnType<typeof cameraOf>) => {
+      if (!D) throw new Error('no stars');
+      const out = starJobs({ ...D, ctxs: ctx ? [ctx] : [] }, P, cam, home).jobs;
+      return {
+        centres: out.filter((j) => j.kind === 5).map((j) => j.c),
+        spikes: out.filter((j) => j.kind === 2).map((j) => j.p0),
+      };
+    };
+
+    it('has satellites', () => {
+      expect(ctx?.picks.stars.length).toBeGreaterThan(3);
+    });
+
+    it('the satellites move against the primary when the camera orbits; the spikes do not turn', () => {
+      const cam = cameraOf(P);
+      const orbit = { ...cam, incl: cam.incl + 25, az: cam.az + 40 };
+      const a = drawn(cam);
+      const b = drawn(orbit);
+      expect(b.centres.length).toBe(a.centres.length);
+      const rel = (d: typeof a, i: number) => [
+        (d.centres[i]?.[0] ?? 0) - (d.centres[0]?.[0] ?? 0),
+        (d.centres[i]?.[1] ?? 0) - (d.centres[0]?.[1] ?? 0),
+      ];
+      for (let i = 1; i < a.centres.length; i++) {
+        const ra = rel(a, i);
+        const rb = rel(b, i);
+        expect(
+          Math.hypot((ra[0] ?? 0) - (rb[0] ?? 0), (ra[1] ?? 0) - (rb[1] ?? 0)),
+        ).toBeGreaterThan(1);
+      }
+      expect(b.spikes).toEqual(a.spikes);
+    });
+
+    it('the satellites scale about the primary with the zoom, at the home camera', () => {
+      const cam = cameraOf(P);
+      const a = drawn({ ...cam, zoom: 1 });
+      const b = drawn({ ...cam, zoom: 2 });
+      const d = (x: typeof a) =>
+        Math.hypot(
+          (x.centres[1]?.[0] ?? 0) - (x.centres[0]?.[0] ?? 0),
+          (x.centres[1]?.[1] ?? 0) - (x.centres[0]?.[1] ?? 0),
+        );
+      expect(d(b) / d(a)).toBeCloseTo(2, 1);
+    });
+  });
+});

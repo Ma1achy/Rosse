@@ -4,8 +4,15 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+
+- The star is occluded by what is nearer (ADR 0074, proposed): its marks (dots, knots and the drawn core) are left out where a nearer mark of the galaxy is drawn, so a galaxy disc passing in front of an overlay star leaves a stippled gap in its glare, spikes and rings. v21 draws the star last, over everything, so this is a deliberate divergence. A 128 x 128 occluder depth grid over the plate (`src/model/occlusion.ts`, `common/occlusion.wgsl`) is filled by the projection (`atomicMax` of the quantised view z of each old, disc, young and knot sample, with a one-cell halo) and read by the star marks (`StarJob.z`, was `pad0`); view tier only. Not occluders yet: the deep field's foreground stars, merger debris, ribbons and vector drawings.
+- Edge-on "straw" and the bulge pops, both inherited from v21 and now deliberate divergences (ADR 0073, proposed): the edge-on midplane stroke, its three hatch rows and the dust-carving pen line are built in screen space and keep their length along the roll axis at every azimuth (v21's shrank with cos(az) to a stub at az 90); the stroke's alpha is `lines * clamp((incE - 72) / 18, 0, 1)` (v21's passed 1 above 90 degrees); the core, smooth whole drawing and envelope flatten with `max(bulgeFlat, |cos i|)` (v21's signed `ci()` squashed them seen from below); the drawn core fades out over incE 66-80 and its line and dotted drawings cross-fade over 66-74, instead of the cuts at 80 and 70. The whole drawing's pool switches (70, 78) are not cross-faded (the vector path has no per-row alpha).
+- Overlay satellite trails and cosmic rays stay fixed to the screen when zooming (the zoom-1 scale, not v21's zoom); the stars of a star sprite, its fainter neighbours too, are points in the scene with a small depth jitter, so a cluster moves as a constellation under orbit and zoom while the spikes stay on the screen; an overlay star has neighbours now. Deliberate divergence from v21 (ADR 0055, `src/model/stars.ts`).
+
 ### Fixed
 
+- Lensing broke under orbit (an Einstein ring became arcs or one image): the lensed source is now fixed in the lens frame, not in 3D behind it. A deliberate divergence from v21's `srcNow`; the home pose is unchanged (ADR 0072, `tests/unit/lens-orbit.test.ts`).
 - The golden harness crashed on the real galaxies (`unknown preset "Real galaxy 0"`): a case's home is now `fromReal`'s parameters for `Real galaxy N` (`tests/unit/golden-real.test.ts`).
 - A camera move built new ink batches again on M7's scenes (`tests/gpu/reuse.ts` failed): the dynamic vector and deep-field sprite layers bind their capacity, not the view's live count (ADR 0070).
 - `capture:reference --redraws` drew the default galaxy for a real galaxy's re-draws.

@@ -134,6 +134,11 @@ export interface SceneOptions {
   merger?: MergerSceneOptions;
   /** the simulated shells (`P.shellsOn`, M8): v21's stroke rows for the arcs, replayed in the goldens */
   shells?: ShellSceneOptions;
+  /**
+   * The sky host of a merger (render(), app23.js:L1232–1234): the main parameters' own sky, trails,
+   * arrow and overlays without a galaxy, though the sky still shears round the merger's mass.
+   */
+  skyHost?: boolean;
 }
 
 /**
@@ -172,7 +177,7 @@ export function withoutGalaxy(P: Params): Params {
 
 export function buildScene(P0: Params, meta: DrawingsMeta, opts: SceneOptions = {}): GalaxyScene {
   const P = P0;
-  const Pg = P.subject === 'galaxy' ? P : withoutGalaxy(P);
+  const Pg = P.subject === 'galaxy' && !opts.skyHost ? P : withoutGalaxy(P);
   const variation = opts.variation ?? makeVariation(P, meta);
   const key = (opts.placementKey ?? P.seed) >>> 0;
   const galaxy = describeGalaxy(Pg, variation, meta, {

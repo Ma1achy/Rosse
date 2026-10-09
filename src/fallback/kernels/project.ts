@@ -21,6 +21,7 @@ import { cosF, sinF } from '../../core/f32math';
 import { randF32 } from '../../core/rng';
 import { Stream } from '../../core/streams';
 import type { StructLayout } from '../../marks/instance';
+import { OCC_CELLS, gridCell, quantZ, stampOccluder } from '../../model/occlusion';
 import type { ViewDesc } from '../../view/camera';
 import { smWarp } from '../../view/warp';
 import type { NoiseField } from '../../core/noise';
@@ -46,7 +47,7 @@ export const CULLS_LAYOUT: StructLayout = {
     ['carve_p', 'f32'],
     ['wobble', 'f32'],
     ['pen_dot', 'f32'],
-    ['pad1', 'f32'],
+    ['occ', 'f32'],
     ['pad2', 'f32'],
   ].map(([name, type], i) => ({
     name: name as string,
@@ -81,7 +82,7 @@ export function noCulls(key = 0): CullsDesc {
       carve_p: 0,
       wobble: 0,
       pen_dot: 1,
-      pad1: 0,
+      occ: 0,
       pad2: 0,
     },
     points: new Float32Array(2),
@@ -157,6 +158,7 @@ export function projectSample(
   instF: Float32Array,
   instU: Uint32Array,
   C: CullsDesc = noCulls(),
+  occ?: Uint32Array,
 ): number {
   const o = i * SAMPLE_WORDS;
   const io = i * INSTANCE_WORDS;
@@ -177,6 +179,9 @@ export function projectSample(
   const sc = V.scale ?? 84;
   let X: number;
   let Y: number;
+  // the view-space z, towards the viewer (larger is nearer); a Sérsic sample is drawn as a 2D disc,
+  // not turned, so its z is the stored one (0, the galaxy's plane)
+  let zv = z;
   if (flags & SampleFlag.sersic2d) {
     X = x;
     Y = y;
@@ -187,6 +192,7 @@ export function projectSample(
     X = f(f(x0 * cz) - f(y * sz));
     const ya = f(f(x0 * sz) + f(y * cz));
     Y = f(f(ya * ci) - f(z * (V.sin_i ?? 0)));
+    zv = f(f(ya * (V.sin_i ?? 0)) + f(z * ci));
   }
   const qx = f((V.cx ?? 400) + f(f(f(X * ca) - f(Y * sa)) * sc));
   const qy = f((V.cy ?? 400) + f(f(f(X * sa) + f(Y * ca)) * sc));
@@ -240,6 +246,8 @@ export function projectSample(
   instF[io + 5] = f(s * size);
   instF[io + 6] = f(-f(s * size));
   instF[io + 7] = f(c * size);
+  // an occluder of the star's marks: its depth into its cell and the halo round it (ADR 0074)
+  if (occ && cls <= Cls.knot) stampOccluder(occ, gridCell(wx, wy), quantZ(zv));
   return cls;
 }
 
@@ -252,13 +260,15 @@ export function runProject(
   samples: { f32: Float32Array; u32: Uint32Array; n: number },
   C: CullsDesc = noCulls(),
   extra = 0,
-): { classes: Uint32Array; f32: Float32Array; u32: Uint32Array } {
+): { classes: Uint32Array; f32: Float32Array; u32: Uint32Array; occ?: Uint32Array } {
   const n = samples.n;
   const buf = new ArrayBuffer(Math.max(1, n + extra) * INSTANCE_WORDS * 4);
   const instF = new Float32Array(buf);
   const instU = new Uint32Array(buf);
   const classes = new Uint32Array(Math.max(1, n + extra)).fill(Cls.none);
+  // the occluder grid (src/model/occlusion.ts), when the view has a star to occlude
+  const occ = (C.c.occ ?? 0) > 0 ? new Uint32Array(OCC_CELLS) : undefined;
   for (let i = 0; i < n; i++)
-    classes[i] = projectSample(i, V, samples.f32, samples.u32, instF, instU, C);
-  return { classes, f32: instF, u32: instU };
+    classes[i] = projectSample(i, V, samples.f32, samples.u32, instF, instU, C, occ);
+  return { classes, f32: instF, u32: instU, ...(occ ? { occ } : {}) };
 }

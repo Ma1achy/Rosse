@@ -11,8 +11,10 @@
  * - the **framing** of a moment: the snapshots `mTime` selects, the frame holding the pair, the scale
  *   `MS.sc`, and each galaxy's camera (`s0 = MS.sc · rmax / 4.2`, R2 = 2 · 4.2 · s0).
  *
- * The main parameters' own parts (the sky, trails, streams and a jet of the whole picture, L1234)
- * and the lens and shells of the merged scene (L1265–1266) are the other milestones'.
+ * - the **sky host**: the main parameters' own sky, trails, arrow, jet, streams and overlay star or
+ *   artefact (L1234, L1281), described once and placed by the real camera, never by a galaxy's.
+ *
+ * The lens and shells of the merged scene (L1265–1266) are the other milestones'.
  */
 import type { Params } from '../core/params';
 import { Draws } from '../core/rng';
@@ -70,6 +72,8 @@ export interface MergerSceneOptions {
    * give the lens its pool, noise and own picks (v21's, replayed, in the goldens).
    */
   lens?: SceneOptions;
+  /** The sky host's scene options (sky catalogue, star picks, overlay home: v21's, replayed). */
+  sky?: SceneOptions;
 }
 
 /** `mWarp`: the two whole drawings the tides tear (app23.js:L1260–1264). */
@@ -96,6 +100,12 @@ export interface MergerScene {
    * scene whose lens is drawn over the merger. Only its lens is used; the plate's camera places it.
    */
   lensHost?: GalaxyScene;
+  /**
+   * The main parameters' own sky and overlays (v21's render() merger branch calls `parts` with the
+   * main P): a scene without a galaxy, placed by the real camera. Only its sky, vector rows and
+   * overlay stars are used. Absent when the picture asks for none of them.
+   */
+  skyHost?: GalaxyScene;
   mwarp: MWarpDesc | null;
   hot: [boolean, boolean];
 }
@@ -110,6 +120,20 @@ export function mwarpPool(types: readonly string[]): number[] {
   return out;
 }
 
+/** Whether the main parameters draw anything of their own over a merger: a sky, a part or an overlay. */
+export function needsSkyHost(P: Params): boolean {
+  return (
+    P.field > 0.02 ||
+    P.fgstars > 0.02 ||
+    P.trails > 0.02 ||
+    P.arrow > 0.02 ||
+    P.jet > 0.5 ||
+    P.streams > 0.02 ||
+    P.ovStar > 0.02 ||
+    (!!P.ovArtefact && P.ovArtefact !== 'none')
+  );
+}
+
 export function buildMergerScene(
   P: Params,
   meta: DrawingsMeta,
@@ -120,6 +144,10 @@ export function buildMergerScene(
   const galaxyParams = [0, 1].map((g) => ({
     ...P,
     ...mergerGalaxyParams(P, g as 0 | 1, opts.picks),
+    // the overlay star and artefact are the whole picture's (the sky host's, on the real camera),
+    // not each face-on galaxy's, which v21's galaxies are never asked for (L1281)
+    ovStar: 0,
+    ovArtefact: 'none',
   })) as [Params, Params];
   const galaxies = [0, 1].map((g) =>
     buildScene(galaxyParams[g] as Params, meta, {
@@ -160,6 +188,14 @@ export function buildMergerScene(
           ...(opts.placementKey !== undefined ? { placementKey: opts.placementKey } : {}),
         })
       : undefined;
+  // the sky, trails, arrow and overlays of the main parameters (companions stay empty, L1234)
+  const skyHost = needsSkyHost(P)
+    ? buildScene({ ...P, companions: 0 }, meta, {
+        ...opts.sky,
+        ...(opts.placementKey !== undefined ? { placementKey: opts.placementKey } : {}),
+        skyHost: true,
+      })
+    : undefined;
   return {
     P,
     meta,
@@ -170,6 +206,7 @@ export function buildMergerScene(
     galaxyParams,
     galaxies,
     ...(lensHost ? { lensHost } : {}),
+    ...(skyHost ? { skyHost } : {}),
     mwarp,
     hot: [typeOf(P.mType1) === 'elliptical', typeOf(P.mType2) === 'elliptical'],
   };

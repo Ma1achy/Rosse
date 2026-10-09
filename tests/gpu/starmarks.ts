@@ -10,6 +10,12 @@
  *   0.1%;
  * - the per-class counts of the compacted lists agree, and the drawn stars' capsules (the dynamic
  *   set) agree with the CPU's.
+ *
+ * Depth occlusion (ADR 0074): the overlay star's marks are left out where a nearer mark of the
+ * galaxy is drawn (the occluder grid the projection fills and the star marks read). The slot by
+ * slot classes above are the culled ones, so they must be EXACTLY the CPU's; the extra camera
+ * 'behind the disc' (the disc seen from below, in front of the star) has the galaxy cover the
+ * star, and the case also asks that the CPU lost marks to it (against its own run with the grid off).
  */
 import { presetParams } from '../../src/core/presets';
 import type { Params } from '../../src/core/params';
@@ -38,6 +44,9 @@ const NAMES = [
   'Layered: ringed galaxy, ghost reflection',
 ];
 
+/** the cases with an overlay star on a galaxy: the galaxy can be in front of the star */
+const OCCLUDED = ['Layered: spiral beside a bright star', 'Layered: edge-on, star on top'];
+
 run('star and artefact marks (GPU = CPU, L1)', async () => {
   const { adapter, device: dev } = await device();
   const assets = await BuiltAssets.load('/');
@@ -60,6 +69,9 @@ run('star and artefact marks (GPU = CPU, L1)', async () => {
       ['home', 0, 0, 1],
       ['orbit', 35, 20, 1],
       ['zoom 2.5', 0, 0, 2.5],
+      ...(OCCLUDED.includes(name)
+        ? [['behind the disc', 0, 90, 1] as [string, number, number, number]]
+        : []),
     ] as [string, number, number, number][]) {
       const P0 = presetParams(name, 7);
       const P: Params = { ...P0, az: P0.az + dAz, incl: Math.min(180, P0.incl + dIncl) };
@@ -104,6 +116,18 @@ run('star and artefact marks (GPU = CPU, L1)', async () => {
         if (cs > 0 && Math.abs(gs - cs) / cs > 1e-3) sizeBad++;
       }
       if (classBad) bad.push(`${String(classBad)} class differences`);
+      if (cam === 'behind the disc') {
+        // the galaxy in front of the star takes marks from it: the CPU, grid on against grid off
+        cpu.occlusion = false;
+        const off = cpu.view(camera);
+        const live = (c: Uint32Array) => c.subarray(n).filter((x) => x < 4).length;
+        const lost = live(off.classes) - live(cv.classes);
+        data[`${name}, ${cam} lost`] = lost;
+        if (lost <= 0) bad.push(`no star mark was occluded (lost ${String(lost)})`);
+        lines.push(
+          `     ${name}: ${String(lost)} of ${String(live(off.classes))} star marks occluded`,
+        );
+      }
       if (sizeBad) bad.push(`${String(sizeBad)} sizes differ`);
       if (gv.nCaps !== cv.stars.nCaps)
         bad.push(`star capsules ${String(gv.nCaps)} ≠ ${String(cv.stars.nCaps)}`);

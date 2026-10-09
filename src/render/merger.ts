@@ -95,6 +95,8 @@ export class GpuMerger {
   private mwarpOn = false;
   /** the lens's host (M9): a merging pair can lens a galaxy behind it */
   private lensHost: GpuStipple | null = null;
+  /** the main parameters' own sky, trails, arrow and overlays, placed by the real camera */
+  private skyHost: GpuStipple | null = null;
 
   /** the buffers of the warp's vector pass and the shells (each galaxy has its own, M10) */
   private readonly res: GpuResources;
@@ -273,6 +275,15 @@ export class GpuMerger {
       this.lensHost = null;
     }
 
+    // the main parameters' own sky and overlays (render()'s merger branch, app23.js:L1234, L1281)
+    if (scene.skyHost) {
+      this.skyHost ??= GpuStipple.create(d);
+      this.skyHost.setScene(scene.skyHost);
+    } else {
+      this.skyHost?.destroy();
+      this.skyHost = null;
+    }
+
     // mWarp's drawings: the main picture's hand, torn through the tidal map itself
     const MW = mwarpDesc(scene);
     this.mwarpOn = !!MW;
@@ -324,6 +335,7 @@ export class GpuMerger {
     });
     if (this.shellsOn) this.shells.view(zoom);
     this.lensHost?.setView(cameraOf(scene.P, zoom), scene.P.mTime);
+    this.skyHost?.setView(cameraOf(scene.P, zoom), scene.P.mTime);
     if (this.mwarpOn) {
       const MW = mwarpDesc(scene);
       if (MW) {
@@ -356,14 +368,21 @@ export class GpuMerger {
     }));
   }
 
-  /** Every ink layer: both galaxies' (the single-galaxy layers, carried by the tides), the debris, mWarp. */
+  /**
+   * Every ink layer, in scene()'s order (app23.js:L1289–1301): the sky's background, both galaxies'
+   * (the single-galaxy layers, carried by the tides), mWarp, the debris, the shells, the lens, then
+   * the main parameters' trails, arrow, overlay stars and foreground stars.
+   */
   inkLayers(): InkLayer[] {
+    const host = this.skyHost?.hostLayers();
     return [
+      ...(host?.back ?? []),
       ...this.galaxies.flatMap((s) => s.inkLayers()),
       ...this.mwarp.layers(),
       ...this.debrisLayers(),
       ...(this.shellsOn ? this.shells.layers() : []),
       ...(this.lensHost?.lensLayers() ?? []),
+      ...(host?.front ?? []),
     ];
   }
 
@@ -379,6 +398,8 @@ export class GpuMerger {
       for (let c = 0; c < CLASS_COUNT; c++) perClass[c] = (perClass[c] ?? 0) + (p.perClass[c] ?? 0);
     const lens = await (this.lensHost?.lensCounts() ?? Promise.resolve([] as number[]));
     for (let c = 0; c < CLASS_COUNT; c++) perClass[c] = (perClass[c] ?? 0) + (lens[c] ?? 0);
+    const host = this.skyHost ? (await this.skyHost.readCounts(false)).perClass : [];
+    for (let c = 0; c < CLASS_COUNT; c++) perClass[c] = (perClass[c] ?? 0) + (host[c] ?? 0);
     // the shells' stars are `old` dots
     if (this.shellsOn) perClass[Cls.old] = (perClass[Cls.old] ?? 0) + this.shells.count;
     const counts: MarkCounts = { ...markCounts(perClass) };
@@ -430,5 +451,6 @@ export class GpuMerger {
     this.shells.destroy();
     this.res.destroy();
     this.lensHost?.destroy();
+    this.skyHost?.destroy();
   }
 }

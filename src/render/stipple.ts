@@ -22,6 +22,7 @@ import { INSTANCE_LAYOUT, packInstances } from '../marks/instance';
 import { CLASS_COUNT, Cls } from '../model/classes';
 import { packGalaxy, sampleCount } from '../model/galaxy';
 import { cullsUniform } from '../model/ribbons';
+import { OCC_CELLS } from '../model/occlusion';
 import { packStruct } from '../gpu/buffers';
 import { CULLS_LAYOUT } from '../fallback/kernels/project';
 import { GpuRibbons } from './ribbons';
@@ -73,6 +74,8 @@ interface ModelBuffers {
   /** the marks of a star or an artefact (M7): their jobs and uniform, and the pass that makes them */
   starJobs: GPUBuffer;
   starU: GPUBuffer;
+  /** the occluder grid (src/model/occlusion.ts): cleared, filled by the projection, read by the star marks */
+  occ: GPUBuffer;
   starGroup: GPUBindGroup | null;
   galaxy: GPUBuffer;
   shape: GPUBuffer;
@@ -302,6 +305,7 @@ export class GpuStipple {
       GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
       'star uniform',
     );
+    const occ = buf(OCC_CELLS * 4, STORAGE | GPUBufferUsage.COPY_SRC, 'occluder grid');
     const blockTotals = buf(blocks * 8, STORAGE, 'block totals');
     const blockOffsets = buf(blocks * BLOCK_STRIDE * 4, STORAGE, 'block offsets');
     const args = buf(
@@ -348,6 +352,7 @@ export class GpuStipple {
       blocks,
       starJobs: starJobsBuf,
       starU,
+      occ,
       starGroup: scene.stars
         ? group(P.starMarks, [
             [0, starU],
@@ -356,6 +361,7 @@ export class GpuStipple {
             [3, dotBase],
             [4, projected],
             [5, classes],
+            [6, occ],
             [30, noise],
           ])
         : null,
@@ -438,6 +444,7 @@ export class GpuStipple {
           [4, culls],
           [5, this.ribbons.points],
           [6, this.ribbons.carve],
+          [7, occ],
           [30, noise],
         ]),
         local: group(P.local, [
@@ -558,7 +565,10 @@ export class GpuStipple {
     d.queue.writeBuffer(
       m.culls,
       0,
-      packStruct(CULLS_LAYOUT, cullsUniform(this.scene.ribbons, cam, params, galaxy.g.key)),
+      packStruct(
+        CULLS_LAYOUT,
+        cullsUniform(this.scene.ribbons, cam, params, galaxy.g.key, nStar > 0),
+      ),
     );
     this.ribbons.setView(cam, params, galaxy.g.n_dot_pool);
     const { variation, meta } = this.scene;
@@ -579,6 +589,8 @@ export class GpuStipple {
     // the quasar's flare follows the moment of the timeline, a view input (mTime)
     if (this.scene.lens && this.lens?.loaded) this.lens.setView(cam, mTime ?? params.mTime);
     const enc = d.createCommandEncoder({ label: 'stipple view' });
+    // the occluder grid starts empty: the projection stamps it, the star marks read it (ADR 0074)
+    if (nStar) enc.clearBuffer(m.occ);
     const ts = this.profiler?.span('view: project, scan, expand');
     const pass = enc.beginComputePass({
       label: 'project + compact',
@@ -677,7 +689,8 @@ export class GpuStipple {
       this.core = {
         inst: d.createBuffer({
           label: 'merging core',
-          size: 2 * INSTANCE.size,
+          // the core, its alternate style and the nuclear spiral (ADR 0073)
+          size: 3 * INSTANCE.size,
           usage: STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC,
         }),
         args: d.createBuffer({
@@ -777,6 +790,15 @@ export class GpuStipple {
       ...this.sky.foreground(),
       ...tided,
     ];
+  }
+
+  /**
+   * A merger's sky host (no galaxy): the sky's background, which goes under the merger, and every
+   * other layer (trails, arrow, overlay stars, foreground stars), which go over it.
+   */
+  hostLayers(): { back: InkLayer[]; front: InkLayer[] } {
+    const back = this.sky.background();
+    return { back, front: this.inkLayers().slice(back.length) };
   }
 
   /** The line-work's layers (ribbons, hatching, pieces), drawn before the stipple. */

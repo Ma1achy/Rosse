@@ -260,6 +260,22 @@ export function scenePoint(
   depth: number,
   cam: Camera,
 ): Vec2 {
+  const p = scenePointZ(home, sx, sy, depth, cam);
+  return [p[0], p[1]];
+}
+
+/**
+ * `scenePoint` with the point's view-frame z as the third component: towards the viewer, so a
+ * larger z is nearer the camera (`rotFwd`; the occluder grid, src/model/occlusion.ts), in galaxy
+ * units like the samples' own.
+ */
+export function scenePointZ(
+  home: Orientation,
+  sx: number,
+  sy: number,
+  depth: number,
+  cam: Camera,
+): Vec3 {
   const pa0 = rad(home.pa);
   const lx = sx * Math.cos(pa0) + sy * Math.sin(pa0);
   const ly = -sx * Math.sin(pa0) + sy * Math.cos(pa0);
@@ -270,6 +286,7 @@ export function scenePoint(
   return [
     PLATE / 2 + (v[0] * Math.cos(pa) - v[1] * Math.sin(pa)) * sc,
     PLATE / 2 + (v[0] * Math.sin(pa) + v[1] * Math.cos(pa)) * sc,
+    v[2],
   ];
 }
 
@@ -450,7 +467,8 @@ export const CI_PREDICATES: readonly InclPredicate[] = [
     source: 'P.bulgeFlat * Math.max(ci(), 0.05) < 0.5',
     test: (P) =>
       P.kind === 'auto' && P.bulge >= 0.95
-        ? P.bulgeFlat * Math.max(Math.cos(rad(P.incl)), 0.05) < 0.5
+        ? // |cos i|, not v21's signed ci(): symmetric about 90° (ADR 0073)
+          P.bulgeFlat * Math.max(Math.abs(Math.cos(rad(P.incl))), 0.05) < 0.5
         : null,
     milestone: 'M5',
     what: "whole-drawing type 'smooth:elongated' from the projected flattening",
@@ -504,7 +522,7 @@ export const INCL_CONTINUOUS: readonly {
   {
     line: 788,
     token: 'P.incl',
-    what: "the edge-on midplane stroke's alpha `lines · (incl − 72) / 18` (view, M4)",
+    what: "the edge-on midplane stroke's alpha `lines · (incl − 72) / 18` (view, M4; the port uses `lines · clamp((incE − 72) / 18, 0, 1)`, ADR 0073)",
   },
   { line: 856, token: 'P.incl', what: 'the definition of `incE()`' },
   { line: 856, token: 'incE()', what: 'the definition of `incE()`' },

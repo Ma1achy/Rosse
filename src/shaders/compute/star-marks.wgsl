@@ -5,6 +5,8 @@
 // so a zoom that adds marks keeps the ones it had (ADR 0004). A mark the reference would have
 // rejected is class CLS_NONE. Output: the stipple's `projected` and `classes` at out_base + slot,
 // so the marks are compacted with the stipple's and drawn in the same layers (v21 `merge`, L456).
+// A mark whose cell of the occluder grid holds something nearer than its job's z is class CLS_NONE
+// too (ADR 0074; v21 draws the star over everything).
 //
 // Every mark is a bitmap sprite (a dot or a knot) of alpha 1 through the hand wobble (app23.js:L171),
 // except the drawn star at the core, a vector drawing (class CLS_RSTAR): its alpha is its pen
@@ -16,6 +18,7 @@
 // #import "common/rng.wgsl"
 // #import "common/math.wgsl"
 // #import "common/noise-table.wgsl"
+// #import "common/occlusion.wgsl"
 // #import "common/stipple-types.wgsl"
 // #import "common/warp.wgsl"
 
@@ -33,7 +36,8 @@ struct StarJob {
   n: u32,
   index: u32,
   q: u32,
-  pad0: u32,
+  // the star's view-space z (towards the viewer), or OCC_Z_RANGE for a mark nothing occludes
+  z: f32,
   pad1: u32,
   pad2: u32,
 }
@@ -80,8 +84,12 @@ const KNOT_POOL: u32 = 24u;
 @group(0) @binding(3) var<storage, read> dot_base: array<f32>;
 @group(0) @binding(4) var<storage, read_write> projected: array<Instance>;
 @group(0) @binding(5) var<storage, read_write> classes: array<u32>;
+// the occluder grid the projection filled (common/occlusion.wgsl); all zero when it was not stamped
+@group(0) @binding(6) var<storage, read> occ: array<u32>;
 
 var<private> idx: u32;
+// the z of the job the mark being made belongs to
+var<private> job_z: f32;
 
 fn r(d: u32) -> f32 {
   return rand_f32(su.key, STREAM_STARS, idx, d);
@@ -132,6 +140,7 @@ fn make(slot: u32, i: u32) -> u32 {
   let J = jobs[job_of(slot)];
   let local = slot - J.first;
   idx = J.index + local;
+  job_z = J.z;
   let c = J.c;
   let a = J.a;
   let b = J.b;
@@ -275,5 +284,13 @@ fn star_marks(@builtin(global_invocation_id) id: vec3<u32>) {
   }
   let i = su.out_base + slot;
   projected[i] = Instance(vec2<f32>(0.0), 0u, 0.0, vec4<f32>(0.0));
-  classes[i] = make(slot, i);
+  var cls = make(slot, i);
+  if (cls != CLS_NONE) {
+    // something nearer than the star is drawn at the mark's cell: leave the mark out (ADR 0074)
+    let cell = occ_cell(projected[i].pos);
+    if (cell >= 0 && occ[u32(cell)] > occ_key(job_z) + OCC_EPS) {
+      cls = CLS_NONE;
+    }
+  }
+  classes[i] = cls;
 }

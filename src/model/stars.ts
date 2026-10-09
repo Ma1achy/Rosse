@@ -32,12 +32,13 @@ import type { StructLayout } from '../marks/instance';
 import {
   PLATE,
   ZOOM_MAX,
-  scenePoint,
+  scenePointZ,
   viewScale,
   type Camera,
   type Orientation,
 } from '../view/camera';
 import { starPools } from './galaxy';
+import { OCC_NEVER_Z } from './occlusion';
 import type { DrawingsMeta, Variation } from './variation';
 
 const f = Math.fround;
@@ -142,6 +143,13 @@ export function corePool(meta: DrawingsMeta): number[] {
 
 const TAU = 2 * Math.PI;
 
+/**
+ * A satellite star's depth from the primary's, in units: a deterministic function of its
+ * brightness pick (0.06 to 0.26 maps to -0.8 to 0.8), so that a cluster is a constellation and
+ * not a flat disc, with no new draw (the picks, and v21's replayed ones, stay as they are).
+ */
+export const satelliteDepth = (s: StarPick): number => f(f(s.B - f(0.16)) * f(8));
+
 /** Stream indices of the descriptors: above the marks' (bit 31), one range per context. */
 const descIndex = (ctx: number, k: number) => (0x80000000 | (ctx << 16) | k) >>> 0;
 
@@ -176,18 +184,17 @@ export function ownCtxPicks(
   const out: StarCtxPicks = { stars: [] };
   if (subject === 'star') {
     out.stars.push(ownStar(at(0), V, pool, 0, 0, starBright, true));
-    if (!overlay) {
-      // v21 parity: the bound of the loop is drawn afresh at every test (`f < 3 + Math.floor(r()
-      // * 5)`, app23.js:L420), so 3 stars are certain and each test stops with probability
-      // 1/5, 2/5 … 1 (3 with 0.2, 4 with 0.32, 5 with 0.288, 6 with 0.154, 7 with 0.038)
-      const r = at(1);
-      for (let i = 0; i < 3 + Math.floor(r.f32() * 5); i++) {
-        const q = at(10 + i);
-        const fa = f(q.f32() * f(TAU));
-        const fd = f(f(1.6) + f(f(2.2) * q.f32()));
-        const B = f(f(0.06) + f(f(0.2) * q.f32()));
-        out.stars.push(ownStar(q, V, pool, f(Math.cos(fa) * fd), f(Math.sin(fa) * fd), B, false));
-      }
+    // v21 parity: the bound of the loop is drawn afresh at every test (`f < 3 + Math.floor(r()
+    // * 5)`, app23.js:L420), so 3 stars are certain and each test stops with probability
+    // 1/5, 2/5 … 1 (3 with 0.2, 4 with 0.32, 5 with 0.288, 6 with 0.154, 7 with 0.038). v21
+    // draws no satellites for an overlay star (`P._ov ? 0 : …`); here it has them too (ADR 0055)
+    const r = at(1);
+    for (let i = 0; i < 3 + Math.floor(r.f32() * 5); i++) {
+      const q = at(10 + i);
+      const fa = f(q.f32() * f(TAU));
+      const fd = f(f(1.6) + f(f(2.2) * q.f32()));
+      const B = f(f(0.06) + f(f(0.2) * q.f32()));
+      out.stars.push(ownStar(q, V, pool, f(Math.cos(fa) * fd), f(Math.sin(fa) * fd), B, false));
     }
     return out;
   }
@@ -325,7 +332,7 @@ export const STAR_JOB_LAYOUT: StructLayout = (() => {
     ['n', 'u32'],
     ['index', 'u32'],
     ['q', 'u32'],
-    ['pad0', 'u32'],
+    ['z', 'f32'],
     ['pad1', 'u32'],
     ['pad2', 'u32'],
   ];
@@ -380,12 +387,20 @@ export interface StarJob {
   n: number;
   index: number;
   q: number;
+  /**
+   * The star's view-space z, towards the viewer (larger is nearer; src/model/occlusion.ts): its
+   * marks are left out where a nearer mark of the galaxy is drawn. `OCC_NEVER_Z` for what nothing
+   * occludes (an artefact's lines, a cosmic ray, the ghost).
+   */
+  z: number;
 }
 
 const round = (x: number) => Math.floor(x + 0.5);
 
 /** A job before its slots and stream index are assigned. */
 type JobIn = Omit<StarJob, 'first' | 'index' | 'n'>;
+/** A job of a star: `starJobsOf` gives it the star's z. */
+type JobOf = Omit<JobIn, 'z'>;
 
 /** The numbers of an `aStar` (L405–418), at this zoom, as jobs. */
 function starJobsOf(
@@ -394,13 +409,14 @@ function starJobsOf(
   cx: number,
   cy: number,
   U: number,
+  z: number,
   push: (j: JobIn, n: number) => void,
 ): void {
   const B = s.B;
   const core = f(f(f(0.1) + f(f(0.2) * B)) * U);
   const c: [number, number] = [f(cx), f(cy)];
-  const job = (kind: number, n: number, extra: Partial<JobIn>) => {
-    push({ c, a: core, b: 0, p0: 0, p1: 0, p2: 0, p3: 0, kind, q: 0, ...extra }, n);
+  const job = (kind: number, n: number, extra: Partial<JobOf>) => {
+    push({ c, a: core, b: 0, p0: 0, p1: 0, p2: 0, p3: 0, kind, q: 0, z: f(z), ...extra }, n);
   };
   job(StarKind.heart, round(20 + 90 * B), {});
   job(StarKind.glare, round((1500 + 7500 * B) * (s.full ? 1 : 0.22)), {
@@ -446,6 +462,9 @@ export function starJobs(
   home: Orientation,
 ): { jobs: StarJob[]; nSlots: number } {
   const U = f(viewScale(cam.zoom));
+  // the zoom-1 scale: an overlay's trail and cosmic rays are fixed to the camera, the screen, and
+  // do not grow with the zoom (a deliberate divergence from v21, ADR 0055)
+  const U1 = f(viewScale(1));
   const jobs: StarJob[] = [];
   let slot = 0;
   const cx0 = PLATE / 2;
@@ -457,25 +476,37 @@ export function starJobs(
       slot += n;
     };
     const place = ctx.place
-      ? scenePoint(home, ctx.place.x, ctx.place.y, ctx.place.depth, cam)
+      ? scenePointZ(home, ctx.place.x, ctx.place.y, ctx.place.depth, cam)
       : null;
     const pk = ctx.picks;
+    const UA = ctx.overlay ? U1 : U;
     // the stars: at the plate centre plus their offset, or (an overlay) at the scene point
     pk.stars.forEach((s, i) => {
       let x = cx0 + s.ux * U;
       let y = cx0 + s.uy * U;
+      // at the galaxy's centre plane, unless placed in the scene
+      let z = 0;
       // the overlay star sits at the scene point; an overlay ghost's star too (its offset is the
       // angle on 1.1 units)
       if (place && (ctx.subject === 'star' || ctx.artefact === 'ghost') && i === 0) {
         x = place[0];
         y = place[1];
+        z = place[2];
+      } else if (ctx.subject === 'star' && i > 0) {
+        // a satellite is a point in the scene beside its primary, at a depth near the primary's,
+        // so the cluster is a constellation under orbit and zoom (ADR 0055)
+        const o = ctx.place ?? { x: 0, y: 0, depth: 0 };
+        const p = scenePointZ(home, o.x + s.ux, o.y + s.uy, o.depth + satelliteDepth(s), cam);
+        x = p[0];
+        y = p[1];
+        z = p[2];
       }
-      starJobsOf(P, s, x, y, U, push);
+      starJobsOf(P, s, x, y, U, z, push);
     });
     if (pk.trail) {
       const t = pk.trail;
-      const half = f(U * f(3.2));
-      const off = f(t.off * U);
+      const half = f(UA * f(3.2));
+      const off = f(t.off * UA);
       const tx = f(cx0 - f(Math.sin(t.ta) * off));
       const ty = f(cx0 + f(Math.cos(t.ta) * off));
       [0, t.dbl ? t.sep : null].forEach((sep, li) => {
@@ -491,6 +522,7 @@ export function starJobs(
             p3: 0,
             kind: StarKind.trail,
             q: li,
+            z: OCC_NEVER_Z,
           },
           round(half * 2.2 * (li ? 0.55 : 1)),
         );
@@ -519,6 +551,7 @@ export function starJobs(
         p2: 0,
         p3: 0,
         q: 0,
+        z: OCC_NEVER_Z,
       };
       push({ ...g0, kind: StarKind.ghostDisc }, 2600);
       push({ ...g0, kind: StarKind.ghostRing }, 500);
@@ -527,7 +560,7 @@ export function starJobs(
       const n = Math.max(2, round(h.hl / 1.5));
       push(
         {
-          c: [f(cx0 + h.ux * U), f(cx0 + h.uy * U)],
+          c: [f(cx0 + h.ux * UA), f(cx0 + h.uy * UA)],
           a: f(h.hl),
           b: f(Math.max(1, h.hl / 1.5)),
           p0: f(h.ha),
@@ -536,6 +569,7 @@ export function starJobs(
           p3: 0,
           kind: StarKind.cosmic,
           q: n,
+          z: OCC_NEVER_Z,
         },
         n + 1,
       );
@@ -570,6 +604,7 @@ export function packStarJobs(jobs: readonly StarJob[]): ArrayBuffer {
     u[o + 10] = j.n;
     u[o + 11] = j.index;
     u[o + 12] = j.q;
+    fl[o + 13] = f(j.z);
   });
   return buf;
 }

@@ -15,6 +15,7 @@
 // #import "common/camera.wgsl"
 // #import "common/instance.wgsl"
 // #import "common/math.wgsl"
+// #import "common/occlusion.wgsl"
 // #import "common/stipple-types.wgsl"
 // #import "common/warp.wgsl"
 
@@ -37,7 +38,8 @@ struct Culls {
   wobble: f32,
   // PEN.dot, for the drawn stars' size limits
   pen_dot: f32,
-  pad1: f32,
+  // 1: stamp the marks' depth in the occluder grid for the star marks (ADR 0074)
+  occ: f32,
   pad2: f32,
 }
 
@@ -51,6 +53,8 @@ const STREAM_STIPPLE_CULL: u32 = 3u;
 // the scene's projected points (compute/ribbons.wgsl project_points), plate units
 @group(0) @binding(5) var<storage, read> points: array<vec2<f32>>;
 @group(0) @binding(6) var<storage, read> carve: array<u32>;
+// the occluder grid (common/occlusion.wgsl), cleared before the view's pass
+@group(0) @binding(7) var<storage, read_write> occ: array<atomic<u32>>;
 
 // nearDust (app23.js:L214-220)
 fn near_carve(q: vec2<f32>) -> bool {
@@ -137,8 +141,13 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     }
   }
   var q = s.pos.xy;
+  // the view-space z (towards the viewer: larger is nearer). A Sersic sample is drawn as a 2D disc,
+  // not turned, so its z is the stored one (0, the galaxy's plane)
+  var zv = s.pos.z;
   if ((s.cls & FLAG_SERSIC2D) == 0u) {
-    q = rot_fwd(view, s.pos).xy;
+    let r = rot_fwd(view, s.pos);
+    q = r.xy;
+    zv = r.z;
   }
   let pre = to_plate(view, q);
   if ((s.cls & FLAG_CARVE) != 0u && culls.n_carve > 0u) {
@@ -172,4 +181,22 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
   let sn = sin_f(s.rot);
   projected[i] = Instance(pos, s.tile, 1.0, vec4<f32>(c * s.size, sn * s.size, -(sn * s.size), c * s.size));
   classes[i] = cls;
+  if (culls.occ > 0.0 && cls <= CLS_KNOT) {
+    // an occluder of the star's marks: its depth into its cell and the halo round it
+    let cell = occ_cell(pos);
+    if (cell >= 0) {
+      let k = occ_key(zv);
+      let cx = cell % OCC_GRID;
+      let cy = cell / OCC_GRID;
+      for (var dy = -OCC_HALO; dy <= OCC_HALO; dy++) {
+        for (var dx = -OCC_HALO; dx <= OCC_HALO; dx++) {
+          let x = cx + dx;
+          let y = cy + dy;
+          if (x >= 0 && x < OCC_GRID && y >= 0 && y < OCC_GRID) {
+            atomicMax(&occ[u32(y * OCC_GRID + x)], k);
+          }
+        }
+      }
+    }
+  }
 }

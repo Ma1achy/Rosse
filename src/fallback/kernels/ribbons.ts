@@ -77,15 +77,22 @@ export function projectPoint(i: number, V: ViewDesc, p3: Float32Array, out: Floa
   const x = p3[i * 4] ?? 0;
   const y = p3[i * 4 + 1] ?? 0;
   const z = p3[i * 4 + 2] ?? 0;
+  const ca = V.cos_pa ?? 1;
+  const sa = V.sin_pa ?? 0;
+  const sc = V.scale ?? 84;
+  if ((p3[i * 4 + 3] ?? 0) !== 0) {
+    // a screen-space offset (the edge-on midplane's lines, ADR 0073): mirrored, rolled, not orbited
+    const X = f(x * (V.winding ?? 1));
+    out[i * 2] = f((V.cx ?? 400) + f(f(f(X * ca) - f(y * sa)) * sc));
+    out[i * 2 + 1] = f((V.cy ?? 400) + f(f(f(X * sa) + f(y * ca)) * sc));
+    return;
+  }
   const cz = V.cos_az ?? 1;
   const sz = V.sin_az ?? 0;
   const x0 = f(x * (V.winding ?? 1));
   const X = f(f(x0 * cz) - f(y * sz));
   const ya = f(f(x0 * sz) + f(y * cz));
   const Y = f(f(ya * (V.cos_i ?? 1)) - f(z * (V.sin_i ?? 0)));
-  const ca = V.cos_pa ?? 1;
-  const sa = V.sin_pa ?? 0;
-  const sc = V.scale ?? 84;
   out[i * 2] = f((V.cx ?? 400) + f(f(f(X * ca) - f(Y * sa)) * sc));
   out[i * 2 + 1] = f((V.cy ?? 400) + f(f(f(X * sa) + f(Y * ca)) * sc));
 }

@@ -70,6 +70,11 @@ export interface Curve {
    * uses `incl`, not `incE()`, reference notes 20.12).
    */
   edgeAlpha: boolean;
+  /**
+   * The points are screen-space offsets (galaxy units, rolled by `pa`, mirrored by the winding),
+   * not galaxy-frame points: the view tier does not orbit them (ADR 0073). Absent: galaxy frame.
+   */
+  screen?: boolean;
   /** what it is (tests, statistics) */
   role: 'arm' | 'arm-piece' | 'spur' | 'ring' | 'bar' | 'edge-on' | 'outline' | 'tail' | 'shell';
 }
@@ -235,6 +240,9 @@ export function curves(
       taper: false,
       stretch: true,
       edgeAlpha: true,
+      // a line in the galaxy plane would shrink with cos(az) while the disc keeps its width; the
+      // stroke keeps its length along the roll axis at every azimuth (ADR 0073)
+      screen: true,
       role: 'edge-on',
     });
   if (P.outline > 0.05) {
@@ -290,8 +298,11 @@ export function curves(
   return C;
 }
 
-/** The edge-on midplane stroke's alpha (app23.js:L788): `lines · (incl − 72) / 18`. */
-// v21 parity: `incl`, not `incE()`; computed per view (src/model/ribbons.ts ribUniform)
+/**
+ * The edge-on midplane stroke's alpha: `lines · clamp((incE − 72) / 18, 0, 1)`. v21 (app23.js:L788)
+ * used the raw `incl` unclamped, so the alpha passed 1 above 90° (1.55 at 100°, 11 at 270°) and went
+ * negative below 72°; the folded inclination is symmetric about 90° and bounded (ADR 0073).
+ */
 export function edgeOnAlpha(lines: number, incl: number): number {
-  return (lines * (incl - 72)) / 18;
+  return lines * clamp((incE(incl) - 72) / 18, 0, 1);
 }

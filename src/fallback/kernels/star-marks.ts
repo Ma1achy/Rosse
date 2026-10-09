@@ -19,6 +19,7 @@ import { NoiseSalt, vnoise, type NoiseField } from '../../core/noise';
 import { Stream } from '../../core/streams';
 import { Cls } from '../../model/classes';
 import { KNOT_POOL } from '../../model/galaxy';
+import { gridCell, occluded, quantZ } from '../../model/occlusion';
 import { STAR_JOB_WORDS, StarKind } from '../../model/stars';
 import { smWarp } from '../../view/warp';
 import { INSTANCE_WORDS } from './project';
@@ -39,6 +40,8 @@ export interface StarInputs {
   pool: Uint32Array;
   dotBase: Float32Array;
   noise: NoiseField;
+  /** the occluder grid the projection filled (src/model/occlusion.ts); none: nothing occludes */
+  occ?: Uint32Array;
 }
 
 /** The last job whose first slot is at or before `slot`. */
@@ -55,7 +58,8 @@ function jobOf(X: StarInputs, slot: number): number {
 
 /**
  * Slot `slot` (0-based among the star slots): its mark into `outF`/`outU` at instance
- * `out_base + slot`, and its class (Cls.none when it makes none).
+ * `out_base + slot`, and its class (Cls.none when it makes none, or when something nearer than its
+ * star is drawn at its cell of the occluder grid, ADR 0074).
  */
 export function starMark(
   X: StarInputs,
@@ -63,6 +67,14 @@ export function starMark(
   outF: Float32Array,
   outU: Uint32Array,
 ): number {
+  const cls = starMarkOf(X, slot, outF, outU);
+  if (cls === Cls.none || !X.occ) return cls;
+  const oo = ((X.u.out_base ?? 0) + slot) * INSTANCE_WORDS;
+  const z = X.jobsF[jobOf(X, slot) * STAR_JOB_WORDS + 13] ?? 0;
+  return occluded(X.occ, gridCell(outF[oo] ?? 0, outF[oo + 1] ?? 0), quantZ(z)) ? Cls.none : cls;
+}
+
+function starMarkOf(X: StarInputs, slot: number, outF: Float32Array, outU: Uint32Array): number {
   const oo = ((X.u.out_base ?? 0) + slot) * INSTANCE_WORDS;
   outF.fill(0, oo, oo + INSTANCE_WORDS);
   const j = jobOf(X, slot);

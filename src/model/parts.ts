@@ -194,7 +194,9 @@ export function rewind(x: number, y: number, dk: number, flip: boolean): [number
 export function wholeTypeOf(P: Params, incl: number): string {
   if (P.kind !== 'auto') return P.kind;
   const e = incE(incl);
-  const ci = Math.cos(incl * DEG);
+  // v21 used the signed cos i, so a galaxy seen from below (90°–270°) was always elongated
+  // (ADR 0073); |cos i| is symmetric about 90°
+  const ci = Math.abs(Math.cos(incl * DEG));
   if (P.bulge >= 0.95)
     return P.bulgeFlat * Math.max(ci, 0.05) < 0.5 || (e > 70 && P.bulgeFlat < 0.6)
       ? 'smooth:elongated'
@@ -471,7 +473,8 @@ export function vectorRows(
   const cy = PLATE / 2;
   const D = discM(cam);
   const pa = cam.pa * DEG;
-  const ci = Math.cos(cam.incl * DEG);
+  // |cos i|, not v21's signed ci() (ADR 0073): the flattening is symmetric about 90°
+  const ci = Math.abs(Math.cos(cam.incl * DEG));
   const by: Record<string, VectorRow[]> = {};
   const add = (atlas: VectorAtlas, row: Omit<VectorRow, 'atlas'>) => {
     (by[atlas] ??= []).push({ atlas, ...row });
@@ -634,12 +637,40 @@ export function vectorRows(
   return order.flatMap((a) => by[a] ?? []);
 }
 
+/** GLSL smoothstep. */
+export function smoothstep(a: number, b: number, x: number): number {
+  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+}
+
+/** The drawn core fades out over `incE` 66–80 instead of vanishing at 80 (ADR 0073). */
+export const CORE_FADE = [66, 80] as const;
+/** The core's style (line to dotted) is swapped over `incE` 66–74, centred on v21's 70. */
+export const CORE_STYLE = [66, 74] as const;
+
+/** The drawn core's alpha factor at an inclination: 1 up to 66°, 0 from 80° (smoothstep). */
+export function coreFade(e: number): number {
+  return 1 - smoothstep(CORE_FADE[0], CORE_FADE[1], e);
+}
+
+/** The weight of the dotted core drawing over the line one: 1 when the style is always dotted. */
+export function coreDottedMix(P: Params, e: number): number {
+  return P.stipple > 0.5 && P.lines < 0.5 ? 1 : smoothstep(CORE_STYLE[0], CORE_STYLE[1], e);
+}
+
 /**
  * The drawn core (app23.js:L1028–1035): for a bulge between 0.03 and 0.97, not a Sérsic galaxy,
  * and not edge-on past 80°. The core drawing is picked by bulge strength among the `core` kind,
  * preferring the dotted style for stipple-heavy or steep views, scaled by bulge size and flattened
- * by max(bulgeFlat, cos incl), at alpha 0.9. With `nuclear`, the nuclear spiral (a `cores` drawing
- * of that kind, picked by the parts) laid on the disc at 0.9 of the core's size.
+ * by max(bulgeFlat, |cos incl|), at alpha 0.9. With `nuclear`, the nuclear spiral (a `cores`
+ * drawing of that kind, picked by the parts) laid on the disc at 0.9 of the core's size.
+ *
+ * Deviations from v21 (ADR 0073): the flattening uses |cos i| (v21's signed `ci()` squashed a core
+ * seen from below), and the core fades out over `incE` 66–80 (`coreFade`) instead of vanishing at
+ * 80°, while the line drawing hands over to the dotted one with complementary alphas over 66–74
+ * (`coreDottedMix`) instead of swapping at 70°. The alternate drawing is emitted whenever the
+ * styles differ and `incE` < 80, at alpha 0 outside the overlap, so the instance count (at most
+ * core, alternate and nuclear: 3) does not change with the camera inside a structure bucket.
  */
 export function coreInstances(
   P: Params,
@@ -655,18 +686,17 @@ export function coreInstances(
     return [];
   const n = meta.cores.kind.filter((k) => k === 'core').length;
   if (n < 1) return [];
-  const wantS = (P.stipple > 0.5 && P.lines < 0.5) || e > 70 ? 'dotted' : 'line';
-  let idx = Math.min(n - 1, Math.floor(Math.pow(P.bulge, 0.6) * n));
-  for (let k = 0; k < n; k++) {
-    const j = (idx + k) % n;
-    if (meta.cores.style[j] === wantS) {
-      idx = j;
-      break;
+  const start = Math.min(n - 1, Math.floor(Math.pow(P.bulge, 0.6) * n));
+  const styled = (want: string) => {
+    for (let k = 0; k < n; k++) {
+      const j = (start + k) % n;
+      if (meta.cores.style[j] === want) return j;
     }
-  }
+    return start;
+  };
   const sc = UNIT_SCALE * cam.zoom;
   const s = sc * (0.32 + 0.8 * P.bulgeSize * Math.sqrt(P.bulge));
-  const ci = Math.cos((cam.incl * Math.PI) / 180);
+  const ci = Math.abs(Math.cos((cam.incl * Math.PI) / 180));
   const a = (cam.pa * Math.PI) / 180;
   const sy = s * Math.max(P.bulgeFlat, ci);
   // chain(Rm(pa), Sm(s, sy))
@@ -674,8 +704,19 @@ export function coreInstances(
   const sn = Math.sin(a);
   // a bitmap mark's centre goes through the hand wobble (inst, app23.js:L171)
   const [x, y] = smWarp(PLATE / 2, PLATE / 2, wobbleAmplitude(P.distort), field);
-  const out: Instance[] = [{ x, y, layer: idx, alpha: 0.9, m: [c * s, sn * s, -sn * sy, c * sy] }];
+  const m: Instance['m'] = [c * s, sn * s, -sn * sy, c * sy];
+  const alpha = 0.9 * coreFade(e);
+  const dotted = coreDottedMix(P, e);
+  const iLine = styled('line');
+  const iDot = styled('dotted');
+  const out: Instance[] = [];
+  if (iLine === iDot) out.push({ x, y, layer: iLine, alpha, m });
+  else if (P.stipple > 0.5 && P.lines < 0.5) out.push({ x, y, layer: iDot, alpha, m });
+  else {
+    out.push({ x, y, layer: iLine, alpha: alpha * (1 - dotted), m });
+    out.push({ x, y, layer: iDot, alpha: alpha * dotted, m });
+  }
   if (nuclear !== undefined && nuclear !== null && P.nuclear)
-    out.push({ x, y, layer: nuclear, alpha: 0.9, m: chain(discM(cam), Sm(s * 0.9, s * 0.9)) });
+    out.push({ x, y, layer: nuclear, alpha, m: chain(discM(cam), Sm(s * 0.9, s * 0.9)) });
   return out;
 }

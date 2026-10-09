@@ -29,7 +29,7 @@ import { coreInstances, vectorRows, type VectorRow } from '../model/parts';
 import type { RibbonDesc } from '../model/ribbons';
 import type { GalaxyScene, SceneOptions } from '../model/scene';
 import type { DrawingsMeta } from '../model/variation';
-import { PLATE, UNIT_SCALE, project, srcNow, viewScale, type Camera } from '../view/camera';
+import { PLATE, UNIT_SCALE, project, viewScale, type Camera } from '../view/camera';
 
 const f = Math.fround;
 const clamp = (x: number, a: number, b: number) => Math.max(a, Math.min(b, x));
@@ -421,15 +421,15 @@ export interface LensOptions {
 
 export type SceneBuilder = (P: Params, meta: DrawingsMeta, opts: SceneOptions) => GalaxyScene;
 
-/** The 3D position of a source, as the camera sees it (`srcNow`, app23.js:L450): lens-frame units. */
-export function sourceOffset(
-  home: LensHome,
-  cam: Camera,
-  bx: number,
-  by: number,
-  depth: number,
-): [number, number] {
-  return srcNow({ incl: home.incl, az: home.az, w: home.w, pa: 0 }, bx, by, depth, cam);
+/**
+ * Where a source sits in the lens frame: its offset (bx, by), whatever the orbit. v21's `srcNow`
+ * (app23.js:L450) keeps the source fixed in 3D a depth D behind a lens that lies in the screen
+ * plane, so an orbit by delta slides it ~D sin(delta) across the lens and breaks the ring into
+ * arcs. Here the source follows the lens frame (ADR 0072): at the home pose this is exactly
+ * `srcNow`'s result, since `rotFwd(rotInv([bx, by, -D], home), home)` is [bx, by].
+ */
+export function sourceOffset(bx: number, by: number): [number, number] {
+  return [bx, by];
 }
 
 /** The depths of v21's sources (`srcNow`'s third argument). */
@@ -777,7 +777,7 @@ export function describeLens(
 
 /** Everything a view adds to the model tier's lens scene. */
 export interface LensView {
-  /** per source, its image-plane position `srcNow` + the offset of the source's own marks (f32) */
+  /** per source, its lens-frame position (`sourceOffset`) + the offset of the source's own marks (f32) */
   bc: [number, number][];
   /** plate px per lens unit (VIEW.scale), cos and sin of the roll, f32 */
   U: number;
@@ -789,7 +789,7 @@ export function lensView(L: LensScene, cam: Camera): LensView {
   const pa = cam.pa * DEG;
   return {
     bc: L.sources.map((s) => {
-      const [x, y] = sourceOffset(L.home, cam, s.bx, s.by, s.depth);
+      const [x, y] = sourceOffset(s.bx, s.by);
       return [f(x), f(y)];
     }),
     U: f(viewScale(cam.zoom)),
