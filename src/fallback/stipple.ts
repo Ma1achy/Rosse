@@ -397,8 +397,21 @@ export class CpuStipple {
       caps.set(parts.caps.subarray(0, parts.count * CAPSULE_WORDS), hatch.count * CAPSULE_WORDS);
       merged.push({ kind: 'capsules', caps, count: hatch.count + parts.count, gain: 1 });
     } else if (hatch ?? parts) merged.push((hatch ?? parts) as InkLayer);
+    const cores = coreInstances(P, meta, cam, galaxy.noise, VD.parts.picks.nuclear);
+    if (T)
+      for (const c of cores) {
+        const q = T.data.post(T.g, c.x, c.y, T.r2);
+        c.x = q[0];
+        c.y = q[1];
+      }
+    // last (v21), or with coreAuto first, under the disc's marks (ADR 0092)
+    const coreLayers: InkLayer[] = cores.length
+      ? [{ kind: 'sprites', atlas: 'cores', gain: 1, pop: 'old', instances: cores }]
+      : [];
+    const corePlaced = P.coreAuto > 0 ? coreLayers : [];
     const layers: InkLayer[] = [
       ...bgLayers,
+      ...corePlaced,
       ...line.filter((l) => !pieces.includes(l) && l !== hatch),
       ...merged,
       ...(LL?.line ?? []),
@@ -415,15 +428,7 @@ export class CpuStipple {
       ...stipple.slice(4),
       ...(LL?.stars ?? []),
     ];
-    const cores = coreInstances(P, meta, cam, galaxy.noise, VD.parts.picks.nuclear);
-    if (T)
-      for (const c of cores) {
-        const q = T.data.post(T.g, c.x, c.y, T.r2);
-        c.x = q[0];
-        c.y = q[1];
-      }
-    if (cores.length)
-      layers.push({ kind: 'sprites', atlas: 'cores', gain: 1, pop: 'old', instances: cores });
+    if (P.coreAuto <= 0) layers.push(...coreLayers);
     layers.push(...(LL?.cores ?? []));
     layers.push(...fgLayers);
     const tiles = (l: InkLayer[], atlas: string) =>

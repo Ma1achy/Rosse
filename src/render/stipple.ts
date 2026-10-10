@@ -769,8 +769,14 @@ export class GpuStipple {
         ],
       });
     else if (hatch ?? parts) merged.push((hatch ?? parts) as InkLayer);
+    // the drawn core: last (v21), or with coreAuto first, under the disc's marks (ADR 0092)
+    const coreLayer: InkLayer[] = cores.length
+      ? [{ kind: 'sprites', atlas: 'cores', gain: 1, pop: 'old', instances: cores }]
+      : [];
+    const coreBehind = P.coreAuto > 0;
     return [
       ...this.sky.background(),
+      ...(coreBehind ? [...coreLayer, ...tided] : []),
       ...line.filter((l) => !pieces.includes(l) && l !== hatch),
       ...merged,
       ...(LL?.line ?? []),
@@ -786,12 +792,10 @@ export class GpuStipple {
       ...(LL?.knots ?? []),
       ...stipple.slice(4),
       ...(LL?.stars ?? []),
-      ...(cores.length
-        ? [{ kind: 'sprites', atlas: 'cores', gain: 1, pop: 'old', instances: cores } as InkLayer]
-        : []),
+      ...(coreBehind ? [] : coreLayer),
       ...(LL?.cores ?? []),
       ...this.sky.foreground(),
-      ...tided,
+      ...(coreBehind ? [] : tided),
     ];
   }
 

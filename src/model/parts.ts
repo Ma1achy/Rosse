@@ -696,6 +696,13 @@ export function smoothstep(a: number, b: number, x: number): number {
 }
 
 /**
+ * How much of the drawn core's ink shows. 1 is v21's (ADR 0079); with `coreAuto` the core is a
+ * translucent drawing under the disc's marks (ADR 0092), so what lies in front of it reads as nearer.
+ */
+export const CORE_BEHIND_ALPHA = 0.5;
+export const coreAlpha = (P: Params): number => (P.coreAuto > 0 ? CORE_BEHIND_ALPHA : 1);
+
+/**
  * The drawn core (app23.js:L1028–1035): for a bulge between 0.03 and 0.97 and not a Sérsic galaxy.
  * The core drawing is picked by bulge strength among the `core` kind, flattened by
  * max(bulgeFlat, |cos incl|), scaled by bulge size. With `nuclear`, the nuclear spiral (a `cores`
@@ -707,7 +714,8 @@ export function smoothstep(a: number, b: number, x: number): number {
  * at incE 70, and dropped it from 80 (ADR 0073 cross-faded both, which left it half transparent
  * over a range of angles). Here it is at full alpha, its style is the dotted one when the galaxy is
  * stipple-only (`stipple > 0.5 && lines < 0.5`) and the line one otherwise, whatever the view, and
- * it stays, flattened by `bulgeFlat`, edge-on.
+ * it stays, flattened by `bulgeFlat`, edge-on. With `coreAuto` it is translucent and drawn first
+ * (`coreAlpha`, ADR 0092).
  */
 export function coreInstances(
   P: Params,
@@ -742,9 +750,15 @@ export function coreInstances(
   const m: Instance['m'] = [c * s, sn * s, -sn * sy, c * sy];
   const dotted = P.stipple > 0.5 && P.lines < 0.5;
   const out: Instance[] = [
-    { x, y, layer: dotted ? styled('dotted') : styled('line'), alpha: 1, m },
+    { x, y, layer: dotted ? styled('dotted') : styled('line'), alpha: coreAlpha(P), m },
   ];
   if (nuclear !== undefined && nuclear !== null && P.nuclear)
-    out.push({ x, y, layer: nuclear, alpha: 1, m: chain(discM(cam), Sm(s * 0.9, s * 0.9)) });
+    out.push({
+      x,
+      y,
+      layer: nuclear,
+      alpha: coreAlpha(P),
+      m: chain(discM(cam), Sm(s * 0.9, s * 0.9)),
+    });
   return out;
 }

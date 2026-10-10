@@ -76,6 +76,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0089](adr/0089-jets-streams-and-tails-as-3d-stroke-bundles.md) | _Proposed:_ with `lineWorld` the jet, streams and tail are bundles of 3D strokes; five stale Sky sliders are retired from the page. |
 | [0090](adr/0090-stellar-populations.md) | _Proposed:_ with `popAuto`, mark character by population, clustering, halo globular clusters and a wider brightness spread. |
 | [0091](adr/0091-a-stars-colour-follows-the-galaxy.md) | _Proposed:_ the colour plate has a fifteen-ink ramp per surface, and a dot's colour follows its place in the galaxy (temperature, radius, arms, dust edges, patches). |
+| [0092](adr/0092-the-core-is-drawn-behind-the-disc.md) | _Proposed:_ with `coreAuto` the drawn core and nuclear spiral are drawn first at half strength, so the disc's marks read over them (v21 draws them last, opaque) |
 
 ## Modules
 

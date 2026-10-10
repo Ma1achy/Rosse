@@ -130,6 +130,7 @@ export const DEF = {
   lensLock: 0,
   occlAuto: 0,
   peanut: 0,
+  coreAuto: 0,
 } as const;
 
 type Widen<T> = T extends number ? number : T extends string ? string : T;

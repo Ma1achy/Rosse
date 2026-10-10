@@ -219,6 +219,7 @@ export const SCHEMA: { readonly [K in ParamKey]: ParamSpec } = {
   thinAuto: choice('Thin disc', ONOFF),
   popAuto: choice('Population detail', ONOFF),
   peanut: choice('Peanut bulge (barred)', ONOFF),
+  coreAuto: choice('Core behind the disc', ONOFF),
   occlAuto: choice('Natural star occlusion', ONOFF),
   lensLock: choice('Lensed source follows the orbit', [0, 1, 2]),
   depthAuto: choice('Depth', [0, 1, 2], { tier: 'view' }),
