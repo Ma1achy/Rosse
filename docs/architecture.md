@@ -71,6 +71,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0084](adr/0084-the-galaxy-has-perspective.md) | _Proposed:_ `depthAuto` (view tier) scales each mark's offset and size by its depth through the View uniform's `persp`, so a tilted disc has a near and a far side. |
 | [0085](adr/0085-jets-and-streams-in-3d.md) | _Proposed:_ with `lineWorld` the jet runs along the galaxy's axis and each stream on an orbit tilted out of its plane, both projected by the camera. |
 | [0086](adr/0086-the-disc-dims-a-star-behind-it.md) | _Proposed:_ `occlAuto` adds the disc's own optical depth to a star's dimming, so a star behind the disc is clearly fainter and smaller. |
+| [0087](adr/0087-dust-as-brush-strokes-in-3d.md) | _Proposed:_ with `strokesAuto`, swirling dust strokes on the arms' inner edges at their own heights above and below the plane. |
 
 ## Modules
 

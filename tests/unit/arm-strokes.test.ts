@@ -41,4 +41,19 @@ describe('strokesAuto', () => {
     const outer = a.filter((c) => radius(c) > 1.4).map((c) => c.w);
     expect(Math.max(...inner)).toBeGreaterThan(Math.max(...outer));
   });
+
+  it('adds dust wisps that leave the plane, only with strokesAuto', () => {
+    const w = (o: object) =>
+      buildScene(
+        presetParams('Grand design', 7, { dustAuto: 1, ...o }),
+        META,
+      ).ribbons.curves.filter((c) => c.role === 'dust-wisp');
+    expect(w({ strokesAuto: 0 })).toHaveLength(0);
+    const a = w({ strokesAuto: 1 });
+    expect(a.length).toBeGreaterThan(5);
+    expect(a).toEqual(w({ strokesAuto: 1 }));
+    const zs = a.flatMap((c) => c.pts.map((p) => Math.abs(p[2])));
+    expect(Math.max(...zs)).toBeGreaterThan(0.05);
+    expect(Math.max(...zs)).toBeLessThan(0.5);
+  });
 });

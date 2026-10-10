@@ -36,6 +36,8 @@ export const CurveIndex = {
   laneRing: 300,
   /** the natural arm's companion strokes (ADR 0082): arm k, stroke i uses `armFibre + 16k + i` */
   armFibre: 400,
+  /** dust wisp i (ADR 0087) uses `dustWisp + i` */
+  dustWisp: 700,
   /** arm k uses index `arms + k` */
   arms: 100,
   /** spur i uses index `spurs + i` */
@@ -91,6 +93,7 @@ export interface Curve {
     | 'bar'
     | 'edge-on'
     | 'lane-ring'
+    | 'dust-wisp'
     | 'outline'
     | 'tail'
     | 'shell';
@@ -247,6 +250,8 @@ export function curves(
       role: 'bar',
     });
   if (P.lineWorld > 0 && P.kind !== 'merger' && P.bulge < 0.95) C.push(...laneRings(P, at, pick));
+  if (P.strokesAuto > 0 && P.kind !== 'merger' && P.arms >= 1 && P.bulge < 0.95)
+    C.push(...dustWisps(P, V, at, pick));
   if (incE(incl) > 80 && P.kind !== 'merger' && P.bulge < 0.95)
     C.push({
       pts: [
@@ -439,4 +444,52 @@ function armFibres(
     });
   }
   return out.filter((c) => c.pts.length > 3);
+}
+
+/**
+ * Dust as brush strokes in 3D (ADR 0087): short faint strokes along the inner edge of each arm, the
+ * side the lanes lie on, each a swirl that rises and falls out of the disc plane (a height of up to
+ * 0.25, a slope and a wobble in the radius), so face-on they are curls along the arm and edge-on
+ * they are wisps standing above and below the midplane. More of them for a dustier galaxy.
+ */
+function dustWisps(
+  P: Params,
+  V: Variation,
+  at: (i: number) => Draws,
+  pick: (kind: string, r: Draws) => number,
+): Curve[] {
+  const dust = clamp(effectiveDust(P), 0, 1);
+  const n = Math.round(P.arms * (3 + 5 * dust));
+  const out: Curve[] = [];
+  for (let i = 0; i < n; i++) {
+    const r = at(CurveIndex.dustWisp + i);
+    const k = i % P.arms;
+    const R0 = 0.5 + 1.5 * r.f32();
+    const span = 0.35 + 0.5 * r.f32();
+    const off = (2 * Math.PI * k) / P.arms;
+    // on the inner (trailing) edge of the arm, a little inside its radius
+    const lead = -(0.1 + 0.16 * r.f32());
+    const z0 = (r.f32() * 2 - 1) * 0.25 * Math.exp(-R0 / 2.2);
+    const dz = (r.f32() * 2 - 1) * 0.12;
+    const swirl = 0.05 + 0.07 * r.f32();
+    const ph = r.f32() * TAU;
+    const pts: Vec3[] = [];
+    for (let j = 0; j <= 26; j++) {
+      const s = j / 26;
+      const R = (R0 + 0.55 * s) * (1 + swirl * Math.sin(TAU * 1.5 * s + ph));
+      const th = armPhaseCpu(P, V, R, k) + off + lead + span * (s - 0.5) * 0.5;
+      pts.push([R * Math.cos(th), R * Math.sin(th), z0 + dz * s + 0.04 * Math.sin(TAU * s + ph)]);
+    }
+    out.push({
+      pts,
+      w: 0.8 + 0.7 * r.f32(),
+      k: pick(r.f32() < 0.5 ? P.stroke : 'broken', r),
+      a: 0.9,
+      taper: true,
+      stretch: false,
+      edgeAlpha: false,
+      role: 'dust-wisp',
+    });
+  }
+  return out;
 }
