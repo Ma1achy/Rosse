@@ -352,21 +352,21 @@ export function mergerViewUniform(
   const c1 = fr.cores[1];
   const sep =
     Math.hypot(c0[0] - c1[0], c0[1] - c1[1], c0[2] - c1[2]) /
-    Math.max(1e-6, (desc.gals[0]?.rmax ?? 1.7) + (desc.gals[1]?.rmax ?? 1.7));
+    Math.max(1e-6, desc.gals[0].rmax + desc.gals[1].rmax);
   const smooth = (a: number, b: number, x: number) => {
     const t = Math.min(Math.max((x - a) / (b - a), 0), 1);
     return t * t * (3 - 2 * t);
   };
   const frame = (g: number) => {
-    const G = desc.gals[g];
-    const disc = !!G && G.type !== 'elliptical';
+    const G = desc.gals[g as 0 | 1];
+    const disc = G.type !== 'elliptical';
     const hold = mauto && disc ? f(0.92 * smooth(0.12, 0.6, sep)) : 0;
     const dust = Math.min(0.8, P.dust * 1.2 + (P.dustAuto > 0 ? 0.35 : 0));
-    const lane = mauto && disc ? f(dust * (G?.type === 'lenticular' ? 0.6 : 1)) : 0;
+    const lane = mauto && disc ? f(dust * (G.type === 'lenticular' ? 0.6 : 1)) : 0;
     return {
-      ea: [...(G?.e1 ?? [1, 0, 0]).map(f), hold],
-      eb: [...(G?.e2 ?? [0, 1, 0]).map(f), 0],
-      pa: [f(G?.arms ?? 0), f(G?.pitch ?? 1), lane, mauto && G?.type === 'elliptical' ? 1 : 0],
+      ea: [...G.e1.map(f), hold],
+      eb: [...G.e2.map(f), 0],
+      pa: [f(G.arms), f(G.pitch), lane, mauto && G.type === 'elliptical' ? 1 : 0],
     };
   };
   const F0 = frame(0);
