@@ -1,6 +1,6 @@
 /**
- * The dust in front of an overlay star dims the whole star (ADR 0074): `starJobs` gives every
- * star job the `keep = exp(−tau)` of the galaxy's own dustTau (src/fallback/kernels/project.ts) for
+ * The dust and the disc in front of an overlay star dim the whole star (ADR 0074, 0086; off unless
+ * `occlAuto`): `starJobs` gives every star job the `keep = exp(−tau)` of the galaxy's own dustTau (src/fallback/kernels/project.ts) for
  * the star's place in the galaxy's frame along the line of sight, and the star-marks kernel keeps
  * each mark with that probability, one draw per mark, so the glare, the spikes, the rings and the
  * heart thin by the same share. The GPU = CPU comparison of the thinned classes is
@@ -13,9 +13,22 @@ import { CpuStipple } from '../../src/fallback/stipple';
 import { dustTau } from '../../src/fallback/kernels/project';
 import { Cls } from '../../src/model/classes';
 import { buildScene } from '../../src/model/scene';
-import { StarKind, satelliteDepth, starJobs, type StarJob } from '../../src/model/stars';
+import {
+  DISC_KEEP_FLOOR,
+  StarKind,
+  discTau,
+  satelliteDepth,
+  starJobs,
+  type StarJob,
+} from '../../src/model/stars';
 import { makeVariation } from '../../src/model/variation';
-import { cameraOf, orientationOf, rotationOf, sceneGalaxyPoint } from '../../src/view/camera';
+import {
+  cameraOf,
+  orientationOf,
+  rotInv,
+  rotationOf,
+  sceneGalaxyPoint,
+} from '../../src/view/camera';
 import { META } from './support/vectors';
 
 const NO_SKY = { field: 0, fgstars: 0, companions: 0 };
@@ -24,7 +37,7 @@ const SPIRAL = 'Layered: spiral beside a bright star';
 
 /** The scene of a dusty spiral with its overlay star near the centre, and the cameras either side. */
 function setup(dust: number) {
-  const P0: Params = { ...presetParams(SPIRAL, 7, NO_SKY), dust, ovStarD: 0.5 };
+  const P0: Params = { ...presetParams(SPIRAL, 7, NO_SKY), dust, ovStarD: 0.5, occlAuto: 1 };
   const home = orientationOf(cameraOf(P0));
   const variation = makeVariation(P0, META);
   const a = (P0.ovStarA * Math.PI) / 180;
@@ -40,6 +53,14 @@ function setup(dust: number) {
 const primaryOf = (jobs: StarJob[]) =>
   jobs.slice(0, jobs.findIndex((j) => j.kind === StarKind.drawn) + 1);
 
+/** The keep of a star at galaxy-frame point g seen from P: dust and disc, floored (ADR 0086). */
+const keepOf = (g: readonly number[], P: Params, dust: number) => {
+  const cam = cameraOf(P);
+  const tau = dustTau(g[0] ?? 0, g[1] ?? 0, g[2] ?? 0, f(rotationOf(cam).ci), dust);
+  const d = discTau(g, rotInv([0, 0, 1], rotationOf(cam)));
+  return f(Math.max(Math.exp(-(tau + d)), DISC_KEEP_FLOOR));
+};
+
 describe('keep, the share of an overlay star the dust lets through', () => {
   const S = setup(0.9);
   const jobsOf = (P: Params, dust: number) => {
@@ -49,7 +70,7 @@ describe('keep, the share of an overlay star the dust lets through', () => {
   };
 
   it('is 1 everywhere with no dust, in every job', () => {
-    const jobs = jobsOf({ ...S.behind, dust: 0 }, 0);
+    const jobs = jobsOf({ ...S.behind, dust: 0, occlAuto: 0 }, 0);
     expect(jobs.length).toBeGreaterThan(0);
     expect(jobs.every((j) => j.keep === 1)).toBe(true);
   });
@@ -57,10 +78,10 @@ describe('keep, the share of an overlay star the dust lets through', () => {
   it('is exp(−tau) of the shared dustTau for the star behind the disc, below 1', () => {
     expect(S.g[2] === 0 ? 0 : Math.abs(S.g[2])).toBeGreaterThan(0.06);
     const jobs = primaryOf(jobsOf(S.behind, 0.9));
-    const tau = dustTau(S.g[0], S.g[1], S.g[2], f(rotationOf(cameraOf(S.behind)).ci), 0.9);
-    expect(tau).toBeGreaterThan(0.5);
+    const keep = keepOf(S.g, S.behind, 0.9);
+    expect(keep).toBeLessThan(0.6);
     expect(jobs.length).toBeGreaterThan(3);
-    for (const j of jobs) expect(j.keep).toBe(f(Math.exp(-tau)));
+    for (const j of jobs) expect(j.keep).toBe(keep);
     expect(jobs[0]?.keep).toBeLessThan(0.5);
   });
 
@@ -69,7 +90,7 @@ describe('keep, the share of an overlay star the dust lets through', () => {
   });
 
   it('is 1 where there is no galaxy (the galaxy dust passed is 0), and for a subject star', () => {
-    for (const j of jobsOf(S.behind, 0)) expect(j.keep).toBe(1);
+    for (const j of jobsOf({ ...S.behind, occlAuto: 0 }, 0)) expect(j.keep).toBe(1);
     const P = { ...presetParams('Star: bright, with spikes', 7, NO_SKY), dust: 0.9 };
     const home = orientationOf(cameraOf(P));
     const D = buildScene(P, META, { home }).stars;
@@ -93,13 +114,13 @@ describe('keep, the share of an overlay star the dust lets through', () => {
     const jobs = jobsOf(S.behind, 0.9);
     const drawn = jobs.filter((j) => j.kind === StarKind.drawn);
     expect(drawn.length).toBe(ctx.picks.stars.length);
-    const ci = f(rotationOf(cameraOf(S.behind)).ci);
     const keeps = ctx.picks.stars.map((s, i) => {
       const p = ctx.place ?? { x: 0, y: 0, depth: 0 };
+      // with occlAuto the cluster is spread twice as deep and centred nearer the disc plane
       const g = i
-        ? sceneGalaxyPoint(S.home, p.x + s.ux, p.y + s.uy, p.depth + satelliteDepth(s))
+        ? sceneGalaxyPoint(S.home, p.x + s.ux, p.y + s.uy, p.depth * 0.4 + satelliteDepth(s, 2))
         : sceneGalaxyPoint(S.home, p.x, p.y, p.depth);
-      return f(Math.exp(-dustTau(g[0], g[1], g[2], ci, 0.9)));
+      return keepOf(g, S.behind, 0.9);
     });
     expect(drawn.map((j) => j.keep)).toEqual(keeps);
     expect(new Set(keeps).size).toBeGreaterThan(1);
@@ -123,7 +144,7 @@ describe('the marks the dust leaves, by kind', () => {
   };
 
   it('with no dust the star is as without the extinction (every mark the kernel makes is kept)', () => {
-    const clear = view({ ...S.behind, dust: 0 });
+    const clear = view({ ...S.behind, dust: 0, occlAuto: 0 });
     const dusty = view(S.behind);
     // dust 0 keeps every mark the dusty run keeps, and the dusty run keeps no mark the clear one lacks
     let more = 0;
@@ -136,7 +157,7 @@ describe('the marks the dust leaves, by kind', () => {
   });
 
   it('thins the glare, the spikes, the rings and the heart by the same share, keep', () => {
-    const clear = view({ ...S.behind, dust: 0 });
+    const clear = view({ ...S.behind, dust: 0, occlAuto: 0 });
     const dusty = view(S.behind);
     const scene = dusty.scene;
     if (!scene.stars) throw new Error('no stars');
@@ -171,7 +192,7 @@ describe('the marks the dust leaves, by kind', () => {
       return starJobs(scene.stars, P, cameraOf(P), S.home, dust).jobs;
     };
     const dusty = primaryOf(jobsOf(S.behind, 0.9));
-    const clear = primaryOf(jobsOf({ ...S.behind, dust: 0 }, 0));
+    const clear = primaryOf(jobsOf({ ...S.behind, dust: 0, occlAuto: 0 }, 0));
     const keep = dusty[0]?.keep ?? 1;
     expect(keep).toBeLessThan(0.5);
     const r = f(Math.sqrt(keep));

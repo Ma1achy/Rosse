@@ -277,7 +277,8 @@ describe('overlay artefacts stay on the screen; star satellites are in the scene
     ['a subject star', 'Star: bright, with spikes', 0],
     ['an overlay star', 'Layered: spiral beside a bright star', 1],
   ])('%s', (_n, preset, ctxId) => {
-    const P = presetParams(preset, 7, NO_SKY);
+    // a subject star's satellites lie in depth only with depthAuto; an overlay's always do
+    const P = presetParams(preset, 7, { ...NO_SKY, depthAuto: 1 });
     const home = orientationOf(cameraOf(P));
     const D = buildScene(P, META, { home }).stars;
     const ctx = D?.ctxs.find((c) => c.id === ctxId);

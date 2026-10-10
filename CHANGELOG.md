@@ -38,6 +38,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Fixed
 
+- CI golden: the dust and disc dimming of an overlay star is now `occlAuto` only (ADR 0074, 0086; it was on whenever `dust > 0`), and a subject star's satellites lie in depth only with `depthAuto` (ADR 0055; they moved under orbit in the core), so the core matches v21 again for the layered edge-on and star orbit cases. The remaining deviations (ADR 0079's opaque core, the 40% wobble) are accepted per preset in `tests/golden/thresholds.json`.
 - The foreground stars slider drew nothing: v21's shell of stars lies outside the camera's cone. With `depthAuto` they fill a ball round the galaxy (ADR 0089).
 - The tidal tail and jet sliders only switched them on and off; with `lineWorld` they now set the reach, strength and strand count (`jet` is a 0 to 1 slider; v21 reads it as on above 0.5) (ADR 0089).
 - Elliptical, cigar and round galaxies on the page had a sharp edge: the thin disc's shortened bulge tail clamped stars onto a ring at the cut; stars beyond it are now left out, so the stipple falls off softly (ADR 0083).
