@@ -428,7 +428,7 @@ export class CpuStipple {
       ...stipple.slice(4),
       ...(LL?.stars ?? []),
     ];
-    if (P.coreAuto <= 0) layers.push(...coreLayers);
+    if (!(P.coreAuto > 0)) layers.push(...coreLayers);
     layers.push(...(LL?.cores ?? []));
     layers.push(...fgLayers);
     const tiles = (l: InkLayer[], atlas: string) =>

@@ -17,12 +17,13 @@ The ink is composited premultiplied over, so a mark drawn over solid ink is invi
 With `coreAuto`:
 
 1. The core and the nuclear spiral are the first layers of the galaxy, after the sky's background (both engines; a merger's tide-carried core too). Every star, stroke and dust mark of the disc is drawn over them.
-2. Their alpha is `CORE_BEHIND_ALPHA` = 0.5 (`coreAlpha`, src/model/parts.ts), so the marks over the core stay readable and the core reads as a haze under them.
+2. They stay opaque (`CORE_BEHIND_ALPHA` = 1, `coreAlpha`, src/model/parts.ts). A first version drew them at 0.5 so that marks over them stayed readable; the owner wanted the core opaque.
 
 Without it nothing changes.
 
 ## Not done
 
+- Over solid ink, a mark of the same ink is invisible, so with an opaque core the order shows only where the bitmap has gaps. To make nearer marks read in front of it needs a knockout (a paper-coloured halo round marks in front) or a depth-split of the marks; neither exists yet.
 - No per-mark depth: marks behind the bulge's midplane are drawn over the core as well. A real ordering needs the marks split by depth into layers before and after the core, or a depth buffer for the ink.
 - The bulge's own stars and strokes (a denser, better-shaped stippled bulge, so the bitmap is only flavour) are a follow-up.
 

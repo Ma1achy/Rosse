@@ -6,7 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
-- The drawn core is behind the disc (ADR 0092, proposed), with `coreAuto` ("Core behind the disc", 0 in the core, 1 on the page): the core and nuclear spiral are drawn first at half strength, so stars, dust and strokes of the disc read over them instead of being covered.
+- The drawn core is behind the disc (ADR 0092, proposed), with `coreAuto` ("Core behind the disc", 0 in the core, 1 on the page): the core and nuclear spiral are drawn first, still opaque, so the disc's stars, dust and strokes are layered over them.
 
 - A more natural colour plate (ADR 0091, proposed), with `popAuto`: fifteen inks per surface (pastel chalks on the chalkboard, pencils on paper) from dust-reddened orange through gold and cream to ice and blue, and rose and lilac nebulae. A dot's colour follows the galaxy: an orange core that goldens outward, a disc that is bluer with radius, blue arms with reddened dust edges, rose knots, and patches of shared hue.
 - Stellar populations (ADR 0090, proposed), with `popAuto` ("Population detail", 0 in the core, 1 on the page): old stars drawn finer and young ones larger and crisper, stars gathered in clumps with thinning between them, globular clusters in the halo, a wider, longer-tailed spread of drawn star sizes, an even jittered-grid spacing, a faint thick disc, halo stars along the stellar streams, and foreground stars that are larger and fainter near the camera.

@@ -696,10 +696,10 @@ export function smoothstep(a: number, b: number, x: number): number {
 }
 
 /**
- * How much of the drawn core's ink shows. 1 is v21's (ADR 0079); with `coreAuto` the core is a
- * translucent drawing under the disc's marks (ADR 0092), so what lies in front of it reads as nearer.
+ * How much of the drawn core's ink shows: 1, opaque (ADR 0079, ADR 0092). v21 drew it at 0.9; with
+ * `coreAuto` it is drawn first, under the disc's marks, at the same strength.
  */
-export const CORE_BEHIND_ALPHA = 0.5;
+export const CORE_BEHIND_ALPHA = 1;
 export const coreAlpha = (P: Params): number => (P.coreAuto > 0 ? CORE_BEHIND_ALPHA : 1);
 
 /**
@@ -714,7 +714,7 @@ export const coreAlpha = (P: Params): number => (P.coreAuto > 0 ? CORE_BEHIND_AL
  * at incE 70, and dropped it from 80 (ADR 0073 cross-faded both, which left it half transparent
  * over a range of angles). Here it is at full alpha, its style is the dotted one when the galaxy is
  * stipple-only (`stipple > 0.5 && lines < 0.5`) and the line one otherwise, whatever the view, and
- * it stays, flattened by `bulgeFlat`, edge-on. With `coreAuto` it is translucent and drawn first
+ * it stays, flattened by `bulgeFlat`, edge-on. With `coreAuto` it is drawn first, under the disc's marks
  * (`coreAlpha`, ADR 0092).
  */
 export function coreInstances(

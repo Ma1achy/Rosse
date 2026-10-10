@@ -1,4 +1,4 @@
-/** The drawn core behind the disc (ADR 0092): `coreAuto` 0 is v21's, 1 a translucent core drawn first. */
+/** The drawn core behind the disc (ADR 0092): `coreAuto` 0 is v21's, 1 a core drawn first, under the disc. */
 import { describe, expect, it } from 'vitest';
 import { DEF } from '../../src/core/params';
 import { presetParams } from '../../src/core/presets';
@@ -22,6 +22,7 @@ describe('coreAuto', () => {
     expect(DEF.coreAuto).toBe(0);
     expect(SCHEMA.coreAuto).toMatchObject({ kind: 'choice', tier: 'model' });
     expect(coreAlpha(presetParams('Grand design', 7))).toBe(1);
+    expect(CORE_BEHIND_ALPHA).toBe(1);
     expect(coreAlpha(presetParams('Grand design', 7, { coreAuto: 1 }))).toBe(CORE_BEHIND_ALPHA);
   });
 
@@ -31,7 +32,7 @@ describe('coreAuto', () => {
     expect(c.at).toBeGreaterThan(c.n / 2);
   });
 
-  it('draws the core first and translucent, under the disc’s marks', () => {
+  it('draws the core first, still opaque, under the disc’s marks', () => {
     const on = coreIndex(1);
     const off = coreIndex(0);
     expect(on.alpha).toBe(CORE_BEHIND_ALPHA);
