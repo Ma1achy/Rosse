@@ -56,6 +56,11 @@ struct Capsule {
 }
 
 const SEAMMAX: f32 = 30.0;
+
+// how much of its width a stroke keeps at a stretch: all up to 1.05, a sixth of it at the tear (ADR 0093)
+fn stretch_thin(r: f32) -> f32 {
+  return 1.0 - 0.85 * smoothstep(1.05, TEAR, r);
+}
 const TEAR: f32 = 1.8;
 
 @group(0) @binding(1) var<uniform> job: TJob;
@@ -128,6 +133,16 @@ fn warp_ribbons(@builtin(global_invocation_id) id: vec3<u32>) {
     w2 = vec2<f32>(mid + (w2.x - mid) * k1, mid_y + (w2.y - mid_y) * k1);
     w3 = vec2<f32>(mid + (w3.x - mid) * k1, mid_y + (w3.y - mid_y) * k1);
   }
+  // ADR 0093: a stroke thins as the tides stretch it, so it tapers out instead of ending in a dash
+  if (tide[9] != 0u) {
+    let thin = stretch_thin(max(ml / ol, mw / ow));
+    let m0 = (w0 + w1) / 2.0;
+    let m1 = (w2 + w3) / 2.0;
+    w0 = m0 + (w0 - m0) * thin;
+    w1 = m0 + (w1 - m0) * thin;
+    w2 = m1 + (w2 - m1) * thin;
+    w3 = m1 + (w3 - m1) * thin;
+  }
   var alpha = s.alpha;
   if (ml > SEAMMAX || ml / ol > TEAR || mw / ow > TEAR) {
     alpha = 0.0;
@@ -158,6 +173,9 @@ fn warp_caps(@builtin(global_invocation_id) id: vec3<u32>) {
   let kk = (pa.z + pb.z) / 2.0;
   if (kk != 1.0) {
     w = w * kk;
+  }
+  if (tide[9] != 0u) {
+    w = w * stretch_thin(ml / ol);
   }
   caps[i] = Capsule(a, b, w, alpha, 0.0, 0.0);
 }

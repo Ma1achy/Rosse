@@ -30,6 +30,13 @@ struct MView {
   // the cores at this moment (xyz, w = the truncation radius rmax)
   c0: vec4<f32>,
   c1: vec4<f32>,
+  // each disc's frame: e1 (w = hold), e2, and (arms, pitch, lane strength, smooth halo)
+  ea0: vec4<f32>,
+  eb0: vec4<f32>,
+  pa0: vec4<f32>,
+  ea1: vec4<f32>,
+  eb1: vec4<f32>,
+  pa1: vec4<f32>,
   cos_i: f32,
   sin_i: f32,
   cos_az: f32,
@@ -62,6 +69,9 @@ struct MView {
   // elliptical galaxies (1) have no drawn stars, tail knots or outer knots
   hot0: u32,
   hot1: u32,
+  // ADR 0093: 1 keeps the galaxies' character; the cores' separation in units of their radii
+  mauto: f32,
+  stage: f32,
 }
 
 const STREAM_MERGER_SPRITES: u32 = 41u;
@@ -121,6 +131,11 @@ fn mstar(i: u32, base: u32, pos: vec2<f32>, bright: bool) {
 
 var<private> pen_k: f32 = 1.0;
 
+fn wrap_pi(a: f32) -> f32 {
+  let t = a + 3.141592653589793;
+  return (t - 6.283185307179586 * floor(t / 6.283185307179586)) - 3.141592653589793;
+}
+
 @compute @workgroup_size(64)
 fn sprites(@builtin(global_invocation_id) id: vec3<u32>) {
   let i = id.x;
@@ -132,7 +147,36 @@ fn sprites(@builtin(global_invocation_id) id: vec3<u32>) {
     classes[o + s] = CLS_NONE;
   }
   // view(x, y, z) (L500), then px (L516)
-  let p3 = cur[i].xyz;
+  let raw = cur[i].xyz;
+  var second = false;
+  if (i >= mv.n0) {
+    second = true;
+  }
+  var core = mv.c0;
+  var ea = mv.ea0;
+  var eb = mv.eb0;
+  var pa = mv.pa0;
+  var hot = mv.hot0 != 0u;
+  var g = 0u;
+  if (second) {
+    g = 1u;
+    core = mv.c1;
+    ea = mv.ea1;
+    eb = mv.eb1;
+    pa = mv.pa1;
+    hot = mv.hot1 != 0u;
+  }
+  let mauto = mv.mauto != 0.0;
+  let rn = ic[i].z;
+  // ADR 0093: a disc keeps its inner stars where they started; the hold lets go as the cores meet
+  var p3 = raw;
+  if (mauto && ea.w > 0.0) {
+    let w = 1.0 - ea.w * (1.0 - smoothstep(0.25, 0.7, rn));
+    let ax = ic[i].x * core.w;
+    let ay = ic[i].y * core.w;
+    let gp = core.xyz + (ax * ea.xyz + ay * eb.xyz);
+    p3 = gp + w * (raw - gp);
+  }
   let xr = p3.x * mv.cos_az - p3.y * mv.sin_az;
   let yr = p3.x * mv.sin_az + p3.y * mv.cos_az;
   let yy = yr * mv.cos_i - p3.z * mv.sin_i;
@@ -143,19 +187,16 @@ fn sprites(@builtin(global_invocation_id) id: vec3<u32>) {
   tide[tide[1] + i * 4u] = bitcast<u32>(p.x);
   tide[tide[1] + i * 4u + 1u] = bitcast<u32>(p.y);
 
-  var g = 0u;
-  var core = mv.c0;
-  var hot = mv.hot0 != 0u;
-  if (i >= mv.n0) {
-    g = 1u;
-    core = mv.c1;
-    hot = mv.hot1 != 0u;
-  }
-  let d = p3 - core.xyz;
+  let d = raw - core.xyz;
   let dcore = sqrt(d.x * d.x + d.y * d.y + d.z * d.z);
   let in_tail = !hot && dcore > 1.15 * core.w;
   let outer = ic[i].z > 0.45;
   let roll = u01(i, 0u);
+  let lane = pa.z;
+  var smooth_halo = false;
+  if (mauto && pa.w != 0.0) {
+    smooth_halo = true;
+  }
   var pen = mv.pen_dot;
   var dk_out = 1.0;
   if (mv.persp != 0.0) {
@@ -167,6 +208,37 @@ fn sprites(@builtin(global_invocation_id) id: vec3<u32>) {
   tide[tide[8] + i] = bitcast<u32>(dk_out);
   pen_k = pen;
 
+  if (mauto && lane > 0.0) {
+    // dust lanes on the trailing edge of each arm, carried along with the stars that make them
+    let R = rn * core.w;
+    if (R > 0.12 && pa.x > 0.0) {
+      let th0 = atan2(ic[i].y, ic[i].x);
+      let base = log(max(R, 0.1) / 0.1) / pa.y;
+      var near = 9.0;
+      for (var k = 0u; k < u32(pa.x); k++) {
+        let ph = (base + 6.283185307179586 * f32(k) / pa.x) - 0.22;
+        near = min(near, abs(wrap_pi(th0 - ph)));
+      }
+      if (near < 0.09 && u01(i, 190u) < lane * 0.85) {
+        return;
+      }
+    }
+    // a dusty bridge between the two galaxies, while they are still apart
+    let o3 = mv.c1.xyz - mv.c0.xyz;
+    let L2 = dot(o3, o3);
+    if (L2 > 1e-6) {
+      let q = raw - mv.c0.xyz;
+      let t = dot(q, o3) / L2;
+      if (t > 0.12 && t < 0.88) {
+        let e = q - t * o3;
+        let d2 = dot(e, e);
+        if (d2 < 0.01 * L2 && u01(i, 191u) < 0.6 * (lane * smoothstep(0.2, 0.7, mv.stage))) {
+          return;
+        }
+      }
+    }
+  }
+
   // a drawn star in place of the dot
   var p_star = 0.05 * mv.star_mix;
   if (in_tail) {
@@ -177,20 +249,41 @@ fn sprites(@builtin(global_invocation_id) id: vec3<u32>) {
     return;
   }
   // a knot of new stars in a tidal tail
-  if (in_tail && roll < 0.012 * (0.4 + mv.knots)) {
-    let nk = 5u + u32(floor(u01(i, 10u) * 7.0));
+  var tail_k = 1.0;
+  if (mauto) {
+    tail_k = 3.0;
+  }
+  if (in_tail && roll < (0.012 * tail_k) * (0.4 + mv.knots)) {
+    // a tidal dwarf: a tight, brighter clump of new stars
+    let dwarf = mauto && u01(i, 11u) < 0.2;
+    var nk = 5u + u32(floor(u01(i, 10u) * 7.0));
+    var spread = 5.0;
+    var grow = 1.0;
+    if (dwarf) {
+      nk = 11u;
+      spread = 2.2;
+      grow = 1.3;
+    }
     for (var j = 0u; j < nk; j++) {
       let b = 20u + j * 8u;
       if (u01(i, 172u + j) < mv.keep_knots) {
-        let kp = vec2<f32>(p.x + gauss(i, b) * 5.0 * pen, p.y + gauss(i, b + 2u) * 5.0 * pen);
+        let kp = vec2<f32>(p.x + gauss(i, b) * spread * pen, p.y + gauss(i, b + 2u) * spread * pen);
         let t = pool[u32(floor(u01(i, b + 4u) * f32(mv.n_knot_pool)))];
-        put(o + j, CLS_KNOT, kp, t, 1.0, simple((3.0 + 4.0 * u01(i, b + 5u)) * pen, u01(i, b + 6u) * 6.28));
+        put(o + j, CLS_KNOT, kp, t, 1.0, simple(((3.0 + 4.0 * u01(i, b + 5u)) * grow) * pen, u01(i, b + 6u) * 6.28));
       }
     }
     mstar(i, 130u, p, true);
     return;
   }
-  if (!hot && outer && roll < 0.035 * (0.4 + mv.knots)) {
+  // star formation where the discs press on each other
+  var oc = mv.c1;
+  if (second) {
+    oc = mv.c0;
+  }
+  let od = raw - oc.xyz;
+  let comp = mauto && !hot && sqrt(dot(od, od)) < 0.9 * oc.w;
+  let knot_p = 0.035 * (0.4 + mv.knots);
+  if (!hot && ((outer && roll < knot_p) || (comp && roll < knot_p * 1.6))) {
     if (u01(i, 171u) < mv.keep_knots) {
       let t = pool[u32(floor(u01(i, 140u) * f32(mv.n_knot_pool)))];
       put(o, CLS_KNOT, p, t, 1.0, simple((4.0 + 5.0 * u01(i, 141u)) * pen, u01(i, 142u) * 6.28));
@@ -203,12 +296,20 @@ fn sprites(@builtin(global_invocation_id) id: vec3<u32>) {
     return;
   }
   // a dot, thinned to 16% (L1236)
-  if (u01(i, 170u) < mv.keep_dots) {
+  var keep_d = mv.keep_dots;
+  if (smooth_halo) {
+    keep_d = mv.keep_dots * 1.5;
+  }
+  if (u01(i, 170u) < keep_d) {
     let t = pool[KNOT_POOL + u32(floor(u01(i, 160u) * f32(mv.n_dot_pool)))];
     var cls = CLS_DISC;
     if (outer) {
       cls = CLS_YOUNG;
     }
-    put(o, cls, p, t, 1.0, simple(dot_base[t], u01(i, 161u) * 6.28));
+    var sz = dot_base[t];
+    if (smooth_halo) {
+      sz = sz * (0.55 + 0.45 * smoothstep(0.0, 0.35, rn));
+    }
+    put(o, cls, p, t, 1.0, simple(sz, u01(i, 161u) * 6.28));
   }
 }

@@ -45,6 +45,16 @@ const CASES: [string, Params][] = [
     }),
   ],
   [
+    'spiral meets elliptical s7, mergeAuto (character kept), dusty',
+    presetParams('Merger: spiral meets elliptical', 7, {
+      mergeAuto: 1,
+      dust: 0.5,
+      field: 0,
+      ovStar: 0,
+      incl: 40,
+    }),
+  ],
+  [
     'long tails s7, full perspective',
     presetParams('Merger: long tails', 7, { depthAuto: 2, incl: 70, field: 0.3, ovStar: 0 }),
   ],

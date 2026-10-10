@@ -8,7 +8,7 @@
  *
  * | words | what |
  * | --- | --- |
- * | 0–8 | header: n, star table, bin offsets, bin ids, grids (word offsets), plate centre x and y, n0, depth scales |
+ * | 0–9 | header: n, star table, bin offsets, bin ids, grids (word offsets), plate centre x and y, n0, depth scales, fade (1: strokes thin as they stretch, ADR 0093) |
  * | star table | 4 words per star: plate x, plate y (this view), initial DX, DY |
  * | bin offsets | 2 galaxies × 441 cells + 1: the first slot of each cell's stars in the ids |
  * | bin ids | the star indices, cell by cell, in index order within a cell |
@@ -24,7 +24,7 @@ export const TIDE_CELL_COUNT = 441;
 export const TIDE_GN = 48;
 export const TIDE_GV = 49;
 /** header words */
-export const TIDE_HEADER = 9;
+export const TIDE_HEADER = 10;
 /** words per grid vertex: plate x, plate y, depth scale */
 export const TIDE_VW = 3;
 /** v21's tear thresholds: along or across a ribbon (L834), and the ribbons' SEAMMAX (L1250) */
@@ -91,6 +91,7 @@ export class TideData {
     readonly n0: number,
     cx = 400,
     cy = 400,
+    fade = false,
   ) {
     this.L = tideWords(n);
     const buf = new ArrayBuffer(this.L.total * 4);
@@ -100,6 +101,7 @@ export class TideData {
     this.fl[5] = cx;
     this.fl[6] = cy;
     this.words[7] = n0;
+    this.words[9] = fade ? 1 : 0;
     this.words[8] = this.L.dkOff;
     this.fl.fill(1, this.L.dkOff, this.L.dkOff + n);
   }
@@ -259,6 +261,12 @@ const dist = (ax: number, ay: number, bx: number, by: number) => {
 };
 
 /** Two corners of a ribbon end scaled about their midpoint, in place. */
+/** How much of its width a stroke keeps at a stretch: all up to 1.05, a sixth of it at the tear. */
+function stretchThin(r: number): number {
+  const x = Math.min(Math.max(f(f(r - f(1.05)) / f(f(TEAR) - f(1.05))), 0), 1);
+  return f(1 - f(f(0.85) * f(f(x * x) * f(3 - f(2 * x)))));
+}
+
 function scaleAbout(a: number[], b: number[], k: number): void {
   const mx = f(f((a[0] as number) + (b[0] as number)) / 2);
   const my = f(f((a[1] as number) + (b[1] as number)) / 2);
@@ -306,11 +314,17 @@ export function warpRibbons(T: TideData, g: number, r2: number, fl: Float32Array
     const mw = dist(w0[0], w0[1], w1[0], w1[1]);
     let alpha = c(11);
     if (ml > SEAMMAX || f(ml / ol) > TEAR || f(mw / ow) > TEAR) alpha = 0;
+    // ADR 0093: a stroke thins as the tides stretch it, so it tapers out instead of ending in a dash
+    const thin = T.words[9] ? stretchThin(Math.max(f(ml / ol), f(mw / ow))) : 1;
     // the width follows the depth of each end (ADR 0088): the corners about their midpoint
     const k0 = f(f(w0[2] + w1[2]) / 2);
     const k1 = f(f(w2[2] + w3[2]) / 2);
     if (k0 !== 1) scaleAbout(w0, w1, k0);
     if (k1 !== 1) scaleAbout(w2, w3, k1);
+    if (thin !== 1) {
+      scaleAbout(w0, w1, thin);
+      scaleAbout(w2, w3, thin);
+    }
     fl.set([w0[0], w0[1], w1[0], w1[1], w2[0], w2[1], w3[0], w3[1]], o);
     fl[o + 11] = alpha;
   }
@@ -327,9 +341,11 @@ export function warpCaps(T: TideData, g: number, r2: number, fl: Float32Array, n
     const ol = f(dist(c(0), c(1), c(2), c(3)) + f(0.8));
     let alpha = c(5);
     if (ml > 22 || f(ml / ol) > TEAR) alpha = 0;
+    const thin = T.words[9] ? stretchThin(f(ml / ol)) : 1;
     fl.set([a[0], a[1], b[0], b[1]], o);
     const k = f(f(a[2] + b[2]) / 2);
     if (k !== 1) fl[o + 4] = f(c(4) * k);
+    if (thin !== 1) fl[o + 4] = f((fl[o + 4] as number) * thin);
     fl[o + 5] = alpha;
   }
 }

@@ -346,9 +346,42 @@ export function mergerViewUniform(
   const cam = cameraOf(P, zoom);
   const v = viewDesc(cam, 0, desc.total, 0);
   const core = (g: number) => [...fr.cores[g as 0 | 1].map(f), f(desc.gals[g]?.rmax ?? 1.7)];
+  // ADR 0093: how far apart the galaxies are, in their radii (the stage of the merger)
+  const mauto = P.mergeAuto > 0;
+  const c0 = fr.cores[0];
+  const c1 = fr.cores[1];
+  const sep =
+    Math.hypot(c0[0] - c1[0], c0[1] - c1[1], c0[2] - c1[2]) /
+    Math.max(1e-6, (desc.gals[0]?.rmax ?? 1.7) + (desc.gals[1]?.rmax ?? 1.7));
+  const smooth = (a: number, b: number, x: number) => {
+    const t = Math.min(Math.max((x - a) / (b - a), 0), 1);
+    return t * t * (3 - 2 * t);
+  };
+  const frame = (g: number) => {
+    const G = desc.gals[g];
+    const disc = !!G && G.type !== 'elliptical';
+    const hold = mauto && disc ? f(0.92 * smooth(0.12, 0.6, sep)) : 0;
+    const dust = Math.min(0.8, P.dust * 1.2 + (P.dustAuto > 0 ? 0.35 : 0));
+    const lane = mauto && disc ? f(dust * (G?.type === 'lenticular' ? 0.6 : 1)) : 0;
+    return {
+      ea: [...(G?.e1 ?? [1, 0, 0]).map(f), hold],
+      eb: [...(G?.e2 ?? [0, 1, 0]).map(f), 0],
+      pa: [f(G?.arms ?? 0), f(G?.pitch ?? 1), lane, mauto && G?.type === 'elliptical' ? 1 : 0],
+    };
+  };
+  const F0 = frame(0);
+  const F1 = frame(1);
   return {
     c0: core(0),
     c1: core(1),
+    ea0: F0.ea,
+    eb0: F0.eb,
+    pa0: F0.pa,
+    ea1: F1.ea,
+    eb1: F1.eb,
+    pa1: F1.pa,
+    mauto: mauto ? 1 : 0,
+    stage: f(sep),
     cos_i: v.cos_i as number,
     sin_i: v.sin_i as number,
     cos_az: v.cos_az as number,

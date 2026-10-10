@@ -6,7 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
-- A merger keeps more of its galaxies' character (ADR 0093, proposed), with `mergeAuto` ("Merger keeps its galaxies' character", 0 in the core, 1 on the page): a spiral progenitor starts with three quarters of its stars on crisper arms and is drawn with stronger, narrower arms and more knots.
+- A merger keeps its galaxies' character (ADR 0093, proposed), with `mergeAuto` ("Merger keeps its galaxies' character", 0 in the core, 1 on the page): a spiral holds its inner disc and arms through the first pass, an elliptical is a soft glow, dust lanes and a bridge thin the stars and travel with them into the tails, tails carry tidal dwarfs, and strokes taper out as the tides stretch them. Merging discs are thicker.
 
 - The drawn core is behind the disc (ADR 0092, proposed), with `coreAuto` ("Core behind the disc", 0 in the core, 1 on the page): the core and nuclear spiral are drawn first, still opaque, so the disc's stars, dust and strokes are layered over them.
 

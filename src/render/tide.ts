@@ -63,7 +63,7 @@ export class GpuTideMap {
    * Model tier: the buffer for `n` stars (the first `n0` in galaxy 0), the star table's initial
    * coordinates from `ic` (vec4 per star), and the bins. The plate centre is (cx, cy).
    */
-  load(n: number, n0: number, ic: GPUBuffer, cx = 400, cy = 400): GPUBuffer {
+  load(n: number, n0: number, ic: GPUBuffer, cx = 400, cy = 400, fade = false): GPUBuffer {
     this.destroy();
     this.n = n;
     this.n0 = n0;
@@ -74,7 +74,7 @@ export class GpuTideMap {
       size: L.total * 4,
       usage: STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST,
     });
-    const head = new TideData(n, n0, cx, cy).words.subarray(0, TIDE_HEADER);
+    const head = new TideData(n, n0, cx, cy, fade).words.subarray(0, TIDE_HEADER);
     d.queue.writeBuffer(this.buffer, 0, head);
     const entries = (e: MapEntry): GPUBindGroupEntry[] =>
       MAP_USES[e].map((binding) => ({

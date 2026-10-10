@@ -85,7 +85,7 @@ export class CpuMerger {
         track.Cend,
       ),
     );
-    this.tide = new TideData(D.total, D.n[0]);
+    this.tide = new TideData(D.total, D.n[0], 400, 400, P.mergeAuto > 0);
     this.tide.setInitial(this.stars.ic);
     this.tide.buildBins();
     this.shells = P.shellsOn

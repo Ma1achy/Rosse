@@ -18,9 +18,26 @@ const f = Math.fround;
 export const MERGER_SLOTS = 12;
 const KNOT_POOL = 24;
 
+const smooth = (a: number, b: number, x: number) => {
+  const t = Math.min(Math.max(f(f(x - a) / f(b - a)), 0), 1);
+  return f(f(t * t) * f(3 - f(2 * t)));
+};
+const wrapPi = (a: number) => {
+  const t = f(a + f(3.141592653589793));
+  return f(
+    f(t - f(f(6.283185307179586) * Math.floor(f(t / f(6.283185307179586))))) - f(3.141592653589793),
+  );
+};
+
 const FIELDS: [string, 'f32' | 'u32' | 'vec4<f32>'][] = [
   ['c0', 'vec4<f32>'],
   ['c1', 'vec4<f32>'],
+  ['ea0', 'vec4<f32>'],
+  ['eb0', 'vec4<f32>'],
+  ['pa0', 'vec4<f32>'],
+  ['ea1', 'vec4<f32>'],
+  ['eb1', 'vec4<f32>'],
+  ['pa1', 'vec4<f32>'],
   ['cos_i', 'f32'],
   ['sin_i', 'f32'],
   ['cos_az', 'f32'],
@@ -51,6 +68,8 @@ const FIELDS: [string, 'f32' | 'u32' | 'vec4<f32>'][] = [
   ['n_star_tiles', 'u32'],
   ['hot0', 'u32'],
   ['hot1', 'u32'],
+  ['mauto', 'f32'],
+  ['stage', 'f32'],
 ];
 
 /** The `MView` uniform of merger-sprites.wgsl. */
@@ -128,9 +147,39 @@ export function runMergerSprites(
     const u01 = (d: number) => randF32(key, Stream.mergerSprites, i, d);
     const gauss = (d: number) => randGaussF(key, Stream.mergerSprites, i, d);
     const o = i * MERGER_SLOTS;
-    const px = f(cur[i * 4] as number);
-    const py = f(cur[i * 4 + 1] as number);
-    const pz = f(cur[i * 4 + 2] as number);
+    const rx = f(cur[i * 4] as number);
+    const ry = f(cur[i * 4 + 1] as number);
+    const rz = f(cur[i * 4 + 2] as number);
+    const second = i >= num('n0');
+    const core = second ? c1 : c0;
+    const ea = (second ? mv.ea1 : mv.ea0) as readonly number[];
+    const eb = (second ? mv.eb1 : mv.eb0) as readonly number[];
+    const pa = (second ? mv.pa1 : mv.pa0) as readonly number[];
+    const mauto = num('mauto') !== 0;
+    // ADR 0093: a disc keeps its inner stars where they started (the arms and the lanes read), the
+    // outer ones follow the tides; the hold lets go as the cores come together
+    let px = rx;
+    let py = ry;
+    let pz = rz;
+    const rn = f(ic[i * 4 + 2] as number);
+    if (mauto && (ea[3] as number) > 0) {
+      const w = f(1 - f(f(ea[3] as number) * f(1 - smooth(0.25, 0.7, rn))));
+      const rm = f(core[3] as number);
+      const ax = f(f(ic[i * 4] as number) * rm);
+      const ay = f(f(ic[i * 4 + 1] as number) * rm);
+      const gx = f(
+        f(core[0] as number) + f(f(ax * f(ea[0] as number)) + f(ay * f(eb[0] as number))),
+      );
+      const gy = f(
+        f(core[1] as number) + f(f(ax * f(ea[1] as number)) + f(ay * f(eb[1] as number))),
+      );
+      const gz = f(
+        f(core[2] as number) + f(f(ax * f(ea[2] as number)) + f(ay * f(eb[2] as number))),
+      );
+      px = f(gx + f(w * f(rx - gx)));
+      py = f(gy + f(w * f(ry - gy)));
+      pz = f(gz + f(w * f(rz - gz)));
+    }
     // view(x, y, z) (L500), then px (L516)
     const xr = f(f(px * num('cos_az')) - f(py * num('sin_az')));
     const yr = f(f(px * num('sin_az')) + f(py * num('cos_az')));
@@ -156,16 +205,51 @@ export function runMergerSprites(
       // the merging galaxies' marks take the same depth scale (ADR 0088)
       tide.fl[tide.L.dkOff + i] = f(dk * (persp !== 0 ? num('zshrink') : 1));
     }
-    const second = i >= num('n0');
-    const core = second ? c1 : c0;
     const hot = (second ? num('hot1') : num('hot0')) !== 0;
-    const dx = f(px - f(core[0] as number));
-    const dy = f(py - f(core[1] as number));
-    const dz = f(pz - f(core[2] as number));
+    const dx = f(rx - f(core[0] as number));
+    const dy = f(ry - f(core[1] as number));
+    const dz = f(rz - f(core[2] as number));
     const dcore = f(Math.sqrt(f(f(f(dx * dx) + f(dy * dy)) + f(dz * dz))));
     const inTail = !hot && dcore > f(f(1.15) * f(core[3] as number));
     const outer = (ic[i * 4 + 2] as number) > f(0.45);
     const roll = u01(0);
+    const lane = f(pa[2] as number);
+    const rm = f(core[3] as number);
+    const stage = num('stage');
+    if (mauto && lane > 0) {
+      // dust lanes on the trailing edge of each arm, carried along with the stars that make them
+      const R = f(rn * rm);
+      if (R > f(0.12) && (pa[0] as number) > 0) {
+        const th0 = Math.atan2(f(ic[i * 4 + 1] as number), f(ic[i * 4] as number));
+        const base = f(f(Math.log(f(Math.max(R, f(0.1)) / f(0.1)))) / f(pa[1] as number));
+        let near = f(9);
+        for (let k = 0; k < (pa[0] as number); k++) {
+          const ph = f(f(base + f(f(f(6.283185307179586) * k) / f(pa[0] as number))) - f(0.22));
+          near = Math.min(near, Math.abs(wrapPi(f(th0 - ph))));
+        }
+        if (near < f(0.09) && u01(190) < f(lane * f(0.85))) continue;
+      }
+      // a dusty bridge between the two galaxies, while they are still apart
+      const ox = f(f(c1[0] as number) - f(c0[0] as number));
+      const oy = f(f(c1[1] as number) - f(c0[1] as number));
+      const oz = f(f(c1[2] as number) - f(c0[2] as number));
+      const L2 = f(f(f(ox * ox) + f(oy * oy)) + f(oz * oz));
+      if (L2 > f(1e-6)) {
+        const qx = f(rx - f(c0[0] as number));
+        const qy = f(ry - f(c0[1] as number));
+        const qz = f(rz - f(c0[2] as number));
+        const t = f(f(f(f(qx * ox) + f(qy * oy)) + f(qz * oz)) / L2);
+        if (t > f(0.12) && t < f(0.88)) {
+          const ex = f(qx - f(t * ox));
+          const ey = f(qy - f(t * oy));
+          const ez = f(qz - f(t * oz));
+          const d2 = f(f(f(ex * ex) + f(ey * ey)) + f(ez * ez));
+          if (d2 < f(f(0.01) * L2) && u01(191) < f(f(0.6) * f(lane * smooth(0.2, 0.7, stage))))
+            continue;
+        }
+      }
+    }
+    const smoothHalo = mauto && (pa[3] as number) !== 0;
 
     /** mstar (L511–512): a drawn star, classified and counted (M7 draws it) */
     const mstar = (base: number, bright: boolean) => {
@@ -187,13 +271,18 @@ export function runMergerSprites(
       mstar(3, inTail && u01(2) < 0.25);
       continue;
     }
-    if (inTail && roll < f(f(0.012) * f(f(0.4) + num('knots')))) {
-      const nk = 5 + Math.floor(f(u01(10) * 7));
+    const tailK = mauto ? f(3) : f(1);
+    if (inTail && roll < f(f(f(0.012) * tailK) * f(f(0.4) + num('knots')))) {
+      // a tidal dwarf: a tight, brighter clump of new stars
+      const dwarf = mauto && u01(11) < f(0.2);
+      const nk = dwarf ? 11 : 5 + Math.floor(f(u01(10) * 7));
+      const spread = dwarf ? f(2.2) : f(5);
+      const grow = dwarf ? f(1.3) : f(1);
       for (let j = 0; j < nk; j++) {
         const b = 20 + j * 8;
         if (u01(172 + j) < num('keep_knots')) {
-          const kx = f(X + f(f(gauss(b) * 5) * pen));
-          const ky = f(Y + f(f(gauss(b + 2) * 5) * pen));
+          const kx = f(X + f(f(gauss(b) * spread) * pen));
+          const ky = f(Y + f(f(gauss(b + 2) * spread) * pen));
           const t = pool[Math.floor(f(u01(b + 4) * nKnot))] as number;
           put(
             o + j,
@@ -202,14 +291,25 @@ export function runMergerSprites(
             ky,
             t,
             1,
-            simple(f(f(3 + f(4 * u01(b + 5))) * pen), f(u01(b + 6) * f(6.28))),
+            simple(f(f(f(3 + f(4 * u01(b + 5))) * grow) * pen), f(u01(b + 6) * f(6.28))),
           );
         }
       }
       mstar(130, true);
       continue;
     }
-    if (!hot && outer && roll < f(f(0.035) * f(f(0.4) + num('knots')))) {
+    // star formation where the discs press on each other
+    const oc = second ? c0 : c1;
+    const ddx = f(rx - f(oc[0] as number));
+    const ddy = f(ry - f(oc[1] as number));
+    const ddz = f(rz - f(oc[2] as number));
+    const comp =
+      mauto &&
+      !hot &&
+      f(Math.sqrt(f(f(f(ddx * ddx) + f(ddy * ddy)) + f(ddz * ddz)))) <
+        f(f(0.9) * f(oc[3] as number));
+    const knotP = f(f(0.035) * f(f(0.4) + num('knots')));
+    if (!hot && ((outer && roll < knotP) || (comp && roll < f(knotP * f(1.6))))) {
       if (u01(171) < num('keep_knots')) {
         const t = pool[Math.floor(f(u01(140) * nKnot))] as number;
         put(
@@ -229,7 +329,7 @@ export function runMergerSprites(
       put(o, Cls.star, X, Y, tile, 1, simple(f(10 + f(10 * u01(151))), f(u01(152) * f(6.28))));
       continue;
     }
-    if (u01(170) < num('keep_dots')) {
+    if (u01(170) < f(num('keep_dots') * (smoothHalo ? f(1.5) : f(1)))) {
       const t = pool[KNOT_POOL + Math.floor(f(u01(160) * nDot))] as number;
       put(
         o,
@@ -238,7 +338,12 @@ export function runMergerSprites(
         Y,
         t,
         1,
-        simple(dotBase[t] as number, f(u01(161) * f(6.28))),
+        simple(
+          smoothHalo
+            ? f(f(dotBase[t] as number) * f(f(0.55) + f(f(0.45) * smooth(0, 0.35, rn))))
+            : (dotBase[t] as number),
+          f(u01(161) * f(6.28)),
+        ),
       );
     }
   }

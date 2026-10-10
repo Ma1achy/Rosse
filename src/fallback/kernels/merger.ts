@@ -246,7 +246,9 @@ export class CpuMergerStars {
     const vc = circular(R);
     const c = cosF(th);
     const sn = sinF(th);
-    const thick = G.type === 'lenticular' ? f(0.04) : f(0.02);
+    const thick0 = G.type === 'lenticular' ? f(0.04) : f(0.02);
+    // ADR 0093: a thicker disc, so a tilted one has depth along its normal
+    const thick = f(thick0 * f(1 + f(1.5 * f(G.crisp))));
     const zz = f(gauss(110) * thick);
     for (let a = 0; a < 3; a++) {
       const e1 = f(G.e1[a] as number);

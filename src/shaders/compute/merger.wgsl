@@ -188,6 +188,7 @@ fn init_stars(@builtin(global_invocation_id) id: vec3<u32>) {
   if (ty == 1u) {
     thick = 0.04;
   }
+  thick = thick * (1.0 + 1.5 * G.p.w);
   let zz = gauss(i, 110u) * thick;
   xs[i] = vec4<f32>(G.c.xyz + R * (c * G.e1.xyz + sn * G.e2.xyz) + zz * G.n.xyz, 0.0);
   vs[i] = vec4<f32>(G.v.xyz + vc * (-sn * G.e1.xyz + c * G.e2.xyz), 0.0);

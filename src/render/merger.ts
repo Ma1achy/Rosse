@@ -172,7 +172,14 @@ export class GpuMerger {
     this.frames = framesFromRadii(scene, rc, re);
 
     // the tidal map and the galaxies carried by it
-    const tide = this.tideMap.load(D.total, D.n[0], this.stars.initial);
+    const tide = this.tideMap.load(
+      D.total,
+      D.n[0],
+      this.stars.initial,
+      400,
+      400,
+      scene.P.mergeAuto > 0,
+    );
     this.galaxies.forEach((s, g) => {
       s.setTide(tide, g as 0 | 1);
       s.setScene(scene.galaxies[g] as MergerScene['galaxies'][number]);
