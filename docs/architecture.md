@@ -75,6 +75,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0088](adr/0088-a-merging-galaxys-marks-follow-depth.md) | _Proposed:_ the tide carries each star's depth scale; a merging galaxy's marks, ribbon widths and capsules follow it with `depthAuto`. |
 | [0089](adr/0089-jets-streams-and-tails-as-3d-stroke-bundles.md) | _Proposed:_ with `lineWorld` the jet, streams and tail are bundles of 3D strokes; five stale Sky sliders are retired from the page. |
 | [0090](adr/0090-stellar-populations.md) | _Proposed:_ with `popAuto`, mark character by population, clustering, halo globular clusters and a wider brightness spread. |
+| [0091](adr/0091-a-stars-colour-follows-the-galaxy.md) | _Proposed:_ the colour plate has a fifteen-ink ramp per surface, and a dot's colour follows its place in the galaxy (temperature, radius, arms, dust edges, patches). |
 
 ## Modules
 

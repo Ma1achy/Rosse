@@ -252,7 +252,8 @@ export function projectSample(
   instF[io] = wx;
   instF[io + 1] = wy;
   instU[io + 2] = su[o + 4] ?? 0;
-  instF[io + 3] = 1;
+  // a dot's tint rides in its alpha: 1 + 2 · tint (ADR 0091)
+  instF[io + 3] = f(1 + f(2 * ((flags >>> 13) & 15)));
   const c = cosF(rot);
   const s = sinF(rot);
   const msz = f(f(size * pk) * perspZoom(V));

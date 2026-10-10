@@ -254,6 +254,59 @@ struct Star {
   bright: bool,
 }
 
+// A hash of a number into 0 to 1 that costs no draw (the tints' scatter).
+fn jitter(x: f32, k: f32, o: f32) -> f32 {
+  let v = x * k + o;
+  return v - floor(v);
+}
+
+fn tint_at(T: f32, lo: f32, hi: f32) -> u32 {
+  return u32(min(hi, max(lo, floor(T + 0.5))));
+}
+
+// The tint of a dot for the colour plate (ADR 0091): which of the palette's fifteen inks it is
+// printed in; the model is described at tintOf in src/fallback/kernels/stipple.ts, its CPU twin.
+fn tint_of(cls: u32, comp: u32, thick: bool, Rg: f32, arm: f32, cn: f32, j1: f32, j2: f32) -> u32 {
+  let sc = (j1 + j2) - 1.0;
+  let hue_patch = (cn - 0.5) * 2.0;
+  if (cls == CLS_KNOT) {
+    if (j1 < 0.2) {
+      return 13u;
+    }
+    return select(12u, 14u, j2 < 0.12);
+  }
+  if (cls == CLS_STAR) {
+    return tint_at(9.0 + sc * 1.2, 8.0, 10.0);
+  }
+  if (cls == CLS_YOUNG) {
+    return tint_at((9.2 + 1.3 * hue_patch) + 1.2 * sc, 7.0, 11.0);
+  }
+  if (cls == CLS_OLD) {
+    if (comp == 1u) {
+      return tint_at(6.3 + 1.3 * sc, 3.0, 8.0);
+    }
+    if (thick) {
+      return tint_at(5.0 + 1.3 * sc, 3.0, 8.0);
+    }
+    return tint_at((3.1 + 2.7 * ss(0.0, 1.6, Rg)) + 1.1 * sc, 2.0, 8.0);
+  }
+  var T = (5.0 + 2.8 * ss(0.3, 3.0, Rg)) + 1.0 * hue_patch;
+  T = T + 0.9 * sc;
+  if (comp == 3u) {
+    T = T + 2.5;
+  } else if (comp == 2u) {
+    T = T - 0.5;
+  }
+  // the arms' trailing edge is dusty: its stars are reddened
+  if (arm > 0.3 && arm < 0.55) {
+    let w = 1.0 - abs(arm - 0.425) / 0.125;
+    if (w > 0.0) {
+      T = T - 2.4 * w;
+    }
+  }
+  return tint_at(T, 1.0, 9.0);
+}
+
 fn draw_star(young: bool, forced: bool) -> Star {
   var p = 0.05;
   if (young) {
@@ -370,7 +423,11 @@ fn sample(i: u32) {
     }
     let t = dot_tile();
     let size = dot_base[t] * 0.9;
-    put(i, p2, CLS_OLD | FLAG_SERSIC2D, t, size, next() * 6.28, 0.0);
+    var tint_s = 0u;
+    if ((flags & FLAG_POP) != 0u) {
+      tint_s = tint_of(CLS_OLD, 0u, false, rS, 0.0, 0.5, jitter(rS, 91.7, 0.0), jitter(rS, 347.3, 0.61)) << 13u;
+    }
+    put(i, p2, CLS_OLD | FLAG_SERSIC2D | tint_s, t, size, next() * 6.28, 0.0);
     return;
   }
 
@@ -378,6 +435,8 @@ fn sample(i: u32) {
   var arm = 0.0;
   // a thick-disc star (ADR 0090): faint, old, high above the plane
   var thick_star = false;
+  // the clumps' noise where this star is, for the colour plate's patches (ADR 0091)
+  var cn_loc = 0.5;
   if (comp == 0u) {
     let a = galaxy.bulge_a;
     var rr = 0.0;
@@ -527,6 +586,7 @@ fn sample(i: u32) {
     if ((flags & FLAG_POP) != 0u) {
       // clustering (ADR 0090): stars gather in clumps, thinning between them, most in the arms
       let cn = vnoise_t((R2 * cos_f(th2)) * 4.5, (R2 * sin_f(th2)) * 4.5, galaxy.seed, SALT_POP);
+      cn_loc = cn;
       let keep = 0.3 + 0.7 * ss(0.3, 0.7, cn);
       if (next() > 1.0 - select(0.45, 0.8, arm > 0.4) * (1.0 - keep)) {
         put(i, none, CLS_NONE, 0u, 0.0, 0.0, 0.0);
@@ -655,14 +715,22 @@ fn sample(i: u32) {
   if (comp == 4u && arm > 0.55 && roll < (galaxy.knots * 0.12) * arm) {
     let tile = pool[min(KNOT_POOL - 1u, u32(floor(next() * f32(KNOT_POOL))))];
     let size = (5.0 + 6.0 * next()) * galaxy.pen_dot;
-    put(i, p, CLS_KNOT | flags_out, tile, size, next() * 6.28, u_tau);
+    var tk = 0u;
+    if ((flags & FLAG_POP) != 0u) {
+      tk = tint_of(CLS_KNOT, comp, false, 0.0, 0.0, 0.5, jitter(roll, 91.7, 0.0), jitter(roll, 347.3, 0.61)) << 13u;
+    }
+    put(i, p, CLS_KNOT | flags_out | tk, tile, size, next() * 6.28, u_tau);
     return;
   }
   if ((comp == 4u || comp == 3u) && roll > 1.0 - (galaxy.sparkle * 0.012) * (0.4 + arm)) {
     let n = galaxy.n_star_tiles;
     let tile = min(n - 1u, u32(floor(next() * f32(n))));
     let size = 10.0 + 13.0 * next();
-    put(i, p, CLS_STAR | flags_out, tile, size, next() * 6.28, u_tau);
+    var ts = 0u;
+    if ((flags & FLAG_POP) != 0u) {
+      ts = tint_of(CLS_STAR, comp, false, 0.0, 0.0, 0.5, jitter(roll, 91.7, 0.0), jitter(roll, 347.3, 0.61)) << 13u;
+    }
+    put(i, p, CLS_STAR | flags_out | ts, tile, size, next() * 6.28, u_tau);
     return;
   }
   let t = dot_tile();
@@ -687,7 +755,11 @@ fn sample(i: u32) {
     }
   }
   let size = dot_base[t] * k;
-  put(i, p, cls | flags_out, t, size, next() * 6.28, u_tau);
+  var tint = 0u;
+  if ((flags & FLAG_POP) != 0u) {
+    tint = tint_of(cls, comp, thick_star, sqrt(p.x * p.x + p.y * p.y), arm, cn_loc, jitter(roll, 91.7, 0.0), jitter(roll, 347.3, 0.61)) << 13u;
+  }
+  put(i, p, cls | flags_out | tint, t, size, next() * 6.28, u_tau);
 }
 
 @compute @workgroup_size(64)

@@ -175,6 +175,8 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
   let c = cos_f(s.rot);
   let sn = sin_f(s.rot);
   let msz = (s.size * pk) * persp_zoom(view);
-  projected[i] = Instance(pos, s.tile, 1.0, vec4<f32>(c * msz, sn * msz, -(sn * msz), c * msz));
+  // a dot's tint rides in its alpha: 1 + 2 * tint (ADR 0091)
+  let tint = (s.cls >> 13u) & 15u;
+  projected[i] = Instance(pos, s.tile, 1.0 + 2.0 * f32(tint), vec4<f32>(c * msz, sn * msz, -(sn * msz), c * msz));
   classes[i] = cls;
 }

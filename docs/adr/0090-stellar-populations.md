@@ -4,7 +4,7 @@ Date: 2026-10-10
 
 ## Status
 
-Proposed. A deliberate divergence from v21, requested by the owner, with `popAuto` ("Stellar populations", 0 in the core, 1 on the page).
+Proposed. A deliberate divergence from v21, requested by the owner, with `popAuto` ("Population detail", 0 in the core, 1 on the page; the colour preset is also called Stellar populations).
 
 ## Context
 
@@ -24,7 +24,7 @@ With `popAuto` (`GalaxyFlag.popAuto`, stipple kernel and its WGSL twin, one extr
 - **Streams in the halo.** With `lineWorld` and streams, 22% of the halo's stars lie on the arc of a stream (ADR 0089): a band that is narrow at the progenitor and fans out along the orbit, on the stream's tilted plane. The orbits are one definition (src/model/stream-orbits.ts) read by the strokes, the stars and v21's pen-line streams, and reach the kernel in the `Galaxy` uniform.
 - **Foreground softness.** With `depthAuto` a foreground star near the camera is drawn larger (up to 3 against 2.2 times) and fainter (down to 55%), so the foreground reads as a different depth from the galaxy.
 
-Not done: the coloured star mode is untouched.
+The colour plate's tints are ADR 0091.
 
 ## Consequences
 

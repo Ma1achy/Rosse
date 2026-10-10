@@ -141,3 +141,71 @@ describe('popAuto', () => {
     expect(near(1)).toBeGreaterThan(3 * near(0));
   });
 });
+
+describe('tints for the colour plate (ADR 0091)', () => {
+  const tints = (popAuto: number, name = 'Grand design') => {
+    const { s } = run(name, popAuto);
+    const by = new Map<number, number[]>();
+    for (let i = 0; i < s.n; i++) {
+      const w = s.u32[i * 8 + 3] ?? 0;
+      const cls = w & 255;
+      if (cls === 255) continue;
+      by.set(cls, [...(by.get(cls) ?? []), (w >>> 13) & 15]);
+    }
+    return by;
+  };
+  const used = (a: number[] = []) => a.filter((t) => t > 0);
+  const mean = (a: number[] = []) => a.reduce((x, y) => x + y, 0) / Math.max(1, a.length);
+
+  it('are 0 without popAuto, and with it put the dots on the ramp (the extras keep their ink)', () => {
+    for (const ts of tints(0).values()) expect(ts.every((t) => t === 0)).toBe(true);
+    const on = tints(1);
+    for (const cls of [Cls.old, Cls.disc, Cls.young]) {
+      const ts = on.get(cls) ?? [];
+      expect(used(ts).length / ts.length).toBeGreaterThan(0.9);
+      expect(ts.every((t) => t <= 15)).toBe(true);
+    }
+  });
+
+  it('follow the galaxy: old stars warm, the disc bluer, the arms blue, knots in the nebula inks', () => {
+    const on = tints(1);
+    expect(mean(used(on.get(Cls.old)))).toBeLessThan(5);
+    expect(mean(used(on.get(Cls.young)))).toBeGreaterThan(8);
+    expect(mean(used(on.get(Cls.young)))).toBeGreaterThan(mean(used(on.get(Cls.disc))));
+    expect(mean(used(on.get(Cls.disc)))).toBeGreaterThan(mean(used(on.get(Cls.old))));
+    const knots = used(on.get(Cls.knot));
+    expect(knots.length).toBeGreaterThan(0);
+    expect(knots.every((t) => t >= 12 && t <= 14)).toBe(true);
+  });
+
+  it('use many of the inks, not a handful: the ramp is spread, with no one tint over a third', () => {
+    const all = [...tints(1).values()].flatMap(used);
+    const count = new Map<number, number>();
+    for (const t of all) count.set(t, (count.get(t) ?? 0) + 1);
+    expect(count.size).toBeGreaterThanOrEqual(9);
+    expect(Math.max(...count.values()) / all.length).toBeLessThan(0.34);
+  });
+
+  it('are bluer outward in the disc, and redder on the arms’ dusty edge', () => {
+    const { s } = run('Grand design', 1);
+    const disc = (lo: number, hi: number) => {
+      const a: number[] = [];
+      for (let i = 0; i < s.n; i++) {
+        const w = s.u32[i * 8 + 3] ?? 0;
+        const R = Math.hypot(s.f32[i * 8] ?? 0, s.f32[i * 8 + 1] ?? 0);
+        if ((w & 255) === Cls.disc && (w >>> 13) & 15 && R >= lo && R < hi) a.push((w >>> 13) & 15);
+      }
+      return mean(a);
+    };
+    expect(disc(2.0, 3.0)).toBeGreaterThan(disc(0.2, 1.0) + 1);
+  });
+
+  it('colour the plate: the colour plate carries the ramp, the others do not', async () => {
+    const { PALETTES } = await import('../../src/render/palette');
+    const { platePasses } = await import('../../src/render/plates');
+    expect(platePasses('colour', PALETTES.light)[0]?.tints).toHaveLength(15);
+    expect(platePasses('colour', PALETTES.dark)[0]?.tints).toHaveLength(15);
+    expect(platePasses('ink', PALETTES.light)[0]?.tints).toBeUndefined();
+    expect(platePasses('slip', PALETTES.light).every((p) => p.tints === undefined)).toBe(true);
+  });
+});

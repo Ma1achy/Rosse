@@ -120,6 +120,21 @@ describe('struct layouts (WGSL = TS)', () => {
       layer_base: 256,
       layer_count: 256,
       off: [-3.6, -1.2],
+      tint1: [1, 1, 1, 1],
+      tint2: [1, 1, 1, 1],
+      tint3: [1, 1, 1, 1],
+      tint4: [1, 1, 1, 1],
+      tint5: [1, 1, 1, 1],
+      tint6: [1, 1, 1, 1],
+      tint7: [1, 1, 1, 1],
+      tint8: [1, 1, 1, 1],
+      tint9: [1, 1, 1, 1],
+      tint10: [1, 1, 1, 1],
+      tint11: [1, 1, 1, 1],
+      tint12: [1, 1, 1, 1],
+      tint13: [1, 1, 1, 1],
+      tint14: [1, 1, 1, 1],
+      tint15: [1, 1, 1, 1],
     });
     expect(new Float32Array(b)[10]).toBe(32);
     expect(new Uint32Array(b)[12]).toBe(256);
