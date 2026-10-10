@@ -54,6 +54,26 @@ const BASE: [string, Params][] = [
     'Edge-on with dust s7, lineWorld (no midplane stroke)',
     presetParams('Edge-on with dust', 7, { lineWorld: 1 }),
   ],
+  [
+    'Grand design s7, strokes with depth (marks mode)',
+    presetParams('Grand design', 7, {
+      ...M4,
+      strokesAuto: 1,
+      lineWorld: 1,
+      depthAuto: 1,
+      incl: 62,
+    }),
+  ],
+  [
+    'Barred spiral s7, strokes with full perspective',
+    presetParams('Barred spiral', 7, {
+      ...M4,
+      strokesAuto: 1,
+      lineWorld: 1,
+      depthAuto: 2,
+      incl: 70,
+    }),
+  ],
   // no stipple samples at all: the line-work must still be drawn (QA D1, minimum binding sizes)
   ['Grand design s7, no stipple', presetParams('Grand design', 7, { ...M4, stipple: 0, vary: 0 })],
   [

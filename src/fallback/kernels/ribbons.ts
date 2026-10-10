@@ -111,6 +111,8 @@ export function measureCurves(
   arc: Float32Array,
   stF: Float32Array,
   stU: Uint32Array,
+  V?: ViewDesc,
+  p3?: Float32Array,
 ): number {
   const { cu, cf } = M;
   const W = rib.sheet_w;
@@ -147,7 +149,17 @@ export function measureCurves(
     stF[so + 2] = kpx;
     stU[so + 3] = reps;
     stF[so + 5] = flags & CurveFlag.edgeAlpha ? rib.edge_alpha : (cf[o + 5] ?? 1);
-    stU[so + 6] = 0;
+    // the ink's width follows the depth of the curve's middle point (ADR 0084)
+    let dk = 1;
+    if (V && p3 && (V.persp ?? 0) !== 0 && n > 0) {
+      const m = (first + (n >> 1)) * 4;
+      if ((p3[m + 3] ?? 0) === 0) {
+        const x0 = f((p3[m] ?? 0) * (V.winding ?? 1));
+        const ya = f(f(x0 * (V.sin_az ?? 0)) + f((p3[m + 1] ?? 0) * (V.cos_az ?? 1)));
+        dk = perspK(V, f(f(ya * (V.sin_i ?? 0)) + f((p3[m + 2] ?? 0) * (V.cos_i ?? 1))));
+      }
+    }
+    stF[so + 6] = dk;
     stU[so + 7] = 0;
   }
   return total;
@@ -209,7 +221,7 @@ export function expandSegment(
     const ny = f(tx / tl);
     const fr = f((arc[first + e] ?? 0) / tot);
     const tap = taper ? f(f(1.1) - f(f(0.45) * fr)) : 1;
-    const w = f(f(cw * tap) / 2);
+    const w = f(f(f(cw * tap) * (stF[so + 6] ?? 1)) / 2);
     const px = q[(first + e) * 2] ?? 0;
     const py = q[(first + e) * 2 + 1] ?? 0;
     const p0 = smWarp(f(px + f(nx * w)), f(py + f(ny * w)), wob, M.R.noise);
@@ -490,7 +502,7 @@ export function runRibbons(M: RibbonModel, V: ViewDesc, rib: RibUniform): Ribbon
   const st = new ArrayBuffer(Math.max(1, R.nCurves) * CURVE_STATE_WORDS * 4);
   const stateF = new Float32Array(st);
   const stateU = new Uint32Array(st);
-  const nPieces = measureCurves(M, rib, points, arc, stateF, stateU);
+  const nPieces = measureCurves(M, rib, points, arc, stateF, stateU, V, R.points3);
   const words = (n: number, w: number) => new ArrayBuffer(Math.max(1, n) * w * 4);
   const sb = words(R.nSegs, RIBBON_SEG_WORDS);
   const segs = new Float32Array(sb);

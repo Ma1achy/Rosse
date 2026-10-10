@@ -68,7 +68,8 @@ export const CURVE_STATE_LAYOUT: StructLayout = u32Layout('CurveState', 32, 4, [
   ['reps', 'u32'],
   ['base', 'u32'],
   ['alpha', 'f32'],
-  ['pad0', 'u32'],
+  // the ink's width factor for the curve's depth (ADR 0084), 1 without `persp`
+  ['dk', 'f32'],
   ['pad1', 'u32'],
 ]);
 export const CURVE_STATE_WORDS = CURVE_STATE_LAYOUT.size / 4;

@@ -41,7 +41,7 @@ type Entry = (typeof ENTRIES)[number];
 /** Which bindings of ribbons.wgsl each entry point uses (its auto layout). */
 const USES: Record<Entry, number[]> = {
   project_points: [0, 1, 2, 3],
-  measure: [1, 3, 4, 5, 6, 10],
+  measure: [0, 1, 2, 3, 4, 5, 6, 10],
   expand: [1, 3, 4, 5, 6, 8, 30],
   place_pieces: [1, 3, 4, 5, 6, 7, 9, 10, 30],
   hatch_caps: [1, 3, 11, 12, 13, 16, 30],
