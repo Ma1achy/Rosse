@@ -45,6 +45,7 @@ const EXTRA_KEYS = {
   occlAuto: 0,
   peanut: 0,
   coreAuto: 0,
+  mergeAuto: 0,
 };
 
 describe('DEF', () => {

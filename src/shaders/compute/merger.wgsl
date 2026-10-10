@@ -47,7 +47,7 @@ struct MSim {
 
 // MGAL_LAYOUT: n = spin axis, w = type (0 spiral, 1 lenticular, 2 elliptical); e1.w = rd;
 // e2.w = rmax; c = the core's start position, w = mass; v = its start velocity, w = softening;
-// p = (arms, log-spiral pitch, bar 0 or 1, 0)
+// p = (arms, log-spiral pitch, bar 0 or 1, crisp: 0 is v21's, 1 crisper arms)
 struct MGal {
   n: vec4<f32>,
   e1: vec4<f32>,
@@ -167,9 +167,9 @@ fn init_stars(@builtin(global_invocation_id) id: vec3<u32>) {
   R = clamp(R, 0.04, rmax);
   var th = u01(i, 100u) * 6.28;
   // spiral structure to start with (lenticulars have none)
-  if (ty == 0u && u01(i, 101u) < 0.5) {
+  if (ty == 0u && u01(i, 101u) < 0.5 + 0.25 * G.p.w) {
     let k = floor(u01(i, 102u) * G.p.x);
-    th = log(R / 0.1) / G.p.y + 6.283185307179586 * k / G.p.x + gauss(i, 104u) * 0.25;
+    th = log(R / 0.1) / G.p.y + 6.283185307179586 * k / G.p.x + gauss(i, 104u) * (0.25 - 0.09 * G.p.w);
   }
   // a bar
   if (G.p.z > 0.5 && R < rd * 1.6 && u01(i, 106u) < 0.35) {

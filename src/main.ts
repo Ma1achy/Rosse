@@ -691,6 +691,7 @@ async function start(): Promise<void> {
                 lensLock: 2,
                 occlAuto: 1,
                 coreAuto: 1,
+                mergeAuto: 1,
                 lens: 0,
                 shells: 0,
                 trails: 0,

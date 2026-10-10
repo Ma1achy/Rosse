@@ -111,7 +111,7 @@ export function galUniform(d: MergerDesc, g: 0 | 1): Record<string, number[]> {
     e2: v(G.e2, G.rmax),
     c: v(G.core.slice(0, 3), G.mass),
     v: v(G.core.slice(3, 6), G.soft),
-    p: [f(G.arms), f(G.pitch), G.bar ? 1 : 0, 0],
+    p: [f(G.arms), f(G.pitch), G.bar ? 1 : 0, f(G.crisp)],
   };
 }
 
@@ -231,11 +231,11 @@ export class CpuMergerStars {
     }
     R = Math.min(Math.max(R, f(0.04)), rmax);
     let th = f(u01(100) * f(6.28));
-    if (G.type === 'spiral' && u01(101) < 0.5) {
+    if (G.type === 'spiral' && u01(101) < f(0.5 + f(0.25 * f(G.crisp)))) {
       const k = Math.floor(f(u01(102) * f(G.arms)));
       th = f(
         f(f(f(Math.log(f(R / f(0.1)))) / f(G.pitch)) + f(f(f(6.283185307179586) * k) / f(G.arms))) +
-          f(gauss(104) * f(0.25)),
+          f(gauss(104) * f(f(0.25) - f(f(0.09) * f(G.crisp)))),
       );
     }
     if (G.bar && R < f(rd * f(1.6)) && u01(106) < 0.35) {

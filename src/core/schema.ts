@@ -220,6 +220,7 @@ export const SCHEMA: { readonly [K in ParamKey]: ParamSpec } = {
   popAuto: choice('Population detail', ONOFF),
   peanut: choice('Peanut bulge (barred)', ONOFF),
   coreAuto: choice('Core behind the disc', ONOFF),
+  mergeAuto: choice('Merger keeps its galaxies’ character', ONOFF),
   occlAuto: choice('Natural star occlusion', ONOFF),
   lensLock: choice('Lensed source follows the orbit', [0, 1, 2]),
   depthAuto: choice('Depth', [0, 1, 2], { tier: 'view' }),

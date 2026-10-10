@@ -64,6 +64,7 @@ const PAGE_DUST = {
   popAuto: 1,
   depthAuto: 1,
   coreAuto: 1,
+  mergeAuto: 1,
   // the old hand-drawn stand-ins are gone from the page: real lensing, shells and artefacts replace them
   lens: 0,
   shells: 0,

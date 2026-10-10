@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- A merger keeps more of its galaxies' character (ADR 0093, proposed), with `mergeAuto` ("Merger keeps its galaxies' character", 0 in the core, 1 on the page): a spiral progenitor starts with three quarters of its stars on crisper arms and is drawn with stronger, narrower arms and more knots.
+
 - The drawn core is behind the disc (ADR 0092, proposed), with `coreAuto` ("Core behind the disc", 0 in the core, 1 on the page): the core and nuclear spiral are drawn first, still opaque, so the disc's stars, dust and strokes are layered over them.
 
 - A more natural colour plate (ADR 0091, proposed), with `popAuto`: fifteen inks per surface (pastel chalks on the chalkboard, pencils on paper) from dust-reddened orange through gold and cream to ice and blue, and rose and lilac nebulae. A dot's colour follows the galaxy: an orange core that goldens outward, a disc that is bluer with radius, blue arms with reddened dust edges, rose knots, and patches of shared hue.
