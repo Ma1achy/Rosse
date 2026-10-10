@@ -340,14 +340,12 @@ export const COMPONENTS: readonly Component[] = [
     name: 'Companions and oddities',
     icon: ['companions', 0],
     main: ['companions', 'tail'],
-    more: ['lens', 'shells', 'fgstars', 'trails', 'arrow', 'jet'],
+    more: ['fgstars', 'jet'],
     summary: (P) => {
       const o: string[] = [];
       if (P.companions > 0.05) o.push('companions');
       if (P.tail > 0.05) o.push('a tidal tail');
-      if (P.lens > 0.05) o.push('drawn arcs');
       if (P.fgstars > 0.05) o.push('field stars');
-      if (P.trails > 0.05) o.push('trails');
       return o.length ? o.join(', ') : 'none';
     },
   },
@@ -356,7 +354,7 @@ export const COMPONENTS: readonly Component[] = [
     tab: 'sky',
     name: 'The deep field',
     icon: ['whole', 'galaxy:flocculent'],
-    main: ['field', 'bubbles'],
+    main: ['field'],
     more: ['streams', 'distort'],
     summary: (P) => (P.field > 0.05 ? `galaxies behind, ${pct(P.field)}` : 'a bare sky'),
   },

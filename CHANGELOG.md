@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- Jets, stellar streams and the tidal tail are bundles of 3D strokes (ADR 0089, proposed), with `lineWorld`: a flared, feathered jet with a bright spine, streams that fan out along their orbit, and a tail that widens and lifts out of the plane.
 - A merging galaxy's marks follow depth (ADR 0088, proposed), with `depthAuto`: the tidal map carries each star's perspective scale, and the galaxy's marks, ribbon widths and capsules are sized by it. First step of unifying the merger with the single-galaxy path.
 - The peanut bulge of a barred galaxy is opt-in (ADR 0076 amended): a new parameter `peanut` (0 by default, also on the page), since it read as a puffier bulge and not an X; `bulgeAuto` alone no longer sets it.
 - Dust as brush strokes in 3D (ADR 0087, proposed), with `strokesAuto`: short swirling strokes on the inner edge of each arm, at their own heights above and below the plane, so edge-on they stand out of the midplane and face-on they curl along the arm.
@@ -21,6 +22,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- The page's Sky tab no longer offers drawn arcs, drawn shells, the satellite trail, the stray arrow or closed curves as bubbles (ADR 0089): real lensing, shells and artefacts replace them; the engine keeps the parameters for v21's drawings.
 - The drawn core is one opaque drawing (ADR 0079, proposed): alpha 1 (v21: 0.9, and ADR 0073's cross-fade left it half transparent), its style picked from the galaxy (dotted for a stipple-only one, line otherwise) and never swapped by the camera, and it stays edge-on, flattened by `bulgeFlat` (v21 dropped it from incE 80). No core fades or flicks between types under orbit.
 - The natural dust lane dims the midplane and does not empty it (ADR 0080, proposed): with `dustAuto` the extinction keeps at least half of the stars, so the strokes along an edge-on disc thicken it. v21's own dust (`dustAuto` 0) is unchanged.
 - A star dimmed by dust also reaches less far (ADR 0074): its core, glare, spikes and bleed column are drawn `sqrt(keep)` as long, on top of the thinning, so spikes and bloom shrink with how much of its light gets through. A star with nothing in front of it is unchanged.

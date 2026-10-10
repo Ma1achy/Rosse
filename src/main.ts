@@ -689,6 +689,11 @@ async function start(): Promise<void> {
                 depthAuto: 1,
                 lensLock: 2,
                 occlAuto: 1,
+                lens: 0,
+                shells: 0,
+                trails: 0,
+                arrow: 0,
+                bubbles: 0,
               };
   const makeParams = (name: string, sd: number) => presetParams(name, sd, variantOverrides(name));
 

@@ -38,6 +38,12 @@ export const CurveIndex = {
   armFibre: 400,
   /** dust wisp i (ADR 0087) uses `dustWisp + i` */
   dustWisp: 700,
+  /** the jet's strands (ADR 0089): lobe l, strand i uses `jet + 16l + i` */
+  jet: 800,
+  /** stream q's strands use `stream + 32q + i` (ADR 0089) */
+  stream: 840,
+  /** the tidal tail's strands use `tailStrand + i` (ADR 0089) */
+  tailStrand: 920,
   /** arm k uses index `arms + k` */
   arms: 100,
   /** spur i uses index `spurs + i` */
@@ -94,6 +100,8 @@ export interface Curve {
     | 'edge-on'
     | 'lane-ring'
     | 'dust-wisp'
+    | 'jet'
+    | 'stream'
     | 'outline'
     | 'tail'
     | 'shell';
@@ -298,7 +306,11 @@ export function curves(
       });
     }
   }
-  if (P.tail > 0.05) {
+  if (P.lineWorld > 0 && P.jet > 0.5) C.push(...jetStrands(P, at, pick));
+  if (P.lineWorld > 0 && P.streams > 0.02) C.push(...streamStrands(P, at, pick));
+  if (P.tail > 0.05 && P.lineWorld > 0) {
+    C.push(...tailStrands(at, pick));
+  } else if (P.tail > 0.05) {
     // a tidal tail swept out from the disc edge
     const r = at(CurveIndex.tail);
     const pts: Vec3[] = [];
@@ -489,6 +501,165 @@ function dustWisps(
       stretch: false,
       edgeAlpha: false,
       role: 'dust-wisp',
+    });
+  }
+  return out;
+}
+
+type Pick = (kind: string, r: Draws) => number;
+
+/**
+ * The jet (ADR 0089, `lineWorld`): two lobes along the galaxy's own axis, each a twisting bundle of
+ * strokes that opens from the nucleus like a cone, with a bright spine, strands ending at different
+ * lengths so the tip feathers out. In 3D, so face-on it is a short bright burst and edge-on it
+ * stands out of the disc with volume.
+ */
+function jetStrands(P: Params, at: (i: number) => Draws, pick: Pick): Curve[] {
+  const head = at(CurveIndex.jet + 15);
+  // the part picks' own jet: an angle in the plane and a length, here on the curves stream
+  const ang = head.f32() * TAU;
+  const u = head.f32();
+  const tilt = 0.14;
+  const d: Vec3 = [Math.sin(tilt) * Math.cos(ang), Math.sin(tilt) * Math.sin(ang), Math.cos(tilt)];
+  const e1: Vec3 = [Math.cos(ang + Math.PI / 2), Math.sin(ang + Math.PI / 2), 0];
+  const e2: Vec3 = [
+    d[1] * e1[2] - d[2] * e1[1],
+    d[2] * e1[0] - d[0] * e1[2],
+    d[0] * e1[1] - d[1] * e1[0],
+  ];
+  const Lg = 3 + u;
+  const out: Curve[] = [];
+  for (let l = 0; l < 2; l++) {
+    const sgn = l === 0 ? 1 : -1;
+    const len = Lg * (l === 0 ? 1 : 0.65);
+    const n = l === 0 ? 22 : 15;
+    for (let i = 0; i <= n; i++) {
+      const r = at(CurveIndex.jet + 16 * l + i);
+      const spine = i === 0;
+      // a third of the strands are short, bright at the root; the rest run to the tip
+      const short = !spine && i % 3 === 0;
+      const reach = spine ? 1 : short ? 0.18 + 0.3 * r.f32() : 0.55 + 0.45 * r.f32();
+      const phase = r.f32() * TAU;
+      const rad = spine ? 0 : 0.35 + 0.65 * r.f32();
+      const twist = 1.2 + 1.4 * r.f32();
+      const pts: Vec3[] = [];
+      for (let j = 0; j <= 28; j++) {
+        const t = (j / 28) * reach;
+        // a cone that opens, with a slow helix and a little unevenness along the strand
+        const rho = 0.05 + 0.32 * Math.pow(t, 1.05);
+        const a = phase + twist * TAU * t * 0.5;
+        const k = rad * rho * len * (1 + 0.12 * Math.sin(TAU * 2.3 * t + phase));
+        const x = sgn * d[0] * t * len + (e1[0] * Math.cos(a) + e2[0] * Math.sin(a)) * k;
+        const y = sgn * d[1] * t * len + (e1[1] * Math.cos(a) + e2[1] * Math.sin(a)) * k;
+        const z = sgn * d[2] * t * len + (e1[2] * Math.cos(a) + e2[2] * Math.sin(a)) * k;
+        pts.push([x, y, z]);
+      }
+      out.push({
+        pts,
+        w: spine ? 2.4 : short ? 1.4 + 0.8 * r.f32() : 1 + 0.8 * r.f32(),
+        k: pick(spine ? P.stroke : r.f32() < 0.5 ? 'faint' : P.stroke, r),
+        a: spine ? 1 : 0.8,
+        taper: true,
+        stretch: false,
+        edgeAlpha: false,
+        role: 'jet',
+      });
+    }
+  }
+  return out;
+}
+
+/**
+ * A stellar stream (ADR 0089, `lineWorld`): a band of strands along an arc round the galaxy that
+ * is narrow at the progenitor and fans out along the orbit, on a plane tilted out of the galaxy's,
+ * each strand ending at its own length. The arc is the stream's own pick (the same angles the
+ * pen-line stream uses), so a stream keeps its place.
+ */
+function streamStrands(P: Params, at: (i: number) => Draws, pick: Pick): Curve[] {
+  const count = 1 + (P.streams > 0.6 ? 1 : 0);
+  const out: Curve[] = [];
+  for (let q = 0; q < count; q++) {
+    // the stream's pick on the `parts` stream (PartIndex.streams = 20, streamTilt = 40, ADR 0085)
+    const pr = new Draws(P.seed, Stream.parts, 20 + q);
+    pr.f32();
+    const R0 = 2.0 + 1.2 * pr.f32();
+    const span = 2.0 + 1.6 * pr.f32();
+    const a0 = pr.f32() * 6.28;
+    const tilt = 0.35 + 0.95 * new Draws(P.seed, Stream.parts, 40 + q).f32();
+    const n = 7;
+    for (let i = 0; i < n; i++) {
+      const r = at(CurveIndex.stream + 32 * q + i);
+      const lat = (r.f32() * 2 - 1) * (i === 0 ? 0 : 1);
+      const lift = (r.f32() * 2 - 1) * 0.6;
+      const reach = i === 0 ? 1 : 0.6 + 0.4 * r.f32();
+      const t0 = i === 0 ? 0 : 0.12 * r.f32();
+      const ph = r.f32() * TAU;
+      const pts: Vec3[] = [];
+      for (let j = 0; j <= 40; j++) {
+        const t = t0 + ((reach - t0) * j) / 40;
+        const width = 0.03 + 0.3 * t * t;
+        const ang = a0 + span * t;
+        const R = R0 * (1 - 0.25 * t) + lat * width + 0.05 * Math.sin(TAU * 2 * t + ph);
+        const y = R * Math.sin(ang);
+        const z0 = lift * width + 0.04 * Math.sin(TAU * t + ph);
+        // the orbit plane is the galaxy's tilted about the x axis
+        pts.push([
+          R * Math.cos(ang),
+          y * Math.cos(tilt) - z0 * Math.sin(tilt),
+          y * Math.sin(tilt) + z0 * Math.cos(tilt),
+        ]);
+      }
+      out.push({
+        pts,
+        w: i === 0 ? 1.5 : 0.6 + 0.6 * r.f32(),
+        k: pick(r.f32() < 0.4 ? P.stroke : 'faint', r),
+        a: i === 0 ? 1 : 0.75,
+        taper: true,
+        stretch: false,
+        edgeAlpha: false,
+        role: 'stream',
+      });
+    }
+  }
+  return out;
+}
+
+/**
+ * The tidal tail (ADR 0089, `lineWorld`): v21's sweep out from the disc edge as a fanning bundle,
+ * lifting out of the plane as it goes, so it has width and depth where v21 drew one line.
+ */
+function tailStrands(at: (i: number) => Draws, pick: Pick): Curve[] {
+  const a1 = at(CurveIndex.tail).f32() * 6.28;
+  const out: Curve[] = [];
+  for (let i = 0; i < 9; i++) {
+    const r = at(CurveIndex.tailStrand + i);
+    const main = i === 0;
+    const lat = main ? 0 : r.f32() * 2 - 1;
+    const lift = main ? 0 : r.f32() * 2 - 1;
+    const reach = main ? 1 : 0.55 + 0.45 * r.f32();
+    const t0 = main ? 0 : 0.1 * r.f32();
+    const ph = r.f32() * TAU;
+    const pts: Vec3[] = [];
+    for (let j = 0; j <= 60; j++) {
+      const fj = t0 + ((reach - t0) * j) / 60;
+      const width = 0.04 + 0.5 * fj * fj;
+      const R3 = 2.6 + 2.8 * fj + lat * width * 0.6 + 0.05 * Math.sin(TAU * 1.7 * fj + ph);
+      const t3 = a1 + 1.5 * fj;
+      pts.push([
+        R3 * Math.cos(t3),
+        R3 * Math.sin(t3) + 0.6 * fj * fj,
+        0.35 * fj * fj + lift * width * 0.5,
+      ]);
+    }
+    out.push({
+      pts,
+      w: main ? 1.3 : 0.6 + 0.6 * r.f32(),
+      k: pick(r.f32() < 0.5 ? 'faint' : 'broken', r),
+      a: main ? 1 : 0.75,
+      taper: true,
+      stretch: false,
+      edgeAlpha: false,
+      role: 'tail',
     });
   }
   return out;

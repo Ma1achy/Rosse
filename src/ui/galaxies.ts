@@ -62,6 +62,12 @@ const PAGE_DUST = {
   lineWorld: 1,
   thinAuto: 1,
   depthAuto: 1,
+  // the old hand-drawn stand-ins are gone from the page: real lensing, shells and artefacts replace them
+  lens: 0,
+  shells: 0,
+  trails: 0,
+  arrow: 0,
+  bubbles: 0,
 } as const;
 
 /** What a catalogue galaxy is drawn as, from its card. */

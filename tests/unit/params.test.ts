@@ -120,7 +120,10 @@ describe('schema', () => {
         // (`tlSetEnd`, app23.js:L1659), so `mTime`'s maximum is 30 rather than the slider's 2.
         const want = c[0] === 'mTime' ? [c[2], 30, c[4]] : [c[2], c[3], c[4]];
         expect([s.min, s.max, s.step], c[0]).toEqual(want);
-        expect(s.control).toBe(true);
+        // retired from the page's controls (owner decision of 2026-10-10): stand-ins that real
+        // lensing, shells and artefacts replaced; the engine still reads them for v21's drawings
+        const retired = ['lens', 'shells', 'trails', 'arrow', 'bubbles'].includes(c[0]);
+        expect(s.control).toBe(!retired);
         checked++;
       }
     expect(checked).toBeGreaterThan(70);

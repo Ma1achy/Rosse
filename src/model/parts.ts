@@ -464,7 +464,13 @@ export function describeParts(
 ): PartsDesc {
   const picks = given ?? ownPartPicks(P, V, meta, incl);
   const wholeType = picks.whole ? wholeTypeOf(P, incl) : null;
-  return { picks, wholeType, streams: streamPolylines(picks, meta.vectors?.penlines) };
+  // with `lineWorld` the streams are bundles of 3D strokes (curves.ts, ADR 0089)
+  const strands = P.lineWorld > 0 && P.lines > 0;
+  return {
+    picks,
+    wholeType,
+    streams: strands ? [] : streamPolylines(picks, meta.vectors?.penlines),
+  };
 }
 
 /**
@@ -570,7 +576,7 @@ export function vectorRows(
     const s4 = 2 * 2.8 * sc;
     add('shells', { ...centre, tile: pk.shells.tile, m: chain(Rm(pk.shells.spin), Sm(s4, s4)) });
   }
-  if (pk.tail) {
+  if (pk.tail && !(P.lineWorld > 0 && P.lines > 0)) {
     const a = pk.tail.ang;
     add('penlines', {
       ...centre,
@@ -620,7 +626,9 @@ export function vectorRows(
       add('rings', { x, y, alpha: 1, ps: 0.6, tile: b.tile, m: chain(D, Rm(b.spin), Sm(bs, bs)) });
     }
   }
-  if (pk.jet && P.lineWorld > 0) {
+  if (pk.jet && P.lineWorld > 0 && P.lines > 0) {
+    // drawn as a bundle of 3D strokes instead (ADR 0089)
+  } else if (pk.jet && P.lineWorld > 0) {
     // the jet is a real thing along the galaxy's own axis, a little off it (ADR 0085): the two
     // lobes run out from the centre in 3D and are projected, so a face-on jet points at the
     // viewer (short, a blob) and an edge-on one stands up out of the disc
