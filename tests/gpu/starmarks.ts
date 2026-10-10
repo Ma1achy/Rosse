@@ -74,7 +74,7 @@ run('star and artefact marks (GPU = CPU, L1)', async () => {
         : []),
     ] as [string, number, number, number][]) {
       const dusty = cam === 'dusty, behind the disc';
-      const P0 = { ...presetParams(name, 7), ...(dusty ? { dust: 0.9 } : {}) };
+      const P0 = { ...presetParams(name, 7), ...(dusty ? { dust: 0.9, occlAuto: 1 } : {}) };
       const P: Params = { ...P0, az: P0.az + dAz, incl: Math.min(180, P0.incl + dIncl) };
       const home = orientationOf(cameraOf(P0));
       const scene = buildScene(P, meta, { home });
@@ -119,7 +119,9 @@ run('star and artefact marks (GPU = CPU, L1)', async () => {
       if (classBad) bad.push(`${String(classBad)} class differences`);
       if (dusty) {
         // the same scene without dust: the star's marks it would have made, and the share the dust took
-        const clear = new CpuStipple(buildScene({ ...P, dust: 0 }, meta, { home })).view(camera);
+        const clear = new CpuStipple(
+          buildScene({ ...P, dust: 0, occlAuto: 0 }, meta, { home }),
+        ).view(camera);
         const live = (c: Uint32Array) => c.subarray(n).filter((x) => x < CLASS_COUNT).length;
         const lost = live(clear.classes) - live(cv.classes);
         data[`${name}, ${cam} lost`] = lost;
