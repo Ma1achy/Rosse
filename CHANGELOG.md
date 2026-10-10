@@ -6,7 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
-- Stellar populations (ADR 0090, proposed), with `popAuto` ("Stellar populations", 0 in the core, 1 on the page): old stars drawn finer and young ones larger and crisper, stars gathered in clumps with thinning between them, globular clusters in the halo, and a wider, longer-tailed spread of drawn star sizes.
+- Stellar populations (ADR 0090, proposed), with `popAuto` ("Stellar populations", 0 in the core, 1 on the page): old stars drawn finer and young ones larger and crisper, stars gathered in clumps with thinning between them, globular clusters in the halo, a wider, longer-tailed spread of drawn star sizes, an even jittered-grid spacing, a faint thick disc, halo stars along the stellar streams, and foreground stars that are larger and fainter near the camera.
 - Jets, stellar streams and the tidal tail are bundles of 3D strokes (ADR 0089, proposed), with `lineWorld`: a flared, feathered jet with a bright spine, streams that fan out along their orbit, and a tail that widens and lifts out of the plane.
 - A merging galaxy's marks follow depth (ADR 0088, proposed), with `depthAuto`: the tidal map carries each star's perspective scale, and the galaxy's marks, ribbon widths and capsules are sized by it. First step of unifying the merger with the single-galaxy path.
 - The peanut bulge of a barred galaxy is opt-in (ADR 0076 amended): a new parameter `peanut` (0 by default, also on the page), since it read as a puffier bulge and not an X; `bulgeAuto` alone no longer sets it.

@@ -335,6 +335,8 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
   let py: number;
   let pz: number;
   let arm = 0;
+  // a thick-disc star (ADR 0090): faint, old, high above the plane
+  let thickStar = false;
   if (comp === 0) {
     const a = g.bulge_a;
     let rr: number;
@@ -385,7 +387,24 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
     px = f(f(rh * s2) * cos(ph));
     py = f(f(rh * s2) * sin(ph));
     pz = f(f(rh * cz) * f(0.7));
-    if (flags & GalaxyFlag.popAuto && r.next() < f(0.14)) {
+    if (flags & GalaxyFlag.popAuto && g.n_stream > 0 && r.next() < f(0.22)) {
+      // a star of a stellar stream (ADR 0090): the halo's stars gather along the arc the stream's
+      // strokes draw, a narrow band at the progenitor that fans out along the orbit
+      const q = g.n_stream > 1 && r.next() < f(0.5) ? 1 : 0;
+      const sR = q ? g.s1_r : g.s0_r;
+      const sSpan = q ? g.s1_span : g.s0_span;
+      const sA = q ? g.s1_a : g.s0_a;
+      const sTilt = q ? g.s1_tilt : g.s0_tilt;
+      const t = r.next();
+      const width = f(f(0.03) + f(f(0.3) * f(t * t)));
+      const ang = f(sA + f(sSpan * t));
+      const R = f(f(sR * f(1 - f(f(0.25) * t))) + f(f(f(0.45) * r.gauss()) * width));
+      const yy = f(R * sin(ang));
+      const z0 = f(f(f(0.35) * r.gauss()) * width);
+      px = f(R * cos(ang));
+      py = f(f(yy * cos(sTilt)) - f(z0 * sin(sTilt)));
+      pz = f(f(yy * sin(sTilt)) + f(z0 * cos(sTilt)));
+    } else if (flags & GalaxyFlag.popAuto && r.next() < f(0.14)) {
       // a globular cluster (ADR 0090): a tight round swarm at one of six places in the halo
       const k = Math.min(5, Math.floor(f(r.next() * 6)));
       const cr = new Rng(g.key, (0xffff0000 + k) >>> 0);
@@ -489,6 +508,10 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
       const sc = sharp ? f(0.4) : f(1.5);
       z = f(f(-f(f(g.thick * sc) * f(f(1) + f(f(0.15) * R2)))) * log(f(f(1) - f(f(0.97) * uu))));
     }
+    if (flags & GalaxyFlag.popAuto && r.next() < f(0.1)) {
+      z = f(z * f(3.5));
+      thickStar = true;
+    }
     if (r.next() < f(0.5)) z = f(-z);
     const warp = g.warp;
     if (warp > 0 && R2 > f(1.8)) {
@@ -511,6 +534,24 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
         none();
         return;
       }
+    }
+  }
+
+  // spacing (ADR 0090): a star is likelier to stay near its cell's jittered anchor, so the stipple
+  // falls on a jittered grid, with no clumps of random coincidence and no lattice to see
+  if (flags & GalaxyFlag.popAuto && (comp === 0 || comp >= 3)) {
+    const h = f(0.045);
+    const cx = Math.floor(f(px / h));
+    const cy = Math.floor(f(py / h));
+    const cell = ((cx + 4096) * 8192 + (cy + 4096)) >>> 0;
+    const ax = f(f(cx + randF32(g.key, Stream.clumps, cell, 0)) * h);
+    const ay = f(f(cy + randF32(g.key, Stream.clumps, cell, 1)) * h);
+    const d2 = f(f(f(px - ax) * f(px - ax)) + f(f(py - ay) * f(py - ay)));
+    const sg = f(f(0.35) * h);
+    const kp = exp(f(-f(d2 / f(f(2 * sg) * sg))));
+    if (!(r.next() < f(f(0.3) + f(f(0.7) * kp)))) {
+      none();
+      return;
     }
   }
 
@@ -577,9 +618,11 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
     return;
   }
   const t = dotTile();
-  const cls = comp === 0 || comp === 1 ? Cls.old : arm > f(0.55) ? Cls.young : Cls.disc;
+  const cls =
+    comp === 0 || comp === 1 || thickStar ? Cls.old : arm > f(0.55) ? Cls.young : Cls.disc;
   let kd = comp === 0 ? f(0.85) : f(1);
-  if (flags & GalaxyFlag.popAuto) {
+  if (flags & GalaxyFlag.popAuto && thickStar) kd = f(0.62);
+  else if (flags & GalaxyFlag.popAuto) {
     // mark character by population (ADR 0090): old stars fine, young ones large and crisp
     kd = cls === Cls.old ? f(kd * f(0.78)) : cls === Cls.young ? f(1.3) : f(1);
   }

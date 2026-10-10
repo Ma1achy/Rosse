@@ -17,6 +17,7 @@ import { Stream } from '../core/streams';
 import { strokeIndex, strokePools, type StrokesMeta } from '../marks/strokes';
 import { incE } from '../view/camera';
 import { effectiveDust } from './dust';
+import { streamCount, streamOrbit, streamPoint } from './stream-orbits';
 import type { Variation } from './variation';
 
 export type Vec3 = [number, number, number];
@@ -578,16 +579,10 @@ function jetStrands(P: Params, at: (i: number) => Draws, pick: Pick): Curve[] {
  * pen-line stream uses), so a stream keeps its place.
  */
 function streamStrands(P: Params, at: (i: number) => Draws, pick: Pick): Curve[] {
-  const count = 1 + (P.streams > 0.6 ? 1 : 0);
+  const count = streamCount(P);
   const out: Curve[] = [];
   for (let q = 0; q < count; q++) {
-    // the stream's pick on the `parts` stream (PartIndex.streams = 20, streamTilt = 40, ADR 0085)
-    const pr = new Draws(P.seed, Stream.parts, 20 + q);
-    pr.f32();
-    const R0 = 2.0 + 1.2 * pr.f32();
-    const span = 2.0 + 1.6 * pr.f32();
-    const a0 = pr.f32() * 6.28;
-    const tilt = 0.35 + 0.95 * new Draws(P.seed, Stream.parts, 40 + q).f32();
+    const orbit = streamOrbit(P.seed, q);
     const n = 7;
     for (let i = 0; i < n; i++) {
       const r = at(CurveIndex.stream + 32 * q + i);
@@ -600,16 +595,15 @@ function streamStrands(P: Params, at: (i: number) => Draws, pick: Pick): Curve[]
       for (let j = 0; j <= 40; j++) {
         const t = t0 + ((reach - t0) * j) / 40;
         const width = 0.03 + 0.3 * t * t;
-        const ang = a0 + span * t;
-        const R = R0 * (1 - 0.25 * t) + lat * width + 0.05 * Math.sin(TAU * 2 * t + ph);
-        const y = R * Math.sin(ang);
-        const z0 = lift * width + 0.04 * Math.sin(TAU * t + ph);
-        // the orbit plane is the galaxy's tilted about the x axis
-        pts.push([
-          R * Math.cos(ang),
-          y * Math.cos(tilt) - z0 * Math.sin(tilt),
-          y * Math.sin(tilt) + z0 * Math.cos(tilt),
-        ]);
+        // the arc and band of the stream, with a small wander of the stroke along it
+        pts.push(
+          streamPoint(
+            orbit,
+            t,
+            lat + (0.05 * Math.sin(TAU * 2 * t + ph)) / width,
+            lift + (0.04 * Math.sin(TAU * t + ph)) / width,
+          ),
+        );
       }
       out.push({
         pts,

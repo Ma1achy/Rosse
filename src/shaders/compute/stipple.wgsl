@@ -62,7 +62,15 @@ struct Galaxy {
   n_ss_small: u32,
   n_ss_bright: u32,
   spike: f32,
-  pad_g: u32,
+  n_stream: u32,
+  s0_r: f32,
+  s0_span: f32,
+  s0_a: f32,
+  s0_tilt: f32,
+  s1_r: f32,
+  s1_span: f32,
+  s1_a: f32,
+  s1_tilt: f32,
 }
 
 // A ring-knot cluster or a clump (GROUP_LAYOUT in src/model/galaxy.ts, src/model/clumps.ts).
@@ -368,6 +376,8 @@ fn sample(i: u32) {
 
   var p = vec3<f32>(0.0);
   var arm = 0.0;
+  // a thick-disc star (ADR 0090): faint, old, high above the plane
+  var thick_star = false;
   if (comp == 0u) {
     let a = galaxy.bulge_a;
     var rr = 0.0;
@@ -414,7 +424,28 @@ fn sample(i: u32) {
       return;
     }
     p = vec3<f32>((rh * s2) * cos_f(ph), (rh * s2) * sin_f(ph), (rh * cz) * 0.7);
-    if ((flags & FLAG_POP) != 0u && next() < 0.14) {
+    var stream_star = false;
+    if ((flags & FLAG_POP) != 0u && galaxy.n_stream > 0u && next() < 0.22) {
+      // a star of a stellar stream (ADR 0090): the halo's stars gather along the arc the stream's
+      // strokes draw, a narrow band at the progenitor that fans out along the orbit
+      stream_star = true;
+      var q = 0u;
+      if (galaxy.n_stream > 1u && next() < 0.5) {
+        q = 1u;
+      }
+      let sR = select(galaxy.s0_r, galaxy.s1_r, q == 1u);
+      let sSpan = select(galaxy.s0_span, galaxy.s1_span, q == 1u);
+      let sA = select(galaxy.s0_a, galaxy.s1_a, q == 1u);
+      let sTilt = select(galaxy.s0_tilt, galaxy.s1_tilt, q == 1u);
+      let t = next();
+      let width = 0.03 + 0.3 * (t * t);
+      let ang = sA + sSpan * t;
+      let R = sR * (1.0 - 0.25 * t) + (0.45 * gauss()) * width;
+      let yy = R * sin_f(ang);
+      let z0 = (0.35 * gauss()) * width;
+      p = vec3<f32>(R * cos_f(ang), yy * cos_f(sTilt) - z0 * sin_f(sTilt), yy * sin_f(sTilt) + z0 * cos_f(sTilt));
+    }
+    if (!stream_star && (flags & FLAG_POP) != 0u && next() < 0.14) {
       // a globular cluster (ADR 0090): a tight round swarm at one of six places in the halo
       let k = min(5u, u32(floor(next() * 6.0)));
       let ci = 0xffff0000u + k;
@@ -520,6 +551,10 @@ fn sample(i: u32) {
       let sc = select(1.5, 0.4, sharp);
       z = -(galaxy.thick * sc * (1.0 + 0.15 * R2)) * log(1.0 - 0.97 * uu);
     }
+    if ((flags & FLAG_POP) != 0u && next() < 0.1) {
+      z = z * 3.5;
+      thick_star = true;
+    }
     if (next() < 0.5) {
       z = -z;
     }
@@ -545,6 +580,24 @@ fn sample(i: u32) {
           return;
         }
       }
+    }
+  }
+
+  // spacing (ADR 0090): a star is likelier to stay near its cell's jittered anchor, so the stipple
+  // falls on a jittered grid, with no clumps of random coincidence and no lattice to see
+  if ((flags & FLAG_POP) != 0u && (comp == 0u || comp >= 3u)) {
+    let h = 0.045;
+    let cx = i32(floor(p.x / h));
+    let cy = i32(floor(p.y / h));
+    let cell = u32((cx + 4096) * 8192 + (cy + 4096));
+    let ax = (f32(cx) + rand_f32(galaxy.key, STREAM_CLUMPS, cell, 0u)) * h;
+    let ay = (f32(cy) + rand_f32(galaxy.key, STREAM_CLUMPS, cell, 1u)) * h;
+    let d2 = (p.x - ax) * (p.x - ax) + (p.y - ay) * (p.y - ay);
+    let sg = 0.35 * h;
+    let kp = exp(-(d2 / ((2.0 * sg) * sg)));
+    if (!(next() < 0.3 + 0.7 * kp)) {
+      put(i, none, CLS_NONE, 0u, 0.0, 0.0, 0.0);
+      return;
     }
   }
 
@@ -618,12 +671,14 @@ fn sample(i: u32) {
     k = 0.85;
   }
   var cls = CLS_DISC;
-  if (comp == 0u || comp == 1u) {
+  if (comp == 0u || comp == 1u || thick_star) {
     cls = CLS_OLD;
   } else if (arm > 0.55) {
     cls = CLS_YOUNG;
   }
-  if ((flags & FLAG_POP) != 0u) {
+  if ((flags & FLAG_POP) != 0u && thick_star) {
+    k = 0.62;
+  } else if ((flags & FLAG_POP) != 0u) {
     // mark character by population (ADR 0090): old stars fine, young ones large and crisp
     if (cls == CLS_OLD) {
       k = k * 0.78;

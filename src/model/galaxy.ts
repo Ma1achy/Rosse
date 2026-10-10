@@ -7,6 +7,7 @@
  * Reference: the set-up at the top of `generate` (app23.js:L175–181) and the globals it reads
  * (`P`, `VAR`, `PEN`, `RMAX`).
  */
+import { streamCount, streamOrbit } from './stream-orbits';
 import type { Params } from '../core/params';
 import type { StructLayout } from '../marks/instance';
 import { dotSprite, penWeights, type DrawingsMeta, type Variation } from './variation';
@@ -104,7 +105,17 @@ const GALAXY_FIELDS = [
   ['n_ss_small', 'u32'],
   ['n_ss_bright', 'u32'],
   ['spike', 'f32'],
-  ['pad_g', 'u32'],
+  // the stellar streams the halo stars trace (ADR 0090): a count, then radius, span, start angle and
+  // tilt of each of two
+  ['n_stream', 'u32'],
+  ['s0_r', 'f32'],
+  ['s0_span', 'f32'],
+  ['s0_a', 'f32'],
+  ['s0_tilt', 'f32'],
+  ['s1_r', 'f32'],
+  ['s1_span', 'f32'],
+  ['s1_a', 'f32'],
+  ['s1_tilt', 'f32'],
 ] as const;
 
 export type GalaxyField = (typeof GALAXY_FIELDS)[number][0];
@@ -211,7 +222,7 @@ export function sampleCount(G: GalaxyDesc): number {
 export function proposalCount(P: Params): number {
   const n = Math.round(P.stars * P.stipple * (1 + 0.28 * (P.starMix || 0)));
   // a thin disc draws half as many stars again: they are denser in the plane (ADR 0083)
-  const more = (P.thinAuto > 0 ? 1.5 : 1) * (P.popAuto > 0 ? 1.25 : 1);
+  const more = (P.thinAuto > 0 ? 1.5 : 1) * (P.popAuto > 0 ? 1.7 : 1);
   return more === 1 ? n : Math.round(n * more);
 }
 
@@ -226,6 +237,9 @@ export function describeGalaxy(
   opts: { key?: number; ringKnots?: readonly RingKnotPick[] } = {},
 ): GalaxyDesc {
   const key = (opts.key ?? P.seed) >>> 0;
+  // the streams the halo stars trace (ADR 0090): those the line-work draws as strokes (ADR 0089)
+  const streams = P.popAuto > 0 && P.lineWorld > 0 ? streamCount(P) : 0;
+  const so = Array.from({ length: streams }, (_, q) => streamOrbit(P.seed, q));
   const wb = P.bulge;
   const wh = P.halo * 0.25;
   const wbar = P.bar * 0.4 * (1 - P.bulge);
@@ -294,7 +308,15 @@ export function describeGalaxy(
     n_ss_small: 0,
     n_ss_bright: 0,
     spike: f(V.spike),
-    pad_g: 0,
+    n_stream: streams,
+    s0_r: so[0]?.R0 ?? 0,
+    s0_span: so[0]?.span ?? 0,
+    s0_a: so[0]?.a0 ?? 0,
+    s0_tilt: so[0]?.tilt ?? 0,
+    s1_r: so[1]?.R0 ?? 0,
+    s1_span: so[1]?.span ?? 0,
+    s1_a: so[1]?.a0 ?? 0,
+    s1_tilt: so[1]?.tilt ?? 0,
   };
   const groupList = markGroups(P, V, key, opts.ringKnots);
   const packed = packGroups(groupList);
