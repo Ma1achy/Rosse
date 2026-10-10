@@ -30,3 +30,7 @@ v21 draws every bulge, from a round elliptical-like core to a small flat one, as
 - On the page the bulge of a spiral is more concentrated or more diffuse according to its type; ellipticals do not change.
 - The comparisons with v21 of any galaxy with a bulge move; the goldens do not (`bulgeAuto` 0).
 - `PARAM_KEYS` has two keys more than v21's `DEF`.
+
+## Amendment: the peanut is opt-in
+
+Seen in the browser, the peanut read as a taller, puffier bulge with no clear X, and the owner left it to be tuned or dropped. It is dropped from the default: the flag is set only with the parameter `peanut` ("Peanut bulge (barred)", 0 in the core and on the page), on top of `bulgeAuto` and a bar. The kernels and the tests keep it, with `peanut: 1`.

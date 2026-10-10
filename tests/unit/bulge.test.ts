@@ -118,17 +118,25 @@ describe('the bulge samples', () => {
 describe('the peanut of a barred bulge', () => {
   const flag = (P: Params) => buildScene(P, META).galaxy.g.flags & GalaxyFlag.bulgePeanut;
 
-  it('is set for a barred galaxy with the natural bulge, and only then', () => {
-    const barred = presetParams('Barred spiral', 7, { bulgeAuto: 1 });
+  it('is set for a barred galaxy with the natural bulge and `peanut`, and only then', () => {
+    const barred = presetParams('Barred spiral', 7, { bulgeAuto: 1, peanut: 1 });
     expect(barred.bar).toBeGreaterThan(0.05);
     expect(flag(barred)).not.toBe(0);
     expect(flag({ ...barred, bulgeAuto: 0 })).toBe(0);
     expect(flag({ ...barred, bar: 0 })).toBe(0);
+    expect(flag({ ...barred, peanut: 0 })).toBe(0);
     expect(flag(presetParams('Grand design', 7, { bulgeAuto: 1, bar: 0 }))).toBe(0);
   });
 
   it('makes the bulge taller either side of the centre than at it, and longer along the bar', () => {
-    const base = pureBulge({ bulgeAuto: 1, bulge: 0.9, bulgeFlat: 0.8, bar: 0.6, barLen: 0.5 });
+    const base = pureBulge({
+      bulgeAuto: 1,
+      peanut: 1,
+      bulge: 0.9,
+      bulgeFlat: 0.8,
+      bar: 0.6,
+      barLen: 0.5,
+    });
     const stats = (P: Params) => {
       const s = runStipple(buildScene(P, META).galaxy);
       let zc = 0;

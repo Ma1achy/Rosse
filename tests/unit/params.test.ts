@@ -42,6 +42,7 @@ const EXTRA_KEYS = {
   depthAuto: 0,
   lensLock: 0,
   occlAuto: 0,
+  peanut: 0,
 };
 
 describe('DEF', () => {

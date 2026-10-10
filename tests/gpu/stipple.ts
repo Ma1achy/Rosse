@@ -56,7 +56,7 @@ const CASES: [string, Params][] = [
   // the natural bulge (ADR 0076): the Sérsic radius of the bulge, its gamma sampler on both engines
   ...['Grand design', 'Barred spiral', 'Edge-on with dust'].map((n): [string, Params] => [
     `${n} s7, natural bulge`,
-    presetParams(n, 7, { bulgeAuto: 1, dustAuto: 1 }),
+    presetParams(n, 7, { bulgeAuto: 1, dustAuto: 1, peanut: 1 }),
   ]),
   // the natural star spread (ADR 0077): the smooth arm weight and the outer taper, drawn stars on
   ...['Grand design', 'Ringed', 'Flocculent'].map((n): [string, Params] => [

@@ -251,7 +251,7 @@ export function describeGalaxy(
       (armsOn ? GalaxyFlag.armsOn : 0) |
       (sersic ? GalaxyFlag.sersic : 0) |
       (bulgeSersic ? GalaxyFlag.bulgeSersic : 0) |
-      (bulgeSersic && barred ? GalaxyFlag.bulgePeanut : 0) |
+      (bulgeSersic && barred && P.peanut > 0 ? GalaxyFlag.bulgePeanut : 0) |
       (P.starsAuto > 0 ? GalaxyFlag.starsSmooth : 0) |
       (P.thinAuto > 0 ? GalaxyFlag.thinDisc : 0),
     key,

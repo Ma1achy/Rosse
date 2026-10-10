@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- The peanut bulge of a barred galaxy is opt-in (ADR 0076 amended): a new parameter `peanut` (0 by default, also on the page), since it read as a puffier bulge and not an X; `bulgeAuto` alone no longer sets it.
 - Dust as brush strokes in 3D (ADR 0087, proposed), with `strokesAuto`: short swirling strokes on the inner edge of each arm, at their own heights above and below the plane, so edge-on they stand out of the midplane and face-on they curl along the arm.
 - The disc dims a star behind it, dramatically (ADR 0086, proposed): a new parameter `occlAuto` ("Natural star occlusion", 0 in the core, 1 on the page) adds the disc's own optical depth to the star's dimming, so a star behind the disc, face-on or edge-on, is clearly fainter and smaller with short spikes, and a star in front is untouched. A merger's star is dimmed by both discs (summed, each in its own frame), and a star's satellites are spread deeper so some lie behind the disc.
 - Jets and stellar streams exist in 3D (ADR 0085, proposed), with `lineWorld`: the jet runs along the galaxy's own axis and is projected (short face-on, standing out edge-on); each stream lies on an orbit tilted out of the galaxy's plane, so orbiting turns and foreshortens them. v21's (`lineWorld` 0) are screen-plane pictures.
