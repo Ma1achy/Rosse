@@ -34,6 +34,21 @@ const MAX_OVER = 8;
 
 const CASES: [string, Params][] = [
   [
+    'the Mice s7, marks shrink with distance, star behind the discs',
+    presetParams('Merger: the Mice', 7, {
+      depthAuto: 1,
+      occlAuto: 1,
+      incl: 150,
+      ovStar: 1,
+      ovStarD: 0.3,
+      field: 0.4,
+    }),
+  ],
+  [
+    'long tails s7, full perspective',
+    presetParams('Merger: long tails', 7, { depthAuto: 2, incl: 70, field: 0.3, ovStar: 0 }),
+  ],
+  [
     'the Mice s7, field and foreground stars',
     presetParams('Merger: the Mice', 7, { field: 0.6, fgstars: 0.6, ovStar: 0 }),
   ],

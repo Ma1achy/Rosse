@@ -40,6 +40,9 @@ struct MView {
   sc: f32,
   fcx: f32,
   fcy: f32,
+  fcz: f32,
+  persp: f32,
+  zshrink: f32,
   vcx: f32,
   vcy: f32,
   star_mix: f32,
@@ -106,15 +109,17 @@ fn mstar(i: u32, base: u32, pos: vec2<f32>, bright: bool) {
   if (u01(i, base + 6u) >= mv.keep_rstars) {
     return;
   }
-  var size = exp(log(4.6) + 0.38 * gauss(i, base + 2u)) * mv.pen_dot;
+  var size = exp(log(4.6) + 0.38 * gauss(i, base + 2u)) * pen_k;
   var alpha = 0.42;
   if (bright) {
-    size = (9.0 + 9.0 * exp(2.4 * log(max(u01(i, base + 1u), 1e-9)))) * mv.pen_dot;
+    size = (9.0 + 9.0 * exp(2.4 * log(max(u01(i, base + 1u), 1e-9)))) * pen_k;
     alpha = 0.58;
   }
   let rot = mv.spike + gauss(i, base + 4u) * 0.2;
   put(i * SLOTS + 11u, CLS_RSTAR, pos, 0u, alpha, simple(size, rot));
 }
+
+var<private> pen_k: f32 = 1.0;
 
 @compute @workgroup_size(64)
 fn sprites(@builtin(global_invocation_id) id: vec3<u32>) {
@@ -151,7 +156,13 @@ fn sprites(@builtin(global_invocation_id) id: vec3<u32>) {
   let in_tail = !hot && dcore > 1.15 * core.w;
   let outer = ic[i].z > 0.45;
   let roll = u01(i, 0u);
-  let pen = mv.pen_dot;
+  var pen = mv.pen_dot;
+  if (mv.persp != 0.0) {
+    let vz = yr * mv.sin_i + p3.z * mv.cos_i;
+    let dk = 1.0 / max(1.0 - (vz - mv.fcz) * mv.persp, 0.3);
+    pen = (mv.pen_dot * dk) * mv.zshrink;
+  }
+  pen_k = pen;
 
   // a drawn star in place of the dot
   var p_star = 0.05 * mv.star_mix;

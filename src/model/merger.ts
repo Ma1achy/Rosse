@@ -24,6 +24,7 @@ import { DRAWING_WORDS } from '../marks/vector';
 import {
   PLATE,
   UNIT_SCALE,
+  GALAXY_PERSP,
   cameraOf,
   rotInv,
   rotationOf,
@@ -244,6 +245,8 @@ export interface MergerFraming {
   sc: number;
   fcx: number;
   fcy: number;
+  /** the frame centre's depth in the view frame (the perspective's zero, ADR 0084) */
+  fcz: number;
   /** `MS.scale`, `sc · 0.3`: the dots of mWarp's drawings */
   scale: number;
   galaxies: [GalaxyFraming, GalaxyFraming];
@@ -272,6 +275,7 @@ export function mergerFraming(
   const yy = yr * R.ci - z * R.si;
   const fcx = xr * R.cp - yy * R.sp;
   const fcy = xr * R.sp + yy * R.cp;
+  const fcz = yr * R.si + z * R.ci;
   const sc = ((MERGER_FIT * PLATE) / Math.max(2 * frame.r, 1e-3)) * ((UNIT_SCALE * zoom) / 84);
   const galaxies = [0, 1].map((g): GalaxyFraming => {
     const rmax = desc.gals[g]?.rmax ?? 1.7;
@@ -284,7 +288,7 @@ export function mergerFraming(
       camera: cameraOf(scene.galaxyParams[g] as Params, gz),
     };
   }) as [GalaxyFraming, GalaxyFraming];
-  return { sel, frame, cores, sc, fcx, fcy, scale: sc * 0.3, galaxies };
+  return { sel, frame, cores, sc, fcx, fcy, fcz, scale: sc * 0.3, galaxies };
 }
 
 /**
@@ -323,6 +327,15 @@ export function mergerOccluder(
   };
 }
 
+/**
+ * The perspective of a merger's debris (ADR 0084), per unit of the merger's own frame: the galaxy's
+ * `GALAXY_PERSP` is per galaxy unit (84 plate px at zoom 1), so per merger unit it is that times
+ * `sc / (84 zoom)`. 0 without `depthAuto`.
+ */
+export function mergerPersp(P: Params, fr: MergerFraming, zoom: number): number {
+  return P.depthAuto > 0 ? (GALAXY_PERSP * fr.sc) / (UNIT_SCALE * zoom) : 0;
+}
+
 /** The values of the `MView` uniform of compute/merger-sprites.wgsl. */
 export function mergerViewUniform(
   scene: MergerScene,
@@ -345,6 +358,9 @@ export function mergerViewUniform(
     sc: f(fr.sc),
     fcx: f(fr.fcx),
     fcy: f(fr.fcy),
+    fcz: f(fr.fcz),
+    persp: f(mergerPersp(P, fr, zoom)),
+    zshrink: f(P.depthAuto > 0 ? Math.min(1, zoom ** 0.35) : 1),
     vcx: PLATE / 2,
     vcy: PLATE / 2,
     star_mix: f(P.starMix),

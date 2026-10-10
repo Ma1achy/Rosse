@@ -14,7 +14,9 @@ v21 projects the galaxy orthographically: a mark's size and its distance from th
 
 A view-tier choice `depthAuto` ("Depth", 0 in the core): 0 flat, 1 marks shrink with distance (the page), 2 full perspective. The `View` uniform's spare word `persp` carries it: 0, `-GALAXY_PERSP` or `GALAXY_PERSP` (0.075, 1 / camera distance, about 13 galaxy units), the sign saying whether the offsets scale too. Each mark's view-frame depth `d` gives `k = 1 / max(1 - d persp, 0.3)`, and its size is scaled by `k` (mode 2 also its plate offset from the centre; mode 1 keeps the orthographic positions, which the owner prefers) and, in both, by `min(1, (scale / 84)^0.35)`, so marks shrink as the view zooms out and a zoomed-out galaxy does not clot into an ellipse. (`persp_k` and `persp_zoom`, shaders/common/camera.wgsl; `perspK` and `perspZoom` in fallback/kernels/project.ts). The ribbon kernel's point projection (curves, lane points, carving lines, hatch anchors, drawing anchors) uses the same factor, so the culls that compare marks with the line-work still agree. A Sérsic 2D sample, which has no depth, keeps k = 1. With `persp` 0 the factor is exactly 1 and every output is bit for bit the orthographic one.
 
-Not yet scaled: ribbon widths, the drawn cores' sizes, and the merger and sky paths.
+Not yet scaled: ribbon widths and the drawn cores' sizes.
+
+**Amendment: mergers.** A merger's debris follows `depthAuto` too: `MView` gained `fcz` (the frame centre's view depth), `persp` (the per-galaxy-unit factor times `sc / (84 zoom)`, `mergerPersp`) and `zshrink` (`min(1, zoom^0.35)`), and the sprite kernel scales its dot, knot and drawn-star sizes by `k` from each star's depth about the frame centre (compute/merger-sprites.wgsl, fallback/kernels/merger-sprites.ts). Positions stay as they are in both modes, as the galaxy's do in mode 1; the merging galaxies themselves are the face-on pictures of the single-galaxy path and take the factor from their own views.
 
 ## Consequences
 
