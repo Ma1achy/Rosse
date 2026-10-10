@@ -23,9 +23,17 @@ export const WOBBLE_AMPLITUDE = 26;
 /** The lattice key of the wobble field: the same for every seed, as v21's. */
 export const WOBBLE_KEY = 0;
 
+/**
+ * How much of v21's wobble is drawn. v21's strength read as too much (the whole picture ripples as
+ * it is orbited or zoomed), so the page draws 40% of it: the presets and the slider keep v21's
+ * numbers, and the gain is applied here, where both engines and the shaders take their amplitude.
+ * 1 is v21's.
+ */
+export const WOBBLE_GAIN = 0.4;
+
 /** The wobble's amplitude for a `distort` value, f32 (0 when off). */
 export function wobbleAmplitude(distort: number): number {
-  return distort > 0 ? f(distort * WOBBLE_AMPLITUDE) : 0;
+  return distort > 0 ? f(distort * WOBBLE_AMPLITUDE * WOBBLE_GAIN) : 0;
 }
 
 /** SM(x, y) in plate units, for a wobble amplitude `d0` (wobbleAmplitude). */

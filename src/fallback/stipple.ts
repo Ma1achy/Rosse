@@ -28,7 +28,7 @@ import {
 import type { Params } from '../core/params';
 import type { DrawingsMeta } from '../model/variation';
 import { TierState, type TierWork } from '../render/tiers';
-import { cameraOf, viewDesc, type Camera } from '../view/camera';
+import { cameraOf, perspOf, viewDesc, type Camera } from '../view/camera';
 import { INSTANCE_WORDS, runProject } from './kernels/project';
 import { breatheRoom } from './kernels/breathe';
 import { dynView, rstarRows } from '../model/dynvec';
@@ -70,6 +70,8 @@ export interface CpuStippleView {
   skyDrawings: VectorOut | null;
   /** the sky's layers alone: the background, then the foreground stars */
   skyLayers: InkLayer[];
+  /** how many of the first `layers` are the sky's background (a merger's host draws it under the rest) */
+  nBack: number;
   /** the lens's view tier (M9), when the scene is lensed */
   lens?: CpuLensView;
 }
@@ -195,6 +197,8 @@ export class CpuStipple {
   readonly lines: RibbonModel;
   /** the lens (M9): its sources are galaxies of their own, sampled and projected like this one */
   readonly lens: CpuLens | null;
+  /** a merger's discs, for the overlay star's dimming (ADR 0086); set by the merger engine each view */
+  occluder: ((sx: number, sy: number, depth: number) => number) | null = null;
 
   constructor(
     readonly scene: GalaxyScene,
@@ -216,10 +220,19 @@ export class CpuStipple {
     const n = this.samples.n;
     const { P, galaxy, ribbons: R } = this.scene;
     // the marks of a star or an artefact follow the stipple's samples (M7)
-    const sj = this.scene.stars ? starJobs(this.scene.stars, P, cam, this.scene.home) : null;
+    const sj = this.scene.stars
+      ? starJobs(
+          this.scene.stars,
+          P,
+          cam,
+          this.scene.home,
+          galaxy.g.dust,
+          this.occluder ?? undefined,
+        )
+      : null;
     const nStar = sj?.nSlots ?? 0;
     const nTot = n + nStar;
-    const V = viewDesc(cam, galaxy.g.dust, n, classCapacity(nTot));
+    const V = viewDesc(cam, galaxy.g.dust, n, classCapacity(nTot), perspOf(P));
     const rv = runRibbons(this.lines, V, ribUniform(R, cam, P, galaxy.g.n_dot_pool));
     const culls = {
       c: cullsUniform(R, cam, P, galaxy.g.key),
@@ -384,8 +397,21 @@ export class CpuStipple {
       caps.set(parts.caps.subarray(0, parts.count * CAPSULE_WORDS), hatch.count * CAPSULE_WORDS);
       merged.push({ kind: 'capsules', caps, count: hatch.count + parts.count, gain: 1 });
     } else if (hatch ?? parts) merged.push((hatch ?? parts) as InkLayer);
+    const cores = coreInstances(P, meta, cam, galaxy.noise, VD.parts.picks.nuclear);
+    if (T)
+      for (const c of cores) {
+        const q = T.data.post(T.g, c.x, c.y, T.r2);
+        c.x = q[0];
+        c.y = q[1];
+      }
+    // last (v21), or with coreAuto first, under the disc's marks (ADR 0092)
+    const coreLayers: InkLayer[] = cores.length
+      ? [{ kind: 'sprites', atlas: 'cores', gain: 1, pop: 'old', instances: cores }]
+      : [];
+    const corePlaced = P.coreAuto > 0 ? coreLayers : [];
     const layers: InkLayer[] = [
       ...bgLayers,
+      ...corePlaced,
       ...line.filter((l) => !pieces.includes(l) && l !== hatch),
       ...merged,
       ...(LL?.line ?? []),
@@ -402,15 +428,7 @@ export class CpuStipple {
       ...stipple.slice(4),
       ...(LL?.stars ?? []),
     ];
-    const cores = coreInstances(P, meta, cam, galaxy.noise, VD.parts.picks.nuclear);
-    if (T)
-      for (const c of cores) {
-        const q = T.data.post(T.g, c.x, c.y, T.r2);
-        c.x = q[0];
-        c.y = q[1];
-      }
-    if (cores.length)
-      layers.push({ kind: 'sprites', atlas: 'cores', gain: 1, pop: 'old', instances: cores });
+    if (!(P.coreAuto > 0)) layers.push(...coreLayers);
     layers.push(...(LL?.cores ?? []));
     layers.push(...fgLayers);
     const tiles = (l: InkLayer[], atlas: string) =>
@@ -487,6 +505,7 @@ export class CpuStipple {
       sky: skyOut,
       skyDrawings: skyVec,
       skyLayers: [...bgLayers, ...fgLayers],
+      nBack: bgLayers.length,
     };
   }
 }

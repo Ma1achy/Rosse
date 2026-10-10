@@ -160,7 +160,7 @@ export const COMPONENTS: readonly Component[] = [
     icon: ['sstars', 'plus'],
     show: (P) => P.subject === 'star' || P.subject === 'artefact',
     main: ['starBright', 'spikes'],
-    more: ['starRings', 'bleed', 'artefact'],
+    more: ['starRings', 'bleed', 'artefact', 'cosmicAuto'],
     summary: (P) =>
       P.subject === 'artefact'
         ? optionLabel('artefact', P.artefact)
@@ -174,7 +174,7 @@ export const COMPONENTS: readonly Component[] = [
     on: { key: 'bulge', onVal: 0.5, offVal: 0 },
     show: isGalaxy,
     main: ['bulge', 'bulgeSize'],
-    more: ['bulgeFlat'],
+    more: ['bulgeFlat', 'bulgeAuto', 'peanut', 'coreAuto'],
     summary: (P) =>
       `${P.bulge > 0.7 ? 'dominant' : P.bulge > 0.35 ? 'prominent' : 'modest'}, ${P.bulgeFlat < 0.6 ? 'flattened' : 'round'}`,
   },
@@ -233,6 +233,7 @@ export const COMPONENTS: readonly Component[] = [
     on: { key: 'dust', onVal: 0.5, offVal: 0 },
     show: (P) => P.subject === 'galaxy',
     main: ['dust', 'dustLines'],
+    more: ['dustAuto'],
     summary: (P) =>
       `${P.dust > 0.6 ? 'heavy' : 'light'}${P.dustLines > 0.1 ? ', with dust lanes' : ''}`,
   },
@@ -338,15 +339,14 @@ export const COMPONENTS: readonly Component[] = [
     tab: 'sky',
     name: 'Companions and oddities',
     icon: ['companions', 0],
-    main: ['companions', 'tail'],
-    more: ['lens', 'shells', 'fgstars', 'trails', 'arrow', 'jet'],
+    main: ['companions', 'tail', 'jet'],
+    more: ['fgstars'],
     summary: (P) => {
       const o: string[] = [];
       if (P.companions > 0.05) o.push('companions');
       if (P.tail > 0.05) o.push('a tidal tail');
-      if (P.lens > 0.05) o.push('drawn arcs');
+      if (P.jet > 0.02) o.push('jets');
       if (P.fgstars > 0.05) o.push('field stars');
-      if (P.trails > 0.05) o.push('trails');
       return o.length ? o.join(', ') : 'none';
     },
   },
@@ -355,7 +355,7 @@ export const COMPONENTS: readonly Component[] = [
     tab: 'sky',
     name: 'The deep field',
     icon: ['whole', 'galaxy:flocculent'],
-    main: ['field', 'bubbles'],
+    main: ['field'],
     more: ['streams', 'distort'],
     summary: (P) => (P.field > 0.05 ? `galaxies behind, ${pct(P.field)}` : 'a bare sky'),
   },
@@ -374,6 +374,7 @@ export const COMPONENTS: readonly Component[] = [
     name: 'Stars and dust',
     icon: ['sstars', 'asterisk'],
     main: ['starMix', 'dustScribble'],
+    more: ['starsAuto'],
     summary: (P) => `drawn stars ${pct(P.starMix)}, hatching ${pct(P.dustScribble)}`,
   },
   {
@@ -382,7 +383,18 @@ export const COMPONENTS: readonly Component[] = [
     name: 'The drawings',
     icon: ['whole', 'galaxy:spiral'],
     main: ['lines', 'whole', 'envelope', 'outline'],
-    more: ['stroke', 'nuclear', 'rewind'],
+    more: [
+      'stroke',
+      'nuclear',
+      'rewind',
+      'lineWorld',
+      'strokesAuto',
+      'thinAuto',
+      'popAuto',
+      'depthAuto',
+      'lensLock',
+      'occlAuto',
+    ],
     summary: () => 'which kinds of drawing are used',
   },
   {
@@ -428,7 +440,19 @@ export const OPTION_LABELS: Partial<Record<ParamKey, Record<string, string>>> = 
   merger: ONOFF,
   nuclear: ONOFF,
   rewind: ONOFF,
-  jet: ONOFF,
+  dustAuto: ONOFF,
+  bulgeAuto: ONOFF,
+  starsAuto: ONOFF,
+  cosmicAuto: ONOFF,
+  lineWorld: ONOFF,
+  strokesAuto: ONOFF,
+  thinAuto: ONOFF,
+  popAuto: ONOFF,
+  occlAuto: ONOFF,
+  peanut: ONOFF,
+  coreAuto: ONOFF,
+  lensLock: { '0': 'fully (v21)', '1': 'not at all', '2': 'a little' },
+  depthAuto: { '0': 'flat', '1': 'marks shrink with distance', '2': 'full perspective' },
   mWarp: ONOFF,
   lensCluster: ONOFF,
   lensDouble: ONOFF,

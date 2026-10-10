@@ -63,6 +63,7 @@ export function shellRibbons(scene: ShellScene, arcs: readonly ShellArc[]): Ribb
     ...scene.P,
     lines: 0,
     dust: 0,
+    dustAuto: 0,
     dustScribble: 0,
     dustLines: 0,
     incl: 0,

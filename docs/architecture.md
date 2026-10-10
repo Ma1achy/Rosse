@@ -57,6 +57,26 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0061](adr/0061-real-galaxies-with-the-sky-on-and-two-more-cases-against-v21s-mean.md) | _Proposed:_ the real galaxies drawn with the sky on (captures without the overrides): the `real` family's dots tolerance calibrated again (ADR 0035's procedure, factor 2; no other threshold), and `Real galaxy 6` and `barred-spiral--knob-ring-lines` (s7 home) compared with the mean of v21's 8 draws (ADR 0036). |
 | [0070](adr/0070-pooled-scratch-shared-uploads-and-kept-batches.md) | _Proposed:_ pooled scratch buffers (cleared on reuse), content-addressed shared uploads and kept ink batches, so a model rebuild and an orbit frame create almost no resources. Output unchanged. |
 | [0071](adr/0071-the-cpu-engine-runs-in-a-worker.md) | _Proposed:_ the CPU engine runs in a worker behind messages (`fallback/core.ts`, `worker.ts`, `client.ts`), so a CPU frame never blocks the page. |
+| [0072](adr/0072-the-lensed-source-follows-the-lens-frame.md) | _Proposed:_ the lensed source follows the lens frame under orbit (a deliberate divergence from v21's `srcNow`), so an Einstein ring stays a ring. |
+| [0074](adr/0074-the-star-is-dimmed-by-the-dust-in-front-of-it.md) | _Proposed:_ an overlay star behind a dusty galaxy is dimmed by the galaxy's own dust extinction `exp(-tau)`, all its marks thinned by the same share (a deliberate divergence: v21 never dims it). |
+| [0075](adr/0075-disc-galaxies-carry-a-natural-dust-layer.md) | _Proposed:_ on the page, disc galaxies carry a natural dust layer (`dustAuto`, `effectiveDust = max(dust, naturalDust)` by type and bulge, none for ellipticals) in v21's own smooth slab; off in the core (a deliberate divergence from v21, where `dust` is 0 unless set). |
+| [0076](adr/0076-bulges-follow-a-sersic-law.md) | _Proposed:_ on the page, a bulge's stars follow a deprojected Sérsic law whose index follows the galaxy (`bulgeAuto`, n 1 for a pseudo-bulge to 4 for a big round one) instead of v21's one Hernquist sphere (boxy-peanut when barred); same size, off in the core. |
+| [0077](adr/0077-drawn-stars-spread-smoothly.md) | _Proposed:_ on the page, the drawn stars' weight and brightness follow the arm profile smoothly and the outer fall-off is a taper (`starsAuto`) instead of v21's steps and cut; off in the core. |
+| [0078](adr/0078-cosmic-rays-are-sparse-and-everywhere.md) | _Proposed:_ on the page, cosmic rays are 40 to 70 streaks spread over the whole plate (`cosmicAuto`) instead of v21's 70 to 130 round the star; off in the core. |
+| [0079](adr/0079-the-core-is-one-opaque-drawing.md) | _Proposed:_ the drawn core is one opaque drawing, its style from the galaxy and never the camera, kept edge-on (supersedes 0073's cross-fade); a merger's sky host has no core. |
+| [0080](adr/0080-the-dust-lane-dims-it-does-not-empty.md) | _Proposed:_ with `dustAuto`, the dust cull keeps at least half the stars (`tau_floor`), so an edge-on lane dims and the strokes thicken the disc. |
+| [0081](adr/0081-line-work-in-three-dimensions.md) | _Proposed:_ `lineWorld` (off by default) describes line-work at a fixed inclination and draws dust lanes as ring arcs in the disc plane, so tilt pops nothing. |
+| [0082](adr/0082-natural-arm-strokes.md) | _Proposed:_ `strokesAuto` adds a broad root stroke and offset companion strokes to each ribbon arm, thinning toward the tip. |
+| [0083](adr/0083-a-thin-disc-with-a-few-wanderers.md) | _Proposed:_ `thinAuto` gives the disc a sharp layer (85%) and a thicker one (15%) and cuts the bulge tail, so the plane is dense. |
+| [0084](adr/0084-the-galaxy-has-perspective.md) | _Proposed:_ `depthAuto` (view tier) scales each mark's offset and size by its depth through the View uniform's `persp`, so a tilted disc has a near and a far side. |
+| [0085](adr/0085-jets-and-streams-in-3d.md) | _Proposed:_ with `lineWorld` the jet runs along the galaxy's axis and each stream on an orbit tilted out of its plane, both projected by the camera. |
+| [0086](adr/0086-the-disc-dims-a-star-behind-it.md) | _Proposed:_ `occlAuto` adds the disc's own optical depth to a star's dimming, so a star behind the disc is clearly fainter and smaller. |
+| [0087](adr/0087-dust-as-brush-strokes-in-3d.md) | _Proposed:_ with `strokesAuto`, swirling dust strokes on the arms' inner edges at their own heights above and below the plane. |
+| [0088](adr/0088-a-merging-galaxys-marks-follow-depth.md) | _Proposed:_ the tide carries each star's depth scale; a merging galaxy's marks, ribbon widths and capsules follow it with `depthAuto`. |
+| [0089](adr/0089-jets-streams-and-tails-as-3d-stroke-bundles.md) | _Proposed:_ with `lineWorld` the jet, streams and tail are bundles of 3D strokes; five stale Sky sliders are retired from the page. |
+| [0090](adr/0090-stellar-populations.md) | _Proposed:_ with `popAuto`, mark character by population, clustering, halo globular clusters and a wider brightness spread. |
+| [0091](adr/0091-a-stars-colour-follows-the-galaxy.md) | _Proposed:_ the colour plate has a fifteen-ink ramp per surface, and a dot's colour follows its place in the galaxy (temperature, radius, arms, dust edges, patches). |
+| [0092](adr/0092-the-core-is-drawn-behind-the-disc.md) | _Proposed:_ with `coreAuto` the drawn core and nuclear spiral are drawn first, still opaque, under the disc's marks (v21 draws them last) |
 
 ## Modules
 
@@ -112,6 +132,11 @@ These are intended changes in behaviour, each confirmed or rejected by the owner
 3. **No mip bleed.** Each drawing has its own mip chain, so small dots no longer pick up ink from neighbouring cells.
 4. **Round pen ends.** Vector drawings other than pen lines are drawn as capsules, with round caps and joins; v21's quads extend 0.9 of the width past each end and rely on MSAA. The spike measured capsules as closer to a real pen stroke (ADR 0006). Pen lines (the dust hatching) are not a divergence: M4 draws them as v21's own quads, 0.9 w past each end, unioned at v21's four MSAA sample positions, because capsules composited per pixel inked 18–41% more than v21 at the joins (ADR 0019, proposed).
 5. **Integer-lattice value noise** replaces the `sin`-hash noise, so flocculence, patchiness and dust gaps are the same on every machine. The patterns differ from v21's, but their statistics do not.
+6. **The star is dimmed by the dust in front of it.** v21 never dims the overlay star; here, behind a dusty galaxy, all its marks thin by the same `exp(-tau)` of the galaxy's own dust model (ADR 0074).
+7. **Disc galaxies carry a natural dust layer.** v21's `dust` is 0 unless a preset sets it; with `dustAuto` (on in the page, off in the core) every reader of the dust takes `max(dust, naturalDust)`: a spiral about 0.35 face-on optical depth, an elliptical none (ADR 0075).
+8. **Bulges follow a Sérsic law.** v21 draws every bulge as one flattened Hernquist sphere; with `bulgeAuto` (on in the page, off in the core) the stipple draws the radius from a deprojected Sérsic law, index by type and flatness, at the same half-mass radius (ADR 0076).
+9. **Drawn stars spread smoothly.** v21's star weights step at an arm profile of 0.55 and at R 2.1 and are cut at 2.7; with `starsAuto` (on in the page, off in the core) they are smooth in the arm profile and taper out to R 3 (ADR 0077).
+10. **Cosmic rays are sparse and everywhere.** v21 draws 70 to 130 hits in a box round the star; with `cosmicAuto` (on in the page, off in the core) they are 40 to 70 over the whole plate (ADR 0078).
 
 ## Performance budget
 

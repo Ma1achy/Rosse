@@ -230,9 +230,9 @@ describe('every use of the inclination in app23.js is classified (ADR 0017)', ()
 
   it('the structure key separates what v21 separates and nothing else', () => {
     const P = { incl: 30, kind: 'auto', bulge: 1, bulgeFlat: 0.9 };
-    // L1000's raw cos i: 30° and 150° share an incE bucket but not the structure
+    // L1000's cos i is |cos i| in the port (ADR 0073; v21's signed one told 30° from 150°)
     expect(inclBucket(30)).toBe(inclBucket(150));
-    expect(structureKey(P)).not.toBe(structureKey({ ...P, incl: 150 }));
+    expect(structureKey(P)).toBe(structureKey({ ...P, incl: 150 }));
     // it flips at bulgeFlat · cos i = 0.5, i = 56.25° for bulgeFlat 0.9, inside bucket 0
     expect(structureKey({ ...P, incl: 56.2 })).not.toBe(structureKey({ ...P, incl: 56.3 }));
     expect(inclBucket(56.2)).toBe(inclBucket(56.3));
@@ -243,7 +243,8 @@ describe('every use of the inclination in app23.js is classified (ADR 0017)', ()
     ])
       expect(structureKey({ ...q, incl: 30 })).toBe(structureKey({ ...q, incl: 150 }));
     // otherwise the incE buckets decide
-    const elongated = (i: number) => 0.9 * Math.max(Math.cos((i * Math.PI) / 180), 0.05) < 0.5;
+    const elongated = (i: number) =>
+      0.9 * Math.max(Math.abs(Math.cos((i * Math.PI) / 180)), 0.05) < 0.5;
     for (let a = 0; a <= 180; a += 0.5)
       for (const b of [a + 0.25, 180 - a]) {
         const same = structureKey({ ...P, incl: a }) === structureKey({ ...P, incl: b });

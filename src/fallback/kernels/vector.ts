@@ -174,10 +174,12 @@ function tf(X: VectorInputs, I: Inst, x: number, y: number): [number, number] {
   else if (I.warp === WarpKind.tide) {
     if (!X.tide) throw new Error('a tide warp needs the tidal map');
     const p = place(I, x, y);
-    q = X.tide.post(I.w[0], p[0], p[1], I.w[1]);
+    const w = X.tide.post(I.w[0], p[0], p[1], I.w[1]);
+    q = [w[0], w[1]];
   } else if (I.warp === WarpKind.tideScreen) {
     if (!X.tide) throw new Error('a tide warp needs the tidal map');
-    q = X.tide.nn(I.w[0], I.w[1] !== 0 ? -x : x, y);
+    const w = X.tide.nn(I.w[0], I.w[1] !== 0 ? -x : x, y);
+    q = [w[0], w[1]];
   } else q = place(I, x, y);
   return smWarp(q[0], q[1], wob, X.noise);
 }

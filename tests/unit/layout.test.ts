@@ -8,6 +8,7 @@ import { SPRITE_UNIFORMS_LAYOUT } from '../../src/render/sprites';
 import { COMPOSITE_UNIFORMS_LAYOUT } from '../../src/render/composite';
 import { GALAXY_LAYOUT, GROUP_LAYOUT } from '../../src/model/galaxy';
 import { CULLS_LAYOUT } from '../../src/fallback/kernels/project';
+import { STAR_JOB_LAYOUT } from '../../src/model/stars';
 import {
   CAPSULE_LAYOUT,
   CURVE_LAYOUT,
@@ -88,6 +89,7 @@ describe('struct layouts (WGSL = TS)', () => {
   it('M4: ring knots and clumps, dust culls', () => {
     checkLayout('compute/stipple.wgsl', GROUP_LAYOUT);
     checkLayout('compute/project.wgsl', CULLS_LAYOUT);
+    checkLayout('compute/star-marks.wgsl', STAR_JOB_LAYOUT);
   });
 
   it('M4: the line-work kernels and render pipelines', () => {
@@ -118,6 +120,21 @@ describe('struct layouts (WGSL = TS)', () => {
       layer_base: 256,
       layer_count: 256,
       off: [-3.6, -1.2],
+      tint1: [1, 1, 1, 1],
+      tint2: [1, 1, 1, 1],
+      tint3: [1, 1, 1, 1],
+      tint4: [1, 1, 1, 1],
+      tint5: [1, 1, 1, 1],
+      tint6: [1, 1, 1, 1],
+      tint7: [1, 1, 1, 1],
+      tint8: [1, 1, 1, 1],
+      tint9: [1, 1, 1, 1],
+      tint10: [1, 1, 1, 1],
+      tint11: [1, 1, 1, 1],
+      tint12: [1, 1, 1, 1],
+      tint13: [1, 1, 1, 1],
+      tint14: [1, 1, 1, 1],
+      tint15: [1, 1, 1, 1],
     });
     expect(new Float32Array(b)[10]).toBe(32);
     expect(new Uint32Array(b)[12]).toBe(256);

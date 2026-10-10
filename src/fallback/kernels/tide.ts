@@ -8,11 +8,12 @@
  *
  * | words | what |
  * | --- | --- |
- * | 0–7 | header: n, star table, bin offsets, bin ids, grids (word offsets), plate centre x and y, n0 |
+ * | 0–8 | header: n, star table, bin offsets, bin ids, grids (word offsets), plate centre x and y, n0, depth scales |
  * | star table | 4 words per star: plate x, plate y (this view), initial DX, DY |
  * | bin offsets | 2 galaxies × 441 cells + 1: the first slot of each cell's stars in the ids |
  * | bin ids | the star indices, cell by cell, in index order within a cell |
- * | grids | 2 galaxies × 49 × 49 vertices × 2: the map sampled once |
+ * | grids | 2 galaxies × 49 × 49 vertices × 3: the map sampled once (plate x, y and the mark scale of the depth, ADR 0088) |
+ * | depth scales | 1 word per star: the perspective scale of its depth in this view (1 without `persp`) |
  */
 import type { StructLayout } from '../../marks/instance';
 
@@ -23,7 +24,9 @@ export const TIDE_CELL_COUNT = 441;
 export const TIDE_GN = 48;
 export const TIDE_GV = 49;
 /** header words */
-export const TIDE_HEADER = 8;
+export const TIDE_HEADER = 9;
+/** words per grid vertex: plate x, plate y, depth scale */
+export const TIDE_VW = 3;
 /** v21's tear thresholds: along or across a ribbon (L834), and the ribbons' SEAMMAX (L1250) */
 export const TEAR = 1.8;
 export const SEAMMAX = 30;
@@ -56,6 +59,7 @@ export interface TideWords {
   offOff: number;
   idsOff: number;
   gridOff: number;
+  dkOff: number;
 }
 
 /** The word offsets of a tide buffer for `n` stars. */
@@ -64,7 +68,8 @@ export function tideWords(n: number): TideWords {
   const offOff = starOff + n * 4;
   const idsOff = offOff + 2 * TIDE_CELL_COUNT + 1;
   const gridOff = idsOff + n;
-  return { starOff, offOff, idsOff, gridOff, total: gridOff + 2 * TIDE_GV * TIDE_GV * 2 };
+  const dkOff = gridOff + 2 * TIDE_GV * TIDE_GV * TIDE_VW;
+  return { starOff, offOff, idsOff, gridOff, dkOff, total: dkOff + n };
 }
 
 /** The bin of an initial coordinate pair: v21's `floor((d + 1) / 2 · 20)` (L537). */
@@ -95,6 +100,8 @@ export class TideData {
     this.fl[5] = cx;
     this.fl[6] = cy;
     this.words[7] = n0;
+    this.words[8] = this.L.dkOff;
+    this.fl.fill(1, this.L.dkOff, this.L.dkOff + n);
   }
 
   /** `init_table`: the stars' initial disc coordinates, from `ic` (DX, DY, R0, 0 per star). */
@@ -131,6 +138,11 @@ export class TideData {
     }
   }
 
+  /** The stars' depth scales for this view (written by the merger's sprite kernel on the GPU). */
+  setDepth(dk: ArrayLike<number>): void {
+    for (let i = 0; i < this.n; i++) this.fl[this.L.dkOff + i] = dk[i] as number;
+  }
+
   /** The stars' plate positions for this view (written by the merger's sprite kernel on the GPU). */
   setScreen(scr: ArrayLike<number>): void {
     for (let i = 0; i < this.n; i++) {
@@ -140,7 +152,7 @@ export class TideData {
   }
 
   /** `tide_nn`: `tidal(g, false)(x, y)` at a point in tile units, the 4 nearest by (distance, index). */
-  nn(g: number, x: number, y: number): [number, number] {
+  nn(g: number, x: number, y: number): [number, number, number] {
     const { starOff, offOff, idsOff } = this.L;
     const nx = Math.min(Math.max(f(x * 2), -1), 1);
     const ny = Math.min(Math.max(f(y * 2), -1), 1);
@@ -181,18 +193,20 @@ export class TideData {
           }
         }
     }
-    if (found === 0) return [this.fl[5] as number, this.fl[6] as number];
+    if (found === 0) return [this.fl[5] as number, this.fl[6] as number, 1];
     let wx = 0;
     let wy = 0;
+    let wk = 0;
     let ws = 0;
     for (let s = 0; s < Math.min(found, 4); s++) {
       const w = f(1 / f((bd[s] as number) + f(0.02)));
       const sx = starOff + (bi[s] as number) * 4;
       wx = f(wx + f((this.fl[sx] as number) * w));
       wy = f(wy + f((this.fl[sx + 1] as number) * w));
+      wk = f(wk + f((this.fl[this.L.dkOff + (bi[s] as number)] as number) * w));
       ws = f(ws + w);
     }
-    return [f(wx / ws), f(wy / ws)];
+    return [f(wx / ws), f(wy / ws), f(wk / ws)];
   }
 
   /** `grid`: every vertex of both galaxies' 49 × 49 grids. */
@@ -201,34 +215,35 @@ export class TideData {
       for (let gy = 0; gy < TIDE_GV; gy++)
         for (let gx = 0; gx < TIDE_GV; gx++) {
           const p = this.nn(g, f(f(gx / TIDE_GN) - 0.5), f(f(gy / TIDE_GN) - 0.5));
-          const o = this.L.gridOff + ((g * TIDE_GV + gy) * TIDE_GV + gx) * 2;
+          const o = this.L.gridOff + ((g * TIDE_GV + gy) * TIDE_GV + gx) * TIDE_VW;
           this.fl[o] = p[0];
           this.fl[o + 1] = p[1];
+          this.fl[o + 2] = p[2];
         }
   }
 
   /** `tide_grid`: the grid bilinearly, at (u, v) = (plate offset) / R2. */
-  grid(g: number, u: number, v: number): [number, number] {
-    const base = this.L.gridOff + g * (TIDE_GV * TIDE_GV * 2);
+  grid(g: number, u: number, v: number): [number, number, number] {
+    const base = this.L.gridOff + g * (TIDE_GV * TIDE_GV * TIDE_VW);
     const fx = Math.min(Math.max(f(f(u + 0.5) * TIDE_GN), 0), f(47.999996));
     const fy = Math.min(Math.max(f(f(v + 0.5) * TIDE_GN), 0), f(47.999996));
     const ix = Math.floor(fx);
     const iy = Math.floor(fy);
     const ax = f(fx - ix);
     const ay = f(fy - iy);
-    const o = base + (iy * TIDE_GV + ix) * 2;
-    const o3 = o + TIDE_GV * 2;
+    const o = base + (iy * TIDE_GV + ix) * TIDE_VW;
+    const o3 = o + TIDE_GV * TIDE_VW;
     const q = (k: number) => this.fl[k] as number;
     const mix = (k: number) =>
       f(
-        f(f(f(q(o + k) * f(1 - ax)) + f(q(o + 2 + k) * ax)) * f(1 - ay)) +
-          f(f(f(q(o3 + k) * f(1 - ax)) + f(q(o3 + 2 + k) * ax)) * ay),
+        f(f(f(q(o + k) * f(1 - ax)) + f(q(o + TIDE_VW + k) * ax)) * f(1 - ay)) +
+          f(f(f(q(o3 + k) * f(1 - ax)) + f(q(o3 + TIDE_VW + k) * ax)) * ay),
       );
-    return [mix(0), mix(1)];
+    return [mix(0), mix(1), mix(2)];
   }
 
   /** `tide_post`: a galaxy's own `post` at a plate point, R2 plate px across the grid. */
-  post(g: number, x: number, y: number, r2: number): [number, number] {
+  post(g: number, x: number, y: number, r2: number): [number, number, number] {
     return this.grid(
       g,
       f(f(x - (this.fl[5] as number)) / r2),
@@ -242,6 +257,16 @@ const dist = (ax: number, ay: number, bx: number, by: number) => {
   const dy = f(by - ay);
   return f(Math.sqrt(f(f(dx * dx) + f(dy * dy))));
 };
+
+/** Two corners of a ribbon end scaled about their midpoint, in place. */
+function scaleAbout(a: number[], b: number[], k: number): void {
+  const mx = f(f((a[0] as number) + (b[0] as number)) / 2);
+  const my = f(f((a[1] as number) + (b[1] as number)) / 2);
+  a[0] = f(mx + f(f((a[0] as number) - mx) * k));
+  a[1] = f(my + f(f((a[1] as number) - my) * k));
+  b[0] = f(mx + f(f((b[0] as number) - mx) * k));
+  b[1] = f(my + f(f((b[1] as number) - my) * k));
+}
 
 /**
  * `warp_instances`: the centres of `n` instances (8 words each: x, y, layer, alpha, m0…m3) carried
@@ -258,6 +283,8 @@ export function warpInstances(
     const p = T.post(g, fl[i * 8] as number, fl[i * 8 + 1] as number, r2);
     fl[i * 8] = p[0];
     fl[i * 8 + 1] = p[1];
+    // the mark keeps its shape, and takes the scale of the depth it sits at (ADR 0088)
+    if (p[2] !== 1) for (let k = 4; k < 8; k++) fl[i * 8 + k] = f((fl[i * 8 + k] as number) * p[2]);
   }
 }
 
@@ -279,6 +306,11 @@ export function warpRibbons(T: TideData, g: number, r2: number, fl: Float32Array
     const mw = dist(w0[0], w0[1], w1[0], w1[1]);
     let alpha = c(11);
     if (ml > SEAMMAX || f(ml / ol) > TEAR || f(mw / ow) > TEAR) alpha = 0;
+    // the width follows the depth of each end (ADR 0088): the corners about their midpoint
+    const k0 = f(f(w0[2] + w1[2]) / 2);
+    const k1 = f(f(w2[2] + w3[2]) / 2);
+    if (k0 !== 1) scaleAbout(w0, w1, k0);
+    if (k1 !== 1) scaleAbout(w2, w3, k1);
     fl.set([w0[0], w0[1], w1[0], w1[1], w2[0], w2[1], w3[0], w3[1]], o);
     fl[o + 11] = alpha;
   }
@@ -296,6 +328,8 @@ export function warpCaps(T: TideData, g: number, r2: number, fl: Float32Array, n
     let alpha = c(5);
     if (ml > 22 || f(ml / ol) > TEAR) alpha = 0;
     fl.set([a[0], a[1], b[0], b[1]], o);
+    const k = f(f(a[2] + b[2]) / 2);
+    if (k !== 1) fl[o + 4] = f(c(4) * k);
     fl[o + 5] = alpha;
   }
 }

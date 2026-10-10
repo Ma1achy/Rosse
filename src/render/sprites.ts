@@ -11,7 +11,7 @@ import { KEY_STYLE, styleKey, withStyle, type PassStyle } from './pass-style';
 /** The `Sprite` uniform of sprite.wgsl. */
 export const SPRITE_UNIFORMS_LAYOUT: StructLayout = {
   name: 'Sprite',
-  size: 64,
+  size: 304,
   align: 16,
   fields: [
     { name: 'ink', type: 'vec4<f32>', offset: 0, size: 16 },
@@ -24,6 +24,21 @@ export const SPRITE_UNIFORMS_LAYOUT: StructLayout = {
     { name: 'layer_base', type: 'u32', offset: 48, size: 4 },
     { name: 'layer_count', type: 'u32', offset: 52, size: 4 },
     { name: 'off', type: 'vec2<f32>', offset: 56, size: 8 },
+    { name: 'tint1', type: 'vec4<f32>', offset: 64, size: 16 },
+    { name: 'tint2', type: 'vec4<f32>', offset: 80, size: 16 },
+    { name: 'tint3', type: 'vec4<f32>', offset: 96, size: 16 },
+    { name: 'tint4', type: 'vec4<f32>', offset: 112, size: 16 },
+    { name: 'tint5', type: 'vec4<f32>', offset: 128, size: 16 },
+    { name: 'tint6', type: 'vec4<f32>', offset: 144, size: 16 },
+    { name: 'tint7', type: 'vec4<f32>', offset: 160, size: 16 },
+    { name: 'tint8', type: 'vec4<f32>', offset: 176, size: 16 },
+    { name: 'tint9', type: 'vec4<f32>', offset: 192, size: 16 },
+    { name: 'tint10', type: 'vec4<f32>', offset: 208, size: 16 },
+    { name: 'tint11', type: 'vec4<f32>', offset: 224, size: 16 },
+    { name: 'tint12', type: 'vec4<f32>', offset: 240, size: 16 },
+    { name: 'tint13', type: 'vec4<f32>', offset: 256, size: 16 },
+    { name: 'tint14', type: 'vec4<f32>', offset: 272, size: 16 },
+    { name: 'tint15', type: 'vec4<f32>', offset: 288, size: 16 },
   ],
 };
 
@@ -91,6 +106,7 @@ interface SpriteOpts {
   gain: number;
   ink?: readonly [number, number, number];
   off?: readonly [number, number];
+  tints?: readonly (readonly [number, number, number])[];
 }
 
 function spriteUniforms(
@@ -113,6 +129,12 @@ function spriteUniforms(
       layer_base: arr.first,
       layer_count: arr.count,
       off: opts.off ?? [0, 0],
+      ...Object.fromEntries(
+        Array.from({ length: 15 }, (_, k) => k + 1).map((k) => [
+          `tint${String(k)}`,
+          [...(opts.tints?.[k - 1] ?? opts.ink ?? [1, 1, 1]), 1],
+        ]),
+      ),
     }),
     GPUBufferUsage.UNIFORM,
     label,

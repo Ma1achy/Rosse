@@ -26,7 +26,7 @@ import { VECTOR_ATLASES, type VectorLibrary } from '../../src/marks/vector';
 import { CLASS_COUNT } from '../../src/model/classes';
 import { buildScene, drawingsMeta } from '../../src/model/scene';
 import { GpuStipple } from '../../src/render/stipple';
-import { UNIT_SCALE, cameraOf, viewDesc } from '../../src/view/camera';
+import { UNIT_SCALE, cameraOf, perspOf, viewDesc } from '../../src/view/camera';
 import { classCapacity } from '../../src/fallback/kernels/scan';
 import { adapterName, device, run } from './harness';
 
@@ -53,6 +53,37 @@ const CASES: [string, Params][] = [
     'Hand wobble',
     'Tightly wound',
   ].map((n): [string, Params] => [`${n} s7`, presetParams(n, 7)]),
+  // the natural bulge (ADR 0076): the Sérsic radius of the bulge, its gamma sampler on both engines
+  ...['Grand design', 'Barred spiral', 'Edge-on with dust'].map((n): [string, Params] => [
+    `${n} s7, natural bulge`,
+    presetParams(n, 7, { bulgeAuto: 1, dustAuto: 1, peanut: 1 }),
+  ]),
+  // the natural star spread (ADR 0077): the smooth arm weight and the outer taper, drawn stars on
+  ...['Grand design', 'Ringed', 'Flocculent'].map((n): [string, Params] => [
+    `${n} s7, natural star spread`,
+    presetParams(n, 7, { starsAuto: 1, starMix: 1 }),
+  ]),
+  // the thin disc (ADR 0083): the mixed vertical layer and the shorter bulge tail
+  ...['Grand design', 'Barred spiral', 'Smooth, round'].map((n): [string, Params] => [
+    `${n} s7, thin disc`,
+    presetParams(n, 7, { thinAuto: 1, bulgeAuto: 1 }),
+  ]),
+  // stellar populations (ADR 0090): clumping, globular clusters, mark character, wider star sizes
+  ...['Grand design', 'Barred spiral', 'Smooth, round', 'Edge-on with dust'].map(
+    (n): [string, Params] => [
+      `${n} s7, stellar populations`,
+      presetParams(n, 7, { popAuto: 1, starsAuto: 1, starMix: 1, thinAuto: 1, bulgeAuto: 1 }),
+    ],
+  ),
+  // the galaxy's own perspective (ADR 0084): marks scale by depth, in both projections
+  ...['Grand design', 'Barred spiral', 'Edge-on with dust'].map((n): [string, Params] => [
+    `${n} s7, perspective`,
+    presetParams(n, 7, { depthAuto: 2, incl: 62 }),
+  ]),
+  ...['Grand design', 'Barred spiral'].map((n): [string, Params] => [
+    `${n} s7, marks shrink with distance`,
+    presetParams(n, 7, { depthAuto: 1, incl: 62 }),
+  ]),
   [
     'every branch: patchy, irregular, flocculent, dusty, ringed, barred',
     presetParams('Grand design', 99, {
@@ -106,7 +137,7 @@ run('stipple kernels (GPU = CPU, L1)', async () => {
 
     const cS = runStipple(scene.galaxy);
     const n = cS.n;
-    const V = viewDesc(cam, scene.galaxy.g.dust, n, classCapacity(n));
+    const V = viewDesc(cam, scene.galaxy.g.dust, n, classCapacity(n), perspOf(scene.P));
     // the dust culls read the line-work's projected points (M4)
     const G = scene.galaxy;
     const rv = runRibbons(
@@ -201,7 +232,12 @@ run('stipple kernels (GPU = CPU, L1)', async () => {
     // differences and every compacted slot within tolerance. Elsewhere (FMA contraction, other
     // log, exp, pow and sqrt) only L1 is claimed: ≥ 99.9% of instances, counts within 0.1%.
     const l1 = match >= 0.999 && countWorst <= 0.001;
-    const ok = swiftShader ? l1 && sClassDiff === 0 && pClassDiff === 0 && slotsBad === 0 : l1;
+    // a globular cluster's stars are placed with Gaussian draws, which the GPU computes within a
+    // tolerance (ADR 0004), so one sample in some thousands may land on the other side of a cull
+    const allow = name.includes('stellar populations') ? 3 : 0;
+    const ok = swiftShader
+      ? l1 && sClassDiff <= allow && pClassDiff <= allow && slotsBad === 0
+      : l1;
     if (!ok) pass = false;
     worstMatch = Math.min(worstMatch, match);
     worstCount = Math.max(worstCount, countWorst);

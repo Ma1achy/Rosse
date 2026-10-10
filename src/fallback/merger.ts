@@ -19,6 +19,7 @@ import {
   type MergerFraming,
   type MergerScene,
   type MergerSceneOptions,
+  mergerOccluder,
 } from '../model/merger';
 import { STIPPLE_LAYERS, markCounts, type MarkCounts } from '../model/scene';
 import type { DrawingsMeta } from '../model/variation';
@@ -52,6 +53,8 @@ export class CpuMerger {
   readonly shells: CpuShellScene | null;
   /** the lens's host (M9): a merging pair can lens a galaxy behind it */
   readonly lensHost: CpuStipple | null;
+  /** the main parameters' own sky, trails, arrow and overlays, placed by the real camera */
+  readonly skyHost: CpuStipple | null;
 
   /** The model tier: the simulation, the framing, the bins and the two galaxies. */
   constructor(
@@ -94,6 +97,7 @@ export class CpuMerger {
         )
       : null;
     this.lensHost = this.scene.lensHost ? new CpuStipple(this.scene.lensHost) : null;
+    this.skyHost = this.scene.skyHost ? new CpuStipple(this.scene.skyHost) : null;
     this.galaxies = [0, 1].map(
       (g) =>
         new CpuStipple(this.scene.galaxies[g] as MergerScene['galaxies'][number], {
@@ -154,23 +158,38 @@ export class CpuMerger {
       );
       mw.push(...vectorLayers(vo, MW.nDots, MW.nBlobs));
     }
+    // after the debris, as the GPU's (src/render/merger.ts inkLayers): the shells, then the lens
+    // over the merged scene
+    const tail: InkLayer[] = [];
     const sh = this.shells?.view(zoom);
-    if (sh) mw.push(...sh.layers);
-    // the lens, over the merged scene
+    if (sh) tail.push(...sh.layers);
     const lens = this.lensHost?.view(cameraOf(scene.P, zoom), scene.P.mTime).lens;
     if (lens) {
       const LL = lens.layers;
-      mw.push(...LL.line, ...LL.vectors, ...LL.pieces, ...LL.dots, ...LL.knots, ...LL.stars);
-      mw.push(...LL.cores);
+      tail.push(...LL.line, ...LL.vectors, ...LL.pieces, ...LL.dots, ...LL.knots, ...LL.stars);
+      tail.push(...LL.cores);
     }
+    // the main parameters' own sky, trails, arrow and overlays: the background goes under all
+    if (this.skyHost && scene.skyHost && scene.P.occlAuto > 0)
+      this.skyHost.occluder = mergerOccluder(
+        scene,
+        fr,
+        cameraOf(scene.P, zoom),
+        scene.skyHost.home,
+      );
+    const host = this.skyHost?.view(cameraOf(scene.P, zoom), scene.P.mTime);
+    const hostBack = host?.layers.slice(0, host.nBack) ?? [];
+    const hostFront = host?.layers.slice(host.nBack) ?? [];
     const perClass = new Uint32Array(CLASS_COUNT);
     for (let c = 0; c < CLASS_COUNT; c++)
       perClass[c] =
+        (host?.perClass[c] ?? 0) +
         (lens?.perClass[c] ?? 0) +
         (counts[c] ?? 0) +
         views.reduce((acc, v) => acc + (v.perClass[c] ?? 0), 0) +
         (c === Cls.old ? (sh?.dots ?? 0) : 0);
-    const sum = (k: keyof MarkCounts) => views.reduce((acc, v) => acc + (v.counts[k] ?? 0), 0);
+    const sum = (k: keyof MarkCounts) =>
+      views.reduce((acc, v) => acc + (v.counts[k] ?? 0), 0) + (host?.counts[k] ?? 0);
     const total: MarkCounts = { ...markCounts(perClass) };
     for (const k of [
       'curves',
@@ -186,7 +205,14 @@ export class CpuMerger {
     ] as const)
       total[k] = sum(k);
     return {
-      layers: [...views.flatMap((v) => v.layers), ...mw, ...debris],
+      layers: [
+        ...hostBack,
+        ...views.flatMap((v) => v.layers),
+        ...mw,
+        ...debris,
+        ...tail,
+        ...hostFront,
+      ],
       counts: total,
       perClass,
       framing: fr,

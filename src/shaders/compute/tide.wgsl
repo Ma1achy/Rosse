@@ -96,7 +96,8 @@ fn grid(@builtin(global_invocation_id) id: vec3<u32>) {
   let gy = w / T_GV;
   let gx = w - gy * T_GV;
   let p = tide_nn(g, f32(gx) / f32(T_GN) - 0.5, f32(gy) / f32(T_GN) - 0.5);
-  let o = tide[4] + v * 2u;
+  let o = tide[4] + v * T_VW;
   tide[o] = bitcast<u32>(p.x);
   tide[o + 1u] = bitcast<u32>(p.y);
+  tide[o + 2u] = bitcast<u32>(p.z);
 }

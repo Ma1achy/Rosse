@@ -276,12 +276,13 @@ describe('parts', () => {
     const P = presetParams('Disc, no arms', 7, STIPPLE_ONLY);
     const c = coreInstances(P, M, cameraOf(P));
     expect(c).toHaveLength(1);
-    expect(c[0]?.alpha).toBe(0.9);
+    expect(c[0]?.alpha).toBe(1);
     expect(M.cores.style[c[0]?.layer ?? 0]).toBe('dotted');
     expect(
       coreInstances(presetParams('Smooth, round'), M, cameraOf(presetParams('Smooth, round'))),
     ).toHaveLength(0);
-    expect(coreInstances({ ...P, incl: 85 }, M, cameraOf({ ...P, incl: 85 }))).toHaveLength(0);
+    // and it stays edge-on (ADR 0079): v21 dropped it from incE 80
+    expect(coreInstances({ ...P, incl: 85 }, M, cameraOf({ ...P, incl: 85 }))).toHaveLength(1);
   });
 
   it('projects with the reference camera', () => {

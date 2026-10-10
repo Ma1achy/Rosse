@@ -22,7 +22,7 @@ import { describeGalaxy, rstarBound, type GalaxyDesc } from './galaxy';
 import { sheetStrides, type DynSpec } from './dynvec';
 import { describeStars, starSlotCapacity, type StarPicks, type StarsDesc } from './stars';
 import { describeSky, type SkyCatalogue, type SkyDesc } from './sky';
-import { cameraOf, orientationOf, type Orientation } from '../view/camera';
+import { cameraOf, orientationOf, structuralIncl, type Orientation } from '../view/camera';
 import { describeRibbons, type RibbonDesc } from './ribbons';
 import { describeLens, type LensOptions, type LensScene } from '../sim/lens';
 import { makeVariation, type DrawingsMeta, type Variation } from './variation';
@@ -134,6 +134,11 @@ export interface SceneOptions {
   merger?: MergerSceneOptions;
   /** the simulated shells (`P.shellsOn`, M8): v21's stroke rows for the arcs, replayed in the goldens */
   shells?: ShellSceneOptions;
+  /**
+   * The sky host of a merger (render(), app23.js:L1232–1234): the main parameters' own sky, trails,
+   * arrow and overlays without a galaxy, though the sky still shears round the merger's mass.
+   */
+  skyHost?: boolean;
 }
 
 /**
@@ -153,6 +158,10 @@ export function withoutGalaxy(P: Params): Params {
     sersicN: 0,
     lines: 0,
     dust: 0,
+    dustAuto: 0,
+    bulgeAuto: 0,
+    starsAuto: 0,
+    occlAuto: 0,
     dustLines: 0,
     dustScribble: 0,
     outline: 0,
@@ -172,7 +181,7 @@ export function withoutGalaxy(P: Params): Params {
 
 export function buildScene(P0: Params, meta: DrawingsMeta, opts: SceneOptions = {}): GalaxyScene {
   const P = P0;
-  const Pg = P.subject === 'galaxy' ? P : withoutGalaxy(P);
+  const Pg = P.subject === 'galaxy' && !opts.skyHost ? P : withoutGalaxy(P);
   const variation = opts.variation ?? makeVariation(P, meta);
   const key = (opts.placementKey ?? P.seed) >>> 0;
   const galaxy = describeGalaxy(Pg, variation, meta, {
@@ -188,7 +197,7 @@ export function buildScene(P0: Params, meta: DrawingsMeta, opts: SceneOptions = 
     variation,
     meta.strokes,
     meta.penlines,
-    P.incl,
+    structuralIncl(P),
     opts.curvePicks,
     galaxy.noise,
     key,
@@ -200,7 +209,7 @@ export function buildScene(P0: Params, meta: DrawingsMeta, opts: SceneOptions = 
     Pg,
     variation,
     meta,
-    P.incl,
+    structuralIncl(P),
     opts.partPicks,
     sky?.catalogue.companions,
     opts.tide,
@@ -232,7 +241,9 @@ export function buildScene(P0: Params, meta: DrawingsMeta, opts: SceneOptions = 
         })
       : undefined;
   return {
-    P,
+    // a sky host (a merger's own sky and overlays) has no galaxy: its parameters are the galaxyless
+    // ones, so nothing draws a drawn core, a nuclear spiral or the like at its plate centre
+    P: opts.skyHost ? Pg : P,
     variation,
     galaxy,
     ribbons,

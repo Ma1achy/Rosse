@@ -1,5 +1,5 @@
 {
-  "about": "Golden thresholds (ADR 0013, as calibrated in ADR 0015 and amended by ADR 0018). keys: the K of the parity comparison, which sets v21 against the mean of each measure over K engine draws, and for which the parity thresholds are calibrated. parity: the new engine against v21 (L2), per family; strict: the CPU engine against WebGPU (L1), one draw each. Gated: ink, coarse SSIM (b′), widths, counts, and the moment and extent test (r25, r50, r90, outer ink, axis ratio q, position angle pa where the reference q < paBelowQ). Written by `npm run golden -- --calibrate`; the numbers behind them are in calibration.json and docs/milestones/m2/README.md. Families marked provisional have no engine yet.",
+  "about": "Golden thresholds (ADR 0013, as calibrated in ADR 0015 and amended by ADR 0018). keys: the K of the parity comparison, which sets v21 against the mean of each measure over K engine draws, and for which the parity thresholds are calibrated. parity: the new engine against v21 (L2), per family; strict: the CPU engine against WebGPU (L1), one draw each. Gated: ink, coarse SSIM (b′), widths, counts, and the moment and extent test (r25, r50, r90, outer ink, axis ratio q, position angle pa where the reference q < paBelowQ). Written by `npm run golden -- --calibrate`; the numbers behind them are in calibration.json and docs/milestones/m2/README.md. Families marked provisional have no engine yet. Accepted deviations (ADR 0079, the core is one opaque drawing, alpha 1 where v21 draws 0.9: the inner moments r25/r50 of the lines plate for Dusty spiral, Grand design and Loose, open arms; WOBBLE_GAIN 0.4, the weaker hand wobble: the inner axis ratio of Hand wobble; the same two on the Layered barred spiral with a satellite trail at zoom 2) are the byPreset entries of those presets in `lines` and `layered@zoom`; --calibrate rewrites this file, so re-apply them (git diff) afterwards.",
   "keys": 6,
   "strict": {
     "ink": 0.005,
@@ -700,7 +700,23 @@
       "paA": 1.651,
       "paEps0": 0.052,
       "heldOut": 56,
-      "byPreset": {}
+      "byPreset": {
+        "Dusty spiral": {
+          "r25": 0.25,
+          "r50": 0.085
+        },
+        "Grand design": {
+          "r25": 0.25,
+          "r50": 0.085
+        },
+        "Loose, open arms": {
+          "r25": 0.25,
+          "r50": 0.085
+        },
+        "Hand wobble": {
+          "qInner": 0.075
+        }
+      }
     },
     "layered": {
       "counts": 0.03,
@@ -857,7 +873,13 @@
       "countsBy": {
         "dots": 0.169
       },
-      "byPreset": {}
+      "byPreset": {
+        "Layered: barred spiral, satellite trail": {
+          "r50": 0.035,
+          "r90": 0.03,
+          "outer": 0.02
+        }
+      }
     },
     "star@zoom": {
       "counts": 0.03,

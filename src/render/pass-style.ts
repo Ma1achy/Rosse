@@ -12,13 +12,15 @@ export interface PassStyle {
   gain: number;
   /** the plate offset, plate units */
   off: readonly [number, number];
+  /** the inks of tints 1 to 15 of a dot (ADR 0091); absent, a tint is `ink` */
+  tints?: readonly Rgb[];
 }
 
 /** The `ink` plate's one pass: the key ink as white (the composite colours it), no offset. */
 export const KEY_STYLE: PassStyle = { ink: [1, 1, 1], gain: 1, off: [0, 0] };
 
 export function styleKey(s: PassStyle): string {
-  return `${s.ink.join(',')}|${String(s.gain)}|${s.off.join(',')}`;
+  return `${s.ink.join(',')}|${String(s.gain)}|${s.off.join(',')}|${s.tints?.flat().join(',') ?? ''}`;
 }
 
 /** A batch's own options (target size, scale, layer gain) laid under a pass's style. */
@@ -27,7 +29,14 @@ export function withStyle<
     gain: number;
     ink?: readonly [number, number, number];
     off?: readonly [number, number];
+    tints?: readonly (readonly [number, number, number])[];
   },
 >(opts: O, style: PassStyle): O {
-  return { ...opts, gain: opts.gain * style.gain, ink: style.ink, off: style.off };
+  return {
+    ...opts,
+    gain: opts.gain * style.gain,
+    ink: style.ink,
+    off: style.off,
+    ...(style.tints ? { tints: style.tints } : {}),
+  };
 }

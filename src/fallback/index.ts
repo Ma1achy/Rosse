@@ -70,6 +70,7 @@ export class CpuRenderer {
           gain: l.gain * p.gain,
           ink: p.inkOf(l.pop ?? 'line'),
           off: p.off,
+          ...(p.tints ? { tints: p.tints } : {}),
         };
         if (l.kind === 'capsules') {
           rasteriseCapsules(this.ink, l.caps, l.count, params);

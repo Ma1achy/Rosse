@@ -11,15 +11,29 @@
  * - the **framing** of a moment: the snapshots `mTime` selects, the frame holding the pair, the scale
  *   `MS.sc`, and each galaxy's camera (`s0 = MS.sc · rmax / 4.2`, R2 = 2 · 4.2 · s0).
  *
- * The main parameters' own parts (the sky, trails, streams and a jet of the whole picture, L1234)
- * and the lens and shells of the merged scene (L1265–1266) are the other milestones'.
+ * - the **sky host**: the main parameters' own sky, trails, arrow, jet, streams and overlay star or
+ *   artefact (L1234, L1281), described once and placed by the real camera, never by a galaxy's.
+ *
+ * The lens and shells of the merged scene (L1265–1266) are the other milestones'.
  */
 import type { Params } from '../core/params';
 import { Draws } from '../core/rng';
 import { Stream } from '../core/streams';
 import { MVIEW_LAYOUT, KEEP } from '../fallback/kernels/merger-sprites';
 import { DRAWING_WORDS } from '../marks/vector';
-import { PLATE, UNIT_SCALE, cameraOf, rotationOf, viewDesc, type Camera } from '../view/camera';
+import {
+  PLATE,
+  UNIT_SCALE,
+  GALAXY_PERSP,
+  cameraOf,
+  rotInv,
+  rotationOf,
+  sceneGalaxyPoint,
+  viewDesc,
+  type Camera,
+  type Orientation,
+} from '../view/camera';
+import { discTau } from './stars';
 import {
   blendCores,
   describeMerger,
@@ -70,6 +84,8 @@ export interface MergerSceneOptions {
    * give the lens its pool, noise and own picks (v21's, replayed, in the goldens).
    */
   lens?: SceneOptions;
+  /** The sky host's scene options (sky catalogue, star picks, overlay home: v21's, replayed). */
+  sky?: SceneOptions;
 }
 
 /** `mWarp`: the two whole drawings the tides tear (app23.js:L1260–1264). */
@@ -96,6 +112,12 @@ export interface MergerScene {
    * scene whose lens is drawn over the merger. Only its lens is used; the plate's camera places it.
    */
   lensHost?: GalaxyScene;
+  /**
+   * The main parameters' own sky and overlays (v21's render() merger branch calls `parts` with the
+   * main P): a scene without a galaxy, placed by the real camera. Only its sky, vector rows and
+   * overlay stars are used. Absent when the picture asks for none of them.
+   */
+  skyHost?: GalaxyScene;
   mwarp: MWarpDesc | null;
   hot: [boolean, boolean];
 }
@@ -110,6 +132,20 @@ export function mwarpPool(types: readonly string[]): number[] {
   return out;
 }
 
+/** Whether the main parameters draw anything of their own over a merger: a sky, a part or an overlay. */
+export function needsSkyHost(P: Params): boolean {
+  return (
+    P.field > 0.02 ||
+    P.fgstars > 0.02 ||
+    P.trails > 0.02 ||
+    P.arrow > 0.02 ||
+    P.jet > 0.5 ||
+    P.streams > 0.02 ||
+    P.ovStar > 0.02 ||
+    (!!P.ovArtefact && P.ovArtefact !== 'none')
+  );
+}
+
 export function buildMergerScene(
   P: Params,
   meta: DrawingsMeta,
@@ -120,6 +156,10 @@ export function buildMergerScene(
   const galaxyParams = [0, 1].map((g) => ({
     ...P,
     ...mergerGalaxyParams(P, g as 0 | 1, opts.picks),
+    // the overlay star and artefact are the whole picture's (the sky host's, on the real camera),
+    // not each face-on galaxy's, which v21's galaxies are never asked for (L1281)
+    ovStar: 0,
+    ovArtefact: 'none',
   })) as [Params, Params];
   const galaxies = [0, 1].map((g) =>
     buildScene(galaxyParams[g] as Params, meta, {
@@ -160,6 +200,14 @@ export function buildMergerScene(
           ...(opts.placementKey !== undefined ? { placementKey: opts.placementKey } : {}),
         })
       : undefined;
+  // the sky, trails, arrow and overlays of the main parameters (companions stay empty, L1234)
+  const skyHost = needsSkyHost(P)
+    ? buildScene({ ...P, companions: 0 }, meta, {
+        ...opts.sky,
+        ...(opts.placementKey !== undefined ? { placementKey: opts.placementKey } : {}),
+        skyHost: true,
+      })
+    : undefined;
   return {
     P,
     meta,
@@ -170,6 +218,7 @@ export function buildMergerScene(
     galaxyParams,
     galaxies,
     ...(lensHost ? { lensHost } : {}),
+    ...(skyHost ? { skyHost } : {}),
     mwarp,
     hot: [typeOf(P.mType1) === 'elliptical', typeOf(P.mType2) === 'elliptical'],
   };
@@ -196,6 +245,8 @@ export interface MergerFraming {
   sc: number;
   fcx: number;
   fcy: number;
+  /** the frame centre's depth in the view frame (the perspective's zero, ADR 0084) */
+  fcz: number;
   /** `MS.scale`, `sc · 0.3`: the dots of mWarp's drawings */
   scale: number;
   galaxies: [GalaxyFraming, GalaxyFraming];
@@ -224,6 +275,7 @@ export function mergerFraming(
   const yy = yr * R.ci - z * R.si;
   const fcx = xr * R.cp - yy * R.sp;
   const fcy = xr * R.sp + yy * R.cp;
+  const fcz = yr * R.si + z * R.ci;
   const sc = ((MERGER_FIT * PLATE) / Math.max(2 * frame.r, 1e-3)) * ((UNIT_SCALE * zoom) / 84);
   const galaxies = [0, 1].map((g): GalaxyFraming => {
     const rmax = desc.gals[g]?.rmax ?? 1.7;
@@ -236,7 +288,52 @@ export function mergerFraming(
       camera: cameraOf(scene.galaxyParams[g] as Params, gz),
     };
   }) as [GalaxyFraming, GalaxyFraming];
-  return { sel, frame, cores, sc, fcx, fcy, scale: sc * 0.3, galaxies };
+  return { sel, frame, cores, sc, fcx, fcy, fcz, scale: sc * 0.3, galaxies };
+}
+
+/**
+ * The optical depth of a merger's two discs between an overlay star and the viewer (ADR 0086), for
+ * the sky host's star. The star's scene point is placed in the merger's frame by the framing's scale,
+ * and each disc is the plane through its core with its own spin normal, seen in its own units
+ * (a galaxy drawn at `rmax / 4.2` merger units per unit): `discTau` of each, summed.
+ */
+export function mergerOccluder(
+  scene: MergerScene,
+  fr: MergerFraming,
+  cam: Camera,
+  home: Orientation,
+): (sx: number, sy: number, depth: number) => number {
+  const toViewer = rotInv([0, 0, 1], rotationOf(cam));
+  const k = (UNIT_SCALE * cam.zoom) / fr.sc;
+  const c = fr.frame.c;
+  const dot = (a: readonly number[], b: readonly number[]) =>
+    (a[0] ?? 0) * (b[0] ?? 0) + (a[1] ?? 0) * (b[1] ?? 0) + (a[2] ?? 0) * (b[2] ?? 0);
+  return (sx, sy, depth) => {
+    const g0 = sceneGalaxyPoint(home, sx, sy, depth);
+    const w = [c[0] + k * g0[0], c[1] + k * g0[1], c[2] + k * g0[2]];
+    let tau = 0;
+    for (let g = 0; g < 2; g++) {
+      const G = scene.desc.gals[g];
+      const core = fr.cores[g as 0 | 1];
+      if (!G) continue;
+      const u = G.rmax / 4.2;
+      const rel = [(w[0] ?? 0) - core[0], (w[1] ?? 0) - core[1], (w[2] ?? 0) - core[2]];
+      tau += discTau(
+        [dot(rel, G.e1) / u, dot(rel, G.e2) / u, dot(rel, G.n) / u],
+        [dot(toViewer, G.e1), dot(toViewer, G.e2), dot(toViewer, G.n)],
+      );
+    }
+    return tau;
+  };
+}
+
+/**
+ * The perspective of a merger's debris (ADR 0084), per unit of the merger's own frame: the galaxy's
+ * `GALAXY_PERSP` is per galaxy unit (84 plate px at zoom 1), so per merger unit it is that times
+ * `sc / (84 zoom)`. 0 without `depthAuto`.
+ */
+export function mergerPersp(P: Params, fr: MergerFraming, zoom: number): number {
+  return P.depthAuto > 0 ? (GALAXY_PERSP * fr.sc) / (UNIT_SCALE * zoom) : 0;
 }
 
 /** The values of the `MView` uniform of compute/merger-sprites.wgsl. */
@@ -261,6 +358,9 @@ export function mergerViewUniform(
     sc: f(fr.sc),
     fcx: f(fr.fcx),
     fcy: f(fr.fcy),
+    fcz: f(fr.fcz),
+    persp: f(mergerPersp(P, fr, zoom)),
+    zshrink: f(P.depthAuto > 0 ? Math.min(1, zoom ** 0.35) : 1),
     vcx: PLATE / 2,
     vcy: PLATE / 2,
     star_mix: f(P.starMix),

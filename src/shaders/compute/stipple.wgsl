@@ -62,7 +62,15 @@ struct Galaxy {
   n_ss_small: u32,
   n_ss_bright: u32,
   spike: f32,
-  pad_g: u32,
+  n_stream: u32,
+  s0_r: f32,
+  s0_span: f32,
+  s0_a: f32,
+  s0_tilt: f32,
+  s1_r: f32,
+  s1_span: f32,
+  s1_a: f32,
+  s1_tilt: f32,
 }
 
 // A ring-knot cluster or a clump (GROUP_LAYOUT in src/model/galaxy.ts, src/model/clumps.ts).
@@ -89,12 +97,18 @@ const KNOT_POOL: u32 = 24u;
 
 const FLAG_ARMS_ON: u32 = 1u;
 const FLAG_SERSIC: u32 = 2u;
+const FLAG_BULGE_SERSIC: u32 = 4u;
+const FLAG_BULGE_PEANUT: u32 = 8u;
+const FLAG_STARS_SMOOTH: u32 = 16u;
+const FLAG_THIN_DISC: u32 = 32u;
+const FLAG_POP: u32 = 64u;
 
 // noise salts (NoiseSalt in src/core/noise.ts)
 const SALT_FLOCC: u32 = 1u;
 const SALT_PATCHY: u32 = 2u;
 const SALT_IRR: u32 = 3u;
 const SALT_RING: u32 = 4u;
+const SALT_POP: u32 = 14u;
 
 const STREAM_STIPPLE: u32 = 2u;
 const STREAM_CLUMPS: u32 = 5u;
@@ -240,7 +254,75 @@ struct Star {
   bright: bool,
 }
 
+// A hash of a number into 0 to 1 that costs no draw (the tints' scatter).
+fn jitter(x: f32, k: f32, o: f32) -> f32 {
+  let v = x * k + o;
+  return v - floor(v);
+}
+
+fn tint_at(T: f32, lo: f32, hi: f32) -> u32 {
+  return u32(min(hi, max(lo, floor(T + 0.5))));
+}
+
+// The tint of a dot for the colour plate (ADR 0091): which of the palette's fifteen inks it is
+// printed in; the model is described at tintOf in src/fallback/kernels/stipple.ts, its CPU twin.
+fn tint_of(cls: u32, comp: u32, thick: bool, Rg: f32, arm: f32, cn: f32, j1: f32, j2: f32) -> u32 {
+  let sc = (j1 + j2) - 1.0;
+  let hue_patch = (cn - 0.5) * 2.0;
+  if (cls == CLS_KNOT) {
+    if (j1 < 0.2) {
+      return 13u;
+    }
+    return select(12u, 14u, j2 < 0.12);
+  }
+  if (cls == CLS_STAR) {
+    return tint_at(9.0 + sc * 1.2, 8.0, 10.0);
+  }
+  if (cls == CLS_YOUNG) {
+    return tint_at((9.2 + 1.3 * hue_patch) + 1.2 * sc, 7.0, 11.0);
+  }
+  if (cls == CLS_OLD) {
+    if (comp == 1u) {
+      return tint_at(6.3 + 1.3 * sc, 3.0, 8.0);
+    }
+    if (thick) {
+      return tint_at(5.0 + 1.3 * sc, 3.0, 8.0);
+    }
+    return tint_at((3.1 + 2.7 * ss(0.0, 1.6, Rg)) + 1.1 * sc, 2.0, 8.0);
+  }
+  var T = (5.0 + 2.8 * ss(0.3, 3.0, Rg)) + 1.0 * hue_patch;
+  T = T + 0.9 * sc;
+  if (comp == 3u) {
+    T = T + 2.5;
+  } else if (comp == 2u) {
+    T = T - 0.5;
+  }
+  // the arms' trailing edge is dusty: its stars are reddened
+  if (arm > 0.3 && arm < 0.55) {
+    let w = 1.0 - abs(arm - 0.425) / 0.125;
+    if (w > 0.0) {
+      T = T - 2.4 * w;
+    }
+  }
+  return tint_at(T, 1.0, 9.0);
+}
+
 fn draw_star(young: bool, forced: bool) -> Star {
+  var p = 0.05;
+  if (young) {
+    p = 0.18;
+  }
+  return draw_star_p(p, forced);
+}
+
+// smoothstep as the polynomial, so the CPU twin computes the same f32 steps
+fn ss(e0: f32, e1: f32, x: f32) -> f32 {
+  let t = clamp((x - e0) / (e1 - e0), 0.0, 1.0);
+  return (t * t) * (3.0 - 2.0 * t);
+}
+
+// a star whose chance of being a bright one is `p` (0.05 old, 0.18 young: v21's two values)
+fn draw_star_p(p_bright: f32, forced: bool) -> Star {
   let ns = galaxy.n_ss_small;
   let nb = galaxy.n_ss_bright;
   if (ns == 0u) {
@@ -248,11 +330,7 @@ fn draw_star(young: bool, forced: bool) -> Star {
   }
   var br = forced;
   if (!br) {
-    var p = 0.05;
-    if (young) {
-      p = 0.18;
-    }
-    br = next() < p;
+    br = next() < p_bright;
   }
   let off = KNOT_POOL + galaxy.n_dot_pool;
   var tile = 0u;
@@ -265,11 +343,13 @@ fn draw_star(young: bool, forced: bool) -> Star {
     tile = e & 0x7fffffffu;
   }
   let pd = galaxy.pen_dot;
+  // stellar populations (ADR 0090): a wider spread of faint sizes and a steeper tail of bright ones
+  let pop = (galaxy.flags & FLAG_POP) != 0u;
   var size = 0.0;
   if (br) {
-    size = (9.0 + 9.0 * pow(next(), 2.4)) * pd;
+    size = (9.0 + select(9.0, 12.0, pop) * pow(next(), select(2.4, 3.0, pop))) * pd;
   } else {
-    size = exp(log(4.6) + 0.38 * gauss()) * pd;
+    size = exp(log(4.6) + select(0.38, 0.55, pop) * gauss()) * pd;
   }
   var sd = 0.2;
   if (br) {
@@ -343,20 +423,55 @@ fn sample(i: u32) {
     }
     let t = dot_tile();
     let size = dot_base[t] * 0.9;
-    put(i, p2, CLS_OLD | FLAG_SERSIC2D, t, size, next() * 6.28, 0.0);
+    var tint_s = 0u;
+    if ((flags & FLAG_POP) != 0u) {
+      tint_s = tint_of(CLS_OLD, 0u, false, rS, 0.0, 0.5, jitter(rS, 91.7, 0.0), jitter(rS, 347.3, 0.61)) << 13u;
+    }
+    put(i, p2, CLS_OLD | FLAG_SERSIC2D | tint_s, t, size, next() * 6.28, 0.0);
     return;
   }
 
   var p = vec3<f32>(0.0);
   var arm = 0.0;
+  // a thick-disc star (ADR 0090): faint, old, high above the plane
+  var thick_star = false;
+  // the clumps' noise where this star is, for the colour plate's patches (ADR 0091)
+  var cn_loc = 0.5;
   if (comp == 0u) {
     let a = galaxy.bulge_a;
-    let sq = sqrt(min(next(), 0.985));
-    let rr = (a * sq) / (1.0 - sq);
+    var rr = 0.0;
+    if ((flags & FLAG_BULGE_SERSIC) != 0u) {
+      // a deprojected Sersic bulge (ADR 0076): the mass inside r is a gamma of shape n (3 - p)
+      let nB = galaxy.sersic_n;
+      let pB = 1.0 - 0.6097 / nB + 0.05463 / (nB * nB);
+      let re3 = 1.788 * a; // the projected half-light radius: the 3D half-mass radius is 1.35 of it
+      // the cut: 20 scale lengths, or 8 for a thin disc's bulge (ADR 0083)
+      let cut = select(20.0, 8.0, (flags & FLAG_THIN_DISC) != 0u);
+      rr = re3 * pow(gamma_s(nB * (3.0 - pB)) / galaxy.sersic_b, nB);
+      if ((flags & FLAG_THIN_DISC) != 0u) {
+        // a star past the cut is left out, not set down on it: clamping piled a ring at the cut
+        if (rr > cut * a) {
+          put(i, none, CLS_NONE, 0u, 0.0, 0.0, 0.0);
+          return;
+        }
+      } else {
+        rr = min(rr, cut * a);
+      }
+    } else {
+      let sq = sqrt(min(next(), 0.985));
+      rr = (a * sq) / (1.0 - sq);
+    }
     let cz = 2.0 * next() - 1.0;
     let ph = TAU * next();
     let sz = sqrt(1.0 - cz * cz);
     p = vec3<f32>((rr * sz) * cos_f(ph), (rr * sz) * sin_f(ph), (rr * cz) * galaxy.bulge_flat);
+    if ((flags & FLAG_BULGE_PEANUT) != 0u) {
+      // the bulge of a barred galaxy is boxy-peanut (ADR 0076): longer along the bar, thinner across
+      // it, and taller either side of the centre than at it
+      let t = min(abs(p.x) / (1.1 * galaxy.bar_len), 1.0);
+      let w = 1.0 - t;
+      p = vec3<f32>(p.x * (1.0 + 0.4 * w), p.y * (1.0 - 0.25 * w), p.z * (1.0 + 3.6 * t * w));
+    }
   } else if (comp == 1u) {
     // -1.4 ln(1 - u) rather than -1.4 ln(u): the same distribution, finite at u = 0
     let rh = -1.4 * log(1.0 - next());
@@ -368,6 +483,40 @@ fn sample(i: u32) {
       return;
     }
     p = vec3<f32>((rh * s2) * cos_f(ph), (rh * s2) * sin_f(ph), (rh * cz) * 0.7);
+    var stream_star = false;
+    if ((flags & FLAG_POP) != 0u && galaxy.n_stream > 0u && next() < 0.22) {
+      // a star of a stellar stream (ADR 0090): the halo's stars gather along the arc the stream's
+      // strokes draw, a narrow band at the progenitor that fans out along the orbit
+      stream_star = true;
+      var q = 0u;
+      if (galaxy.n_stream > 1u && next() < 0.5) {
+        q = 1u;
+      }
+      let sR = select(galaxy.s0_r, galaxy.s1_r, q == 1u);
+      let sSpan = select(galaxy.s0_span, galaxy.s1_span, q == 1u);
+      let sA = select(galaxy.s0_a, galaxy.s1_a, q == 1u);
+      let sTilt = select(galaxy.s0_tilt, galaxy.s1_tilt, q == 1u);
+      let t = next();
+      let width = 0.03 + 0.3 * (t * t);
+      let ang = sA + sSpan * t;
+      let R = sR * (1.0 - 0.25 * t) + (0.45 * gauss()) * width;
+      let yy = R * sin_f(ang);
+      let z0 = (0.35 * gauss()) * width;
+      p = vec3<f32>(R * cos_f(ang), yy * cos_f(sTilt) - z0 * sin_f(sTilt), yy * sin_f(sTilt) + z0 * cos_f(sTilt));
+    }
+    if (!stream_star && (flags & FLAG_POP) != 0u && next() < 0.14) {
+      // a globular cluster (ADR 0090): a tight round swarm at one of six places in the halo
+      let k = min(5u, u32(floor(next() * 6.0)));
+      let ci = 0xffff0000u + k;
+      let cu = 2.0 * rand_f32(galaxy.key, STREAM_STIPPLE, ci, 0u) - 1.0;
+      let ct = TAU * rand_f32(galaxy.key, STREAM_STIPPLE, ci, 1u);
+      let cq = sqrt(1.0 - cu * cu);
+      let cd = 0.9 + 1.7 * rand_f32(galaxy.key, STREAM_STIPPLE, ci, 2u);
+      let gx = (cd * cq) * cos_f(ct) + 0.07 * gauss();
+      let gy = (cd * cq) * sin_f(ct) + 0.07 * gauss();
+      let gz = (cd * cu) * 0.7 + 0.07 * gauss();
+      p = vec3<f32>(gx, gy, gz);
+    }
   } else if (comp == 2u) {
     let bl = galaxy.bar_len;
     var x = next() * 2.0 - 1.0;
@@ -398,7 +547,11 @@ fn sample(i: u32) {
     var th2 = 0.0;
     let patchy = galaxy.patchy;
     let arms_on = (flags & FLAG_ARMS_ON) != 0u;
-    let as_ = galaxy.arm_strength;
+    // a thin disc packs more of its stars into the arms (ADR 0083)
+    var as_ = galaxy.arm_strength;
+    if ((flags & FLAG_THIN_DISC) != 0u) {
+      as_ = min(as_ * 1.25, 0.95);
+    }
     var tries = 0;
     loop {
       if (tries >= 30) {
@@ -430,6 +583,16 @@ fn sample(i: u32) {
       put(i, none, CLS_NONE, 0u, 0.0, 0.0, 0.0);
       return;
     }
+    if ((flags & FLAG_POP) != 0u) {
+      // clustering (ADR 0090): stars gather in clumps, thinning between them, most in the arms
+      let cn = vnoise_t((R2 * cos_f(th2)) * 4.5, (R2 * sin_f(th2)) * 4.5, galaxy.seed, SALT_POP);
+      cn_loc = cn;
+      let keep = 0.3 + 0.7 * ss(0.3, 0.7, cn);
+      if (next() > 1.0 - select(0.45, 0.8, arm > 0.4) * (1.0 - keep)) {
+        put(i, none, CLS_NONE, 0u, 0.0, 0.0, 0.0);
+        return;
+      }
+    }
     let irr = galaxy.irr;
     if (irr > 0.0) {
       let nz = vnoise_t((R2 * cos_f(th2)) * 1.3, (R2 * sin_f(th2)) * 1.3, galaxy.seed, SALT_IRR);
@@ -438,7 +601,20 @@ fn sample(i: u32) {
         return;
       }
     }
-    var z = -galaxy.thick * log(1.0 - next());
+    let uz = next();
+    var z = -galaxy.thick * log(1.0 - uz);
+    if ((flags & FLAG_THIN_DISC) != 0u) {
+      // a thin disc (ADR 0083): a tighter scale that flares a little outward, and a tail that stops
+      // 85% in a sharp layer, 15% in a thicker one, from the one draw
+      let sharp = uz < 0.85;
+      let uu = select((uz - 0.85) / 0.15, uz / 0.85, sharp);
+      let sc = select(1.5, 0.4, sharp);
+      z = -(galaxy.thick * sc * (1.0 + 0.15 * R2)) * log(1.0 - 0.97 * uu);
+    }
+    if ((flags & FLAG_POP) != 0u && next() < 0.1) {
+      z = z * 3.5;
+      thick_star = true;
+    }
     if (next() < 0.5) {
       z = -z;
     }
@@ -464,6 +640,24 @@ fn sample(i: u32) {
           return;
         }
       }
+    }
+  }
+
+  // spacing (ADR 0090): a star is likelier to stay near its cell's jittered anchor, so the stipple
+  // falls on a jittered grid, with no clumps of random coincidence and no lattice to see
+  if ((flags & FLAG_POP) != 0u && (comp == 0u || comp >= 3u)) {
+    let h = 0.045;
+    let cx = i32(floor(p.x / h));
+    let cy = i32(floor(p.y / h));
+    let cell = u32((cx + 4096) * 8192 + (cy + 4096));
+    let ax = (f32(cx) + rand_f32(galaxy.key, STREAM_CLUMPS, cell, 0u)) * h;
+    let ay = (f32(cy) + rand_f32(galaxy.key, STREAM_CLUMPS, cell, 1u)) * h;
+    let d2 = (p.x - ax) * (p.x - ax) + (p.y - ay) * (p.y - ay);
+    let sg = 0.35 * h;
+    let kp = exp(-(d2 / ((2.0 * sg) * sg)));
+    if (!(next() < 0.3 + 0.7 * kp)) {
+      put(i, none, CLS_NONE, 0u, 0.0, 0.0, 0.0);
+      return;
     }
   }
 
@@ -496,7 +690,22 @@ fn sample(i: u32) {
     if (Rg > 2.1) {
       outer = 0.55;
     }
-    if (Rg < 2.7) {
+    if ((flags & FLAG_STARS_SMOOTH) != 0u) {
+      // ADR 0077: the arms' share of the stars, and of the bright ones, rises smoothly with the
+      // arm profile, and the outer fall-off is a taper rather than two steps
+      var yw = 0.0;
+      if (comp == 3u) {
+        yw = 1.0;
+      } else if (comp == 4u) {
+        yw = ss(0.3, 0.8, arm);
+        kc = 0.85 + 0.5 * yw;
+      }
+      outer = (1.0 - 0.45 * ss(1.7, 2.5, Rg)) * (1.0 - ss(2.5, 3.0, Rg));
+      if (next() < ((0.34 * star_mix) * kc) * outer) {
+        put_star(i, p, flags_out, u_tau, draw_star_p(0.05 + select(0.13, 0.2, (flags & FLAG_POP) != 0u) * yw, false));
+        return;
+      }
+    } else if (Rg < 2.7) {
       if (next() < ((0.34 * star_mix) * kc) * outer) {
         put_star(i, p, flags_out, u_tau, draw_star(comp == 3u || (comp == 4u && arm > 0.55), false));
         return;
@@ -506,14 +715,22 @@ fn sample(i: u32) {
   if (comp == 4u && arm > 0.55 && roll < (galaxy.knots * 0.12) * arm) {
     let tile = pool[min(KNOT_POOL - 1u, u32(floor(next() * f32(KNOT_POOL))))];
     let size = (5.0 + 6.0 * next()) * galaxy.pen_dot;
-    put(i, p, CLS_KNOT | flags_out, tile, size, next() * 6.28, u_tau);
+    var tk = 0u;
+    if ((flags & FLAG_POP) != 0u) {
+      tk = tint_of(CLS_KNOT, comp, false, 0.0, 0.0, 0.5, jitter(roll, 91.7, 0.0), jitter(roll, 347.3, 0.61)) << 13u;
+    }
+    put(i, p, CLS_KNOT | flags_out | tk, tile, size, next() * 6.28, u_tau);
     return;
   }
   if ((comp == 4u || comp == 3u) && roll > 1.0 - (galaxy.sparkle * 0.012) * (0.4 + arm)) {
     let n = galaxy.n_star_tiles;
     let tile = min(n - 1u, u32(floor(next() * f32(n))));
     let size = 10.0 + 13.0 * next();
-    put(i, p, CLS_STAR | flags_out, tile, size, next() * 6.28, u_tau);
+    var ts = 0u;
+    if ((flags & FLAG_POP) != 0u) {
+      ts = tint_of(CLS_STAR, comp, false, 0.0, 0.0, 0.5, jitter(roll, 91.7, 0.0), jitter(roll, 347.3, 0.61)) << 13u;
+    }
+    put(i, p, CLS_STAR | flags_out | ts, tile, size, next() * 6.28, u_tau);
     return;
   }
   let t = dot_tile();
@@ -521,14 +738,28 @@ fn sample(i: u32) {
   if (comp == 0u) {
     k = 0.85;
   }
-  let size = dot_base[t] * k;
   var cls = CLS_DISC;
-  if (comp == 0u || comp == 1u) {
+  if (comp == 0u || comp == 1u || thick_star) {
     cls = CLS_OLD;
   } else if (arm > 0.55) {
     cls = CLS_YOUNG;
   }
-  put(i, p, cls | flags_out, t, size, next() * 6.28, u_tau);
+  if ((flags & FLAG_POP) != 0u && thick_star) {
+    k = 0.62;
+  } else if ((flags & FLAG_POP) != 0u) {
+    // mark character by population (ADR 0090): old stars fine, young ones large and crisp
+    if (cls == CLS_OLD) {
+      k = k * 0.78;
+    } else if (cls == CLS_YOUNG) {
+      k = 1.3;
+    }
+  }
+  let size = dot_base[t] * k;
+  var tint = 0u;
+  if ((flags & FLAG_POP) != 0u) {
+    tint = tint_of(cls, comp, thick_star, sqrt(p.x * p.x + p.y * p.y), arm, cn_loc, jitter(roll, 91.7, 0.0), jitter(roll, 347.3, 0.61)) << 13u;
+  }
+  put(i, p, cls | flags_out | tint, t, size, next() * 6.28, u_tau);
 }
 
 @compute @workgroup_size(64)

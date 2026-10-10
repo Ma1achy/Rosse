@@ -7,11 +7,14 @@
  * Reference: the set-up at the top of `generate` (app23.js:L175–181) and the globals it reads
  * (`P`, `VAR`, `PEN`, `RMAX`).
  */
+import { streamCount, streamOrbit } from './stream-orbits';
 import type { Params } from '../core/params';
 import type { StructLayout } from '../marks/instance';
 import { dotSprite, penWeights, type DrawingsMeta, type Variation } from './variation';
 import { GROUP_STRIDE, markGroups, type MarkGroup, type RingKnotPick } from './clumps';
 import { packNoise, type NoiseField } from '../core/noise';
+import { bulgeIndex, bulgeIsSersic, psB } from './bulge';
+import { effectiveDust } from './dust';
 
 const f = Math.fround;
 
@@ -41,7 +44,15 @@ export const SHAPE = {
 } as const;
 
 /** Galaxy flags. */
-export const GalaxyFlag = { armsOn: 1, sersic: 2 } as const;
+export const GalaxyFlag = {
+  armsOn: 1,
+  sersic: 2,
+  bulgeSersic: 4,
+  bulgePeanut: 8,
+  starsSmooth: 16,
+  thinDisc: 32,
+  popAuto: 64,
+} as const;
 
 /** The fields of the `Galaxy` uniform of stipple.wgsl, in order: scalars only. */
 const GALAXY_FIELDS = [
@@ -94,7 +105,17 @@ const GALAXY_FIELDS = [
   ['n_ss_small', 'u32'],
   ['n_ss_bright', 'u32'],
   ['spike', 'f32'],
-  ['pad_g', 'u32'],
+  // the stellar streams the halo stars trace (ADR 0090): a count, then radius, span, start angle and
+  // tilt of each of two
+  ['n_stream', 'u32'],
+  ['s0_r', 'f32'],
+  ['s0_span', 'f32'],
+  ['s0_a', 'f32'],
+  ['s0_tilt', 'f32'],
+  ['s1_r', 'f32'],
+  ['s1_span', 'f32'],
+  ['s1_a', 'f32'],
+  ['s1_tilt', 'f32'],
 ] as const;
 
 export type GalaxyField = (typeof GALAXY_FIELDS)[number][0];
@@ -199,7 +220,10 @@ export function sampleCount(G: GalaxyDesc): number {
 
 /** Number of stipple proposals: `round(stars · stipple · (1 + 0.28 · starMix))` (app23.js:L176). */
 export function proposalCount(P: Params): number {
-  return Math.round(P.stars * P.stipple * (1 + 0.28 * (P.starMix || 0)));
+  const n = Math.round(P.stars * P.stipple * (1 + 0.28 * (P.starMix || 0)));
+  // a thin disc draws half as many stars again: they are denser in the plane (ADR 0083)
+  const more = (P.thinAuto > 0 ? 1.5 : 1) * (P.popAuto > 0 ? 1.7 : 1);
+  return more === 1 ? n : Math.round(n * more);
 }
 
 /**
@@ -213,6 +237,9 @@ export function describeGalaxy(
   opts: { key?: number; ringKnots?: readonly RingKnotPick[] } = {},
 ): GalaxyDesc {
   const key = (opts.key ?? P.seed) >>> 0;
+  // the streams the halo stars trace (ADR 0090): those the line-work draws as strokes (ADR 0089)
+  const streams = P.popAuto > 0 && P.lineWorld > 0 ? streamCount(P) : 0;
+  const so = Array.from({ length: streams }, (_, q) => streamOrbit(P.seed, q));
   const wb = P.bulge;
   const wh = P.halo * 0.25;
   const wbar = P.bar * 0.4 * (1 - P.bulge);
@@ -220,6 +247,8 @@ export function describeGalaxy(
   const wd = Math.max(0, 1 - wb - wh - wbar - wring);
   const armsOn = P.arms >= 1 && P.bulge < 0.98;
   const sersic = P.sersicN > 0 && P.bulge >= 0.95;
+  const bulgeSersic = bulgeIsSersic(P);
+  const nB = bulgeSersic ? bulgeIndex(P) : P.sersicN;
   const barred = P.bar > 0.05;
   const penDot = penWeights(P.pen).dot;
   const nVar = Math.min(MAX_ARMS, V.arms.length);
@@ -234,7 +263,14 @@ export function describeGalaxy(
     n_dot_pool: V.dotPool.length,
     n_knot_pool: KNOT_POOL,
     n_star_tiles: meta.stars.count,
-    flags: (armsOn ? GalaxyFlag.armsOn : 0) | (sersic ? GalaxyFlag.sersic : 0),
+    flags:
+      (armsOn ? GalaxyFlag.armsOn : 0) |
+      (sersic ? GalaxyFlag.sersic : 0) |
+      (bulgeSersic ? GalaxyFlag.bulgeSersic : 0) |
+      (bulgeSersic && barred && P.peanut > 0 ? GalaxyFlag.bulgePeanut : 0) |
+      (P.starsAuto > 0 ? GalaxyFlag.starsSmooth : 0) |
+      (P.thinAuto > 0 ? GalaxyFlag.thinDisc : 0) |
+      (P.popAuto > 0 ? GalaxyFlag.popAuto : 0),
     key,
     n_groups: 0,
     c_bulge: f(wb),
@@ -255,10 +291,10 @@ export function describeGalaxy(
     arm_inner: f(barred ? P.barLen : 0.3),
     patchy: f(P.patchy),
     irr: f(P.irr),
-    sersic_n: f(P.sersicN),
-    sersic_b: f(2 * P.sersicN - 1 / 3),
+    sersic_n: f(nB),
+    sersic_b: f(bulgeSersic ? psB(nB) : 2 * P.sersicN - 1 / 3),
     re: f(P.re),
-    dust: f(P.dust),
+    dust: f(effectiveDust(P)),
     star_mix: f(P.starMix || 0),
     knots: f(P.knots),
     sparkle: f(P.sparkle),
@@ -272,7 +308,15 @@ export function describeGalaxy(
     n_ss_small: 0,
     n_ss_bright: 0,
     spike: f(V.spike),
-    pad_g: 0,
+    n_stream: streams,
+    s0_r: so[0]?.R0 ?? 0,
+    s0_span: so[0]?.span ?? 0,
+    s0_a: so[0]?.a0 ?? 0,
+    s0_tilt: so[0]?.tilt ?? 0,
+    s1_r: so[1]?.R0 ?? 0,
+    s1_span: so[1]?.span ?? 0,
+    s1_a: so[1]?.a0 ?? 0,
+    s1_tilt: so[1]?.tilt ?? 0,
   };
   const groupList = markGroups(P, V, key, opts.ringKnots);
   const packed = packGroups(groupList);

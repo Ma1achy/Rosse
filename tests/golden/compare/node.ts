@@ -56,6 +56,7 @@ import { cameraOf, orientationOf } from '../../../src/view/camera';
 import { v21LensPlan } from './v21-lens';
 
 export { compareMeasures, countAllowance, evaluate, impossibleClasses, measure };
+export { localError, writeGalleryImage, writeGalleryIndex } from './gallery';
 export type { Comparison, Evaluation, Grey, ImageMeasures, Thresholds };
 
 export interface CaptureRecord {

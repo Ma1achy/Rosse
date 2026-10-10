@@ -27,12 +27,32 @@ function literal(name: string, close: string): unknown {
   return new Function(`return ${m[1]};`)() as unknown;
 }
 
+/**
+ * The keys the port adds to v21's `DEF`, after v21's own, each with a default that leaves v21's
+ * behaviour as it is. `dustAuto`: the natural dust of disc galaxies, on only on the page (ADR 0075).
+ */
+const EXTRA_KEYS = {
+  dustAuto: 0,
+  bulgeAuto: 0,
+  starsAuto: 0,
+  cosmicAuto: 0,
+  lineWorld: 0,
+  strokesAuto: 0,
+  thinAuto: 0,
+  popAuto: 0,
+  depthAuto: 0,
+  lensLock: 0,
+  occlAuto: 0,
+  peanut: 0,
+  coreAuto: 0,
+};
+
 describe('DEF', () => {
-  it('has every key of the reference, with the same defaults, in order', () => {
+  it('has every key of the reference, with the same defaults, in order, then the extra keys', () => {
     const ref = literal('DEF', '\\};') as Record<string, unknown>;
-    expect(Object.keys(DEF)).toEqual(Object.keys(ref));
-    expect({ ...DEF }).toEqual(ref);
-    expect(PARAM_KEYS.length).toBe(109);
+    expect(Object.keys(DEF)).toEqual([...Object.keys(ref), ...Object.keys(EXTRA_KEYS)]);
+    expect({ ...DEF }).toEqual({ ...ref, ...EXTRA_KEYS });
+    expect(PARAM_KEYS.length).toBe(109 + Object.keys(EXTRA_KEYS).length);
   });
 
   it('withDefaults rejects unknown keys', () => {
@@ -102,7 +122,10 @@ describe('schema', () => {
         // (`tlSetEnd`, app23.js:L1659), so `mTime`'s maximum is 30 rather than the slider's 2.
         const want = c[0] === 'mTime' ? [c[2], 30, c[4]] : [c[2], c[3], c[4]];
         expect([s.min, s.max, s.step], c[0]).toEqual(want);
-        expect(s.control).toBe(true);
+        // retired from the page's controls (owner decision of 2026-10-10): stand-ins that real
+        // lensing, shells and artefacts replaced; the engine still reads them for v21's drawings
+        const retired = ['lens', 'shells', 'trails', 'arrow', 'bubbles'].includes(c[0]);
+        expect(s.control).toBe(!retired);
         checked++;
       }
     expect(checked).toBeGreaterThan(70);

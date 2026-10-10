@@ -62,7 +62,24 @@ describe('the 42 real galaxies', () => {
       const card = cards[c.real as number];
       // the orbit capture has its camera moved from home
       const home = c.name.endsWith('__home');
-      const want = { ...card?.params, ...c.overrides };
+      // the records are v21's: they have none of the keys the port adds (`dustAuto`, ADR 0075)
+      const want = {
+        ...card?.params,
+        ...c.overrides,
+        dustAuto: undefined,
+        bulgeAuto: undefined,
+        starsAuto: undefined,
+        cosmicAuto: undefined,
+        lineWorld: undefined,
+        strokesAuto: undefined,
+        thinAuto: undefined,
+        popAuto: undefined,
+        depthAuto: undefined,
+        lensLock: undefined,
+        occlAuto: undefined,
+        peanut: undefined,
+        coreAuto: undefined,
+      };
       if (home) expect(rec.params, c.name).toEqual(want);
       else expect({ ...rec.params, az: 0, incl: 0 }, c.name).toEqual({ ...want, az: 0, incl: 0 });
     }

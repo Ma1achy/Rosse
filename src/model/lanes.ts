@@ -10,7 +10,9 @@
  * them and lays out the hatches, and the stipple's lane and carving culls are pure filters on
  * per-sample uniforms (compute/project.wgsl). Which hatches exist does not depend on the camera
  * (the lanes' noise is evaluated in the galaxy frame), only on the `incE` bucket: past 74° the
- * lanes become one hatched midplane, past 72° the carving lines lie along the midplane.
+ * lanes become one hatched midplane, past 72° the carving lines lie along the midplane. Those
+ * midplane lines are in screen space (x along the roll axis), so their length does not shrink with
+ * the azimuth (ADR 0073).
  */
 import type { Params } from '../core/params';
 import { NoiseSalt, vnoise, type NoiseField } from '../core/noise';
@@ -38,6 +40,8 @@ export interface Hatch {
   dAng: number;
   len: number;
   tile: number;
+  /** `a` and `b` are screen-space offsets (see `Curve.screen`, ADR 0073), not galaxy-frame points */
+  screen?: boolean;
 }
 
 export interface DustLanes {
@@ -48,6 +52,10 @@ export interface DustLanes {
   laneR: number;
   /** the carving lines (`DL`), galaxy frame */
   lines: Vec3[][];
+  /** the lane points (`pts`) are screen-space offsets: the edge-on midplane (ADR 0073) */
+  screenPts: boolean;
+  /** the carving lines are screen-space offsets: past 72° (ADR 0073) */
+  screenLines: boolean;
 }
 
 /** Indices on the `dust` stream. Fixed forever (ADR 0004). */
@@ -161,7 +169,9 @@ export function dustLanes(
             NoiseSalt.laneEdge,
             field,
           );
-          const a: Vec3 = [x, 0, zo];
+          // screen space (ADR 0073): x along the roll axis, y down; the row offset is the z of
+          // the galaxy frame seen edge-on (Y = -z), so the rows keep their spacing at every azimuth
+          const a: Vec3 = [x, -zo, 0];
           if (row === 1) pts.push(a);
           if (n > keep * (0.4 + 0.8 * dens)) continue;
           const r = step(DustIndex.edge + 1000 * row + s);
@@ -169,7 +179,17 @@ export function dustLanes(
           const offY = r.gauss() * 1.2;
           const dAng = r.gauss() * 0.08;
           const len = (10 + 9 * r.f32()) * (0.6 + 0.6 * dens);
-          hatches.push({ a, b: [x + 0.1, 0, zo], offN: 0, offY, offF: 0, dAng, len, tile: pen(r) });
+          hatches.push({
+            a,
+            b: [x + 0.1, -zo, 0],
+            offN: 0,
+            offY,
+            offF: 0,
+            dAng,
+            len,
+            tile: pen(r),
+            screen: true,
+          });
         }
       }
     }
@@ -251,6 +271,8 @@ export function dustLanes(
     hatches,
     pts,
     laneR: 3.5 + 3 * P.dustScribble,
+    screenPts: e > 74,
+    screenLines: e > 72,
     lines: dustLines(P, V, penlines, incl, key, picks?.lines),
   };
 }
@@ -284,7 +306,7 @@ export function dustLines(
     if (!fl) continue;
     out.push(
       lineParam(fl).map(([s, d]): Vec3 => {
-        if (edge) return [-3 + 6 * s, 0, d * 0.28];
+        if (edge) return [-3 + 6 * s, -d * 0.28, 0]; // screen space (ADR 0073)
         const Rr = 0.5 + 2.0 * s;
         const th =
           armPhaseCpu(P, V, Rr, li) +

@@ -7,6 +7,7 @@ import { presetParams } from '../../src/core/presets';
 import { SCHEMA, tierOf } from '../../src/core/schema';
 import { CpuStippleTiers } from '../../src/fallback/stipple';
 import { packGalaxy } from '../../src/model/galaxy';
+import { effectiveDust } from '../../src/model/dust';
 import { hasDustCulls } from '../../src/model/ribbons';
 import { buildScene, drawingsMeta } from '../../src/model/scene';
 import type { DrawingsMeta } from '../../src/model/variation';
@@ -173,6 +174,34 @@ describe('tier invalidation (ADR 0010)', () => {
       for (const m of moves(P)) expect(sceneHash(m.P), `${name}: ${m.what}`).toBe(h0);
     }
   });
+
+  it('natural dust is model data: orbit and zoom leave its scene description alone (ADR 0075)', () => {
+    for (const name of ['Grand design', 'Edge-on with dust', 'Disc, no arms']) {
+      const P = presetParams(name, 7, { dustAuto: 1 });
+      const h0 = sceneHash(P);
+      for (const m of moves(P)) expect(sceneHash(m.P), `${name}: ${m.what}`).toBe(h0);
+    }
+    // and it is a model change when it is switched on or off, for a galaxy that carries any
+    const P = presetParams('Grand design', 7);
+    expect(sceneHash({ ...P, dustAuto: 1 })).not.toBe(sceneHash(P));
+    expect(tierWork({ P, zoom: 1 }, { P: { ...P, dustAuto: 1 }, zoom: 1 }).model).toBe(true);
+  });
+
+  it('the natural star spread is model data: orbit and zoom leave it alone, switching it rebuilds (ADR 0077)', () => {
+    const P = presetParams('Grand design', 7, { starsAuto: 1, starMix: 1 });
+    const h0 = sceneHash(P);
+    for (const m of moves(P)) expect(sceneHash(m.P), m.what).toBe(h0);
+    expect(sceneHash({ ...P, starsAuto: 0 })).not.toBe(h0);
+    expect(tierWork({ P, zoom: 1 }, { P: { ...P, starsAuto: 0 }, zoom: 1 }).model).toBe(true);
+  });
+
+  it('the natural bulge is model data: orbit and zoom leave it alone, switching it rebuilds (ADR 0076)', () => {
+    const P = presetParams('Grand design', 7, { bulgeAuto: 1 });
+    const h0 = sceneHash(P);
+    for (const m of moves(P)) expect(sceneHash(m.P), m.what).toBe(h0);
+    expect(sceneHash({ ...P, bulgeAuto: 0 })).not.toBe(h0);
+    expect(tierWork({ P, zoom: 1 }, { P: { ...P, bulgeAuto: 0 }, zoom: 1 }).model).toBe(true);
+  });
 });
 
 describe('the CPU engine: orbiting changes no model buffer (hashes)', () => {
@@ -183,6 +212,20 @@ describe('the CPU engine: orbiting changes no model buffer (hashes)', () => {
     ['Edge-on with dust s7 (incl 88, the dust cull)', presetParams('Edge-on with dust', 7)],
     ['Dusty spiral s4242 (lanes and carving lines)', presetParams('Dusty spiral', 4242)],
     ['Barred spiral s7 (ring knots, ring lane)', presetParams('Barred spiral', 7)],
+    // the natural dust (ADR 0075) is model data: a camera move leaves it alone
+    [
+      'Grand design s7, natural dust (incl 35)',
+      presetParams('Grand design', 7, { dustAuto: 1, incl: 35 }),
+    ],
+    // the natural bulge (ADR 0076) is model data too
+    [
+      'Grand design s7, natural bulge and dust (incl 60)',
+      presetParams('Grand design', 7, { bulgeAuto: 1, dustAuto: 1, incl: 60 }),
+    ],
+    [
+      'Barred spiral s7, natural dust, edge-on (lane, carving, the cull)',
+      presetParams('Barred spiral', 7, { dustAuto: 1, incl: 88 }),
+    ],
   ];
   for (const [name, P] of cases)
     it(name, () => {
@@ -203,7 +246,7 @@ describe('the CPU engine: orbiting changes no model buffer (hashes)', () => {
         if (m.what !== 'mTime 0.7') expect(sha(view.projected), m.what).not.toBe(pos0);
         // without dust (extinction, lanes, carving lines) nothing is culled by the view, so the
         // count cannot change
-        if (!P.dust && !hasDustCulls(stipple.scene.ribbons))
+        if (!effectiveDust(P) && !hasDustCulls(stipple.scene.ribbons))
           expect(total(view.perClass), m.what).toBe(n0);
         // and back: the culls are pure functions of the camera, so returning restores every
         // sample's class exactly, lanes and carving lines included (review m3)
