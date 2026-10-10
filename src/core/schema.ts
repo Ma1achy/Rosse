@@ -186,7 +186,7 @@ export const SCHEMA: { readonly [K in ParamKey]: ParamSpec } = {
   rewind: choice('Rewind the drawings to this pitch', ONOFF),
   unwrap: choice('Log-polar view (forced off)', [0], off),
   lensSource: choice('What gets lensed', ['galaxy', 'drawing', 'quasar']),
-  jet: choice('Jet (a drawn spring)', ONOFF),
+  jet: num('Jets', 0, 1, 0.01),
   mWarp: choice('Tear the drawings in mergers', ONOFF),
   sersicN: num('Sérsic index', 0, 8, 0.1, off),
   re: num('Effective radius', 0.1, 3, 0.01, off),

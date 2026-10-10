@@ -23,7 +23,7 @@ describe('strands', () => {
     const r = roles({ lineWorld: 1 });
     expect(r.jet.length).toBeGreaterThan(20);
     expect(r.stream.length).toBe(14);
-    expect(r.tail.length).toBe(9);
+    expect(r.tail.length).toBe(11);
   });
 
   it("leave v21's one tail curve, and no jet or stream strokes, without it", () => {
@@ -42,6 +42,18 @@ describe('strands', () => {
     expect(Math.max(...r.tail.flatMap((c) => c.pts.map((p) => Math.abs(p[2]))))).toBeGreaterThan(
       0.1,
     );
+  });
+
+  it('are tuned by the sliders: a bigger tail and jet have more, longer strands', () => {
+    const lo = roles({ lineWorld: 1, tail: 0.2, jet: 0.2 });
+    const hi = roles({ lineWorld: 1, tail: 1, jet: 1 });
+    expect(hi.tail.length).toBeGreaterThan(lo.tail.length);
+    expect(hi.jet.length).toBeGreaterThan(lo.jet.length);
+    const reach = (c: { pts: number[][] }[]) =>
+      Math.max(...c.map((x) => Math.hypot(...((x.pts[x.pts.length - 1] ?? [0])))));
+    expect(reach(hi.tail)).toBeGreaterThan(1.3 * reach(lo.tail));
+    expect(reach(hi.jet)).toBeGreaterThan(2 * reach(lo.jet));
+    expect(roles({ lineWorld: 1, jet: 0 }).jet).toHaveLength(0);
   });
 
   it('is deterministic', () => {

@@ -36,6 +36,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Fixed
 
+- The foreground stars slider drew nothing: v21's shell of stars lies outside the camera's cone. With `depthAuto` they fill a ball round the galaxy (ADR 0089).
+- The tidal tail and jet sliders only switched them on and off; with `lineWorld` they now set the reach, strength and strand count (`jet` is a 0 to 1 slider; v21 reads it as on above 0.5) (ADR 0089).
 - Elliptical, cigar and round galaxies on the page had a sharp edge: the thin disc's shortened bulge tail clamped stars onto a ring at the cut; stars beyond it are now left out, so the stipple falls off softly (ADR 0083).
 - A merger drew a third core at the middle of the plate, between the two galaxies: its sky host kept the merger's full parameters and both engines drew a drawn core from them (ADR 0079).
 - The CPU merger drew its shells and lens before the debris; the GPU merger, and v21's order, draw them after it. The CPU now matches (`src/fallback/merger.ts`), and `tests/gpu/merger-sky.ts` holds the two engines to one another for a merger's sky and overlays: the same layers in the same order, the sky's own layers within 1/255 on SwiftShader, and the whole picture's ink within 1%.

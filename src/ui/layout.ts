@@ -339,12 +339,13 @@ export const COMPONENTS: readonly Component[] = [
     tab: 'sky',
     name: 'Companions and oddities',
     icon: ['companions', 0],
-    main: ['companions', 'tail'],
-    more: ['fgstars', 'jet'],
+    main: ['companions', 'tail', 'jet'],
+    more: ['fgstars'],
     summary: (P) => {
       const o: string[] = [];
       if (P.companions > 0.05) o.push('companions');
       if (P.tail > 0.05) o.push('a tidal tail');
+      if (P.jet > 0.02) o.push('jets');
       if (P.fgstars > 0.05) o.push('field stars');
       return o.length ? o.join(', ') : 'none';
     },
@@ -449,7 +450,6 @@ export const OPTION_LABELS: Partial<Record<ParamKey, Record<string, string>>> = 
   peanut: ONOFF,
   lensLock: { '0': 'fully (v21)', '1': 'not at all', '2': 'a little' },
   depthAuto: { '0': 'flat', '1': 'marks shrink with distance', '2': 'full perspective' },
-  jet: ONOFF,
   mWarp: ONOFF,
   lensCluster: ONOFF,
   lensDouble: ONOFF,

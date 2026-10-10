@@ -306,10 +306,10 @@ export function curves(
       });
     }
   }
-  if (P.lineWorld > 0 && P.jet > 0.5) C.push(...jetStrands(P, at, pick));
+  if (P.lineWorld > 0 && P.jet > 0.02) C.push(...jetStrands(P, at, pick));
   if (P.lineWorld > 0 && P.streams > 0.02) C.push(...streamStrands(P, at, pick));
   if (P.tail > 0.05 && P.lineWorld > 0) {
-    C.push(...tailStrands(at, pick));
+    C.push(...tailStrands(P, at, pick));
   } else if (P.tail > 0.05) {
     // a tidal tail swept out from the disc edge
     const r = at(CurveIndex.tail);
@@ -527,12 +527,14 @@ function jetStrands(P: Params, at: (i: number) => Draws, pick: Pick): Curve[] {
     d[2] * e1[0] - d[0] * e1[2],
     d[0] * e1[1] - d[1] * e1[0],
   ];
-  const Lg = 3 + u;
+  // the slider: 1 is a long, broad, dense jet (1.75 times v21's length); 0.25 a short thin one
+  const big = 0.25 + 1.5 * P.jet;
+  const Lg = (3 + u) * big;
   const out: Curve[] = [];
   for (let l = 0; l < 2; l++) {
     const sgn = l === 0 ? 1 : -1;
     const len = Lg * (l === 0 ? 1 : 0.65);
-    const n = l === 0 ? 22 : 15;
+    const n = Math.max(5, Math.round((l === 0 ? 22 : 15) * (0.4 + 0.6 * P.jet)));
     for (let i = 0; i <= n; i++) {
       const r = at(CurveIndex.jet + 16 * l + i);
       const spine = i === 0;
@@ -556,7 +558,7 @@ function jetStrands(P: Params, at: (i: number) => Draws, pick: Pick): Curve[] {
       }
       out.push({
         pts,
-        w: spine ? 2.4 : short ? 1.4 + 0.8 * r.f32() : 1 + 0.8 * r.f32(),
+        w: (spine ? 2.4 : short ? 1.4 + 0.8 * r.f32() : 1 + 0.8 * r.f32()) * (0.6 + 0.6 * P.jet),
         k: pick(spine ? P.stroke : r.f32() < 0.5 ? 'faint' : P.stroke, r),
         a: spine ? 1 : 0.8,
         taper: true,
@@ -628,10 +630,15 @@ function streamStrands(P: Params, at: (i: number) => Draws, pick: Pick): Curve[]
  * The tidal tail (ADR 0089, `lineWorld`): v21's sweep out from the disc edge as a fanning bundle,
  * lifting out of the plane as it goes, so it has width and depth where v21 drew one line.
  */
-function tailStrands(at: (i: number) => Draws, pick: Pick): Curve[] {
+function tailStrands(P: Params, at: (i: number) => Draws, pick: Pick): Curve[] {
   const a1 = at(CurveIndex.tail).f32() * 6.28;
   const out: Curve[] = [];
-  for (let i = 0; i < 9; i++) {
+  // the slider sets the strength: how far it sweeps, how far round, how many strands, how thick
+  const T = clamp(P.tail, 0, 1);
+  const reachR = 2.8 + 6 * T;
+  const sweep = 1.5 + 1.8 * T;
+  const count = 3 + Math.round(10 * T);
+  for (let i = 0; i < count; i++) {
     const r = at(CurveIndex.tailStrand + i);
     const main = i === 0;
     const lat = main ? 0 : r.f32() * 2 - 1;
@@ -642,18 +649,18 @@ function tailStrands(at: (i: number) => Draws, pick: Pick): Curve[] {
     const pts: Vec3[] = [];
     for (let j = 0; j <= 60; j++) {
       const fj = t0 + ((reach - t0) * j) / 60;
-      const width = 0.04 + 0.5 * fj * fj;
-      const R3 = 2.6 + 2.8 * fj + lat * width * 0.6 + 0.05 * Math.sin(TAU * 1.7 * fj + ph);
-      const t3 = a1 + 1.5 * fj;
+      const width = (0.04 + 0.5 * fj * fj) * (0.5 + T) * (1 + 0.5 * T);
+      const R3 = 2.6 + reachR * fj + lat * width * 0.6 + 0.05 * Math.sin(TAU * 1.7 * fj + ph);
+      const t3 = a1 + sweep * fj;
       pts.push([
         R3 * Math.cos(t3),
         R3 * Math.sin(t3) + 0.6 * fj * fj,
-        0.35 * fj * fj + lift * width * 0.5,
+        (0.15 + 0.6 * T) * fj * fj + lift * width * 0.5,
       ]);
     }
     out.push({
       pts,
-      w: main ? 1.3 : 0.6 + 0.6 * r.f32(),
+      w: (main ? 1.3 : 0.6 + 0.6 * r.f32()) * (0.6 + 0.8 * T),
       k: pick(r.f32() < 0.5 ? 'faint' : 'broken', r),
       a: main ? 1 : 0.75,
       taper: true,
