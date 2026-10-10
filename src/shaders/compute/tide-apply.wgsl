@@ -80,7 +80,13 @@ fn warp_instances(@builtin(global_invocation_id) id: vec3<u32>) {
     return;
   }
   let s = insts[i];
-  insts[i] = Instance(tide_post(job.g, s.pos, job.r2), s.layer, s.alpha, s.m);
+  let w = tide_post(job.g, s.pos, job.r2);
+  // the mark keeps its shape, and takes the scale of the depth it sits at (ADR 0088)
+  var m = s.m;
+  if (w.z != 1.0) {
+    m = m * w.z;
+  }
+  insts[i] = Instance(w.xy, s.layer, s.alpha, m);
 }
 
 @compute @workgroup_size(64)
@@ -97,12 +103,31 @@ fn warp_ribbons(@builtin(global_invocation_id) id: vec3<u32>) {
   // the stroke's length and width before the tides (+ 1, L834)
   let ol = dist(c0, c2) + 1.0;
   let ow = dist(c0, c1) + 1.0;
-  let w0 = tide_post(job.g, c0, job.r2);
-  let w1 = tide_post(job.g, c1, job.r2);
-  let w2 = tide_post(job.g, c2, job.r2);
-  let w3 = tide_post(job.g, c3, job.r2);
+  let p0 = tide_post(job.g, c0, job.r2);
+  let p1 = tide_post(job.g, c1, job.r2);
+  let p2 = tide_post(job.g, c2, job.r2);
+  let p3 = tide_post(job.g, c3, job.r2);
+  var w0 = p0.xy;
+  var w1 = p1.xy;
+  var w2 = p2.xy;
+  var w3 = p3.xy;
   let ml = dist(w0, w2);
   let mw = dist(w0, w1);
+  // the width follows the depth of each end: the corners about their midpoint (ADR 0088)
+  let k0 = (p0.z + p1.z) / 2.0;
+  let k1 = (p2.z + p3.z) / 2.0;
+  if (k0 != 1.0) {
+    let mid = (w0.x + w1.x) / 2.0;
+    let mid_y = (w0.y + w1.y) / 2.0;
+    w0 = vec2<f32>(mid + (w0.x - mid) * k0, mid_y + (w0.y - mid_y) * k0);
+    w1 = vec2<f32>(mid + (w1.x - mid) * k0, mid_y + (w1.y - mid_y) * k0);
+  }
+  if (k1 != 1.0) {
+    let mid = (w2.x + w3.x) / 2.0;
+    let mid_y = (w2.y + w3.y) / 2.0;
+    w2 = vec2<f32>(mid + (w2.x - mid) * k1, mid_y + (w2.y - mid_y) * k1);
+    w3 = vec2<f32>(mid + (w3.x - mid) * k1, mid_y + (w3.y - mid_y) * k1);
+  }
   var alpha = s.alpha;
   if (ml > SEAMMAX || ml / ol > TEAR || mw / ow > TEAR) {
     alpha = 0.0;
@@ -117,8 +142,10 @@ fn warp_caps(@builtin(global_invocation_id) id: vec3<u32>) {
     return;
   }
   let c = caps[i];
-  let a = tide_post(job.g, c.a, job.r2);
-  let b = tide_post(job.g, c.b, job.r2);
+  let pa = tide_post(job.g, c.a, job.r2);
+  let pb = tide_post(job.g, c.b, job.r2);
+  let a = pa.xy;
+  let b = pb.xy;
   // expandVector: a warped segment longer than 22 px is dropped, and one stretched more than 1.8
   // (the original's length + 0.8) under `post` (L1207-1208)
   let ml = dist(a, b);
@@ -127,5 +154,10 @@ fn warp_caps(@builtin(global_invocation_id) id: vec3<u32>) {
   if (ml > 22.0 || ml / ol > TEAR) {
     alpha = 0.0;
   }
-  caps[i] = Capsule(a, b, c.w, alpha, 0.0, 0.0);
+  var w = c.w;
+  let kk = (pa.z + pb.z) / 2.0;
+  if (kk != 1.0) {
+    w = w * kk;
+  }
+  caps[i] = Capsule(a, b, w, alpha, 0.0, 0.0);
 }

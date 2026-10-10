@@ -15,6 +15,7 @@ import {
   TIDE_CELL_COUNT,
   TIDE_GV,
   TJOB_LAYOUT,
+  TIDE_HEADER,
   TideData,
   tideWords,
 } from '../fallback/kernels/tide';
@@ -73,7 +74,7 @@ export class GpuTideMap {
       size: L.total * 4,
       usage: STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST,
     });
-    const head = new TideData(n, n0, cx, cy).words.subarray(0, 8);
+    const head = new TideData(n, n0, cx, cy).words.subarray(0, TIDE_HEADER);
     d.queue.writeBuffer(this.buffer, 0, head);
     const entries = (e: MapEntry): GPUBindGroupEntry[] =>
       MAP_USES[e].map((binding) => ({

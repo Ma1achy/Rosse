@@ -142,9 +142,10 @@ export function runMergerSprites(
     // the debris's size follows its depth (ADR 0084); exactly 1 without `persp`
     const persp = num('persp');
     let pen = pen0;
+    let dk = 1;
     if (persp !== 0) {
       const vz = f(f(yr * num('sin_i')) + f(pz * num('cos_i')));
-      const dk = f(1 / Math.max(f(1 - f(f(vz - num('fcz')) * persp)), f(0.3)));
+      dk = f(1 / Math.max(f(1 - f(f(vz - num('fcz')) * persp)), f(0.3)));
       pen = f(f(pen0 * dk) * num('zshrink'));
     }
     scr[i * 2] = X;
@@ -152,6 +153,8 @@ export function runMergerSprites(
     if (tide) {
       tide.fl[tide.L.starOff + i * 4] = X;
       tide.fl[tide.L.starOff + i * 4 + 1] = Y;
+      // the merging galaxies' marks take the same depth scale (ADR 0088)
+      tide.fl[tide.L.dkOff + i] = f(dk * (persp !== 0 ? num('zshrink') : 1));
     }
     const second = i >= num('n0');
     const core = second ? c1 : c0;

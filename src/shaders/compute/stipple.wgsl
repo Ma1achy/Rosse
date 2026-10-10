@@ -374,7 +374,16 @@ fn sample(i: u32) {
       let re3 = 1.788 * a; // the projected half-light radius: the 3D half-mass radius is 1.35 of it
       // the cut: 20 scale lengths, or 8 for a thin disc's bulge (ADR 0083)
       let cut = select(20.0, 8.0, (flags & FLAG_THIN_DISC) != 0u);
-      rr = min(re3 * pow(gamma_s(nB * (3.0 - pB)) / galaxy.sersic_b, nB), cut * a);
+      rr = re3 * pow(gamma_s(nB * (3.0 - pB)) / galaxy.sersic_b, nB);
+      if ((flags & FLAG_THIN_DISC) != 0u) {
+        // a star past the cut is left out, not set down on it: clamping piled a ring at the cut
+        if (rr > cut * a) {
+          put(i, none, CLS_NONE, 0u, 0.0, 0.0, 0.0);
+          return;
+        }
+      } else {
+        rr = min(rr, cut * a);
+      }
     } else {
       let sq = sqrt(min(next(), 0.985));
       rr = (a * sq) / (1.0 - sq);

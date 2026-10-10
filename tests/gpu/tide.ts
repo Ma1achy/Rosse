@@ -12,6 +12,7 @@
 import { readBuffer } from '../../src/gpu/readback';
 import {
   TIDE_GV,
+  TIDE_VW,
   TideData,
   tideWords,
   warpCaps,
@@ -66,6 +67,10 @@ run('tidal map and carried marks (GPU = CPU twin, L1)', async () => {
   cpu.setInitial(ic);
   cpu.buildBins();
   cpu.setScreen(scr);
+  // each star's depth scale (ADR 0088): 1 for some, a spread for the rest
+  const dk = new Float32Array(N);
+  for (let i = 0; i < N; i++) dk[i] = i % 3 === 0 ? 1 : 0.8 + r() * 0.45;
+  cpu.setDepth(dk);
   cpu.buildGrid();
 
   // the GPU's: the bins from the initial coordinates, the stars' plate positions written to its table
@@ -77,6 +82,7 @@ run('tidal map and carried marks (GPU = CPU twin, L1)', async () => {
   // only the first two words of each star's four are the plate position: write them one by one
   for (let i = 0; i < N; i++)
     dev.queue.writeBuffer(buf, (L.starOff + i * 4) * 4, table.subarray(i * 4, i * 4 + 2));
+  dev.queue.writeBuffer(buf, L.dkOff * 4, dk);
   const enc = dev.createCommandEncoder();
   const gp = enc.beginComputePass();
   map.encodeGrid(gp);
@@ -94,8 +100,12 @@ run('tidal map and carried marks (GPU = CPU twin, L1)', async () => {
   const nGrid = 2 * TIDE_GV * TIDE_GV;
   for (let v = 0; v < nGrid; v++) {
     const dx = Math.hypot(
-      (fl[L.gridOff + v * 2] as number) - (cpu.fl[L.gridOff + v * 2] as number),
-      (fl[L.gridOff + v * 2 + 1] as number) - (cpu.fl[L.gridOff + v * 2 + 1] as number),
+      (fl[L.gridOff + v * TIDE_VW] as number) - (cpu.fl[L.gridOff + v * TIDE_VW] as number),
+      (fl[L.gridOff + v * TIDE_VW + 1] as number) - (cpu.fl[L.gridOff + v * TIDE_VW + 1] as number),
+      // the depth scale, in plate px terms
+      ((fl[L.gridOff + v * TIDE_VW + 2] as number) -
+        (cpu.fl[L.gridOff + v * TIDE_VW + 2] as number)) *
+        100,
     );
     gridMax = Math.max(gridMax, dx);
     if (dx > 0) gridDiff++;
@@ -173,7 +183,7 @@ run('tidal map and carried marks (GPU = CPU twin, L1)', async () => {
       if (!skip(k)) m = Math.max(m, Math.abs((a[k] as number) - (b[k] as number)));
     return m;
   };
-  const posI = (k: number) => k % 8 > 1;
+  const posI = (k: number) => k % 8 === 2 || k % 8 === 3;
   const posS = (k: number) => k % 12 > 7;
   const alphaS = (k: number) => k % 12 === 11;
   const tornS = [...Array(3000).keys()].filter(
@@ -184,7 +194,7 @@ run('tidal map and carried marks (GPU = CPU twin, L1)', async () => {
   ).length;
   const dI = worst(gi, inst, posI);
   const dS = worst(gs, segs, (k) => posS(k) || alphaS(k));
-  const dC = worst(gc, caps, (k) => k % 8 > 3);
+  const dC = worst(gc, caps, (k) => k % 8 > 4);
   lines.push(
     `instances: max |Δ| ${dI.toExponential(1)} px`,
     `ribbon segments: max |Δ| ${dS.toExponential(1)} px, ${String(tornS)} torn differently of 3000 (${String(segs.filter((_, k) => k % 12 === 11 && segs[k] === 0).length)} torn)`,

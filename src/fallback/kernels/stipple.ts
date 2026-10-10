@@ -343,7 +343,14 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
       const re3 = f(f(1.788) * a);
       const k = f(nB * f(3 - pB));
       const cut = flags & GalaxyFlag.thinDisc ? f(8) : f(20);
-      rr = Math.min(f(re3 * pow(f(gammaS(k, r) / g.sersic_b), nB)), f(cut * a));
+      rr = f(re3 * pow(f(gammaS(k, r) / g.sersic_b), nB));
+      if (flags & GalaxyFlag.thinDisc) {
+        // a star past the cut is left out, not set down on it: clamping piled a ring at the cut
+        if (rr > f(cut * a)) {
+          none();
+          return;
+        }
+      } else rr = Math.min(rr, f(cut * a));
     } else {
       const sq = sqrt(Math.min(r.next(), f(0.985)));
       rr = f(f(a * sq) / f(1 - sq));

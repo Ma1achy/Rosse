@@ -157,11 +157,14 @@ fn sprites(@builtin(global_invocation_id) id: vec3<u32>) {
   let outer = ic[i].z > 0.45;
   let roll = u01(i, 0u);
   var pen = mv.pen_dot;
+  var dk_out = 1.0;
   if (mv.persp != 0.0) {
     let vz = yr * mv.sin_i + p3.z * mv.cos_i;
     let dk = 1.0 / max(1.0 - (vz - mv.fcz) * mv.persp, 0.3);
     pen = (mv.pen_dot * dk) * mv.zshrink;
+    dk_out = dk * mv.zshrink;
   }
+  tide[tide[8] + i] = bitcast<u32>(dk_out);
   pen_k = pen;
 
   // a drawn star in place of the dot

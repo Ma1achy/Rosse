@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- A merging galaxy's marks follow depth (ADR 0088, proposed), with `depthAuto`: the tidal map carries each star's perspective scale, and the galaxy's marks, ribbon widths and capsules are sized by it. First step of unifying the merger with the single-galaxy path.
 - The peanut bulge of a barred galaxy is opt-in (ADR 0076 amended): a new parameter `peanut` (0 by default, also on the page), since it read as a puffier bulge and not an X; `bulgeAuto` alone no longer sets it.
 - Dust as brush strokes in 3D (ADR 0087, proposed), with `strokesAuto`: short swirling strokes on the inner edge of each arm, at their own heights above and below the plane, so edge-on they stand out of the midplane and face-on they curl along the arm.
 - The disc dims a star behind it, dramatically (ADR 0086, proposed): a new parameter `occlAuto` ("Natural star occlusion", 0 in the core, 1 on the page) adds the disc's own optical depth to the star's dimming, so a star behind the disc, face-on or edge-on, is clearly fainter and smaller with short spikes, and a star in front is untouched. A merger's star is dimmed by both discs (summed, each in its own frame), and a star's satellites are spread deeper so some lie behind the disc.
@@ -33,6 +34,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Fixed
 
+- Elliptical, cigar and round galaxies on the page had a sharp edge: the thin disc's shortened bulge tail clamped stars onto a ring at the cut; stars beyond it are now left out, so the stipple falls off softly (ADR 0083).
 - A merger drew a third core at the middle of the plate, between the two galaxies: its sky host kept the merger's full parameters and both engines drew a drawn core from them (ADR 0079).
 - The CPU merger drew its shells and lens before the debris; the GPU merger, and v21's order, draw them after it. The CPU now matches (`src/fallback/merger.ts`), and `tests/gpu/merger-sky.ts` holds the two engines to one another for a merger's sky and overlays: the same layers in the same order, the sky's own layers within 1/255 on SwiftShader, and the whole picture's ink within 1%.
 - Lensing broke under orbit (an Einstein ring became arcs or one image): the lensed source is now fixed in the lens frame, not in 3D behind it. A deliberate divergence from v21's `srcNow`; the home pose is unchanged (ADR 0072, `tests/unit/lens-orbit.test.ts`).

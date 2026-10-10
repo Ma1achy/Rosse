@@ -44,4 +44,22 @@ describe('thinAuto', () => {
     expect(within(b, 0.3)).toBeLessThan(1);
     expect(q(b, 0.995)).toBeGreaterThan(0.1);
   });
+
+  it('leaves a round galaxy without a ring at the bulge cut: the stipple thins out, not piles up', () => {
+    const P = presetParams('Smooth, round', 7, {
+      thinAuto: 1,
+      bulgeAuto: 1,
+      stars: 30000,
+      field: 0,
+    });
+    const G = buildScene(P, META).galaxy;
+    const s = runStipple(G);
+    const r: number[] = [];
+    for (let i = 0; i < s.n; i++)
+      if (s.u32[i * 8 + 3]) r.push(Math.hypot(s.f32[i * 8] ?? 0, s.f32[i * 8 + 1] ?? 0));
+    const top = Math.max(...r);
+    const shell = (lo: number, hi: number) => r.filter((x) => x > lo * top && x <= hi * top).length;
+    // the outermost tenth of the radius holds fewer stars than the tenth inside it
+    expect(shell(0.9, 1)).toBeLessThan(shell(0.8, 0.9));
+  });
 });
