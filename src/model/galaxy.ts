@@ -50,6 +50,7 @@ export const GalaxyFlag = {
   bulgePeanut: 8,
   starsSmooth: 16,
   thinDisc: 32,
+  popAuto: 64,
 } as const;
 
 /** The fields of the `Galaxy` uniform of stipple.wgsl, in order: scalars only. */
@@ -210,7 +211,8 @@ export function sampleCount(G: GalaxyDesc): number {
 export function proposalCount(P: Params): number {
   const n = Math.round(P.stars * P.stipple * (1 + 0.28 * (P.starMix || 0)));
   // a thin disc draws half as many stars again: they are denser in the plane (ADR 0083)
-  return P.thinAuto > 0 ? Math.round(n * 1.5) : n;
+  const more = (P.thinAuto > 0 ? 1.5 : 1) * (P.popAuto > 0 ? 1.25 : 1);
+  return more === 1 ? n : Math.round(n * more);
 }
 
 /**
@@ -253,7 +255,8 @@ export function describeGalaxy(
       (bulgeSersic ? GalaxyFlag.bulgeSersic : 0) |
       (bulgeSersic && barred && P.peanut > 0 ? GalaxyFlag.bulgePeanut : 0) |
       (P.starsAuto > 0 ? GalaxyFlag.starsSmooth : 0) |
-      (P.thinAuto > 0 ? GalaxyFlag.thinDisc : 0),
+      (P.thinAuto > 0 ? GalaxyFlag.thinDisc : 0) |
+      (P.popAuto > 0 ? GalaxyFlag.popAuto : 0),
     key,
     n_groups: 0,
     c_bulge: f(wb),

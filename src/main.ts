@@ -686,6 +686,7 @@ async function start(): Promise<void> {
                 strokesAuto: 1,
                 lineWorld: 1,
                 thinAuto: 1,
+                popAuto: 1,
                 depthAuto: 1,
                 lensLock: 2,
                 occlAuto: 1,

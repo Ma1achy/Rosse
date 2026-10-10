@@ -225,9 +225,11 @@ export function drawStar(
     tile = e & 0x7fffffff;
   }
   const pd = g.pen_dot;
+  // stellar populations (ADR 0090): a wider spread of faint sizes and a steeper tail of bright ones
+  const pop = (g.flags & GalaxyFlag.popAuto) !== 0;
   const size = br
-    ? f(f(f(9) + f(f(9) * pow(r.next(), f(2.4)))) * pd)
-    : f(exp(f(log(f(4.6)) + f(f(0.38) * r.gauss()))) * pd);
+    ? f(f(f(9) + f(f(pop ? 12 : 9) * pow(r.next(), pop ? f(3) : f(2.4)))) * pd)
+    : f(exp(f(log(f(4.6)) + f(f(pop ? 0.55 : 0.38) * r.gauss()))) * pd);
   const sd = br ? f(0.1) : asterisk ? f(0.35) : f(0.2);
   const rot = f(g.spike + f(r.gauss() * sd));
   return { tile, size, rot, bright: br };
@@ -383,6 +385,18 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
     px = f(f(rh * s2) * cos(ph));
     py = f(f(rh * s2) * sin(ph));
     pz = f(f(rh * cz) * f(0.7));
+    if (flags & GalaxyFlag.popAuto && r.next() < f(0.14)) {
+      // a globular cluster (ADR 0090): a tight round swarm at one of six places in the halo
+      const k = Math.min(5, Math.floor(f(r.next() * 6)));
+      const cr = new Rng(g.key, (0xffff0000 + k) >>> 0);
+      const cu = f(f(2 * cr.next()) - 1);
+      const ct = f(TAU * cr.next());
+      const cq = sqrt(f(1 - f(cu * cu)));
+      const cd = f(f(0.9) + f(f(1.7) * cr.next()));
+      px = f(f(f(cd * cq) * cos(ct)) + f(f(0.07) * r.gauss()));
+      py = f(f(f(cd * cq) * sin(ct)) + f(f(0.07) * r.gauss()));
+      pz = f(f(f(cd * cu) * f(0.7)) + f(f(0.07) * r.gauss()));
+    }
   } else if (comp === 2) {
     const bl = g.bar_len;
     let x = f(f(r.next() * 2) - 1);
@@ -436,6 +450,21 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
     if (R2 > rmax) {
       none();
       return;
+    }
+    if (flags & GalaxyFlag.popAuto) {
+      // clustering (ADR 0090): stars gather in clumps, thinning between them, most in the arms
+      const cn = vnoise(
+        f(f(R2 * cos(th2)) * f(4.5)),
+        f(f(R2 * sin(th2)) * f(4.5)),
+        g.seed,
+        NoiseSalt.pop,
+        G.noise,
+      );
+      const keep = f(f(0.3) + f(f(0.7) * ss(f(0.3), f(0.7), cn)));
+      if (r.next() > f(f(1) - f(f(arm > f(0.4) ? f(0.8) : f(0.45)) * f(1 - keep)))) {
+        none();
+        return;
+      }
     }
     const irr = g.irr;
     if (irr > 0) {
@@ -513,7 +542,13 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
     }
     if ((smooth || Rg < f(2.7)) && r.next() < f(f(f(f(0.34) * starMix) * kc) * outer)) {
       const st = smooth
-        ? drawStar(r, G, false, false, f(f(0.05) + f(f(0.13) * yw)))
+        ? drawStar(
+            r,
+            G,
+            false,
+            false,
+            f(f(0.05) + f(f(flags & GalaxyFlag.popAuto ? 0.2 : 0.13) * yw)),
+          )
         : drawStar(r, G, comp === 3 || (comp === 4 && arm > f(0.55)), false);
       put(
         px,
@@ -542,8 +577,13 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
     return;
   }
   const t = dotTile();
-  const size = dotSize(t, comp === 0 ? f(0.85) : 1);
   const cls = comp === 0 || comp === 1 ? Cls.old : arm > f(0.55) ? Cls.young : Cls.disc;
+  let kd = comp === 0 ? f(0.85) : f(1);
+  if (flags & GalaxyFlag.popAuto) {
+    // mark character by population (ADR 0090): old stars fine, young ones large and crisp
+    kd = cls === Cls.old ? f(kd * f(0.78)) : cls === Cls.young ? f(1.3) : f(1);
+  }
+  const size = dotSize(t, kd);
   put(px, py, pz, cls | flagsOut, t, size, f(r.next() * f(6.28)), uTau);
 }
 

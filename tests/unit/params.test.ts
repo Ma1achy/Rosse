@@ -39,6 +39,7 @@ const EXTRA_KEYS = {
   lineWorld: 0,
   strokesAuto: 0,
   thinAuto: 0,
+  popAuto: 0,
   depthAuto: 0,
   lensLock: 0,
   occlAuto: 0,

@@ -73,6 +73,7 @@ describe('the 42 real galaxies', () => {
         lineWorld: undefined,
         strokesAuto: undefined,
         thinAuto: undefined,
+        popAuto: undefined,
         depthAuto: undefined,
         lensLock: undefined,
         occlAuto: undefined,

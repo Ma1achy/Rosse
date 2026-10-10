@@ -50,7 +50,7 @@ describe('strands', () => {
     expect(hi.tail.length).toBeGreaterThan(lo.tail.length);
     expect(hi.jet.length).toBeGreaterThan(lo.jet.length);
     const reach = (c: { pts: number[][] }[]) =>
-      Math.max(...c.map((x) => Math.hypot(...((x.pts[x.pts.length - 1] ?? [0])))));
+      Math.max(...c.map((x) => Math.hypot(...(x.pts[x.pts.length - 1] ?? [0]))));
     expect(reach(hi.tail)).toBeGreaterThan(1.3 * reach(lo.tail));
     expect(reach(hi.jet)).toBeGreaterThan(2 * reach(lo.jet));
     expect(roles({ lineWorld: 1, jet: 0 }).jet).toHaveLength(0);

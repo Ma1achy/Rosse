@@ -68,6 +68,13 @@ const CASES: [string, Params][] = [
     `${n} s7, thin disc`,
     presetParams(n, 7, { thinAuto: 1, bulgeAuto: 1 }),
   ]),
+  // stellar populations (ADR 0090): clumping, globular clusters, mark character, wider star sizes
+  ...['Grand design', 'Barred spiral', 'Smooth, round', 'Edge-on with dust'].map(
+    (n): [string, Params] => [
+      `${n} s7, stellar populations`,
+      presetParams(n, 7, { popAuto: 1, starsAuto: 1, starMix: 1, thinAuto: 1, bulgeAuto: 1 }),
+    ],
+  ),
   // the galaxy's own perspective (ADR 0084): marks scale by depth, in both projections
   ...['Grand design', 'Barred spiral', 'Edge-on with dust'].map((n): [string, Params] => [
     `${n} s7, perspective`,
@@ -225,7 +232,12 @@ run('stipple kernels (GPU = CPU, L1)', async () => {
     // differences and every compacted slot within tolerance. Elsewhere (FMA contraction, other
     // log, exp, pow and sqrt) only L1 is claimed: ≥ 99.9% of instances, counts within 0.1%.
     const l1 = match >= 0.999 && countWorst <= 0.001;
-    const ok = swiftShader ? l1 && sClassDiff === 0 && pClassDiff === 0 && slotsBad === 0 : l1;
+    // a globular cluster's stars are placed with Gaussian draws, which the GPU computes within a
+    // tolerance (ADR 0004), so one sample in some thousands may land on the other side of a cull
+    const allow = name.includes('stellar populations') ? 3 : 0;
+    const ok = swiftShader
+      ? l1 && sClassDiff <= allow && pClassDiff <= allow && slotsBad === 0
+      : l1;
     if (!ok) pass = false;
     worstMatch = Math.min(worstMatch, match);
     worstCount = Math.max(worstCount, countWorst);

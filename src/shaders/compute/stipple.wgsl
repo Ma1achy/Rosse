@@ -93,12 +93,14 @@ const FLAG_BULGE_SERSIC: u32 = 4u;
 const FLAG_BULGE_PEANUT: u32 = 8u;
 const FLAG_STARS_SMOOTH: u32 = 16u;
 const FLAG_THIN_DISC: u32 = 32u;
+const FLAG_POP: u32 = 64u;
 
 // noise salts (NoiseSalt in src/core/noise.ts)
 const SALT_FLOCC: u32 = 1u;
 const SALT_PATCHY: u32 = 2u;
 const SALT_IRR: u32 = 3u;
 const SALT_RING: u32 = 4u;
+const SALT_POP: u32 = 14u;
 
 const STREAM_STIPPLE: u32 = 2u;
 const STREAM_CLUMPS: u32 = 5u;
@@ -280,11 +282,13 @@ fn draw_star_p(p_bright: f32, forced: bool) -> Star {
     tile = e & 0x7fffffffu;
   }
   let pd = galaxy.pen_dot;
+  // stellar populations (ADR 0090): a wider spread of faint sizes and a steeper tail of bright ones
+  let pop = (galaxy.flags & FLAG_POP) != 0u;
   var size = 0.0;
   if (br) {
-    size = (9.0 + 9.0 * pow(next(), 2.4)) * pd;
+    size = (9.0 + select(9.0, 12.0, pop) * pow(next(), select(2.4, 3.0, pop))) * pd;
   } else {
-    size = exp(log(4.6) + 0.38 * gauss()) * pd;
+    size = exp(log(4.6) + select(0.38, 0.55, pop) * gauss()) * pd;
   }
   var sd = 0.2;
   if (br) {
@@ -410,6 +414,19 @@ fn sample(i: u32) {
       return;
     }
     p = vec3<f32>((rh * s2) * cos_f(ph), (rh * s2) * sin_f(ph), (rh * cz) * 0.7);
+    if ((flags & FLAG_POP) != 0u && next() < 0.14) {
+      // a globular cluster (ADR 0090): a tight round swarm at one of six places in the halo
+      let k = min(5u, u32(floor(next() * 6.0)));
+      let ci = 0xffff0000u + k;
+      let cu = 2.0 * rand_f32(galaxy.key, STREAM_STIPPLE, ci, 0u) - 1.0;
+      let ct = TAU * rand_f32(galaxy.key, STREAM_STIPPLE, ci, 1u);
+      let cq = sqrt(1.0 - cu * cu);
+      let cd = 0.9 + 1.7 * rand_f32(galaxy.key, STREAM_STIPPLE, ci, 2u);
+      let gx = (cd * cq) * cos_f(ct) + 0.07 * gauss();
+      let gy = (cd * cq) * sin_f(ct) + 0.07 * gauss();
+      let gz = (cd * cu) * 0.7 + 0.07 * gauss();
+      p = vec3<f32>(gx, gy, gz);
+    }
   } else if (comp == 2u) {
     let bl = galaxy.bar_len;
     var x = next() * 2.0 - 1.0;
@@ -475,6 +492,15 @@ fn sample(i: u32) {
     if (R2 > rmax) {
       put(i, none, CLS_NONE, 0u, 0.0, 0.0, 0.0);
       return;
+    }
+    if ((flags & FLAG_POP) != 0u) {
+      // clustering (ADR 0090): stars gather in clumps, thinning between them, most in the arms
+      let cn = vnoise_t((R2 * cos_f(th2)) * 4.5, (R2 * sin_f(th2)) * 4.5, galaxy.seed, SALT_POP);
+      let keep = 0.3 + 0.7 * ss(0.3, 0.7, cn);
+      if (next() > 1.0 - select(0.45, 0.8, arm > 0.4) * (1.0 - keep)) {
+        put(i, none, CLS_NONE, 0u, 0.0, 0.0, 0.0);
+        return;
+      }
     }
     let irr = galaxy.irr;
     if (irr > 0.0) {
@@ -563,7 +589,7 @@ fn sample(i: u32) {
       }
       outer = (1.0 - 0.45 * ss(1.7, 2.5, Rg)) * (1.0 - ss(2.5, 3.0, Rg));
       if (next() < ((0.34 * star_mix) * kc) * outer) {
-        put_star(i, p, flags_out, u_tau, draw_star_p(0.05 + 0.13 * yw, false));
+        put_star(i, p, flags_out, u_tau, draw_star_p(0.05 + select(0.13, 0.2, (flags & FLAG_POP) != 0u) * yw, false));
         return;
       }
     } else if (Rg < 2.7) {
@@ -591,13 +617,21 @@ fn sample(i: u32) {
   if (comp == 0u) {
     k = 0.85;
   }
-  let size = dot_base[t] * k;
   var cls = CLS_DISC;
   if (comp == 0u || comp == 1u) {
     cls = CLS_OLD;
   } else if (arm > 0.55) {
     cls = CLS_YOUNG;
   }
+  if ((flags & FLAG_POP) != 0u) {
+    // mark character by population (ADR 0090): old stars fine, young ones large and crisp
+    if (cls == CLS_OLD) {
+      k = k * 0.78;
+    } else if (cls == CLS_YOUNG) {
+      k = 1.3;
+    }
+  }
+  let size = dot_base[t] * k;
   put(i, p, cls | flags_out, t, size, next() * 6.28, u_tau);
 }
 
