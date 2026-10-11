@@ -30,12 +30,8 @@ struct MView {
   // the cores at this moment (xyz, w = the truncation radius rmax)
   c0: vec4<f32>,
   c1: vec4<f32>,
-  // each disc's frame: e1 (w = hold), e2, and (arms, pitch, lane strength, smooth halo)
-  ea0: vec4<f32>,
-  eb0: vec4<f32>,
+  // each disc's (arms, pitch, lane strength, smooth halo)
   pa0: vec4<f32>,
-  ea1: vec4<f32>,
-  eb1: vec4<f32>,
   pa1: vec4<f32>,
   cos_i: f32,
   sin_i: f32,
@@ -149,30 +145,18 @@ fn sprites(@builtin(global_invocation_id) id: vec3<u32>) {
     second = true;
   }
   var core = mv.c0;
-  var ea = mv.ea0;
-  var eb = mv.eb0;
   var pa = mv.pa0;
   var hot = mv.hot0 != 0u;
   var g = 0u;
   if (second) {
     g = 1u;
     core = mv.c1;
-    ea = mv.ea1;
-    eb = mv.eb1;
     pa = mv.pa1;
     hot = mv.hot1 != 0u;
   }
   let mauto = mv.mauto != 0.0;
   let rn = ic[i].z;
-  // ADR 0093: a disc keeps its inner stars where they started; the hold lets go as the cores meet
-  var p3 = raw;
-  if (mauto && ea.w > 0.0) {
-    let w = 1.0 - ea.w * (1.0 - smoothstep(0.25, 0.7, rn));
-    let ax = ic[i].x * core.w;
-    let ay = ic[i].y * core.w;
-    let gp = core.xyz + (ax * ea.xyz + ay * eb.xyz);
-    p3 = gp + w * (raw - gp);
-  }
+  let p3 = raw;
   let xr = p3.x * mv.cos_az - p3.y * mv.sin_az;
   let yr = p3.x * mv.sin_az + p3.y * mv.cos_az;
   let yy = yr * mv.cos_i - p3.z * mv.sin_i;

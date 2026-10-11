@@ -77,7 +77,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0090](adr/0090-stellar-populations.md) | _Proposed:_ with `popAuto`, mark character by population, clustering, halo globular clusters and a wider brightness spread. |
 | [0091](adr/0091-a-stars-colour-follows-the-galaxy.md) | _Proposed:_ the colour plate has a fifteen-ink ramp per surface, and a dot's colour follows its place in the galaxy (temperature, radius, arms, dust edges, patches). |
 | [0092](adr/0092-the-core-is-drawn-behind-the-disc.md) | _Proposed:_ with `coreAuto` the drawn core and nuclear spiral are drawn first, still opaque, under the disc's marks (v21 draws them last) |
-| [0093](adr/0093-a-merger-keeps-its-galaxies-character.md) | _Proposed:_ with `mergeAuto` a merging disc holds its inner stars, an elliptical is a soft glow, dust lanes and a bridge travel with the stars, tails carry tidal dwarfs, strokes taper at the tear, and discs are thicker |
+| [0093](adr/0093-a-merger-keeps-its-galaxies-character.md) | _Proposed:_ with `mergeAuto` a merging disc has crisper arms and dust lanes, an elliptical is a soft glow, dust lanes and a bridge travel with the stars, tails carry tidal dwarfs, strokes taper at the tear, and discs are thicker |
 
 ## Modules
 

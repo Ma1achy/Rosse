@@ -32,11 +32,7 @@ const wrapPi = (a: number) => {
 const FIELDS: [string, 'f32' | 'u32' | 'vec4<f32>'][] = [
   ['c0', 'vec4<f32>'],
   ['c1', 'vec4<f32>'],
-  ['ea0', 'vec4<f32>'],
-  ['eb0', 'vec4<f32>'],
   ['pa0', 'vec4<f32>'],
-  ['ea1', 'vec4<f32>'],
-  ['eb1', 'vec4<f32>'],
   ['pa1', 'vec4<f32>'],
   ['cos_i', 'f32'],
   ['sin_i', 'f32'],
@@ -152,34 +148,12 @@ export function runMergerSprites(
     const rz = f(cur[i * 4 + 2] as number);
     const second = i >= num('n0');
     const core = second ? c1 : c0;
-    const ea = (second ? mv.ea1 : mv.ea0) as readonly number[];
-    const eb = (second ? mv.eb1 : mv.eb0) as readonly number[];
     const pa = (second ? mv.pa1 : mv.pa0) as readonly number[];
     const mauto = num('mauto') !== 0;
-    // ADR 0093: a disc keeps its inner stars where they started (the arms and the lanes read), the
-    // outer ones follow the tides; the hold lets go as the cores come together
-    let px = rx;
-    let py = ry;
-    let pz = rz;
     const rn = f(ic[i * 4 + 2] as number);
-    if (mauto && (ea[3] as number) > 0) {
-      const w = f(1 - f(f(ea[3] as number) * f(1 - smooth(0.25, 0.7, rn))));
-      const rm = f(core[3] as number);
-      const ax = f(f(ic[i * 4] as number) * rm);
-      const ay = f(f(ic[i * 4 + 1] as number) * rm);
-      const gx = f(
-        f(core[0] as number) + f(f(ax * f(ea[0] as number)) + f(ay * f(eb[0] as number))),
-      );
-      const gy = f(
-        f(core[1] as number) + f(f(ax * f(ea[1] as number)) + f(ay * f(eb[1] as number))),
-      );
-      const gz = f(
-        f(core[2] as number) + f(f(ax * f(ea[2] as number)) + f(ay * f(eb[2] as number))),
-      );
-      px = f(gx + f(w * f(rx - gx)));
-      py = f(gy + f(w * f(ry - gy)));
-      pz = f(gz + f(w * f(rz - gz)));
-    }
+    const px = rx;
+    const py = ry;
+    const pz = rz;
     // view(x, y, z) (L500), then px (L516)
     const xr = f(f(px * num('cos_az')) - f(py * num('sin_az')));
     const yr = f(f(px * num('sin_az')) + f(py * num('cos_az')));

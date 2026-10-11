@@ -34,7 +34,7 @@ v21 stays the oracle: the engine's core draws what v21 draws, and the goldens ho
 | **A thin disc and 3D line-work** | a dense sharp plane with a few wanderers; arms, dust lanes, jets, streams and tails as 3D stroke bundles that stay put when you orbit | [0081](docs/adr/0081-line-work-in-three-dimensions.md), [0083](docs/adr/0083-a-thin-disc-with-a-few-wanderers.md), [0089](docs/adr/0089-jets-streams-and-tails-as-3d-stroke-bundles.md) |
 | **Stellar populations and colour** | old stars drawn fine and young ones large, clumps, halo clusters and streams of stars; a fifteen-ink colour plate whose colour follows temperature, radius, arms and dust, in pastel chalks on the Chalkboard and pencils on Paper | [0090](docs/adr/0090-stellar-populations.md), [0091](docs/adr/0091-a-stars-colour-follows-the-galaxy.md) |
 | **The drawn core behind the disc** | the central bitmap is drawn first, under the disc's stars, dust and strokes | [0092](docs/adr/0092-the-core-is-drawn-behind-the-disc.md) |
-| **Mergers that keep their galaxies' character** | a spiral holds its inner disc and crisper arms through the first pass, an elliptical is a soft glow, dust lanes and a bridge thin the stars and travel into the tails, tails carry tidal dwarfs, strokes taper at the tear, discs are thicker | [0093](docs/adr/0093-a-merger-keeps-its-galaxies-character.md) |
+| **Mergers that keep their galaxies' character** | a spiral starts with crisper arms and dust lanes, an elliptical is a soft glow, dust lanes and a bridge thin the stars and travel into the tails, tails carry tidal dwarfs, strokes taper at the tear, discs are thicker | [0093](docs/adr/0093-a-merger-keeps-its-galaxies-character.md) |
 
 Open `?dustAuto=0&bulgeAuto=0&starsAuto=0&cosmicAuto=0&strokesAuto=0&lineWorld=0&thinAuto=0&popAuto=0&depthAuto=0&occlAuto=0&coreAuto=0&mergeAuto=0` to see the core's drawing alone.
 
@@ -211,7 +211,7 @@ A lens is a galaxy (or a cluster) in front of a source: the source's drawing is 
 
 ### Mergers
 
-Mergers are simulated: a core track integrated on the CPU and test stars moved by the GPU, with the tides stretching the discs into tails. The merger's own timeline (`mTime`) runs from the approach to the settled remnant; each film below moves the camera with it. On the page each galaxy keeps its character through the first pass: a spiral its arms and dust lanes, an elliptical its smooth glow, with dust lanes and tidal dwarfs carried into the tails ([ADR 0093](docs/adr/0093-a-merger-keeps-its-galaxies-character.md)).
+Mergers are simulated: a core track integrated on the CPU and test stars moved by the GPU, with the tides stretching the discs into tails. The merger's own timeline (`mTime`) runs from the approach to the settled remnant; each film below moves the camera with it. On the page each galaxy keeps its character: a spiral its arms and dust lanes, an elliptical its smooth glow, with dust lanes and tidal dwarfs carried into the tails; every star moves as the simulation moves it ([ADR 0093](docs/adr/0093-a-merger-keeps-its-galaxies-character.md)).
 
 <img src="docs/img/figures/mergers.jpg" alt="Fig. 20: nine merger presets, from the Mice to sketches torn apart" width="100%">
 

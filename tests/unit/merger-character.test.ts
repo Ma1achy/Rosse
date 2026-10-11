@@ -1,7 +1,7 @@
 /**
- * A merger keeps its galaxies' character (ADR 0093): with `mergeAuto` a disc holds its inner stars
- * where they started, an elliptical is a soft glow, dust lanes and a bridge thin the stars, and
- * with 0 the marks are v21's (tests/unit/merger-view.test.ts).
+ * A merger keeps its galaxies' character (ADR 0093): with `mergeAuto` an elliptical is a soft glow,
+ * dust lanes and a bridge thin the stars, and every star stays where the simulation puts it (nothing
+ * is pinned to its start, so the discs rotate and the tides tear them); with 0 the marks are v21's (tests/unit/merger-view.test.ts).
  */
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -34,32 +34,19 @@ describe('mergeAuto in the merger kernels', () => {
   it('is off in the uniform without it', () => {
     const { mv } = run(0);
     expect(mv.mauto).toBe(0);
-    expect((mv.ea0 as number[])[3]).toBe(0);
     expect((mv.pa0 as number[])[2]).toBe(0);
   });
 
-  it('holds a spiral’s inner disc, lets an elliptical be a halo, and has dust lanes', () => {
+  it('gives a spiral dust lanes, lets an elliptical be a halo, and has dust lanes', () => {
     const { mv } = run(1);
     expect(mv.mauto).toBe(1);
-    expect((mv.ea0 as number[])[3]).toBeGreaterThan(0);
     expect((mv.pa0 as number[])[2]).toBeGreaterThan(0);
-    expect((mv.ea1 as number[])[3]).toBe(0);
     expect((mv.pa1 as number[])[3]).toBe(1);
   });
 
-  it('moves a spiral’s inner stars toward their own disc, and thins them along the lanes', () => {
+  it('thins a spiral’s stars along the lanes', () => {
     const a = run(0);
     const b = run(1);
-    let moved = 0;
-    for (let i = 0; i < a.n0; i++)
-      if ((a.ic[i * 4 + 2] as number) < 0.2) {
-        const d = Math.hypot(
-          (a.marks.scr[i * 2] as number) - (b.marks.scr[i * 2] as number),
-          (a.marks.scr[i * 2 + 1] as number) - (b.marks.scr[i * 2 + 1] as number),
-        );
-        if (d > 0.5) moved++;
-      }
-    expect(moved).toBeGreaterThan(20);
     const live = (r: typeof a, from: number, to: number) => {
       let k = 0;
       for (let i = from * 12; i < to * 12; i++) if (r.marks.classes[i] !== Cls.none) k++;
