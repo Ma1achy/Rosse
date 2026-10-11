@@ -32,6 +32,7 @@ jobs:
       - if: ${{ !inputs.update_hashes }}
         run: npm run golden
       - if: ${{ inputs.update_hashes }}
+        continue-on-error: true
         run: npm run golden -- --update-engine
       - if: ${{ inputs.update_hashes }}
         uses: actions/upload-artifact@v5
