@@ -131,10 +131,6 @@ fn mstar(i: u32, base: u32, pos: vec2<f32>, bright: bool) {
 
 var<private> pen_k: f32 = 1.0;
 
-fn wrap_pi(a: f32) -> f32 {
-  let t = a + 3.141592653589793;
-  return (t - 6.283185307179586 * floor(t / 6.283185307179586)) - 3.141592653589793;
-}
 
 @compute @workgroup_size(64)
 fn sprites(@builtin(global_invocation_id) id: vec3<u32>) {

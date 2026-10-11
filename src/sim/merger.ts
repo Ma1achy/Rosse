@@ -502,7 +502,7 @@ export function galaxyICs(
       arms: ARM[g] as number,
       pitch,
       bar: !!BAR[g],
-      crisp: p.mergeAuto && p.mergeAuto > 0 ? 1 : 0,
+      crisp: (p.mergeAuto ?? 0) > 0 ? 1 : 0,
       n: fr.n,
       e1: fr.e1,
       e2: fr.e2,
