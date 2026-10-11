@@ -497,8 +497,15 @@ export function galaxyICs(
       count: n[g] as number,
       mass: M,
       soft: track.A[g] as number,
-      rd: 0.32 * Math.sqrt(M) * (SZ[g] as number),
-      rmax: 1.7 * Math.sqrt(M) * (SZ[g] as number),
+      // ADR 0093: with mergeAuto the disc reaches further out, where the tides pull the tails from
+      rd:
+        (p.mergeAuto ?? 0) > 0
+          ? 0.37 * Math.sqrt(M) * (SZ[g] as number)
+          : 0.32 * Math.sqrt(M) * (SZ[g] as number),
+      rmax:
+        (p.mergeAuto ?? 0) > 0
+          ? 2.3 * Math.sqrt(M) * (SZ[g] as number)
+          : 1.7 * Math.sqrt(M) * (SZ[g] as number),
       arms: ARM[g] as number,
       pitch,
       bar: !!BAR[g],

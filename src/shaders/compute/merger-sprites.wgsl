@@ -231,7 +231,7 @@ fn sprites(@builtin(global_invocation_id) id: vec3<u32>) {
   // a knot of new stars in a tidal tail
   var tail_k = 1.0;
   if (mauto) {
-    tail_k = 3.0;
+    tail_k = 2.0;
   }
   if (in_tail && roll < (0.012 * tail_k) * (0.4 + mv.knots)) {
     // a tidal dwarf: a tight, brighter clump of new stars

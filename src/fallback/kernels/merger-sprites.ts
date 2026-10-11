@@ -245,7 +245,7 @@ export function runMergerSprites(
       mstar(3, inTail && u01(2) < 0.25);
       continue;
     }
-    const tailK = mauto ? f(3) : f(1);
+    const tailK = mauto ? f(2) : f(1);
     if (inTail && roll < f(f(f(0.012) * tailK) * f(f(0.4) + num('knots')))) {
       // a tidal dwarf: a tight, brighter clump of new stars
       const dwarf = mauto && u01(11) < f(0.2);

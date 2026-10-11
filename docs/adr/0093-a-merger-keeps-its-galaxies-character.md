@@ -21,6 +21,7 @@ With `mergeAuto`:
 5. **Tails and star formation.** Tail knots are 3 times as likely, a fifth of them are tidal dwarfs (11 tight, larger knots), and where a disc lies inside 0.9 of the other galaxy's radius it forms knots 1.6 times as often as the outer disc.
 6. **Strokes taper out.** In the tidal map (header word 9) ribbon segments and capsules thin from 1.05 times their length to a sixth of their width at the tear (1.8), instead of ending in a dash.
 7. **A thicker disc.** The initial thickness of a disc is 2.5 times v21's, so a tilted one has depth along its normal.
+8. **A more extended disc.** The scale length is 0.37 √M (v21: 0.32) and the truncation radius 2.3 √M (v21: 1.7), so the outer disc, which the tides pull the tails and the bridge from, holds more stars. `GalaxyIC.rd` and `rmax` carry it to every kernel. Tail knots are twice v21's (not three times).
 
 Without it nothing changes.
 
