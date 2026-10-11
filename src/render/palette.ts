@@ -14,6 +14,12 @@ export interface Palette {
   old: Rgb;
   young: Rgb;
   hii: Rgb;
+  /**
+   * The tints of a dot (ADR 0091): fifteen inks, the stars' temperature from dust-reddened and
+   * orange through gold and cream to ice, sky and periwinkle blue, then the emission nebulae's
+   * rose, coral and lilac and a pale teal: a box of coloured pencils, or of pastel chalks.
+   */
+  ramp: readonly Rgb[];
 }
 
 export const PALETTES: { light: Palette; dark: Palette } = {
@@ -23,6 +29,23 @@ export const PALETTES: { light: Palette; dark: Palette } = {
     old: [0.62, 0.3, 0.08],
     young: [0.06, 0.35, 0.62],
     hii: [0.74, 0.07, 0.36],
+    ramp: [
+      [0.5, 0.18, 0.14],
+      [0.62, 0.26, 0.12],
+      [0.68, 0.38, 0.1],
+      [0.66, 0.46, 0.12],
+      [0.58, 0.48, 0.14],
+      [0.52, 0.47, 0.22],
+      [0.34, 0.32, 0.27],
+      [0.28, 0.36, 0.44],
+      [0.18, 0.36, 0.58],
+      [0.1, 0.3, 0.62],
+      [0.26, 0.26, 0.6],
+      [0.7, 0.18, 0.4],
+      [0.74, 0.1, 0.3],
+      [0.48, 0.26, 0.58],
+      [0.12, 0.46, 0.44],
+    ],
   },
   dark: {
     ink: [0.925, 0.894, 0.824],
@@ -30,6 +53,23 @@ export const PALETTES: { light: Palette; dark: Palette } = {
     old: [0.9, 0.64, 0.38],
     young: [0.58, 0.78, 0.92],
     hii: [0.92, 0.56, 0.71],
+    ramp: [
+      [0.8, 0.45, 0.4],
+      [0.9, 0.55, 0.4],
+      [0.94, 0.66, 0.4],
+      [0.94, 0.76, 0.45],
+      [0.93, 0.84, 0.55],
+      [0.93, 0.9, 0.7],
+      [0.92, 0.91, 0.84],
+      [0.84, 0.9, 0.95],
+      [0.7, 0.83, 0.96],
+      [0.6, 0.76, 0.97],
+      [0.66, 0.68, 0.95],
+      [0.95, 0.62, 0.74],
+      [0.93, 0.52, 0.66],
+      [0.8, 0.66, 0.92],
+      [0.6, 0.86, 0.82],
+    ],
   },
 };
 

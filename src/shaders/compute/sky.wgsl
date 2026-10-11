@@ -347,10 +347,19 @@ fn sky_fg(@builtin(global_invocation_id) id: vec3<u32>) {
   if (!(q.x > -40.0 && q.x < PLATE_W + 40.0 && q.y > -40.0 && q.y < PLATE_W + 40.0)) {
     return;
   }
-  let size = f0.w * min(2.2, k / 0.42);
+  var size = f0.w * min(2.2, k / 0.42);
+  var alpha = 1.0;
+  if (view.persp != 0.0) {
+    // out of focus (ADR 0090): a star near the camera is larger and fainter, so the foreground
+    // reads as a different depth from the galaxy
+    let near = k / 0.42;
+    size = f0.w * min(3.0, near);
+    let t = clamp((near - 1.1) / 1.3, 0.0, 1.0);
+    alpha = 1.0 - 0.45 * ((t * t) * (3.0 - 2.0 * t));
+  }
   let rot = f1.x;
   let p = sm_warp(q, su.wobble);
   let c = cos_f(rot);
   let s = sin_f(rot);
-  fg_out[i] = Instance(p, bitcast<u32>(f1.y), 1.0, vec4<f32>(c * size, s * size, -(s * size), c * size));
+  fg_out[i] = Instance(p, bitcast<u32>(f1.y), alpha, vec4<f32>(c * size, s * size, -(s * size), c * size));
 }

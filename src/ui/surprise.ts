@@ -55,7 +55,7 @@ export function surprise(
       merger: 1,
       mRatio: 0.15 + 0.85 * r(),
       mPeri: 0.8 + 1.6 * r(),
-      mStage: 0.3 + 3.5 * r(),
+      mStage: mergerStage(r()),
       mSpin1: Math.round(r() * 90),
       mSpin2: Math.round(r() * 180),
       mFriction: r() < 0.3 ? 0.7 : 0,
@@ -101,4 +101,13 @@ export function surprise(
       });
   }
   return { P: sanitise(P), preset };
+}
+
+/**
+ * When in the merger a surprise lands, from one draw: a quarter are still approaching (the two
+ * galaxies skipping past each other, -1.2 to 0.2), the rest run from just after the closest
+ * approach to late in it (0.3 to 4.5). v21's was 0.3 to 3.8, never before contact.
+ */
+export function mergerStage(u: number): number {
+  return u < 0.25 ? -1.2 + 1.4 * (u / 0.25) : 0.3 + 4.2 * ((u - 0.25) / 0.75);
 }

@@ -42,7 +42,7 @@ import {
 } from '../model/scene';
 import type { Params } from '../core/params';
 import type { DrawingsMeta } from '../model/variation';
-import { ZOOM_MAX, cameraOf, packView, viewDesc, type Camera } from '../view/camera';
+import { ZOOM_MAX, cameraOf, packView, perspOf, viewDesc, type Camera } from '../view/camera';
 import { TierState, type TierWork } from './tiers';
 import { SAMPLE_LAYOUT } from '../fallback/kernels/stipple';
 import { STAR_JOB_LAYOUT, STAR_UNIFORM_LAYOUT, packStarJobs, starJobs } from '../model/stars';
@@ -123,6 +123,8 @@ interface ModelBuffers {
 
 export class GpuStipple {
   private model: ModelBuffers | null = null;
+  /** a merger's discs, for the overlay star's dimming (ADR 0086); set by the merger engine each view */
+  occluder: ((sx: number, sy: number, depth: number) => number) | null = null;
   /** the lens (M9), made when a lensed scene is first loaded; its sources are sampled by `scratch` */
   private lens: GpuLens | null = null;
   private scratch: GpuStipple | null = null;
@@ -527,12 +529,25 @@ export class GpuStipple {
     this.stars.setView(params, galaxy.g.key, galaxy.g.n_dot_pool);
     this.sky.setView(params, cam);
     // the marks of a star or an artefact for this view, after the samples (M7)
-    const sj = this.scene.stars ? starJobs(this.scene.stars, params, cam, this.scene.home) : null;
+    const sj = this.scene.stars
+      ? starJobs(
+          this.scene.stars,
+          params,
+          cam,
+          this.scene.home,
+          galaxy.g.dust,
+          this.occluder ?? undefined,
+        )
+      : null;
     const nStar = sj?.nSlots ?? 0;
     const nTot = m.n + nStar;
     this.nStarSlots = nStar;
     if (nTot > m.nTot) throw new Error('star marks beyond their capacity');
-    d.queue.writeBuffer(m.view, 0, packView(viewDesc(cam, galaxy.g.dust, m.n, m.cap)));
+    d.queue.writeBuffer(
+      m.view,
+      0,
+      packView(viewDesc(cam, galaxy.g.dust, m.n, m.cap, perspOf(params))),
+    );
     d.queue.writeBuffer(m.scan, 0, new Uint32Array([nTot, m.cap, blockCount(nTot), 0]));
     if (sj && nStar) {
       d.queue.writeBuffer(m.starJobs, 0, packStarJobs(sj.jobs));
@@ -677,7 +692,8 @@ export class GpuStipple {
       this.core = {
         inst: d.createBuffer({
           label: 'merging core',
-          size: 2 * INSTANCE.size,
+          // the core, its alternate style and the nuclear spiral (ADR 0073)
+          size: 3 * INSTANCE.size,
           usage: STORAGE | GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC,
         }),
         args: d.createBuffer({
@@ -753,8 +769,14 @@ export class GpuStipple {
         ],
       });
     else if (hatch ?? parts) merged.push((hatch ?? parts) as InkLayer);
+    // the drawn core: last (v21), or with coreAuto first, under the disc's marks (ADR 0092)
+    const coreLayer: InkLayer[] = cores.length
+      ? [{ kind: 'sprites', atlas: 'cores', gain: 1, pop: 'old', instances: cores }]
+      : [];
+    const coreBehind = P.coreAuto > 0;
     return [
       ...this.sky.background(),
+      ...(coreBehind ? [...coreLayer, ...tided] : []),
       ...line.filter((l) => !pieces.includes(l) && l !== hatch),
       ...merged,
       ...(LL?.line ?? []),
@@ -770,13 +792,20 @@ export class GpuStipple {
       ...(LL?.knots ?? []),
       ...stipple.slice(4),
       ...(LL?.stars ?? []),
-      ...(cores.length
-        ? [{ kind: 'sprites', atlas: 'cores', gain: 1, pop: 'old', instances: cores } as InkLayer]
-        : []),
+      ...(coreBehind ? [] : coreLayer),
       ...(LL?.cores ?? []),
       ...this.sky.foreground(),
-      ...tided,
+      ...(coreBehind ? [] : tided),
     ];
+  }
+
+  /**
+   * A merger's sky host (no galaxy): the sky's background, which goes under the merger, and every
+   * other layer (trails, arrow, overlay stars, foreground stars), which go over it.
+   */
+  hostLayers(): { back: InkLayer[]; front: InkLayer[] } {
+    const back = this.sky.background();
+    return { back, front: this.inkLayers().slice(back.length) };
   }
 
   /** The line-work's layers (ribbons, hatching, pieces), drawn before the stipple. */

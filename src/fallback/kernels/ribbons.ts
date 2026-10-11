@@ -39,7 +39,7 @@ import { HATCH_FLAT, HATCH_PEN } from '../../model/lanes';
 import type { ViewDesc } from '../../view/camera';
 import { smWarp } from '../../view/warp';
 import type { NoiseField } from '../../core/noise';
-import { INSTANCE_WORDS } from './project';
+import { INSTANCE_WORDS, perspK } from './project';
 
 const f = Math.fround;
 const sqrt = (x: number) => f(Math.sqrt(x));
@@ -77,17 +77,30 @@ export function projectPoint(i: number, V: ViewDesc, p3: Float32Array, out: Floa
   const x = p3[i * 4] ?? 0;
   const y = p3[i * 4 + 1] ?? 0;
   const z = p3[i * 4 + 2] ?? 0;
+  const ca = V.cos_pa ?? 1;
+  const sa = V.sin_pa ?? 0;
+  const sc = V.scale ?? 84;
+  if ((p3[i * 4 + 3] ?? 0) !== 0) {
+    // a screen-space offset (the edge-on midplane's lines, ADR 0073): mirrored, rolled, not orbited
+    const X = f(x * (V.winding ?? 1));
+    out[i * 2] = f((V.cx ?? 400) + f(f(f(X * ca) - f(y * sa)) * sc));
+    out[i * 2 + 1] = f((V.cy ?? 400) + f(f(f(X * sa) + f(y * ca)) * sc));
+    return;
+  }
   const cz = V.cos_az ?? 1;
   const sz = V.sin_az ?? 0;
   const x0 = f(x * (V.winding ?? 1));
   const X = f(f(x0 * cz) - f(y * sz));
   const ya = f(f(x0 * sz) + f(y * cz));
-  const Y = f(f(ya * (V.cos_i ?? 1)) - f(z * (V.sin_i ?? 0)));
-  const ca = V.cos_pa ?? 1;
-  const sa = V.sin_pa ?? 0;
-  const sc = V.scale ?? 84;
-  out[i * 2] = f((V.cx ?? 400) + f(f(f(X * ca) - f(Y * sa)) * sc));
-  out[i * 2 + 1] = f((V.cy ?? 400) + f(f(f(X * sa) + f(Y * ca)) * sc));
+  let Y = f(f(ya * (V.cos_i ?? 1)) - f(z * (V.sin_i ?? 0)));
+  let Xp = X;
+  const pk = perspK(V, f(f(ya * (V.sin_i ?? 0)) + f(z * (V.cos_i ?? 1))));
+  if (pk !== 1 && (V.persp ?? 0) > 0) {
+    Xp = f(X * pk);
+    Y = f(Y * pk);
+  }
+  out[i * 2] = f((V.cx ?? 400) + f(f(f(Xp * ca) - f(Y * sa)) * sc));
+  out[i * 2 + 1] = f((V.cy ?? 400) + f(f(f(Xp * sa) + f(Y * ca)) * sc));
 }
 
 /** 2. Arc lengths and per-curve state; returns the number of pieces (the indirect count). */
@@ -98,6 +111,8 @@ export function measureCurves(
   arc: Float32Array,
   stF: Float32Array,
   stU: Uint32Array,
+  V?: ViewDesc,
+  p3?: Float32Array,
 ): number {
   const { cu, cf } = M;
   const W = rib.sheet_w;
@@ -134,7 +149,17 @@ export function measureCurves(
     stF[so + 2] = kpx;
     stU[so + 3] = reps;
     stF[so + 5] = flags & CurveFlag.edgeAlpha ? rib.edge_alpha : (cf[o + 5] ?? 1);
-    stU[so + 6] = 0;
+    // the ink's width follows the depth of the curve's middle point (ADR 0084)
+    let dk = 1;
+    if (V && p3 && (V.persp ?? 0) !== 0 && n > 0) {
+      const m = (first + (n >> 1)) * 4;
+      if ((p3[m + 3] ?? 0) === 0) {
+        const x0 = f((p3[m] ?? 0) * (V.winding ?? 1));
+        const ya = f(f(x0 * (V.sin_az ?? 0)) + f((p3[m + 1] ?? 0) * (V.cos_az ?? 1)));
+        dk = perspK(V, f(f(ya * (V.sin_i ?? 0)) + f((p3[m + 2] ?? 0) * (V.cos_i ?? 1))));
+      }
+    }
+    stF[so + 6] = dk;
     stU[so + 7] = 0;
   }
   return total;
@@ -196,7 +221,7 @@ export function expandSegment(
     const ny = f(tx / tl);
     const fr = f((arc[first + e] ?? 0) / tot);
     const tap = taper ? f(f(1.1) - f(f(0.45) * fr)) : 1;
-    const w = f(f(cw * tap) / 2);
+    const w = f(f(f(cw * tap) * (stF[so + 6] ?? 1)) / 2);
     const px = q[(first + e) * 2] ?? 0;
     const py = q[(first + e) * 2 + 1] ?? 0;
     const p0 = smWarp(f(px + f(nx * w)), f(py + f(ny * w)), wob, M.R.noise);
@@ -477,7 +502,7 @@ export function runRibbons(M: RibbonModel, V: ViewDesc, rib: RibUniform): Ribbon
   const st = new ArrayBuffer(Math.max(1, R.nCurves) * CURVE_STATE_WORDS * 4);
   const stateF = new Float32Array(st);
   const stateU = new Uint32Array(st);
-  const nPieces = measureCurves(M, rib, points, arc, stateF, stateU);
+  const nPieces = measureCurves(M, rib, points, arc, stateF, stateU, V, R.points3);
   const words = (n: number, w: number) => new ArrayBuffer(Math.max(1, n) * w * 4);
   const sb = words(R.nSegs, RIBBON_SEG_WORDS);
   const segs = new Float32Array(sb);

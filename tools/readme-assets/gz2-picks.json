@@ -159,7 +159,21 @@
    "shellsOn": 0,
    "shellTime": 70,
    "shellAxis": 30,
-   "shellStars": 6000
+   "shellStars": 6000,
+   "dustAuto": 0,
+   "bulgeAuto": 0,
+   "starsAuto": 0,
+   "cosmicAuto": 0,
+   "lineWorld": 0,
+   "strokesAuto": 0,
+   "thinAuto": 0,
+   "popAuto": 0,
+   "depthAuto": 0,
+   "lensLock": 0,
+   "occlAuto": 0,
+   "peanut": 0,
+   "coreAuto": 0,
+   "mergeAuto": 0
   }
  },
  {
@@ -322,7 +336,21 @@
    "shellsOn": 0,
    "shellTime": 70,
    "shellAxis": 30,
-   "shellStars": 6000
+   "shellStars": 6000,
+   "dustAuto": 0,
+   "bulgeAuto": 0,
+   "starsAuto": 0,
+   "cosmicAuto": 0,
+   "lineWorld": 0,
+   "strokesAuto": 0,
+   "thinAuto": 0,
+   "popAuto": 0,
+   "depthAuto": 0,
+   "lensLock": 0,
+   "occlAuto": 0,
+   "peanut": 0,
+   "coreAuto": 0,
+   "mergeAuto": 0
   }
  },
  {
@@ -485,7 +513,21 @@
    "shellsOn": 0,
    "shellTime": 70,
    "shellAxis": 30,
-   "shellStars": 6000
+   "shellStars": 6000,
+   "dustAuto": 0,
+   "bulgeAuto": 0,
+   "starsAuto": 0,
+   "cosmicAuto": 0,
+   "lineWorld": 0,
+   "strokesAuto": 0,
+   "thinAuto": 0,
+   "popAuto": 0,
+   "depthAuto": 0,
+   "lensLock": 0,
+   "occlAuto": 0,
+   "peanut": 0,
+   "coreAuto": 0,
+   "mergeAuto": 0
   }
  },
  {
@@ -648,7 +690,21 @@
    "shellsOn": 0,
    "shellTime": 70,
    "shellAxis": 30,
-   "shellStars": 6000
+   "shellStars": 6000,
+   "dustAuto": 0,
+   "bulgeAuto": 0,
+   "starsAuto": 0,
+   "cosmicAuto": 0,
+   "lineWorld": 0,
+   "strokesAuto": 0,
+   "thinAuto": 0,
+   "popAuto": 0,
+   "depthAuto": 0,
+   "lensLock": 0,
+   "occlAuto": 0,
+   "peanut": 0,
+   "coreAuto": 0,
+   "mergeAuto": 0
   }
  },
  {
@@ -811,7 +867,21 @@
    "shellsOn": 0,
    "shellTime": 70,
    "shellAxis": 30,
-   "shellStars": 6000
+   "shellStars": 6000,
+   "dustAuto": 0,
+   "bulgeAuto": 0,
+   "starsAuto": 0,
+   "cosmicAuto": 0,
+   "lineWorld": 0,
+   "strokesAuto": 0,
+   "thinAuto": 0,
+   "popAuto": 0,
+   "depthAuto": 0,
+   "lensLock": 0,
+   "occlAuto": 0,
+   "peanut": 0,
+   "coreAuto": 0,
+   "mergeAuto": 0
   }
  },
  {
@@ -974,7 +1044,21 @@
    "shellsOn": 0,
    "shellTime": 70,
    "shellAxis": 30,
-   "shellStars": 6000
+   "shellStars": 6000,
+   "dustAuto": 0,
+   "bulgeAuto": 0,
+   "starsAuto": 0,
+   "cosmicAuto": 0,
+   "lineWorld": 0,
+   "strokesAuto": 0,
+   "thinAuto": 0,
+   "popAuto": 0,
+   "depthAuto": 0,
+   "lensLock": 0,
+   "occlAuto": 0,
+   "peanut": 0,
+   "coreAuto": 0,
+   "mergeAuto": 0
   }
  },
  {
@@ -1137,7 +1221,21 @@
    "shellsOn": 0,
    "shellTime": 70,
    "shellAxis": 30,
-   "shellStars": 6000
+   "shellStars": 6000,
+   "dustAuto": 0,
+   "bulgeAuto": 0,
+   "starsAuto": 0,
+   "cosmicAuto": 0,
+   "lineWorld": 0,
+   "strokesAuto": 0,
+   "thinAuto": 0,
+   "popAuto": 0,
+   "depthAuto": 0,
+   "lensLock": 0,
+   "occlAuto": 0,
+   "peanut": 0,
+   "coreAuto": 0,
+   "mergeAuto": 0
   }
  },
  {
@@ -1301,7 +1399,21 @@
    "shellsOn": 0,
    "shellTime": 70,
    "shellAxis": 30,
-   "shellStars": 6000
+   "shellStars": 6000,
+   "dustAuto": 0,
+   "bulgeAuto": 0,
+   "starsAuto": 0,
+   "cosmicAuto": 0,
+   "lineWorld": 0,
+   "strokesAuto": 0,
+   "thinAuto": 0,
+   "popAuto": 0,
+   "depthAuto": 0,
+   "lensLock": 0,
+   "occlAuto": 0,
+   "peanut": 0,
+   "coreAuto": 0,
+   "mergeAuto": 0
   }
  },
  {
@@ -1464,7 +1576,21 @@
    "shellsOn": 0,
    "shellTime": 70,
    "shellAxis": 30,
-   "shellStars": 6000
+   "shellStars": 6000,
+   "dustAuto": 0,
+   "bulgeAuto": 0,
+   "starsAuto": 0,
+   "cosmicAuto": 0,
+   "lineWorld": 0,
+   "strokesAuto": 0,
+   "thinAuto": 0,
+   "popAuto": 0,
+   "depthAuto": 0,
+   "lensLock": 0,
+   "occlAuto": 0,
+   "peanut": 0,
+   "coreAuto": 0,
+   "mergeAuto": 0
   }
  },
  {
@@ -1627,7 +1753,21 @@
    "shellsOn": 0,
    "shellTime": 70,
    "shellAxis": 30,
-   "shellStars": 6000
+   "shellStars": 6000,
+   "dustAuto": 0,
+   "bulgeAuto": 0,
+   "starsAuto": 0,
+   "cosmicAuto": 0,
+   "lineWorld": 0,
+   "strokesAuto": 0,
+   "thinAuto": 0,
+   "popAuto": 0,
+   "depthAuto": 0,
+   "lensLock": 0,
+   "occlAuto": 0,
+   "peanut": 0,
+   "coreAuto": 0,
+   "mergeAuto": 0
   }
  }
 ]

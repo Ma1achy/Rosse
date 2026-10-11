@@ -274,6 +274,17 @@ export function scenePoint(
 }
 
 /**
+ * The galaxy-frame point of `scenePoint`'s scene point: where the overlay sits in the galaxy's own
+ * frame (the samples'), which the camera does not move. Its dust optical depth (ADR 0074).
+ */
+export function sceneGalaxyPoint(home: Orientation, sx: number, sy: number, depth: number): Vec3 {
+  const pa0 = rad(home.pa);
+  const lx = sx * Math.cos(pa0) + sy * Math.sin(pa0);
+  const ly = -sx * Math.sin(pa0) + sy * Math.cos(pa0);
+  return rotInv([lx, ly, depth], rotation(home));
+}
+
+/**
  * A lensed source fixed in 3D a distance D behind the lens, placed at (bx, by) from `home`: its
  * lens-plane offset as seen now (app23.js:L450).
  */
@@ -426,7 +437,8 @@ export function inclBucket(incl: number): number {
 // Inclination and structure: the model tier's key (ADR 0010, ADR 0017)
 
 /** What a structure predicate reads besides the inclination. */
-export type StructureParams = Pick<Params, 'incl' | 'kind' | 'bulge' | 'bulgeFlat'>;
+export type StructureParams = Pick<Params, 'incl' | 'kind' | 'bulge' | 'bulgeFlat'> &
+  Partial<Pick<Params, 'lineWorld'>>;
 
 /**
  * A discrete switch of structure on the inclination that does not go through `incE()`. v21 has
@@ -450,12 +462,24 @@ export const CI_PREDICATES: readonly InclPredicate[] = [
     source: 'P.bulgeFlat * Math.max(ci(), 0.05) < 0.5',
     test: (P) =>
       P.kind === 'auto' && P.bulge >= 0.95
-        ? P.bulgeFlat * Math.max(Math.cos(rad(P.incl)), 0.05) < 0.5
+        ? // |cos i|, not v21's signed ci(): symmetric about 90° (ADR 0073)
+          P.bulgeFlat * Math.max(Math.abs(Math.cos(rad(P.incl))), 0.05) < 0.5
         : null,
     milestone: 'M5',
     what: "whole-drawing type 'smooth:elongated' from the projected flattening",
   },
 ];
+
+/**
+ * The inclination the model's structure is built for: the camera's, or, with `lineWorld`, the
+ * face-on one: every buckets-by-inclination switch of v21 is then off, and the line-work is real
+ * geometry in the disc's frame that the camera looks at (ADR 0081).
+ */
+export function structuralIncl(
+  P: Pick<Params, 'incl'> & Partial<Pick<Params, 'lineWorld'>>,
+): number {
+  return (P.lineWorld ?? 0) > 0 ? 0 : P.incl;
+}
 
 /**
  * The structure signature of an inclination for these parameters: the answer of every discrete
@@ -464,6 +488,8 @@ export const CI_PREDICATES: readonly InclPredicate[] = [
  * view tier (`INCL_CONTINUOUS`).
  */
 export function structureKey(P: StructureParams): string {
+  // line-work in 3D (ADR 0081): the structure does not depend on the camera at all
+  if ((P.lineWorld ?? 0) > 0) return 'world';
   const e = incE(P.incl);
   const bits: string[] = INCE_USES.map((u) => (u.test(e) ? '1' : '0'));
   for (const c of CI_PREDICATES) {
@@ -504,7 +530,7 @@ export const INCL_CONTINUOUS: readonly {
   {
     line: 788,
     token: 'P.incl',
-    what: "the edge-on midplane stroke's alpha `lines · (incl − 72) / 18` (view, M4)",
+    what: "the edge-on midplane stroke's alpha `lines · (incl − 72) / 18` (view, M4; the port uses `lines · clamp((incE − 72) / 18, 0, 1)`, ADR 0073)",
   },
   { line: 856, token: 'P.incl', what: 'the definition of `incE()`' },
   { line: 856, token: 'incE()', what: 'the definition of `incE()`' },
@@ -555,7 +581,7 @@ export const VIEW_LAYOUT: StructLayout = {
     'cx',
     'cy',
     'dust',
-    'pad0',
+    'persp',
     'n',
     'cap',
     'pad1',
@@ -571,7 +597,12 @@ export const VIEW_LAYOUT: StructLayout = {
 export type ViewDesc = Record<string, number>;
 
 /** The camera's numbers, rounded to f32. `dust` is the galaxy's extinction (for the τ cull). */
-export function viewDesc(cam: Camera, dust: number, n: number, cap: number): ViewDesc {
+/** The galaxy's own perspective (ADR 0084): 1 / camera distance in galaxy units; negative scales only the marks. */
+export const GALAXY_PERSP = 0.075;
+export const perspOf = (P: { depthAuto?: number }) =>
+  (P.depthAuto ?? 0) >= 2 ? GALAXY_PERSP : (P.depthAuto ?? 0) >= 1 ? -GALAXY_PERSP : 0;
+
+export function viewDesc(cam: Camera, dust: number, n: number, cap: number, persp = 0): ViewDesc {
   const R = rotationOf(cam);
   return {
     cos_i: f(R.ci),
@@ -585,7 +616,7 @@ export function viewDesc(cam: Camera, dust: number, n: number, cap: number): Vie
     cx: PLATE / 2,
     cy: PLATE / 2,
     dust: f(dust),
-    pad0: 0,
+    persp: f(persp),
     n,
     cap,
     pad1: 0,

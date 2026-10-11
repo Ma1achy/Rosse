@@ -14,7 +14,7 @@ import {
 } from '../../src/extras/export/svg';
 import { presetParams } from '../../src/core/presets';
 import { buildScene } from '../../src/model/scene';
-import { cameraOf } from '../../src/view/camera';
+import { cameraOf, incE } from '../../src/view/camera';
 import { GoldenNode } from '../golden/compare/node';
 import { countAllowance, type ThresholdFile } from '../golden/compare/thresholds';
 
@@ -187,11 +187,16 @@ describe('the SVG of the CPU engine against v21 (five presets)', () => {
       const check = checkSvg(r.svg);
       expect(check.problems).toEqual([]);
       expect(check.layers).toEqual(SVG_LAYERS.filter((k) => r.counts[k] > 0));
-      expect(check.layers).toEqual(c.layers);
+      // v21 drops the drawn core from incE 80; the port keeps it, edge-on (ADR 0079)
+      const edgeOn = incE(P.incl) >= 80 && r.counts.cores > 0;
+      expect(check.layers).toEqual(
+        edgeOn ? SVG_LAYERS.filter((k) => k === 'cores' || c.layers.includes(k)) : c.layers,
+      );
       const rows: string[] = [];
       for (const k of SVG_LAYERS) {
         const ref = c.counts[k];
         const got = r.counts[k];
+        if (k === 'cores' && edgeOn) continue;
         const allow = countAllowance(ref, got, base, ref === 0);
         rows.push(`${k} ${String(got)}/${String(ref)}`);
         expect(

@@ -164,6 +164,11 @@ run('plates (GPU = CPU, present tier)', async () => {
       presetParams('Stellar populations', 4242, { starMix: 0, field: 0, fgstars: 0 }),
       1,
     ],
+    [
+      'Stellar populations s7, tinted dots (ADR 0091)',
+      presetParams('Stellar populations', 7, { starMix: 0, field: 0, fgstars: 0, popAuto: 1 }),
+      1,
+    ],
   ];
   let worstTotal = 0;
   for (const [label, P, zoom] of cases) {

@@ -10,6 +10,10 @@ on:
       runner:
         description: 'Runner label: ubuntu-latest (SwiftShader) or gpu (self-hosted, hardware adapter)'
         default: ubuntu-latest
+      update_hashes:
+        description: 'Write tests/golden/engine-hashes.json from this runner and upload it (the hashes are bytes, so they must come from the runner that checks them)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -25,7 +29,16 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm run golden
+      - if: ${{ !inputs.update_hashes }}
+        run: npm run golden
+      - if: ${{ inputs.update_hashes }}
+        continue-on-error: true
+        run: npm run golden -- --update-engine
+      - if: ${{ inputs.update_hashes }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: engine-hashes
+          path: tests/golden/engine-hashes.json
       - if: always()
         uses: actions/upload-artifact@v5
         with:

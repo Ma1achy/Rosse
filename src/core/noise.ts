@@ -39,6 +39,8 @@ export const NoiseSalt = {
   starRing: 11,
   starTrail: 12,
   starGhost: 13,
+  /** the stellar populations' clumping (ADR 0090) */
+  pop: 14,
 } as const;
 
 /** Salts a noise field can hold, and the words of its header per salt. */

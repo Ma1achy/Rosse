@@ -26,7 +26,7 @@ import {
 import { buildScene, drawingsMeta } from '../../src/model/scene';
 import { GpuRenderer } from '../../src/render/frame';
 import { GpuStipple } from '../../src/render/stipple';
-import { cameraOf, viewDesc } from '../../src/view/camera';
+import { cameraOf, perspOf, viewDesc } from '../../src/view/camera';
 import { classCapacity } from '../../src/fallback/kernels/scan';
 import { sampleCount } from '../../src/model/galaxy';
 import { adapterName, device, halfToFloat, readTexture, run } from './harness';
@@ -46,6 +46,34 @@ const BASE: [string, Params][] = [
   ['Dusty spiral s7 (carving lines)', presetParams('Dusty spiral', 7, M4)],
   ['Hand wobble s7 (the wobble)', presetParams('Hand wobble', 7, M4)],
   ['Edge-on with dust s7 (midplane stroke and hatching)', presetParams('Edge-on with dust', 7)],
+  [
+    'Grand design s7, lineWorld (3D dust lane arcs)',
+    presetParams('Grand design', 7, { ...M4, lineWorld: 1, dustAuto: 1 }),
+  ],
+  [
+    'Edge-on with dust s7, lineWorld (no midplane stroke)',
+    presetParams('Edge-on with dust', 7, { lineWorld: 1 }),
+  ],
+  [
+    'Grand design s7, strokes with depth (marks mode)',
+    presetParams('Grand design', 7, {
+      ...M4,
+      strokesAuto: 1,
+      lineWorld: 1,
+      depthAuto: 1,
+      incl: 62,
+    }),
+  ],
+  [
+    'Barred spiral s7, strokes with full perspective',
+    presetParams('Barred spiral', 7, {
+      ...M4,
+      strokesAuto: 1,
+      lineWorld: 1,
+      depthAuto: 2,
+      incl: 70,
+    }),
+  ],
   // no stipple samples at all: the line-work must still be drawn (QA D1, minimum binding sizes)
   ['Grand design s7, no stipple', presetParams('Grand design', 7, { ...M4, stipple: 0, vary: 0 })],
   [
@@ -119,7 +147,7 @@ run('line-work kernels and raster (GPU = CPU, L1)', async () => {
       const G = scene.galaxy;
       const R = scene.ribbons;
       const n = sampleCount(G);
-      const V = viewDesc(camera, G.g.dust, n, classCapacity(n));
+      const V = viewDesc(camera, G.g.dust, n, classCapacity(n), perspOf(P));
       const M = ribbonModel(R, G.pool, G.dotBase);
       const c = runRibbons(M, V, ribUniform(R, camera, P, G.g.n_dot_pool));
       const bad: string[] = [];

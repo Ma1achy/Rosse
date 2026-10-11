@@ -29,6 +29,8 @@ export interface PlatePass {
   off: readonly [number, number];
   /** multiplies each layer's gain (`uGain`) */
   gain: number;
+  /** the inks of tints 1 to 15 of a dot (ADR 0091): the colour plate's ramp; absent, a tint is the pass's ink */
+  tints?: readonly Rgb[];
 }
 
 const WHITE: Rgb = [1, 1, 1];
@@ -72,7 +74,14 @@ export function platePasses(plates: Plates, palette: Palette): PlatePass[] {
         flat(palette.ink, [0, 0], 1),
       ];
     case 'colour':
-      return [{ inkOf: (pop) => populationInk(pop, palette), off: [0, 0], gain: 1 }];
+      return [
+        {
+          inkOf: (pop) => populationInk(pop, palette),
+          off: [0, 0],
+          gain: 1,
+          tints: palette.ramp,
+        },
+      ];
     case 'ink':
       return [flat(WHITE, [0, 0], 1)];
   }

@@ -2,143 +2,143 @@
   "figures": {
     "stars": {
       "file": "docs/img/figures/stars.jpg",
-      "bytes": 316904
+      "bytes": 316796
     },
     "star-zoom": {
       "file": "docs/img/figures/star-zoom.jpg",
-      "bytes": 226181
+      "bytes": 228886
     },
     "artefacts": {
       "file": "docs/img/figures/artefacts.jpg",
-      "bytes": 260443
+      "bytes": 258672
     },
     "layered": {
       "file": "docs/img/figures/layered.jpg",
-      "bytes": 411634
+      "bytes": 381217
     },
     "sky": {
       "file": "docs/img/figures/sky.jpg",
-      "bytes": 321673
+      "bytes": 353559
     },
     "foreground": {
       "file": "docs/img/figures/foreground.jpg",
-      "bytes": 150848
+      "bytes": 193328
     },
     "arms": {
       "file": "docs/img/figures/arms.jpg",
-      "bytes": 531188
+      "bytes": 487787
     },
     "kinds": {
       "file": "docs/img/figures/kinds.jpg",
-      "bytes": 438631
+      "bytes": 460585
     },
     "hand": {
       "file": "docs/img/figures/hand.jpg",
-      "bytes": 418518
+      "bytes": 503213
     },
     "lenses": {
       "file": "docs/img/figures/lenses.jpg",
-      "bytes": 423166
+      "bytes": 540820
     },
     "lens-offset": {
       "file": "docs/img/figures/lens-offset.jpg",
-      "bytes": 220863
+      "bytes": 287307
     },
     "mergers": {
       "file": "docs/img/figures/mergers.jpg",
-      "bytes": 483201
+      "bytes": 483958
     },
     "merger-sequence": {
       "file": "docs/img/figures/merger-sequence.jpg",
-      "bytes": 271464
+      "bytes": 271698
     },
     "shells": {
       "file": "docs/img/figures/shells.jpg",
-      "bytes": 248432
+      "bytes": 303950
     },
     "pen": {
       "file": "docs/img/figures/pen.jpg",
-      "bytes": 272593
+      "bytes": 307581
     },
     "presets": {
       "file": "docs/img/figures/presets.jpg",
-      "bytes": 787377
+      "bytes": 785083
     },
     "anatomy": {
       "file": "docs/img/figures/anatomy.jpg",
-      "bytes": 389178
+      "bytes": 520226
     }
   },
   "gifs": {
     "spiral-orbit": {
       "file": "docs/img/gifs/spiral-orbit.gif",
-      "bytes": 2491482,
-      "frames": 75,
-      "fps": 15,
-      "encoded": "378 px, 24 colours"
-    },
-    "merger-mice": {
-      "file": "docs/img/gifs/merger-mice.gif",
-      "bytes": 2337983,
-      "frames": 110,
-      "fps": 15,
-      "encoded": "378 px, 24 colours"
-    },
-    "anatomy": {
-      "file": "docs/img/gifs/anatomy.gif",
-      "bytes": 2529597,
-      "frames": 140,
-      "fps": 15,
-      "encoded": "357 px, 16 colours"
-    },
-    "edge-on-orbit": {
-      "file": "docs/img/gifs/edge-on-orbit.gif",
-      "bytes": 2300535,
+      "bytes": 2521448,
       "frames": 75,
       "fps": 15,
       "encoded": "315 px, 16 colours"
     },
+    "merger-mice": {
+      "file": "docs/img/gifs/merger-mice.gif",
+      "bytes": 2482710,
+      "frames": 110,
+      "fps": 15,
+      "encoded": "420 px, 24 colours"
+    },
+    "anatomy": {
+      "file": "docs/img/gifs/anatomy.gif",
+      "bytes": 2067236,
+      "frames": 140,
+      "fps": 15,
+      "encoded": "252 px, 12 colours"
+    },
+    "edge-on-orbit": {
+      "file": "docs/img/gifs/edge-on-orbit.gif",
+      "bytes": 1999924,
+      "frames": 75,
+      "fps": 15,
+      "encoded": "357 px, 16 colours"
+    },
     "pen-dive": {
       "file": "docs/img/gifs/pen-dive.gif",
-      "bytes": 2505109,
+      "bytes": 2071056,
       "frames": 90,
       "fps": 15,
-      "encoded": "286 px, 16 colours"
+      "encoded": "252 px, 12 colours"
     },
     "merger-tails": {
       "file": "docs/img/gifs/merger-tails.gif",
-      "bytes": 1846075,
+      "bytes": 1985403,
       "frames": 110,
       "fps": 15,
       "encoded": "420 px, 32 colours"
     },
     "merger-polar": {
       "file": "docs/img/gifs/merger-polar.gif",
-      "bytes": 1608779,
+      "bytes": 1916113,
       "frames": 110,
       "fps": 15,
       "encoded": "420 px, 32 colours"
     },
     "merger-torn": {
       "file": "docs/img/gifs/merger-torn.gif",
-      "bytes": 2164181,
+      "bytes": 2349788,
       "frames": 110,
       "fps": 15,
-      "encoded": "378 px, 24 colours"
+      "encoded": "420 px, 24 colours"
     },
     "lens-ring": {
       "file": "docs/img/gifs/lens-ring.gif",
-      "bytes": 2215043,
+      "bytes": 2057540,
       "frames": 90,
       "fps": 15,
-      "encoded": "286 px, 16 colours"
+      "encoded": "252 px, 12 colours"
     },
     "lens-quasar": {
       "file": "docs/img/gifs/lens-quasar.gif",
-      "bytes": 2156606,
+      "bytes": 2540502,
       "frames": 90,
       "fps": 15,
-      "encoded": "315 px, 16 colours"
+      "encoded": "286 px, 16 colours"
     },
     "lens-sketch": {
       "file": "docs/img/gifs/lens-sketch.gif",
@@ -149,52 +149,52 @@
     },
     "morph": {
       "file": "docs/img/gifs/morph.gif",
-      "bytes": 2524787,
+      "bytes": 2390509,
       "frames": 90,
       "fps": 15,
-      "encoded": "357 px, 16 colours"
+      "encoded": "286 px, 16 colours"
     },
     "shells": {
       "file": "docs/img/gifs/shells.gif",
-      "bytes": 2294092,
+      "bytes": 2457311,
       "frames": 104,
       "fps": 15,
       "encoded": "378 px, 24 colours"
     },
     "deep-field": {
       "file": "docs/img/gifs/deep-field.gif",
-      "bytes": 2518682,
+      "bytes": 1829714,
       "frames": 90,
       "fps": 15,
-      "encoded": "315 px, 16 colours"
+      "encoded": "252 px, 12 colours"
     },
     "star-dive": {
       "file": "docs/img/gifs/star-dive.gif",
-      "bytes": 2324496,
+      "bytes": 2324553,
       "frames": 90,
       "fps": 15,
       "encoded": "286 px, 16 colours"
     },
     "surfaces": {
       "file": "docs/img/gifs/surfaces.gif",
-      "bytes": 343746,
+      "bytes": 387197,
       "frames": 50,
       "fps": 20,
       "encoded": "420 px, 64 colours"
     },
     "breathe": {
       "file": "docs/img/gifs/breathe.gif",
-      "bytes": 1229162,
+      "bytes": 1751812,
       "frames": 90,
       "fps": 15,
       "encoded": "420 px, 96 colours"
     },
     "lens-double": {
       "file": "docs/img/gifs/lens-double.gif",
-      "bytes": 2138130,
+      "bytes": 2355194,
       "frames": 75,
       "fps": 15,
-      "encoded": "315 px, 16 colours"
+      "encoded": "286 px, 16 colours"
     }
   },
   "gz2": {
@@ -207,7 +207,7 @@
       "matches": 39506,
       "cutout": null,
       "file": "docs/img/gz2/smooth.jpg",
-      "bytes": 231708
+      "bytes": 283886
     },
     "spiral": {
       "objid": "587722981742084144",
@@ -218,7 +218,7 @@
       "matches": 90360,
       "cutout": null,
       "file": "docs/img/gz2/spiral.jpg",
-      "bytes": 278000
+      "bytes": 263462
     },
     "barred": {
       "objid": "587722981750014126",
@@ -229,7 +229,7 @@
       "matches": 30581,
       "cutout": null,
       "file": "docs/img/gz2/barred.jpg",
-      "bytes": 254404
+      "bytes": 247030
     },
     "edge-on": {
       "objid": "587732771579953183",
@@ -240,7 +240,7 @@
       "matches": 16653,
       "cutout": null,
       "file": "docs/img/gz2/edge-on.jpg",
-      "bytes": 223530
+      "bytes": 214152
     },
     "merger": {
       "objid": "587731514215432360",
@@ -251,7 +251,7 @@
       "matches": 1215,
       "cutout": null,
       "file": "docs/img/gz2/merger.jpg",
-      "bytes": 219817
+      "bytes": 223228
     },
     "ring": {
       "objid": "587722982285312179",
@@ -262,7 +262,7 @@
       "matches": 6513,
       "cutout": null,
       "file": "docs/img/gz2/ring.jpg",
-      "bytes": 268604
+      "bytes": 276361
     },
     "irregular": {
       "objid": "587732048403497138",
@@ -273,7 +273,7 @@
       "matches": 901,
       "cutout": null,
       "file": "docs/img/gz2/irregular.jpg",
-      "bytes": 316577
+      "bytes": 330278
     },
     "many-arms": {
       "objid": "587729653428191602",
@@ -284,7 +284,7 @@
       "matches": 5622,
       "cutout": null,
       "file": "docs/img/gz2/many-arms.jpg",
-      "bytes": 330098
+      "bytes": 317584
     },
     "tight-arms": {
       "objid": "587725575886274642",
@@ -295,7 +295,7 @@
       "matches": 33584,
       "cutout": null,
       "file": "docs/img/gz2/tight-arms.jpg",
-      "bytes": 320450
+      "bytes": 308992
     },
     "loose-arms": {
       "objid": "587724648183234759",
@@ -306,11 +306,11 @@
       "matches": 7811,
       "cutout": null,
       "file": "docs/img/gz2/loose-arms.jpg",
-      "bytes": 251213
+      "bytes": 243711
     },
     "overview": {
       "file": "docs/img/gz2/overview.jpg",
-      "bytes": 277139
+      "bytes": 276542
     }
   },
   "real": {
@@ -339,86 +339,86 @@
       "category": "ring",
       "seed": 7941,
       "file": "docs/img/real/10.jpg",
-      "bytes": 165050
+      "bytes": 168070
     },
     "12": {
       "objid": "587741821066215489",
       "category": "spiral",
       "seed": 6057,
       "file": "docs/img/real/12.jpg",
-      "bytes": 173892
+      "bytes": 170087
     },
     "15": {
       "objid": "587741386738827731",
       "category": "barred",
       "seed": 9946,
       "file": "docs/img/real/15.jpg",
-      "bytes": 150347
+      "bytes": 150047
     },
     "19": {
       "objid": "587733079742021829",
       "category": "barred",
       "seed": 1884,
       "file": "docs/img/real/19.jpg",
-      "bytes": 166385
+      "bytes": 163369
     },
     "23": {
       "objid": "587738409796108477",
       "category": "spiral",
       "seed": 8748,
       "file": "docs/img/real/23.jpg",
-      "bytes": 147345
+      "bytes": 143497
     },
     "26": {
       "objid": "587729409148256445",
       "category": "barred",
       "seed": 7121,
       "file": "docs/img/real/26.jpg",
-      "bytes": 166950
+      "bytes": 164705
     },
     "27": {
       "objid": "587732702326685867",
       "category": "many arms",
       "seed": 7704,
       "file": "docs/img/real/27.jpg",
-      "bytes": 163689
+      "bytes": 158105
     },
     "34": {
       "objid": "588017109683732600",
       "category": "merger",
       "seed": 4572,
       "file": "docs/img/real/34.jpg",
-      "bytes": 137574
+      "bytes": 142007
     },
     "37": {
       "objid": "587735662619263234",
       "category": "irregular",
       "seed": 3937,
       "file": "docs/img/real/37.jpg",
-      "bytes": 169244
+      "bytes": 175168
     },
     "41": {
       "objid": "588017991777714325",
       "category": "edge-on",
       "seed": 6243,
       "file": "docs/img/real/41.jpg",
-      "bytes": 137515
+      "bytes": 133811
     },
     "00": {
       "file": "docs/img/real/00.jpg",
-      "bytes": 173553
+      "bytes": 204578
     },
     "03": {
       "file": "docs/img/real/03.jpg",
-      "bytes": 133044
+      "bytes": 151017
     },
     "06": {
       "file": "docs/img/real/06.jpg",
-      "bytes": 143666
+      "bytes": 139004
     },
     "08": {
       "file": "docs/img/real/08.jpg",
-      "bytes": 161394
+      "bytes": 156891
     }
   },
   "presets": [

@@ -244,3 +244,17 @@ describe('Surprise me', () => {
     expect(P).not.toEqual(presetParams('Grand design', P.seed));
   });
 });
+
+describe('the moment a surprise merger lands', () => {
+  it('has some still approaching and the rest from contact to late, from the one draw', async () => {
+    const { mergerStage } = await import('../../src/ui/surprise');
+    const u = Array.from({ length: 200 }, (_, i) => (i + 0.5) / 200);
+    const s = u.map(mergerStage);
+    expect(Math.min(...s)).toBeGreaterThanOrEqual(-1.2);
+    expect(Math.max(...s)).toBeLessThanOrEqual(4.5);
+    const before = s.filter((x) => x < 0.3).length / s.length;
+    expect(before).toBeGreaterThan(0.2);
+    expect(before).toBeLessThan(0.3);
+    expect(s.filter((x) => x > 3).length).toBeGreaterThan(20);
+  });
+});

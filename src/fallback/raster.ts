@@ -46,6 +46,8 @@ export interface SpriteParams {
   ink?: readonly [number, number, number];
   /** the plate's offset, plate units (the slipped plates) */
   off?: readonly [number, number];
+  /** the inks of tints 1 to 15 of a dot (ADR 0091); absent, a tint is `ink` */
+  tints?: readonly (readonly [number, number, number])[];
 }
 
 type M2 = [number, number, number, number];
@@ -151,7 +153,11 @@ export function rasteriseSprites(
   for (const s of instances) {
     // nothing to ink (and a lensed image that was switched off has a zero matrix, whose inverse is
     // not a number): the GPU's quad of no area covers no pixel
-    if (!(f(s.alpha) > 0)) continue;
+    // a dot's tint rides in its alpha: alpha + 2 · tint (ADR 0091)
+    const tint = Math.floor(f(s.alpha * 0.5));
+    const alpha = f(s.alpha - f(2 * tint));
+    const sink = tint > 0 && params.tints ? (params.tints[tint - 1] ?? ink) : ink;
+    if (!(alpha > 0)) continue;
     const m: M2 = [f(f(s.m[0]) * px), f(f(s.m[1]) * px), f(f(s.m[2]) * px), f(f(s.m[3]) * px)];
     const cx = f(f(f(s.x) + offX) * px);
     const cy = f(f(f(s.y) + offY) * px);
@@ -174,13 +180,13 @@ export function rasteriseSprites(
         const v = f(f(f(inv[1] * dx) + f(inv[3] * dy)) + 0.5);
         if (u < 0 || u > 1 || v < 0 || v > 1) continue;
         const t = sampleLevel(atlas, s.layer, u, v, lod);
-        const a = f(f(smoothstep(lo, hi, t) * f(s.alpha)) * f(params.gain));
+        const a = f(f(smoothstep(lo, hi, t) * alpha) * f(params.gain));
         if (a === 0) continue;
         const o = (y * W + x) * 4;
         const k = f(1 - a);
-        data[o] = f(f(ink[0] * a) + f((data[o] ?? 0) * k));
-        data[o + 1] = f(f(ink[1] * a) + f((data[o + 1] ?? 0) * k));
-        data[o + 2] = f(f(ink[2] * a) + f((data[o + 2] ?? 0) * k));
+        data[o] = f(f(sink[0] * a) + f((data[o] ?? 0) * k));
+        data[o + 1] = f(f(sink[1] * a) + f((data[o + 1] ?? 0) * k));
+        data[o + 2] = f(f(sink[2] * a) + f((data[o + 2] ?? 0) * k));
         data[o + 3] = f(a + f((data[o + 3] ?? 0) * k));
       }
     }

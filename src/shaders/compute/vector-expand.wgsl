@@ -182,7 +182,7 @@ fn tf(I: VInst, p: vec2<f32>) -> vec2<f32> {
   }
   if (I.warp == WARP_TIDE) {
     // a merging galaxy's mark carried by its tides (L1195): the grid, after the matrix
-    return sm_warp(tide_post(u32(I.w.x), place(I, p), I.w.y), vu.wobble);
+    return sm_warp(tide_post(u32(I.w.x), place(I, p), I.w.y).xy, vu.wobble);
   }
   if (I.warp == WARP_TIDE_SCREEN) {
     // mWarp's whole drawing (L1196): the tidal map itself, on the raw drawing coordinates
@@ -190,7 +190,7 @@ fn tf(I: VInst, p: vec2<f32>) -> vec2<f32> {
     if (I.w.y != 0.0) {
       q.x = -q.x;
     }
-    return sm_warp(tide_nn(u32(I.w.x), q.x, q.y), vu.wobble);
+    return sm_warp(tide_nn(u32(I.w.x), q.x, q.y).xy, vu.wobble);
   }
   return sm_warp(place(I, p), vu.wobble);
 }

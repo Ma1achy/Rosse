@@ -53,9 +53,13 @@ function jobOf(X: StarInputs, slot: number): number {
   return lo;
 }
 
+/** The draw that decides whether the dust passes a mark: after every draw the marks make (0 to 4). */
+const DRAW_KEEP = 5;
+
 /**
  * Slot `slot` (0-based among the star slots): its mark into `outF`/`outU` at instance
- * `out_base + slot`, and its class (Cls.none when it makes none).
+ * `out_base + slot`, and its class (Cls.none when it makes none, or when its draw `DRAW_KEEP` is not
+ * below the job's keep, exp(−tau) of the dust in front of the star: ADR 0074).
  */
 export function starMark(
   X: StarInputs,
@@ -63,6 +67,16 @@ export function starMark(
   outF: Float32Array,
   outU: Uint32Array,
 ): number {
+  const cls = starMarkOf(X, slot, outF, outU);
+  if (cls === Cls.none) return cls;
+  const j = jobOf(X, slot);
+  const keep = X.jobsF[j * STAR_JOB_WORDS + 13] ?? 1;
+  const idx =
+    ((X.jobsU[j * STAR_JOB_WORDS + 11] ?? 0) + slot - (X.jobsU[j * STAR_JOB_WORDS + 9] ?? 0)) >>> 0;
+  return randF32((X.u.key ?? 0) >>> 0, Stream.stars, idx, DRAW_KEEP) < keep ? cls : Cls.none;
+}
+
+function starMarkOf(X: StarInputs, slot: number, outF: Float32Array, outU: Uint32Array): number {
   const oo = ((X.u.out_base ?? 0) + slot) * INSTANCE_WORDS;
   outF.fill(0, oo, oo + INSTANCE_WORDS);
   const j = jobOf(X, slot);

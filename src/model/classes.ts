@@ -21,4 +21,9 @@ export const SampleFlag = {
   carve: 1 << 11,
   /** a bright drawn star (M7): it clears a breathing room among the stipple (app23.js:L191) */
   bright: 1 << 12,
+  /** the colour plate's tint of a dot (0 the population's own ink, 1 to 15 the palette's ramp), bits 13 to 16 */
+  tint: 15 << 13,
 } as const;
+
+/** Where a sample's tint sits in `cls` (ADR 0091). */
+export const TINT_SHIFT = 13;

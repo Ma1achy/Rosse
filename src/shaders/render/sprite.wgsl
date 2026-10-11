@@ -38,6 +38,22 @@ struct Sprite {
   layer_count: u32,
   // the plate's offset, plate units (the slipped plates' `uOff`, app23.js:L1093)
   off: vec2<f32>,
+  // the inks of tints 1 to 15 of a dot (ADR 0091); a tint without a ramp is the ink
+  tint1: vec4<f32>,
+  tint2: vec4<f32>,
+  tint3: vec4<f32>,
+  tint4: vec4<f32>,
+  tint5: vec4<f32>,
+  tint6: vec4<f32>,
+  tint7: vec4<f32>,
+  tint8: vec4<f32>,
+  tint9: vec4<f32>,
+  tint10: vec4<f32>,
+  tint11: vec4<f32>,
+  tint12: vec4<f32>,
+  tint13: vec4<f32>,
+  tint14: vec4<f32>,
+  tint15: vec4<f32>,
 }
 
 @group(0) @binding(0) var<uniform> sprite: Sprite;
@@ -54,6 +70,7 @@ struct VertexOut {
   @location(2) @interpolate(flat) layer: u32,
   @location(3) @interpolate(flat) alpha: f32,
   @location(4) @interpolate(flat) lod: f32,
+  @location(5) @interpolate(flat) tint: u32,
 }
 
 // The quad corners, as the reference's strip (-.5,-.5), (.5,-.5), (-.5,.5), (.5,.5).
@@ -95,7 +112,10 @@ fn vs(@builtin(vertex_index) v: u32, @builtin(instance_index) i: u32) -> VertexO
   out.centre = centre;
   out.inv = inverse2(m);
   out.layer = s.layer - sprite.layer_base;
-  out.alpha = s.alpha;
+  // a dot's tint rides in its alpha: alpha + 2 * tint (ADR 0091)
+  let tint = u32(floor(s.alpha * 0.5));
+  out.alpha = s.alpha - 2.0 * f32(tint);
+  out.tint = tint;
   out.lod = sprite_lod(s.m);
   return out;
 }
@@ -109,5 +129,24 @@ fn fs(in: VertexOut) -> @location(0) vec4<f32> {
   }
   let t = textureSampleLevel(atlas, atlas_sampler, uv, in.layer, in.lod).r;
   let a = smoothstep(sprite.edge.x, sprite.edge.y, t) * in.alpha * sprite.gain;
-  return vec4<f32>(sprite.ink.rgb * a, a);
+  var ink = sprite.ink.rgb;
+  switch in.tint {
+    case 1u: { ink = sprite.tint1.rgb; }
+    case 2u: { ink = sprite.tint2.rgb; }
+    case 3u: { ink = sprite.tint3.rgb; }
+    case 4u: { ink = sprite.tint4.rgb; }
+    case 5u: { ink = sprite.tint5.rgb; }
+    case 6u: { ink = sprite.tint6.rgb; }
+    case 7u: { ink = sprite.tint7.rgb; }
+    case 8u: { ink = sprite.tint8.rgb; }
+    case 9u: { ink = sprite.tint9.rgb; }
+    case 10u: { ink = sprite.tint10.rgb; }
+    case 11u: { ink = sprite.tint11.rgb; }
+    case 12u: { ink = sprite.tint12.rgb; }
+    case 13u: { ink = sprite.tint13.rgb; }
+    case 14u: { ink = sprite.tint14.rgb; }
+    case 15u: { ink = sprite.tint15.rgb; }
+    default: {}
+  }
+  return vec4<f32>(ink * a, a);
 }

@@ -42,6 +42,10 @@ export const SKY_SHEETS = [
   'arms',
 ] as const satisfies readonly VectorAtlas[];
 
+/** The foreground stars' ball with `depthAuto`, galaxy units (ADR 0090). */
+export const FG_NEAR = 3;
+export const FG_FAR = 26;
+
 /** The most background galaxies and foreground stars (L871, L874). */
 export const SKY_BG_MAX = 6000;
 export const SKY_FG_MAX = 2500;
@@ -109,7 +113,10 @@ export function skyItems(lib: PackedVectors, meta: DrawingsMeta): number[] {
 export function skyCounts(P: Params): { bg: number; fg: number; companions: number } {
   return {
     bg: P.field > 0.02 ? Math.min(SKY_BG_MAX, Math.round((P.field * 26) / 0.0145)) : 0,
-    fg: P.fgstars > 0.02 ? Math.min(SKY_FG_MAX, Math.round((P.fgstars * 7) / 0.021)) : 0,
+    fg:
+      P.fgstars > 0.02
+        ? Math.min(SKY_FG_MAX, Math.round((P.fgstars * 7 * (P.depthAuto > 0 ? 4 : 1)) / 0.021))
+        : 0,
     companions: P.companions > 0.05 ? Math.round(1 + 3 * P.companions) : 0,
   };
 }
@@ -149,9 +156,14 @@ export function ownCatalogue(
     const u = unit3(r);
     // v21 parity: the radius factor is drawn afresh for each coordinate (`unit3(r).map(x · R_FG ·
     // (0.85 + 0.3 r()))`, app23.js:L875), so the stars lie in a thick shell, not on a sphere
-    const fx = f(R_FG * f(0.85 + f(0.3 * r.f32())));
-    const fy = f(R_FG * f(0.85 + f(0.3 * r.f32())));
-    const fz = f(R_FG * f(0.85 + f(0.3 * r.f32())));
+    let fx = f(R_FG * f(0.85 + f(0.3 * r.f32())));
+    let fy = f(R_FG * f(0.85 + f(0.3 * r.f32())));
+    let fz = f(R_FG * f(0.85 + f(0.3 * r.f32())));
+    if (P.depthAuto > 0) {
+      // a shell of v21's radius lies outside the camera's cone, so the slider drew nothing: with
+      // `depthAuto` the stars fill a ball round the galaxy, near enough to be seen (ADR 0090)
+      fx = fy = fz = f(FG_NEAR + f(f(FG_FAR - FG_NEAR) * Math.cbrt(f(0.05 + 0.95 * r.f32()))));
+    }
     const tile = Math.floor(r.f32() * nTiles.fgstars);
     const size = f(16 + f(26 * r.f32()));
     const rot = f(f(r.f32() - 0.5) * f(0.6));

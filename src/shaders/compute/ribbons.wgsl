@@ -4,7 +4,8 @@
 //
 // Entry points, in dispatch order:
 //   project_points  every scene point (curves, lane points, carving lines, hatch anchors) to the
-//                   plate, as project (app23.js:L153);
+//                   plate, as project (app23.js:L153); a point flagged by w = 1 is a
+//                   screen-space offset instead: mirrored and rolled, not orbited (ADR 0073);
 //   measure         ONE invocation, sequential and so deterministic: per curve the arc-length
 //                   prefix sum, the total, cw = clamp(PEN.line * w * h / thick, 6, 90), kpx,
 //                   reps = max(1, round(tot / (1.4 * 512 * kpx))) (1 when stretched), the first
@@ -78,7 +79,7 @@ struct CurveState {
   // the first slot of the curve's pieces
   base: u32,
   alpha: f32,
-  pad0: u32,
+  dk: f32,
   pad1: u32,
 }
 
@@ -153,7 +154,14 @@ fn project_points(@builtin(global_invocation_id) id: vec3<u32>) {
   if (i >= rib.n_points) {
     return;
   }
-  points[i] = to_plate(view, rot_fwd(view, points3[i].xyz).xy);
+  let p = points3[i];
+  if (p.w != 0.0) {
+    // a screen-space offset (the edge-on midplane's lines, ADR 0073): mirrored, rolled, not orbited
+    points[i] = to_plate(view, vec2<f32>(p.x * view.winding, p.y));
+    return;
+  }
+  let rv = rot_fwd(view, p.xyz);
+  points[i] = to_plate(view, rv.xy * select(1.0, persp_k(view, rv.z), view.persp > 0.0));
 }
 
 @compute @workgroup_size(1)
@@ -193,7 +201,15 @@ fn measure() {
     if ((cv.flags & FLAG_EDGE_ALPHA) != 0u) {
       alpha = rib.edge_alpha;
     }
-    state[c] = CurveState(tot, cw, kpx, reps, base, alpha, 0u, 0u);
+    // the ink's width follows the depth of the curve's middle point (ADR 0084)
+    var dk = 1.0;
+    if (view.persp != 0.0 && cv.n > 0u) {
+      let m3 = points3[cv.first + cv.n / 2u];
+      if (m3.w == 0.0) {
+        dk = persp_k(view, rot_fwd(view, m3.xyz).z);
+      }
+    }
+    state[c] = CurveState(tot, cw, kpx, reps, base, alpha, dk, 0u);
   }
   args[0] = 4u;
   args[1] = total;
@@ -267,7 +283,7 @@ fn expand(@builtin(global_invocation_id) id: vec3<u32>) {
     if (taper) {
       tap = 1.1 - 0.45 * fr;
     }
-    let w = (st.cw * tap) / 2.0;
+    let w = ((st.cw * tap) * st.dk) / 2.0;
     let p = points[cv.first + e];
     corners[2u * k] = sm_warp(vec2<f32>(p.x + nx * w, p.y + ny * w), rib.wobble);
     corners[2u * k + 1u] = sm_warp(vec2<f32>(p.x - nx * w, p.y - ny * w), rib.wobble);

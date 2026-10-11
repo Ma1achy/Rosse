@@ -52,6 +52,7 @@ import {
 import type { CompanionPick } from './sky';
 import { smWarp, wobbleAmplitude } from '../view/warp';
 import { armPhaseCpu } from './curves';
+import { effectiveDust } from './dust';
 import type { DrawingsMeta, Variation } from './variation';
 
 const DEG = Math.PI / 180;
@@ -81,6 +82,8 @@ export const PartIndex = {
   jet: 12,
   /** stream q uses index `streams + q` */
   streams: 20,
+  /** stream q's tilt out of the galaxy plane (ADR 0085) uses `streamTilt + q` */
+  streamTilt: 40,
 } as const;
 
 /**
@@ -194,13 +197,19 @@ export function rewind(x: number, y: number, dk: number, flip: boolean): [number
 export function wholeTypeOf(P: Params, incl: number): string {
   if (P.kind !== 'auto') return P.kind;
   const e = incE(incl);
-  const ci = Math.cos(incl * DEG);
+  // v21 used the signed cos i, so a galaxy seen from below (90°–270°) was always elongated
+  // (ADR 0073); |cos i| is symmetric about 90°
+  const ci = Math.abs(Math.cos(incl * DEG));
   if (P.bulge >= 0.95)
     return P.bulgeFlat * Math.max(ci, 0.05) < 0.5 || (e > 70 && P.bulgeFlat < 0.6)
       ? 'smooth:elongated'
       : 'smooth';
   if (e > 78)
-    return P.dust > 0.3 ? 'edge-on:dust-lane' : P.bulge < 0.08 ? 'edge-on:thick' : 'edge-on';
+    return effectiveDust(P) > 0.3
+      ? 'edge-on:dust-lane'
+      : P.bulge < 0.08
+        ? 'edge-on:thick'
+        : 'edge-on';
   if (P.flocc > 0.5) return 'galaxy:flocculent';
   if (P.bar > 0.3) return 'galaxy:barred-spiral';
   return P.arms >= 1 ? 'galaxy:spiral' : 'smooth';
@@ -418,6 +427,14 @@ export function ownPartPicks(P: Params, V: Variation, meta: DrawingsMeta, incl: 
   return picks;
 }
 
+/**
+ * How far stream q's orbit is tilted out of the galaxy's plane, radians (ADR 0085): drawn on the
+ * stream's own counter, so a stream keeps its plane whatever else changes.
+ */
+export function streamTilt(seed: number, q: number): number {
+  return 0.35 + 0.95 * new Draws(seed, Stream.parts, PartIndex.streamTilt + q).f32();
+}
+
 /** The streams' pen lines bent round the galaxy (L1072–1075), in galaxy units about the centre. */
 export function streamPolylines(picks: PartPicks, penlines: VectorSheet | undefined) {
   const out: [number, number][][] = [];
@@ -447,7 +464,13 @@ export function describeParts(
 ): PartsDesc {
   const picks = given ?? ownPartPicks(P, V, meta, incl);
   const wholeType = picks.whole ? wholeTypeOf(P, incl) : null;
-  return { picks, wholeType, streams: streamPolylines(picks, meta.vectors?.penlines) };
+  // with `lineWorld` the streams are bundles of 3D strokes (curves.ts, ADR 0089)
+  const strands = P.lineWorld > 0 && P.lines > 0;
+  return {
+    picks,
+    wholeType,
+    streams: strands ? [] : streamPolylines(picks, meta.vectors?.penlines),
+  };
 }
 
 /**
@@ -471,7 +494,8 @@ export function vectorRows(
   const cy = PLATE / 2;
   const D = discM(cam);
   const pa = cam.pa * DEG;
-  const ci = Math.cos(cam.incl * DEG);
+  // |cos i|, not v21's signed ci() (ADR 0073): the flattening is symmetric about 90°
+  const ci = Math.abs(Math.cos(cam.incl * DEG));
   const by: Record<string, VectorRow[]> = {};
   const add = (atlas: VectorAtlas, row: Omit<VectorRow, 'atlas'>) => {
     (by[atlas] ??= []).push({ atlas, ...row });
@@ -552,7 +576,7 @@ export function vectorRows(
     const s4 = 2 * 2.8 * sc;
     add('shells', { ...centre, tile: pk.shells.tile, m: chain(Rm(pk.shells.spin), Sm(s4, s4)) });
   }
-  if (pk.tail) {
+  if (pk.tail && !(P.lineWorld > 0 && P.lines > 0)) {
     const a = pk.tail.ang;
     add('penlines', {
       ...centre,
@@ -602,7 +626,38 @@ export function vectorRows(
       add('rings', { x, y, alpha: 1, ps: 0.6, tile: b.tile, m: chain(D, Rm(b.spin), Sm(bs, bs)) });
     }
   }
-  if (pk.jet) {
+  if (pk.jet && P.lineWorld > 0 && P.lines > 0) {
+    // drawn as a bundle of 3D strokes instead (ADR 0089)
+  } else if (pk.jet && P.lineWorld > 0) {
+    // the jet is a real thing along the galaxy's own axis, a little off it (ADR 0085): the two
+    // lobes run out from the centre in 3D and are projected, so a face-on jet points at the
+    // viewer (short, a blob) and an edge-on one stands up out of the disc
+    const tilt = 0.14;
+    const dir: [number, number, number] = [
+      Math.sin(tilt) * Math.cos(pk.jet.ang),
+      Math.sin(tilt) * Math.sin(pk.jet.ang),
+      Math.cos(tilt),
+    ];
+    const base = project([0, 0, 0], cam);
+    const Lg = 3 + 1.0 * pk.jet.u;
+    for (const s2 of [1, -1]) {
+      const len = Lg * (s2 > 0 ? 1 : 0.65);
+      const tip = project([dir[0] * s2 * len, dir[1] * s2 * len, dir[2] * s2 * len], cam);
+      const dx = tip[0] - base[0];
+      const dy = tip[1] - base[1];
+      const w = 0.2 * len * sc;
+      const L = Math.max(Math.hypot(dx, dy), 1.4 * w);
+      const ang = Math.atan2(dy, dx);
+      add('misc', {
+        x: base[0] + Math.cos(ang) * L * 0.5,
+        y: base[1] + Math.sin(ang) * L * 0.5,
+        alpha: 1,
+        ps: 1.1,
+        tile: 0,
+        m: chain(Rm(ang), Sm(L, w)),
+      });
+    }
+  } else if (pk.jet) {
     const ja = pk.jet.ang;
     const jl = (3.6 + 1.0 * pk.jet.u) * sc;
     for (const s2 of [1, -1]) {
@@ -634,12 +689,33 @@ export function vectorRows(
   return order.flatMap((a) => by[a] ?? []);
 }
 
+/** GLSL smoothstep. */
+export function smoothstep(a: number, b: number, x: number): number {
+  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+}
+
 /**
- * The drawn core (app23.js:L1028–1035): for a bulge between 0.03 and 0.97, not a Sérsic galaxy,
- * and not edge-on past 80°. The core drawing is picked by bulge strength among the `core` kind,
- * preferring the dotted style for stipple-heavy or steep views, scaled by bulge size and flattened
- * by max(bulgeFlat, cos incl), at alpha 0.9. With `nuclear`, the nuclear spiral (a `cores` drawing
- * of that kind, picked by the parts) laid on the disc at 0.9 of the core's size.
+ * How much of the drawn core's ink shows: 1, opaque (ADR 0079, ADR 0092). v21 drew it at 0.9; with
+ * `coreAuto` it is drawn first, under the disc's marks, at the same strength.
+ */
+export const CORE_BEHIND_ALPHA = 1;
+export const coreAlpha = (P: Params): number => (P.coreAuto > 0 ? CORE_BEHIND_ALPHA : 1);
+
+/**
+ * The drawn core (app23.js:L1028–1035): for a bulge between 0.03 and 0.97 and not a Sérsic galaxy.
+ * The core drawing is picked by bulge strength among the `core` kind, flattened by
+ * max(bulgeFlat, |cos incl|), scaled by bulge size. With `nuclear`, the nuclear spiral (a `cores`
+ * drawing of that kind, picked by the parts) laid on the disc at 0.9 of the core's size.
+ *
+ * Deviations from v21 (ADR 0073, 0079): the flattening uses |cos i| (v21's signed `ci()` squashed a
+ * core seen from below), and the core is **one opaque drawing that does not depend on the camera
+ * but for its flattening**: v21 drew it at alpha 0.9, swapped its line drawing for the dotted one
+ * at incE 70, and dropped it from 80 (ADR 0073 cross-faded both, which left it half transparent
+ * over a range of angles). Here it is at full alpha, its style is the dotted one when the galaxy is
+ * stipple-only (`stipple > 0.5 && lines < 0.5`) and the line one otherwise, whatever the view, and
+ * it stays, flattened by `bulgeFlat`, edge-on. With `coreAuto` it is drawn first, under the disc's marks
+ * (`coreAlpha`, ADR 0092).
  */
 export function coreInstances(
   P: Params,
@@ -648,25 +724,22 @@ export function coreInstances(
   field?: NoiseField | null,
   nuclear?: number | null,
 ): Instance[] {
-  const e = incE(cam.incl);
   // a star or an artefact has no galaxy, so no core (render(), app23.js:L1230 empties them)
   if (P.subject !== 'galaxy') return [];
-  if (!(P.bulge > 0.03 && P.bulge < 0.97) || (P.sersicN > 0 && P.bulge >= 0.95) || e >= 80)
-    return [];
+  if (!(P.bulge > 0.03 && P.bulge < 0.97) || (P.sersicN > 0 && P.bulge >= 0.95)) return [];
   const n = meta.cores.kind.filter((k) => k === 'core').length;
   if (n < 1) return [];
-  const wantS = (P.stipple > 0.5 && P.lines < 0.5) || e > 70 ? 'dotted' : 'line';
-  let idx = Math.min(n - 1, Math.floor(Math.pow(P.bulge, 0.6) * n));
-  for (let k = 0; k < n; k++) {
-    const j = (idx + k) % n;
-    if (meta.cores.style[j] === wantS) {
-      idx = j;
-      break;
+  const start = Math.min(n - 1, Math.floor(Math.pow(P.bulge, 0.6) * n));
+  const styled = (want: string) => {
+    for (let k = 0; k < n; k++) {
+      const j = (start + k) % n;
+      if (meta.cores.style[j] === want) return j;
     }
-  }
+    return start;
+  };
   const sc = UNIT_SCALE * cam.zoom;
   const s = sc * (0.32 + 0.8 * P.bulgeSize * Math.sqrt(P.bulge));
-  const ci = Math.cos((cam.incl * Math.PI) / 180);
+  const ci = Math.abs(Math.cos((cam.incl * Math.PI) / 180));
   const a = (cam.pa * Math.PI) / 180;
   const sy = s * Math.max(P.bulgeFlat, ci);
   // chain(Rm(pa), Sm(s, sy))
@@ -674,8 +747,18 @@ export function coreInstances(
   const sn = Math.sin(a);
   // a bitmap mark's centre goes through the hand wobble (inst, app23.js:L171)
   const [x, y] = smWarp(PLATE / 2, PLATE / 2, wobbleAmplitude(P.distort), field);
-  const out: Instance[] = [{ x, y, layer: idx, alpha: 0.9, m: [c * s, sn * s, -sn * sy, c * sy] }];
+  const m: Instance['m'] = [c * s, sn * s, -sn * sy, c * sy];
+  const dotted = P.stipple > 0.5 && P.lines < 0.5;
+  const out: Instance[] = [
+    { x, y, layer: dotted ? styled('dotted') : styled('line'), alpha: coreAlpha(P), m },
+  ];
   if (nuclear !== undefined && nuclear !== null && P.nuclear)
-    out.push({ x, y, layer: nuclear, alpha: 0.9, m: chain(discM(cam), Sm(s * 0.9, s * 0.9)) });
+    out.push({
+      x,
+      y,
+      layer: nuclear,
+      alpha: coreAlpha(P),
+      m: chain(discM(cam), Sm(s * 0.9, s * 0.9)),
+    });
   return out;
 }

@@ -23,7 +23,15 @@ import { markGroups } from '../../src/model/clumps';
 import { buildScene, drawingsMeta } from '../../src/model/scene';
 import { atlasFromBytes, type BuiltIndex } from '../../src/marks/atlas';
 import type { VectorSheet } from '../../src/marks/vector';
-import { cameraOf, incE, project, structureKey, viewDesc } from '../../src/view/camera';
+import {
+  cameraOf,
+  incE,
+  project,
+  structureKey,
+  viewDesc,
+  type Camera,
+} from '../../src/view/camera';
+import type { Vec3 } from '../../src/model/curves';
 import { v21Variation } from '../golden/compare/v21';
 import { v21CurvePicks, v21DustPicks, v21Lines, v21RingKnots } from '../golden/compare/v21-curves';
 import { v21NoiseTables } from '../golden/compare/v21-noise';
@@ -116,7 +124,7 @@ describe('dust lanes against v21 (app23.js:L944–985)', () => {
         expect(ours.pts.length).toBe(theirs.pts.length);
         let worst = 0;
         ours.pts.forEach((p, j) => {
-          const q = project(p, cam);
+          const q = ours.screenPts ? screenPoint(p, cam) : project(p, cam);
           const t = theirs.pts[j] ?? [0, 0];
           worst = Math.max(worst, Math.hypot(q[0] - (t[0] ?? 0), q[1] - (t[1] ?? 0)));
         });
@@ -128,6 +136,17 @@ describe('dust lanes against v21 (app23.js:L944–985)', () => {
         }
       });
 });
+
+/** A screen-space offset to the plate (ribbons.wgsl `project_points` for a flagged point). */
+function screenPoint(p: Vec3, cam: Camera): [number, number] {
+  const a = (cam.pa * Math.PI) / 180;
+  const x = p[0] * cam.winding;
+  const sc = 84 * cam.zoom;
+  return [
+    400 + (x * Math.cos(a) - p[1] * Math.sin(a)) * sc,
+    400 + (x * Math.sin(a) + p[1] * Math.cos(a)) * sc,
+  ];
+}
 
 describe("with v21's dust choices (ADR 0018), the hatches are v21's", () => {
   for (const [name, P] of CASES)
@@ -145,8 +164,10 @@ describe("with v21's dust choices (ADR 0018), the hatches are v21's", () => {
         let worstAng = 0;
         ours.hatches.forEach((h, i) => {
           // the view tier's layout (src/fallback/kernels/ribbons.ts hatchFrame), in f64
-          const q = project(h.a, cam);
-          const q2 = project(h.b, cam);
+          // the edge-on midplane's hatches are in screen space (ADR 0073): v21's, at azimuth 0
+          const place = (p: Vec3) => (h.screen ? screenPoint(p, cam) : project(p, cam));
+          const q = place(h.a);
+          const q2 = place(h.b);
           const a0 = Math.atan2(q2[1] - q[1], q2[0] - q[0]);
           const ang = a0 + h.dAng;
           const x = q[0] - Math.sin(a0) * h.offN * zoom + Math.cos(ang) * h.offF * zoom;
@@ -161,7 +182,8 @@ describe("with v21's dust choices (ADR 0018), the hatches are v21's", () => {
           const dA = Math.abs(ang - (t[2] ?? 0)) % (2 * Math.PI);
           worstAng = Math.max(worstAng, Math.min(dA, 2 * Math.PI - dA));
         });
-        expect(worst).toBeLessThan(1e-6);
+        // the screen-space rows keep their spacing, v21's z·sin i shrinks by at most 2% (0.05 px)
+        expect(worst).toBeLessThan(ours.screenPts ? 0.05 : 1e-6);
         expect(worstAng).toBeLessThan(1e-9);
       });
 });
@@ -382,22 +404,55 @@ describe('the ribbon kernels (CPU)', () => {
     expect(sig(79)).not.toBe(sig(81));
   });
 
-  it('the edge-on stroke takes its alpha from the raw inclination (v21 parity, L788)', () => {
+  it('the edge-on stroke takes lines * clamp((incE - 72) / 18, 0, 1) as its alpha (ADR 0073)', () => {
     const at = (incl: number) => {
       const P = presetParams('Edge-on with dust', 7, { incl });
       const R = buildScene(P, M).ribbons;
       return ribUniform(R, cameraOf(P), P, 1).edge_alpha;
     };
-    // 81° and 99° fall in one incE bucket, but v21's alpha is 0.5 and 1.5 × lines
+    // 81° and 99° are one incE bucket and now one alpha (v21's was 0.5 and 1.5 x lines)
     expect(at(81)).toBeCloseTo((0.5 * (81 - 72)) / 18, 5);
-    expect(at(99)).toBeCloseTo((0.5 * (99 - 72)) / 18, 5);
+    expect(at(99)).toBeCloseTo(at(81), 5);
+    expect(at(90)).toBeCloseTo(0.5, 5);
+  });
+  it('is clamped to [0, lines] over the whole circle (v21: 1.55 at 100, 11 at 270, < 0 at -90)', () => {
+    for (let incl = -360; incl <= 720; incl += 7) {
+      const a = edgeOnAlpha(0.8, incl);
+      expect(a).toBeGreaterThanOrEqual(0);
+      expect(a).toBeLessThanOrEqual(0.8 + 1e-12);
+    }
+    expect(edgeOnAlpha(1, 270)).toBeCloseTo(1, 12);
+    expect(edgeOnAlpha(1, 180)).toBe(0);
+    expect(edgeOnAlpha(1, -90)).toBeCloseTo(1, 12);
+    expect(edgeOnAlpha(1, 100)).toBeCloseTo(edgeOnAlpha(1, 80), 12);
+  });
+  it('keeps the same screen length along the roll axis at every azimuth (ADR 0073)', () => {
+    const spans = [0, 30, 60, 80, 90, 135].map((az) => {
+      const P = presetParams('Edge-on with dust', 7, { incl: 88, az, pa: 0, lines: 0.8 });
+      const scene = buildScene(P, M);
+      const R = scene.ribbons;
+      const cam = cameraOf(P, 1);
+      const rv = runRibbons(
+        ribbonModel(R, scene.galaxy.pool, scene.galaxy.dotBase),
+        viewDesc(cam, 0, 1, 1),
+        ribUniform(R, cam, P, 1),
+      );
+      const cu = new Uint32Array(R.curveBuf);
+      const i = R.curves.findIndex((c) => c.role === 'edge-on');
+      expect(i).toBeGreaterThanOrEqual(0);
+      const first = cu[i * 12] ?? 0;
+      const n = cu[i * 12 + 1] ?? 0;
+      const xs = Array.from({ length: n }, (_, j) => rv.points[(first + j) * 2] ?? 0);
+      return Math.max(...xs) - Math.min(...xs);
+    });
+    for (const s of spans) expect(s).toBeCloseTo(6.4 * 84, 3);
   });
 });
 
 describe('the edge-on stroke past 90° (review m1)', () => {
-  it('inks at most 1 on the raster, as v21 does through its RGBA8 canvas', () => {
+  it('inks at most 1 on the raster (the alpha is bounded now, ADR 0073)', () => {
     const P = presetParams('Edge-on with dust', 7, { lines: 1, incl: 99 });
-    expect(edgeOnAlpha(P.lines, P.incl)).toBeGreaterThan(1);
+    expect(edgeOnAlpha(P.lines, P.incl)).toBeLessThanOrEqual(1);
     const scene = buildScene(P, M);
     const st = new CpuStipple(scene);
     const v = st.view(cameraOf(P));

@@ -23,6 +23,23 @@ This repository is the rebuild of Rosse v21 (a single HTML page, kept in `assets
 
 <br>
 
+## Beyond v21
+
+v21 stays the oracle: the engine's core draws what v21 draws, and the goldens hold it to that. On top of that core, the page switches on a set of **natural features**, each an optional flag (off in the core, on in the page, listed per ADR in [docs/architecture.md](docs/architecture.md)), so a galaxy reads as a body in space and not a flat print. The pictures below are the page's.
+
+| the page draws | what changes | ADR |
+| --- | --- | --- |
+| **Depth and perspective** | marks shrink with distance and as the view zooms out; the disc dims a star behind it; the near and far sides of a galaxy and its debris differ | [0084](docs/adr/0084-the-galaxy-has-perspective.md), [0086](docs/adr/0086-the-disc-dims-a-star-behind-it.md), [0088](docs/adr/0088-a-merging-galaxys-marks-follow-depth.md) |
+| **Natural dust and bulges** | a dust layer in the disc, deprojected Sersic bulges, a boxy-peanut bulge for barred galaxies on request, dust as brush strokes at their own heights | [0075](docs/adr/0075-disc-galaxies-carry-a-natural-dust-layer.md), [0076](docs/adr/0076-bulges-follow-a-sersic-law.md), [0087](docs/adr/0087-dust-as-brush-strokes-in-3d.md) |
+| **A thin disc and 3D line-work** | a dense sharp plane with a few wanderers; arms, dust lanes, jets, streams and tails as 3D stroke bundles that stay put when you orbit | [0081](docs/adr/0081-line-work-in-three-dimensions.md), [0083](docs/adr/0083-a-thin-disc-with-a-few-wanderers.md), [0089](docs/adr/0089-jets-streams-and-tails-as-3d-stroke-bundles.md) |
+| **Stellar populations and colour** | old stars drawn fine and young ones large, clumps, halo clusters and streams of stars; a fifteen-ink colour plate whose colour follows temperature, radius, arms and dust, in pastel chalks on the Chalkboard and pencils on Paper | [0090](docs/adr/0090-stellar-populations.md), [0091](docs/adr/0091-a-stars-colour-follows-the-galaxy.md) |
+| **The drawn core behind the disc** | the central bitmap is drawn first, under the disc's stars, dust and strokes | [0092](docs/adr/0092-the-core-is-drawn-behind-the-disc.md) |
+| **Mergers that keep their galaxies' character** | a spiral holds its inner disc and crisper arms through the first pass, an elliptical is a soft glow, dust lanes and a bridge thin the stars and travel into the tails, tails carry tidal dwarfs, strokes taper at the tear, discs are thicker | [0093](docs/adr/0093-a-merger-keeps-its-galaxies-character.md) |
+
+Open `?dustAuto=0&bulgeAuto=0&starsAuto=0&cosmicAuto=0&strokesAuto=0&lineWorld=0&thinAuto=0&popAuto=0&depthAuto=0&occlAuto=0&coreAuto=0&mergeAuto=0` to see the core's drawing alone.
+
+<br>
+
 ## An atlas
 
 Every picture below was drawn by this engine, on SwiftShader (software WebGPU), at a fixed seed. The pictures are plates in the sense of an atlas: numbered, captioned, laid on a grid. Every galaxy, seed, parameter and camera path is in [`tools/readme-assets/plan.mjs`](tools/readme-assets/plan.mjs), and one command re-draws all of them (see [Regenerating](#regenerating-the-pictures)). The colour you see is the engine's own (the colour plates); nothing is added.
@@ -194,7 +211,7 @@ A lens is a galaxy (or a cluster) in front of a source: the source's drawing is 
 
 ### Mergers
 
-Mergers are simulated: a core track integrated on the CPU and test stars moved by the GPU, with the tides stretching the discs into tails. The merger's own timeline (`mTime`) runs from the approach to the settled remnant; each film below moves the camera with it.
+Mergers are simulated: a core track integrated on the CPU and test stars moved by the GPU, with the tides stretching the discs into tails. The merger's own timeline (`mTime`) runs from the approach to the settled remnant; each film below moves the camera with it. On the page each galaxy keeps its character through the first pass: a spiral its arms and dust lanes, an elliptical its smooth glow, with dust lanes and tidal dwarfs carried into the tails ([ADR 0093](docs/adr/0093-a-merger-keeps-its-galaxies-character.md)).
 
 <img src="docs/img/figures/mergers.jpg" alt="Fig. 20: nine merger presets, from the Mice to sketches torn apart" width="100%">
 
@@ -340,6 +357,8 @@ Each milestone is one reviewable pull request. The engine draws single galaxies,
 | M10 | Performance pass: pooling, kept batches, the CPU engine in a worker, the profiling and L1 harnesses | merged; real-hardware numbers open |
 | M11 | The page and its UI | merged |
 | M12 | The extras: Galaxy Zoo 2 catalogue, real galaxies, SVG and GIF export | built (pull request #15), wired into the page |
+
+Beyond the milestones, the pull request that follows them (#17) adds the natural features above, each behind a flag with its own ADR, and tests them on both engines.
 
 Still open: everything that needs a real GPU (the budget table of [docs/architecture.md](docs/architecture.md), the L1 report on a second adapter, and recalibrating the golden thresholds, [Q14](docs/open-questions.md)); measurements on a phone; the licence ([Q1](docs/open-questions.md)) and the SDSS acknowledgement wording the page must show; and the owner's sign-off of the proposed ADRs (0035, 0036, 0061 among them).
 

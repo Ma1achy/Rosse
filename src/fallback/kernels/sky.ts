@@ -330,7 +330,12 @@ export function fgStar(
   const k = f(CAM / depth);
   const q = toScreenF(V, v[0], v[1], k);
   if (!(q[0] > -40 && q[0] < PLATE + 40 && q[1] > -40 && q[1] < PLATE + 40)) return false;
-  const size = f((F[o + 3] ?? 0) * Math.min(f(2.2), f(k / f(0.42))));
+  // out of focus (ADR 0090), with `depthAuto`: a star near the camera is larger and fainter
+  const out = (V.persp ?? 0) !== 0;
+  const near = f(k / f(0.42));
+  const size = f((F[o + 3] ?? 0) * Math.min(out ? f(3) : f(2.2), near));
+  const tt = out ? Math.min(1, Math.max(0, f(f(near - f(1.1)) / f(1.3)))) : 0;
+  const alpha = out ? f(1 - f(f(0.45) * f(f(tt * tt) * f(3 - f(2 * tt))))) : 1;
   const rot = F[o + 4] ?? 0;
   const [px, py] = smWarp(q[0], q[1], X.view.wobble, X.noise);
   const c = cosF(rot);
@@ -339,7 +344,7 @@ export function fgStar(
   outF[at8] = px;
   outF[at8 + 1] = py;
   outU[at8 + 2] = X.fgU[o + 5] ?? 0;
-  outF[at8 + 3] = 1;
+  outF[at8 + 3] = alpha;
   outF[at8 + 4] = f(c * size);
   outF[at8 + 5] = f(s * size);
   outF[at8 + 6] = f(-f(s * size));

@@ -37,6 +37,8 @@ export type MergerType = 'spiral' | 'lenticular' | 'elliptical';
 
 /** The parameters that fix the simulation (v21's cache key, app23.js:L305, without the camera). */
 export interface MergerParams {
+  /** crisper arms in a spiral's initial stars (ADR 0093); absent is v21's */
+  mergeAuto?: number;
   seed: number;
   mRatio: number;
   mPeri: number;
@@ -81,6 +83,7 @@ export function mergerParamsOf(P: Params | MergerParams): MergerParams {
     mTilt: P.mTilt,
     mEcc: P.mEcc,
     mHorizon: P.mHorizon,
+    ...('mergeAuto' in P && P.mergeAuto > 0 ? { mergeAuto: P.mergeAuto } : {}),
   };
 }
 
@@ -464,6 +467,8 @@ export interface GalaxyIC {
   /** log-spiral pitch (the tangent of the winding angle) */
   pitch: number;
   bar: boolean;
+  /** 0 is v21's half of the stars on the arms, 0.25 rad wide; 1 is three quarters, 0.16 wide */
+  crisp: number;
   n: [number, number, number];
   e1: [number, number, number];
   e2: [number, number, number];
@@ -497,6 +502,7 @@ export function galaxyICs(
       arms: ARM[g] as number,
       pitch,
       bar: !!BAR[g],
+      crisp: (p.mergeAuto ?? 0) > 0 ? 1 : 0,
       n: fr.n,
       e1: fr.e1,
       e2: fr.e2,
@@ -786,6 +792,17 @@ export function mergerGalaxyParams(P: Params, g: 0 | 1, picks?: MergerPicks): Pa
       dustScribble: 0.2,
       bar: bar ? 0.7 : 0,
     };
+  // a spiral that keeps its character (ADR 0093): crisper arms with more contrast, more stars to
+  // carry them, knots along them
+  const keep: Partial<Params> =
+    P.mergeAuto > 0
+      ? {
+          armStrength: Math.max(P.armStrength, 0.95),
+          armWidth: P.armWidth * 0.7,
+          knots: Math.max(P.knots, 0.5),
+          stars: Math.round((P.mStars * 0.42 * share + 700) * 1.5),
+        }
+      : {};
   return {
     ...base,
     arms: g === 0 ? P.mArms1 : P.mArms2,
@@ -796,6 +813,7 @@ export function mergerGalaxyParams(P: Params, g: 0 | 1, picks?: MergerPicks): Pa
     lines: Math.min(P.lines, 0.45),
     flocc: 0,
     dustScribble: Math.min(P.dustScribble, 0.3),
+    ...keep,
   };
 }
 

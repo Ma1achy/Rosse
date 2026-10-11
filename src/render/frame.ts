@@ -273,7 +273,12 @@ export class GpuRenderer {
     let pass: GPURenderPassEncoder | null = null;
     for (const p of platePasses(look.plates, look.palette))
       for (const b of this.batches) {
-        const style = { ink: p.inkOf(b.pop), gain: p.gain, off: p.off };
+        const style = {
+          ink: p.inkOf(b.pop),
+          gain: p.gain,
+          off: p.off,
+          ...(p.tints ? { tints: p.tints } : {}),
+        };
         if (b.prepass) {
           pass?.end();
           pass = null;

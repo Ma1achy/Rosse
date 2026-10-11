@@ -17,7 +17,8 @@ struct View {
   cx: f32,
   cy: f32,
   dust: f32,
-  pad0: f32,
+  // the galaxy's own perspective, 1 / camera distance (ADR 0084); 0 is orthographic
+  persp: f32,
   n: u32,
   cap: u32,
   pad1: u32,
@@ -51,6 +52,23 @@ fn to_screen(v: View, q: vec2<f32>, k: f32) -> vec2<f32> {
     v.cx + (q.x * v.cos_pa - q.y * v.sin_pa) * f,
     v.cy + (q.x * v.sin_pa + q.y * v.cos_pa) * f,
   );
+}
+
+// The galaxy's own depth factor for a view-frame depth (ADR 0084): 1 when `persp` is 0. A positive
+// `persp` is full perspective (the offsets scale too); a negative one only scales the marks.
+fn persp_k(v: View, depth: f32) -> f32 {
+  if (v.persp == 0.0) {
+    return 1.0;
+  }
+  return 1.0 / max(1.0 - depth * abs(v.persp), 0.3);
+}
+
+// The marks' shrink as the view zooms out (ADR 0084): 1 at zoom 1 and above.
+fn persp_zoom(v: View) -> f32 {
+  if (v.persp == 0.0) {
+    return 1.0;
+  }
+  return min(1.0, pow(v.scale / 84.0, 0.35));
 }
 
 // The deep field's perspective factor for a view-frame depth (app23.js:L884).

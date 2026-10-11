@@ -45,6 +45,10 @@ const CASES: [string, Params][] = [
   ['dry s7 (friction)', presetParams('Merger: dry (two ellipticals)', 7)],
   ['polar s4242 (fly-by, tilt 80)', presetParams('Merger: polar collision', 4242)],
   ['coalescing s7 (stage 4.5, friction)', presetParams('Merger: coalescing', 7)],
+  [
+    'spiral meets elliptical s7, mergeAuto (crisper arms)',
+    presetParams('Merger: spiral meets elliptical', 7, { mergeAuto: 1 }),
+  ],
   ['the Mice, horizon 6 s7', presetParams('Merger: the Mice', 7, { mHorizon: 6 })],
 ];
 
