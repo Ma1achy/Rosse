@@ -34,6 +34,26 @@ import { GpuStipple } from '../../src/render/stipple';
 import { SURFACES, type SurfaceName } from '../../src/render/surface';
 
 /** how a catalogue galaxy is picked: the category, and the vote fields its score is the maximum of */
+/**
+ * The page's natural features, which the core leaves off so that v21's goldens hold (ADR 0075 to
+ * 0093): the pictures show the page, not the core.
+ */
+const PAGE_FEATURES: Partial<Params> = {
+  dustAuto: 1,
+  bulgeAuto: 1,
+  starsAuto: 1,
+  cosmicAuto: 1,
+  strokesAuto: 1,
+  lineWorld: 1,
+  thinAuto: 1,
+  popAuto: 1,
+  depthAuto: 1,
+  lensLock: 2,
+  occlAuto: 1,
+  coreAuto: 1,
+  mergeAuto: 1,
+};
+
 export interface Rule {
   id: string;
   type: GalaxyType;
@@ -235,7 +255,11 @@ async function main(): Promise<void> {
       out = null;
     },
     async shot(s) {
-      const base = s.params ?? presetParams(s.preset, s.seed, s.over ?? {});
+      // the pictures are the page's: its natural features on (src/main.ts `variantOverrides`), under
+      // whatever the shot sets itself
+      const base: Params = s.params
+        ? { ...s.params, ...PAGE_FEATURES }
+        : presetParams(s.preset, s.seed, { ...PAGE_FEATURES, ...(s.over ?? {}) });
       // the overlays' home: the preset's own camera, whatever the shot's angles (as the page)
       const home = orientationOf(cameraOf(base));
       const P: Params = {
