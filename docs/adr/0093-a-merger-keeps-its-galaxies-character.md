@@ -33,3 +33,4 @@ Without it nothing changes.
 ## Consequences
 
 - A spiral progenitor reads as a spiral through the first pass, an elliptical as a smooth halo, and dust lanes stretch with the tails. The merger kernel's uniform grows by six `vec4` and two scalars; the tidal map's header by one word (10).
+- The page also sets `mWarp` to 0 (except for the preset about it): v21 tears whole library drawings with the tides, and the pieces read as straight dashes and zigzags in the outskirts. It is a page override, not a flag; the core's default stays v21's.

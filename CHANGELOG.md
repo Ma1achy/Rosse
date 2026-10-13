@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- The page no longer tears v21's library drawings in mergers (`mWarp` is 0 there except on "Sketches, torn apart"): carried by the tides they were the straight dashes and zigzags scattered round a merger. The core's default is v21's.
 - A merging galaxy has a dark halo (ADR 0096, proposed), with `mergeAuto`: an isothermal sphere that its stars feel (and start in), so a disc rotates on a flat curve instead of a point mass's falling one and its arms stay coherent into the first pass.
 - Shells are in the scene (ADR 0095, proposed), with `shellAuto` ("Shells in 3D", 0 in the core, 1 on the page): a shell galaxy's stars are drawn through the galaxy's camera, and each shell is a meridian and a rim, so an orbit turns them instead of leaving a flat picture (v21's shells ignored the camera).
 - An elliptical is a spheroid in the scene (ADR 0094, proposed), with `bulgeAuto`: the round and cigar-shaped galaxies are prolate, so an orbit turns them (v21's were oblate about the polar axis, which no azimuth can change), and a galaxy with an explicit Sérsic index is the deprojected 3D Sérsic instead of v21's flat 2D draw that ignored the camera.
