@@ -9,6 +9,7 @@ import { randF32 } from '../../core/rng';
 import { Stream } from '../../core/streams';
 import type { StructLayout } from '../../marks/instance';
 import { Cls } from '../../model/classes';
+import { MERGER_GAS_FRAC } from '../../sim/merger';
 import { INSTANCE_WORDS } from './project';
 import type { TideData } from './tide';
 
@@ -282,6 +283,34 @@ export function runMergerSprites(
       !hot &&
       f(Math.sqrt(f(f(f(ddx * ddx) + f(ddy * ddy)) + f(ddz * ddz)))) <
         f(f(0.9) * f(oc[3] as number));
+    // the gas the merger has driven into a nucleus lights up: a nuclear starburst, fiercest when the
+    // discs have overlapped (ADR 0098)
+    if (
+      mauto &&
+      !hot &&
+      (pa[3] as number) === 0 &&
+      randF32(key, Stream.mergerInit, i, 220) < f(MERGER_GAS_FRAC)
+    ) {
+      const od = f(Math.sqrt(f(f(f(ddx * ddx) + f(ddy * ddy)) + f(ddz * ddz))));
+      const dn = Math.min(f(dcore / f(core[3] as number)), f(od / f(oc[3] as number)));
+      const burst = f(1 - smooth(0.3, 1.2, num('stage')));
+      const gp = f(f(f(0.55) * f(1 - smooth(0.12, 0.8, dn))) * f(f(0.25) + f(f(0.75) * burst)));
+      if (u01(215) < gp) {
+        if (u01(171) < num('keep_knots')) {
+          const t = pool[Math.floor(f(u01(216) * nKnot))] as number;
+          put(
+            o,
+            Cls.knot,
+            X,
+            Y,
+            t,
+            1,
+            simple(f(f(3 + f(4 * u01(217))) * pen), f(u01(218) * f(6.28))),
+          );
+        }
+        continue;
+      }
+    }
     const knotP = f(f(0.035) * f(f(0.4) + num('knots')));
     if (!hot && ((outer && roll < knotP) || (comp && roll < f(knotP * f(1.6))))) {
       if (u01(171) < num('keep_knots')) {

@@ -108,3 +108,53 @@ describe('the dark halo (ADR 0096)', () => {
     expect(ratio(1)).toBeGreaterThan(1.1);
   });
 });
+
+describe('the gas (ADR 0098)', () => {
+  const sim = (mergeAuto: number) => {
+    const P = presetParams('Merger: the Mice', 7, { mergeAuto });
+    const m = new CpuMerger(P, node.cpu.meta, node.referenceOptions(P, 1).merger);
+    return { d: m.scene.desc, s: m.stars };
+  };
+
+  it('is off without mergeAuto and a share of the disc stars with it, never an elliptical’s', () => {
+    const a = sim(0);
+    expect(simUniform(a.d).gas).toBe(0);
+    expect(Array.from({ length: a.d.total }, (_, i) => a.s.isGas(i)).some(Boolean)).toBe(false);
+    const b = sim(1);
+    expect(simUniform(b.d).gas).toBeGreaterThan(0);
+    let g = 0;
+    for (let i = 0; i < b.d.total; i++) if (b.s.isGas(i)) g++;
+    expect(g / b.d.total).toBeGreaterThan(0.2);
+    expect(g / b.d.total).toBeLessThan(0.4);
+    const e = presetParams('Merger: spiral meets elliptical', 7, { mergeAuto: 1 });
+    const me = new CpuMerger(e, node.cpu.meta, node.referenceOptions(e, 1).merger);
+    let ge = 0;
+    for (let i = me.scene.desc.n[0]; i < me.scene.desc.total; i++) if (me.stars.isGas(i)) ge++;
+    expect(ge).toBe(0);
+  });
+
+  it('sinks toward the nuclei: at the horizon the gas is nearer a core than the stars are', () => {
+    const { d, s } = sim(1);
+    s.run();
+    const k = Math.max(d.track.future.steps, 0);
+    const core = (g: number) => {
+      const o = (d.off.pos2 + k * 2 + g) * 4;
+      return [d.cores[o] as number, d.cores[o + 1] as number, d.cores[o + 2] as number];
+    };
+    const c = [core(0), core(1)];
+    const med = (gas: boolean) => {
+      const r: number[] = [];
+      for (let i = 0; i < d.total; i++) {
+        if (s.isGas(i) !== gas) continue;
+        const x = [
+          s.horizon[i * 4] as number,
+          s.horizon[i * 4 + 1] as number,
+          s.horizon[i * 4 + 2] as number,
+        ];
+        r.push(Math.min(...c.map((q) => Math.hypot(...x.map((v, a) => v - (q[a] as number))))));
+      }
+      return r.sort((p, q) => p - q)[Math.floor(r.length / 2)] as number;
+    };
+    expect(med(true)).toBeLessThan(0.85 * med(false));
+  });
+});

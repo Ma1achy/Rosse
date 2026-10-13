@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- A merging disc has gas (ADR 0098, proposed), with `mergeAuto`: 30% of a disc's test stars are gas that relaxes toward the circular motion about the nearer core (so it sinks into the nuclei as the discs pass) and lights up there as a nuclear starburst, in both engines.
 - The lens bends the deep field (ADR 0097, proposed), with `lensField` ("Lens bends the deep field", 0 in the core, 1 on the page): each deep-field dot and drawing is placed at its primary image through the lens (damped Newton on the lens equation) and a drawing is stretched by A⁻¹ there, so the field's galaxies are displaced and drawn as arcs near the ring; v21 only sheared the drawings.
 - A jet is a bundle of strokes in the scene even when `lines` is 0 (with `lineWorld`, ADR 0089): the "Radio jet" preset drew v21's looped squiggle sprite, fixed to the screen, because it has no line-work; now it draws the twisting strand bundle along the galaxy's axis, which turns with the camera. The beam is narrow and flares into a lobe at each end, and the counter-jet is nearly as long (0.85 of the jet).
 - The page no longer tears v21's library drawings in mergers (`mWarp` is 0 there except on "Sketches, torn apart"): carried by the tides they were the straight dashes and zigzags scattered round a merger. The core's default is v21's.

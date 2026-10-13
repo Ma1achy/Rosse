@@ -13,7 +13,7 @@ import { randF32 } from '../../core/rng';
 import { Stream } from '../../core/streams';
 import type { StructLayout } from '../../marks/instance';
 import type { MergerDesc, SnapSelect } from '../../sim/merger';
-import { MERGER_DT, MERGER_HALO_RC2 } from '../../sim/merger';
+import { MERGER_DT, MERGER_GAS_FRAC, MERGER_HALO_RC2 } from '../../sim/merger';
 
 const f = Math.fround;
 
@@ -47,7 +47,8 @@ export const MSIM_LAYOUT = layout('MSim', [
   ['h0', 'f32'],
   ['h1', 'f32'],
   ['hrc2', 'f32'],
-  ['pad', 'f32'],
+  // the gas's relaxation rate (ADR 0098)
+  ['gas', 'f32'],
 ]);
 
 /** The `MGal` uniform, one per galaxy. */
@@ -106,7 +107,7 @@ export function simUniform(d: MergerDesc): Record<string, number> {
     h0: f(f(d.gals[0].halo) * f(d.gals[0].mass)),
     h1: f(f(d.gals[1].halo) * f(d.gals[1].mass)),
     hrc2: f(MERGER_HALO_RC2),
-    pad: 0,
+    gas: f(Math.max(d.gals[0].gas, d.gals[1].gas)),
   };
 }
 
@@ -317,6 +318,88 @@ export class CpuMergerStars {
     this.az = az;
   }
 
+  /** Whether star `i` is gas (ADR 0098): a disc star on the init stream, `MERGER_GAS_FRAC` of them. */
+  isGas(i: number): boolean {
+    if (!((this.s.gas as number) > 0)) return false;
+    const G = this.d.gals[i >= this.d.n[0] ? 1 : 0];
+    return (
+      G.type !== 'elliptical' && randF32(this.d.key, Stream.mergerInit, i, 220) < f(MERGER_GAS_FRAC)
+    );
+  }
+
+  /**
+   * The gas's relaxation (ADR 0098), after the kick `k` of a phase starting at `off`: toward the
+   * circular motion about the nearer core in that core's own plane, at `gas` times the local orbital
+   * rate and fading out past the disc's edge, with the semi-implicit step v ← (v + h κ vt)/(1 + h κ).
+   * The new velocity is left in `rx, ry, rz`.
+   */
+  private relax(
+    x: number,
+    y: number,
+    z: number,
+    v: number[],
+    k: number,
+    off: number,
+    h: number,
+  ): void {
+    const s = this.s;
+    const c0 = this.core(off, k, 0);
+    const c1 = this.core(off, k, 1);
+    const q0 = f(
+      f(f(f(x - c0[0]) * f(x - c0[0])) + f(f(y - c0[1]) * f(y - c0[1]))) +
+        f(f(z - c0[2]) * f(z - c0[2])),
+    );
+    const q1 = f(
+      f(f(f(x - c1[0]) * f(x - c1[0])) + f(f(y - c1[1]) * f(y - c1[1]))) +
+        f(f(z - c1[2]) * f(z - c1[2])),
+    );
+    const g = q1 < q0 ? 1 : 0;
+    const G = this.d.gals[g];
+    const c = g ? c1 : c0;
+    const p = this.core(off, k - 1, g);
+    const n = G.n.map(f) as [number, number, number];
+    const dx = f(x - c[0]);
+    const dy = f(y - c[1]);
+    const dz = f(z - c[2]);
+    const dn = f(f(f(dx * n[0]) + f(dy * n[1])) + f(dz * n[2]));
+    const px = f(dx - f(dn * n[0]));
+    const py = f(dy - f(dn * n[1]));
+    const pz = f(dz - f(dn * n[2]));
+    const r = f(Math.sqrt(f(f(f(px * px) + f(py * py)) + f(pz * pz))));
+    const rmax = f(G.rmax);
+    const t = Math.min(Math.max(f(f(r - rmax) / f(f(0.6) * rmax)), 0), 1);
+    const w = f(1 - f(f(t * t) * f(3 - f(2 * t))));
+    if (!(w > 0) || !(r > f(0.02))) return;
+    const hh = f(f(G.halo) * f(G.mass));
+    const rr = f(r * r);
+    const qq = f(rr + f(f(G.soft) * f(G.soft)));
+    const vc = f(
+      Math.sqrt(
+        f(
+          f(f(f(f(G.mass) * r) * r) / f(qq * f(Math.sqrt(qq)))) +
+            (hh > 0 ? f(f(hh * rr) / f(rr + f(MERGER_HALO_RC2))) : 0),
+        ),
+      ),
+    );
+    const idt = f(1 / f(MERGER_DT));
+    // the tangent n × (in-plane radial)
+    const ux = f(px / r);
+    const uy = f(py / r);
+    const uz = f(pz / r);
+    const tx = f(f(n[1] * uz) - f(n[2] * uy));
+    const ty = f(f(n[2] * ux) - f(n[0] * uz));
+    const tz = f(f(n[0] * uy) - f(n[1] * ux));
+    const kk = f(f(f(f(s.gas as number) * w) * vc) / r);
+    const a = f(h * kk);
+    const den = f(1 + a);
+    const vt = [
+      f(f(f(c[0] - p[0]) * idt) + f(vc * tx)),
+      f(f(f(c[1] - p[1]) * idt) + f(vc * ty)),
+      f(f(f(c[2] - p[2]) * idt) + f(vc * tz)),
+    ];
+    for (let j = 0; j < 3; j++) v[j] = f(f((v[j] as number) + f(a * (vt[j] as number))) / den);
+  }
+
   private writeSnap(
     table: Uint32Array,
     row: number,
@@ -387,6 +470,8 @@ export class CpuMergerStars {
       let vx = this.vs[o] as number;
       let vy = this.vs[o + 1] as number;
       let vz = this.vs[o + 2] as number;
+      const gas = this.isGas(i);
+      const vg = [0, 0, 0];
       for (let st = st0; st < st1; st++) {
         if (st > 0 && st % ph.every === 0) {
           const row = Math.floor(st / ph.every) - (future ? 1 : 0);
@@ -400,6 +485,15 @@ export class CpuMergerStars {
         vx = f(vx + f(this.ax * h));
         vy = f(vy + f(this.ay * h));
         vz = f(vz + f(this.az * h));
+        if (gas) {
+          vg[0] = vx;
+          vg[1] = vy;
+          vg[2] = vz;
+          this.relax(x, y, z, vg, st + 1, off, h);
+          vx = vg[0];
+          vy = vg[1];
+          vz = vg[2];
+        }
       }
       this.xs[o] = x;
       this.xs[o + 1] = y;

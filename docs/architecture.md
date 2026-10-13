@@ -82,6 +82,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0095](adr/0095-shells-are-in-the-scene.md) | _Proposed:_ with `shellAuto` a shell galaxy's stars are drawn in the scene through the galaxy's camera and each shell gains its rim, so orbiting turns them |
 | [0096](adr/0096-a-merging-galaxy-has-a-dark-halo.md) | _Proposed:_ with `mergeAuto` each merging galaxy has an isothermal dark halo that its test stars feel, so discs rotate on a flat curve |
 | [0097](adr/0097-the-lens-bends-the-deep-field.md) | _Proposed:_ with `lensField` the deep field's dots and drawings are placed at their primary image through the lens and stretched by its magnification, so background galaxies arc |
+| [0098](adr/0098-a-merging-disc-has-gas.md) | _Proposed:_ with `mergeAuto` 30% of a merging disc's stars are gas that dissipates toward the nearer core and lights up there as a nuclear starburst |
 
 ## Modules
 

@@ -36,6 +36,14 @@ export const MERGER_MAX_STEPS = 1400;
  */
 export const MERGER_HALO = 0.3;
 export const MERGER_HALO_RC2 = 0.5;
+/**
+ * ADR 0098: with `mergeAuto` a share of each disc's test stars is gas: it relaxes toward the
+ * circular motion about the nearer core at this fraction of the local orbital rate (so a disc in
+ * equilibrium feels nothing and a perturbed one settles and sinks), and `MERGER_GAS_FRAC` of a disc
+ * is gas.
+ */
+export const MERGER_GAS = 0.25;
+export const MERGER_GAS_FRAC = 0.3;
 /** The core softening squared (app23.js:L346, `+ 0.02`). */
 export const CORE_SOFT2 = 0.02;
 /** The true anomaly the cores start from (app23.js:L307). */
@@ -479,6 +487,8 @@ export interface GalaxyIC {
   crisp: number;
   /** the squared circular speed of the dark halo, per unit mass (ADR 0096); 0 is v21's point mass alone */
   halo: number;
+  /** the gas's relaxation rate in units of the local orbital rate (ADR 0098); 0 is v21's collisionless stars */
+  gas: number;
   n: [number, number, number];
   e1: [number, number, number];
   e2: [number, number, number];
@@ -521,6 +531,7 @@ export function galaxyICs(
       bar: !!BAR[g],
       crisp: (p.mergeAuto ?? 0) > 0 ? 1 : 0,
       halo: (p.mergeAuto ?? 0) > 0 ? MERGER_HALO : 0,
+      gas: (p.mergeAuto ?? 0) > 0 ? MERGER_GAS : 0,
       n: fr.n,
       e1: fr.e1,
       e2: fr.e2,
