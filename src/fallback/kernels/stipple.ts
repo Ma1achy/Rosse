@@ -422,6 +422,8 @@ export function sampleStipple(i: number, G: GalaxyDesc, fo: Float32Array, uo: Ui
     px = f(f(rr * sz) * cos(ph));
     py = f(f(rr * sz) * sin(ph));
     pz = f(f(rr * cz) * g.bulge_flat);
+    // a smooth galaxy is a cigar, not a disc: both short axes are the flat ones (ADR 0094)
+    if (flags & GalaxyFlag.prolate) py = f(py * g.bulge_flat);
     if (flags & GalaxyFlag.bulgePeanut) {
       // the bulge of a barred galaxy is boxy-peanut (ADR 0076): longer along the bar, thinner across
       // it, and taller either side of the centre than at it

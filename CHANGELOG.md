@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- An elliptical is a spheroid in the scene (ADR 0094, proposed), with `bulgeAuto`: the round and cigar-shaped galaxies are prolate, so an orbit turns them (v21's were oblate about the polar axis, which no azimuth can change), and a galaxy with an explicit Sérsic index is the deprojected 3D Sérsic instead of v21's flat 2D draw that ignored the camera.
+- A subject trail or cosmic rays are fixed to the lens, not the zoom, with `depthAuto` (an overlay's already were, ADR 0055).
 - A merger keeps its galaxies' character (ADR 0093, proposed), with `mergeAuto` ("Merger keeps its galaxies' character", 0 in the core, 1 on the page): an elliptical is a soft glow, dust lanes and a bridge thin the stars and travel with them into the tails, tails carry tidal dwarfs, and strokes taper out as the tides stretch them. Merging discs are thicker and reach further out, so the tides have more to draw into tails and a bridge. Every star is drawn where the simulation puts it: an earlier hold of the inner discs, which pinned the arms and then let them snap, is gone.
 
 - The drawn core is behind the disc (ADR 0092, proposed), with `coreAuto` ("Core behind the disc", 0 in the core, 1 on the page): the core and nuclear spiral are drawn first, still opaque, so the disc's stars, dust and strokes are layered over them.
@@ -42,6 +44,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Fixed
 
+- A slider at zero no longer removes its part from the panel: a part stays until you take it out or load another galaxy.
 - CI golden: the dust and disc dimming of an overlay star is now `occlAuto` only (ADR 0074, 0086; it was on whenever `dust > 0`), and a subject star's satellites lie in depth only with `depthAuto` (ADR 0055; they moved under orbit in the core), so the core matches v21 again for the layered edge-on and star orbit cases. The remaining deviations (ADR 0079's opaque core, the 40% wobble) are accepted per preset in `tests/golden/thresholds.json`.
 - The foreground stars slider drew nothing: v21's shell of stars lies outside the camera's cone. With `depthAuto` they fill a ball round the galaxy (ADR 0089).
 - The tidal tail and jet sliders only switched them on and off; with `lineWorld` they now set the reach, strength and strand count (`jet` is a 0 to 1 slider; v21 reads it as on above 0.5) (ADR 0089).

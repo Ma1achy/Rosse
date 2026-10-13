@@ -58,6 +58,15 @@ const CASES: [string, Params][] = [
     `${n} s7, natural bulge`,
     presetParams(n, 7, { bulgeAuto: 1, dustAuto: 1, peanut: 1 }),
   ]),
+  // an elliptical is a spheroid in the scene (ADR 0094): prolate, and the deprojected Sérsic of an explicit index
+  ...['Cigar-shaped', 'Smooth, round'].map((n): [string, Params] => [
+    `${n} s7, spheroid`,
+    presetParams(n, 7, { bulgeAuto: 1, az: 37 }),
+  ]),
+  [
+    'Smooth, round s7, Sérsic spheroid',
+    presetParams('Smooth, round', 7, { bulgeAuto: 1, sersicN: 3, az: 37 }),
+  ],
   // the natural star spread (ADR 0077): the smooth arm weight and the outer taper, drawn stars on
   ...['Grand design', 'Ringed', 'Flocculent'].map((n): [string, Params] => [
     `${n} s7, natural star spread`,
