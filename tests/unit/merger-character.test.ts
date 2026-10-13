@@ -74,7 +74,7 @@ describe('the dark halo (ADR 0096)', () => {
     expect(a.h1).toBe(0);
     expect(b.h0).toBeGreaterThan(0);
     expect(b.h1).toBeGreaterThan(0);
-    expect(b.h0 / b.m0).toBeCloseTo((b.h1 as number) / (b.m1 as number), 5);
+    expect((b.h0 as number) / (b.m0 as number)).toBeCloseTo((b.h1 as number) / (b.m1 as number), 5);
   });
 
   it('starts the outer disc faster than the point mass alone gives: a flatter rotation curve', () => {
