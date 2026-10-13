@@ -13,7 +13,7 @@ import { randF32 } from '../../core/rng';
 import { Stream } from '../../core/streams';
 import type { StructLayout } from '../../marks/instance';
 import type { MergerDesc, SnapSelect } from '../../sim/merger';
-import { MERGER_DT } from '../../sim/merger';
+import { MERGER_DT, MERGER_HALO_RC2 } from '../../sim/merger';
 
 const f = Math.fround;
 
@@ -43,6 +43,11 @@ export const MSIM_LAYOUT = layout('MSim', [
   ['m1', 'f32'],
   ['a0sq', 'f32'],
   ['a1sq', 'f32'],
+  // the dark halos' squared circular speeds (mass · halo) and their shared core radius squared (ADR 0096)
+  ['h0', 'f32'],
+  ['h1', 'f32'],
+  ['hrc2', 'f32'],
+  ['pad', 'f32'],
 ]);
 
 /** The `MGal` uniform, one per galaxy. */
@@ -98,6 +103,10 @@ export function simUniform(d: MergerDesc): Record<string, number> {
     m1: f(d.track.M[1]),
     a0sq: f(f(d.track.A[0]) * f(d.track.A[0])),
     a1sq: f(f(d.track.A[1]) * f(d.track.A[1])),
+    h0: f(f(d.gals[0].halo) * f(d.gals[0].mass)),
+    h1: f(f(d.gals[1].halo) * f(d.gals[1].mass)),
+    hrc2: f(MERGER_HALO_RC2),
+    pad: 0,
   };
 }
 
@@ -200,9 +209,16 @@ export class CpuMergerStars {
     const soft = f(G.soft);
     const c0 = G.core.slice(0, 3).map(f);
     const v0 = G.core.slice(3, 6).map(f);
+    const hh = f(f(G.halo) * mass);
     const circular = (r: number) => {
       const q = f(f(f(r * r) + f(soft * soft)));
-      return f(Math.sqrt(f(f(f(mass * r) * r) / f(q * f(Math.sqrt(q))))));
+      const rr = f(r * r);
+      // the point mass's, and the dark halo's (an isothermal sphere: h r² / (r² + rc²), ADR 0096)
+      const v2 = f(
+        f(f(f(mass * r) * r) / f(q * f(Math.sqrt(q)))) +
+          (hh > 0 ? f(f(hh * rr) / f(rr + f(MERGER_HALO_RC2))) : 0),
+      );
+      return f(Math.sqrt(v2));
     };
     const o = i * 4;
     if (G.type === 'elliptical') {
@@ -284,9 +300,21 @@ export class CpuMergerStars {
     const d1z = f((c[o1 + 2] as number) - z);
     const q1 = f(f(f(f(d1x * d1x) + f(d1y * d1y)) + f(d1z * d1z)) + (s.a1sq as number));
     const i1 = f((s.m1 as number) / f(q1 * f(Math.sqrt(q1))));
-    this.ax = f(f(d0x * i0) + f(d1x * i1));
-    this.ay = f(f(d0y * i0) + f(d1y * i1));
-    this.az = f(f(d0z * i0) + f(d1z * i1));
+    let ax = f(f(d0x * i0) + f(d1x * i1));
+    let ay = f(f(d0y * i0) + f(d1y * i1));
+    let az = f(f(d0z * i0) + f(d1z * i1));
+    if ((s.h0 as number) > 0) {
+      // the dark halos: an isothermal sphere's pull, h d / (d² + rc²) (ADR 0096)
+      const hr = s.hrc2 as number;
+      const j0 = f((s.h0 as number) / f(f(f(f(d0x * d0x) + f(d0y * d0y)) + f(d0z * d0z)) + hr));
+      const j1 = f((s.h1 as number) / f(f(f(f(d1x * d1x) + f(d1y * d1y)) + f(d1z * d1z)) + hr));
+      ax = f(ax + f(f(d0x * j0) + f(d1x * j1)));
+      ay = f(ay + f(f(d0y * j0) + f(d1y * j1)));
+      az = f(az + f(f(d0z * j0) + f(d1z * j1)));
+    }
+    this.ax = ax;
+    this.ay = ay;
+    this.az = az;
   }
 
   private writeSnap(

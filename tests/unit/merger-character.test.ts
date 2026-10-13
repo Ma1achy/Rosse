@@ -9,6 +9,7 @@ import { presetParams } from '../../src/core/presets';
 import { CpuMerger } from '../../src/fallback/merger';
 import { runMergerSprites } from '../../src/fallback/kernels/merger-sprites';
 import { mergerViewUniform } from '../../src/model/merger';
+import { CpuMergerStars, simUniform } from '../../src/fallback/kernels/merger';
 import { Cls } from '../../src/model/classes';
 import { GoldenNode } from '../golden/compare/node';
 
@@ -56,5 +57,54 @@ describe('mergeAuto in the merger kernels', () => {
     // the denser halo
     expect(live(b, 0, b.n0)).toBeLessThan(live(a, 0, a.n0));
     expect(live(b, b.n0, b.total)).toBeGreaterThanOrEqual(live(a, b.n0, a.total));
+  });
+});
+
+describe('the dark halo (ADR 0096)', () => {
+  const stars = (mergeAuto: number) => {
+    const P = presetParams('Merger: spiral meets elliptical', 7, { mergeAuto });
+    const m = new CpuMerger(P, node.cpu.meta, node.referenceOptions(P, 1).merger);
+    return { d: m.scene.desc, s: m.stars };
+  };
+
+  it('is off without mergeAuto, and a mass-scaled pull with it', () => {
+    const a = simUniform(stars(0).d);
+    const b = simUniform(stars(1).d);
+    expect(a.h0).toBe(0);
+    expect(a.h1).toBe(0);
+    expect(b.h0).toBeGreaterThan(0);
+    expect(b.h1).toBeGreaterThan(0);
+    expect(b.h0 / b.m0).toBeCloseTo((b.h1 as number) / (b.m1 as number), 5);
+  });
+
+  it('starts the outer disc faster than the point mass alone gives: a flatter rotation curve', () => {
+    // the mean of a star's speed about its core over the point mass's circular speed at its radius,
+    // for the first galaxy's stars past half its radius, at the start
+    const ratio = (mergeAuto: number) => {
+      const { d } = stars(mergeAuto);
+      const S = new CpuMergerStars(d);
+      S.init();
+      const G = d.gals[0];
+      let sum = 0;
+      let n = 0;
+      for (let i = 0; i < G.count; i++) {
+        const rn = S.ic[i * 4 + 2] as number;
+        if (rn < 0.5) continue;
+        const R = rn * G.rmax;
+        const q = R * R + G.soft * G.soft;
+        const vp = Math.sqrt((G.mass * R * R) / (q * Math.sqrt(q)));
+        // the speed in the disc's plane about the core (the core's own velocity taken off)
+        sum +=
+          Math.hypot(
+            (S.vs[i * 4] as number) - G.core[3],
+            (S.vs[i * 4 + 1] as number) - G.core[4],
+            (S.vs[i * 4 + 2] as number) - G.core[5],
+          ) / vp;
+        n++;
+      }
+      return sum / n;
+    };
+    expect(ratio(0)).toBeCloseTo(1, 1);
+    expect(ratio(1)).toBeGreaterThan(1.1);
   });
 });

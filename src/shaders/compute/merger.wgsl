@@ -43,6 +43,11 @@ struct MSim {
   m1: f32,
   a0sq: f32,
   a1sq: f32,
+  // the dark halos' squared circular speeds and their core radius squared (ADR 0096)
+  h0: f32,
+  h1: f32,
+  hrc2: f32,
+  pad: f32,
 }
 
 // MGAL_LAYOUT: n = spin axis, w = type (0 spiral, 1 lenticular, 2 elliptical); e1.w = rd;
@@ -121,9 +126,14 @@ fn gauss(i: u32, d: u32) -> f32 {
 }
 
 // The Plummer circular speed at radius R about a core of mass M and softening A.
-fn circular(m: f32, r: f32, a: f32) -> f32 {
+// With a dark halo (h > 0, ADR 0096) its isothermal sphere adds h r^2 / (r^2 + rc^2) to the square.
+fn circular(m: f32, r: f32, a: f32, h: f32) -> f32 {
   let q = r * r + a * a;
-  return sqrt(m * r * r / (q * sqrt(q)));
+  var v2 = m * r * r / (q * sqrt(q));
+  if (h > 0.0) {
+    v2 = v2 + h * (r * r) / (r * r + sim.hrc2);
+  }
+  return sqrt(v2);
 }
 
 @compute @workgroup_size(64)
@@ -142,6 +152,10 @@ fn init_stars(@builtin(global_invocation_id) id: vec3<u32>) {
   let rmax = G.e2.w;
   let mass = G.c.w;
   let soft = G.v.w;
+  var halo = sim.h0;
+  if (g == 1u) {
+    halo = sim.h1;
+  }
   if (ty == 2u) {
     // a hot ball of stars: random orbits, no disc (L320-325)
     let u0 = sqrt(min(u01(i, 200u), 0.97));
@@ -150,7 +164,7 @@ fn init_stars(@builtin(global_invocation_id) id: vec3<u32>) {
     let t = u01(i, 202u) * 6.28318;
     let q = sqrt(1.0 - z * z);
     let dv = vec3<f32>(q * cos_f(t), q * sin_f(t), z);
-    let vcE = circular(mass, Re, soft);
+    let vcE = circular(mass, Re, soft, halo);
     let vv = vec3<f32>(gauss(i, 203u), gauss(i, 205u), gauss(i, 207u));
     xs[i] = vec4<f32>(G.c.xyz + Re * dv, 0.0);
     vs[i] = vec4<f32>(G.v.xyz + vv * vcE * 0.55, 0.0);
@@ -181,7 +195,7 @@ fn init_stars(@builtin(global_invocation_id) id: vec3<u32>) {
     }
     th = base + gauss(i, 108u) * 0.12;
   }
-  let vc = circular(mass, R, soft);
+  let vc = circular(mass, R, soft, halo);
   let c = cos_f(th);
   let sn = sin_f(th);
   var thick = 0.02;
@@ -203,7 +217,14 @@ fn accel(x: vec3<f32>, p0: vec3<f32>, p1: vec3<f32>) -> vec3<f32> {
   let d1 = p1 - x;
   let q1 = d1.x * d1.x + d1.y * d1.y + d1.z * d1.z + sim.a1sq;
   let i1 = sim.m1 / (q1 * sqrt(q1));
-  return d0 * i0 + d1 * i1;
+  var a = d0 * i0 + d1 * i1;
+  if (sim.h0 > 0.0) {
+    // the dark halos: an isothermal sphere's pull, h d / (d^2 + rc^2) (ADR 0096)
+    let j0 = sim.h0 / (dot(d0, d0) + sim.hrc2);
+    let j1 = sim.h1 / (dot(d1, d1) + sim.hrc2);
+    a = a + d0 * j0 + d1 * j1;
+  }
+  return a;
 }
 
 fn core_at(k: u32, g: u32) -> vec3<f32> {

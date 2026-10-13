@@ -80,6 +80,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0093](adr/0093-a-merger-keeps-its-galaxies-character.md) | _Proposed:_ with `mergeAuto` a merging disc has crisper arms and dust lanes, an elliptical is a soft glow, dust lanes and a bridge travel with the stars, tails carry tidal dwarfs, strokes taper at the tear, and discs are thicker |
 | [0094](adr/0094-an-elliptical-is-a-spheroid-in-the-scene.md) | _Proposed:_ with `bulgeAuto` an elliptical is a prolate spheroid in the scene, and an explicit Sérsic index is a 3D spheroid, so the camera moves around them |
 | [0095](adr/0095-shells-are-in-the-scene.md) | _Proposed:_ with `shellAuto` a shell galaxy's stars are drawn in the scene through the galaxy's camera and each shell gains its rim, so orbiting turns them |
+| [0096](adr/0096-a-merging-galaxy-has-a-dark-halo.md) | _Proposed:_ with `mergeAuto` each merging galaxy has an isothermal dark halo that its test stars feel, so discs rotate on a flat curve |
 
 ## Modules
 
