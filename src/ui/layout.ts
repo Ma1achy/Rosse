@@ -333,6 +333,7 @@ export const COMPONENTS: readonly Component[] = [
     icon: ['shells', 0],
     on: { key: 'shellsOn', onVal: 1, offVal: 0 },
     main: ['shellTime', 'shellAxis', 'shellStars'],
+    more: ['shellAuto'],
     summary: () => 'shells from a galaxy it swallowed',
   },
   {
@@ -453,6 +454,7 @@ export const OPTION_LABELS: Partial<Record<ParamKey, Record<string, string>>> = 
   peanut: ONOFF,
   coreAuto: ONOFF,
   mergeAuto: ONOFF,
+  shellAuto: ONOFF,
   lensLock: { '0': 'fully (v21)', '1': 'not at all', '2': 'a little' },
   depthAuto: { '0': 'flat', '1': 'marks shrink with distance', '2': 'full perspective' },
   mWarp: ONOFF,

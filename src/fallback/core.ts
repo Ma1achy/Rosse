@@ -116,7 +116,7 @@ export class CpuEngineCore {
           };
           this.pageRuns.model++;
         }
-        shellsView = this.shells.s.view(zoom);
+        shellsView = this.shells.s.view(zoom, cameraOf(P, zoom));
         this.pageRuns.view++;
       }
       if (work.view || shellsView || this.mode !== 'stipple') {

@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- Shells are in the scene (ADR 0095, proposed), with `shellAuto` ("Shells in 3D", 0 in the core, 1 on the page): a shell galaxy's stars are drawn through the galaxy's camera, and each shell is a meridian and a rim, so an orbit turns them instead of leaving a flat picture (v21's shells ignored the camera).
 - An elliptical is a spheroid in the scene (ADR 0094, proposed), with `bulgeAuto`: the round and cigar-shaped galaxies are prolate, so an orbit turns them (v21's were oblate about the polar axis, which no azimuth can change), and a galaxy with an explicit Sérsic index is the deprojected 3D Sérsic instead of v21's flat 2D draw that ignored the camera.
 - A subject trail or cosmic rays are fixed to the lens, not the zoom, with `depthAuto` (an overlay's already were, ADR 0055).
 - A merger keeps its galaxies' character (ADR 0093, proposed), with `mergeAuto` ("Merger keeps its galaxies' character", 0 in the core, 1 on the page): an elliptical is a soft glow, dust lanes and a bridge thin the stars and travel with them into the tails, tails carry tidal dwarfs, and strokes taper out as the tides stretch them. Merging discs are thicker and reach further out, so the tides have more to draw into tails and a bridge. Every star is drawn where the simulation puts it: an earlier hold of the inner discs, which pinned the arms and then let them snap, is gone.

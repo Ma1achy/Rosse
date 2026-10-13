@@ -13,7 +13,8 @@
 //                (> 45%) holding more than 0.4% of the stars, the three biggest, and for each the
 //                85th percentile of the polar angles of the stars within 0.12 of its radius
 //                (L728-739), by bisection on the angles' bits: the arcs, a few numbers;
-//   dots         each star as a dots instance, from x and y only, turned by the infall axis (L741-747).
+//   dots         each star as a dots instance, from x and y only, turned by the infall axis (L741-747);
+//                with `mode` 1 (ADR 0095) from x, y and z through the camera.
 // Drops are compared as 100 drop > 45 sm and 250 sm > N, exact in f32 for the histogram's counts.
 //
 // CPU twin: src/fallback/kernels/shells.ts, function for function (ADR 0014).
@@ -39,11 +40,15 @@ struct SSim {
   scale: f32,
   // the dots' hand
   n_dot_pool: u32,
-  // N * 0.004, in the reference's f64, as an exact f32 for the test sm > N * 0.004
+  // 1 draws the stars in the scene, through the camera below (ADR 0095)
+  mode: u32,
+  cos_i: f32,
+  sin_i: f32,
+  cos_az: f32,
+  sin_az: f32,
+  cos_pa: f32,
+  sin_pa: f32,
   pad0: u32,
-  pad1: u32,
-  pad2: u32,
-  pad3: u32,
 }
 
 const STREAM_SHELLS: u32 = 12u;
@@ -210,9 +215,21 @@ fn dots(@builtin(global_invocation_id) id: vec3<u32>) {
   let rot = rand_f32(sim.seed, STREAM_SHELLS, i, 21u) * 6.28;
   let c = cos_f(rot);
   let s = sin_f(rot);
-  let pos = vec2<f32>(
+  var pos = vec2<f32>(
     sim.cx + (p.x * sim.ca - p.y * sim.sn) * sim.scale,
     sim.cy + (p.x * sim.sn + p.y * sim.ca) * sim.scale,
   );
+  if (sim.mode != 0u) {
+    // in the scene: turned by the infall axis about z, then the galaxy's own camera
+    let gx = p.x * sim.ca - p.y * sim.sn;
+    let gy = p.x * sim.sn + p.y * sim.ca;
+    let xx = gx * sim.cos_az - gy * sim.sin_az;
+    let ya = gx * sim.sin_az + gy * sim.cos_az;
+    let yy = ya * sim.cos_i - p.z * sim.sin_i;
+    pos = vec2<f32>(
+      sim.cx + (xx * sim.cos_pa - yy * sim.sin_pa) * sim.scale,
+      sim.cy + (xx * sim.sin_pa + yy * sim.cos_pa) * sim.scale,
+    );
+  }
   dots_out[i] = Instance(pos, t, 1.0, vec4<f32>(c * size, s * size, -(s * size), c * size));
 }

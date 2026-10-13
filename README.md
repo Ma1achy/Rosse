@@ -35,8 +35,9 @@ v21 stays the oracle: the engine's core draws what v21 draws, and the goldens ho
 | **Stellar populations and colour** | old stars drawn fine and young ones large, clumps, halo clusters and streams of stars; a fifteen-ink colour plate whose colour follows temperature, radius, arms and dust, in pastel chalks on the Chalkboard and pencils on Paper | [0090](docs/adr/0090-stellar-populations.md), [0091](docs/adr/0091-a-stars-colour-follows-the-galaxy.md) |
 | **The drawn core behind the disc** | the central bitmap is drawn first, under the disc's stars, dust and strokes | [0092](docs/adr/0092-the-core-is-drawn-behind-the-disc.md) |
 | **Mergers that keep their galaxies' character** | a spiral starts with crisper arms and dust lanes, an elliptical is a soft glow, dust lanes and a bridge thin the stars and travel into the tails, tails carry tidal dwarfs, strokes taper at the tear, discs are thicker | [0093](docs/adr/0093-a-merger-keeps-its-galaxies-character.md) |
+| **Ellipticals and shells in the scene** | round and cigar-shaped galaxies are spheroids the camera moves around; a shell galaxy's stars and shells turn with an orbit | [0094](docs/adr/0094-an-elliptical-is-a-spheroid-in-the-scene.md), [0095](docs/adr/0095-shells-are-in-the-scene.md) |
 
-Open `?dustAuto=0&bulgeAuto=0&starsAuto=0&cosmicAuto=0&strokesAuto=0&lineWorld=0&thinAuto=0&popAuto=0&depthAuto=0&occlAuto=0&coreAuto=0&mergeAuto=0` to see the core's drawing alone.
+Open `?dustAuto=0&bulgeAuto=0&starsAuto=0&cosmicAuto=0&strokesAuto=0&lineWorld=0&thinAuto=0&popAuto=0&depthAuto=0&occlAuto=0&coreAuto=0&mergeAuto=0&shellAuto=0` to see the core's drawing alone.
 
 <br>
 

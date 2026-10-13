@@ -469,7 +469,7 @@ async function gpuEngine(
             shellsKey = key;
             pageRuns.model++;
           }
-          sh.view(zoom);
+          sh.view(zoom, cameraOf(P, zoom));
           pageRuns.view++;
         }
         // every layer in scene() order: line-work, drawn parts, stipple, streams, cores
@@ -692,6 +692,7 @@ async function start(): Promise<void> {
                 occlAuto: 1,
                 coreAuto: 1,
                 mergeAuto: 1,
+                shellAuto: 1,
                 lens: 0,
                 shells: 0,
                 trails: 0,
