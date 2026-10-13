@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- A jet is a bundle of strokes in the scene even when `lines` is 0 (with `lineWorld`, ADR 0089): the "Radio jet" preset drew v21's looped squiggle sprite, fixed to the screen, because it has no line-work; now it draws the twisting strand bundle along the galaxy's axis, which turns with the camera.
 - The page no longer tears v21's library drawings in mergers (`mWarp` is 0 there except on "Sketches, torn apart"): carried by the tides they were the straight dashes and zigzags scattered round a merger. The core's default is v21's.
 - A merging galaxy has a dark halo (ADR 0096, proposed), with `mergeAuto`: an isothermal sphere that its stars feel (and start in), so a disc rotates on a flat curve instead of a point mass's falling one and its arms stay coherent into the first pass.
 - Shells are in the scene (ADR 0095, proposed), with `shellAuto` ("Shells in 3D", 0 in the core, 1 on the page): a shell galaxy's stars are drawn through the galaxy's camera, and each shell is a meridian and a rim, so an orbit turns them instead of leaving a flat picture (v21's shells ignored the camera).

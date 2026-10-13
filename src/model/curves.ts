@@ -134,7 +134,9 @@ export function curves(
   field?: NoiseField | null,
 ): Curve[] {
   const C: Curve[] = [];
-  if (P.lines <= 0 || !strokes) return C;
+  // a jet (ADR 0089) is a body, not line-work: with `lines` at 0 the page still draws its strands
+  const jetOnly = P.lines <= 0 && P.lineWorld > 0 && P.jet > 0.02;
+  if ((P.lines <= 0 && !jetOnly) || !strokes) return C;
   const pools = strokePools(strokes.kind);
   const pick = (kind: string, r: Draws) => {
     const u = r.f32();
@@ -142,6 +144,7 @@ export function curves(
     return given ?? strokeIndex(kind, pools, u);
   };
   const at = (i: number) => new Draws(P.seed, Stream.curves, i);
+  if (jetOnly) return jetStrands(P, at, pick);
   const w = 1;
   const A = 1;
   const lx = V.lop * Math.cos(V.lopA) * 0.35;
