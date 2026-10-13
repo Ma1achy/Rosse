@@ -28,6 +28,8 @@ import { Stream } from '../../core/streams';
 import type { NoiseField } from '../../core/noise';
 import { CAM, PLATE } from '../../view/camera';
 import { smWarp } from '../../view/warp';
+import type { SkyLens } from '../../sim/lens';
+import { deflectF } from './lens';
 import { writeRow } from '../../model/dynvec';
 import {
   ARMS_FLAG,
@@ -56,6 +58,8 @@ export interface SkyView {
   wobble: number;
   nDotPool: number;
   massive: boolean;
+  /** the lens the deep field is seen through (`lensField`, ADR 0097) */
+  lens?: SkyLens | undefined;
 }
 
 export interface SkyInputs {
@@ -220,7 +224,8 @@ export function skyDot(
   const k = f(f(0.62) * Math.max(f(0.6), Math.min(f(1.3), zf)));
   const size = f((X.dotBase[t] ?? 0) * k);
   const rot = f(r(11) * f(6.28));
-  const [px, py] = smWarp(pq[0], pq[1], X.view.wobble, X.noise);
+  const lp = X.view.lens ? lensImage(X.view.lens, pq[0], pq[1], false) : null;
+  const [px, py] = smWarp(lp ? lp.x : pq[0], lp ? lp.y : pq[1], X.view.wobble, X.noise);
   const c = cosF(rot);
   const s = sinF(rot);
   const o = at * INSTANCE_WORDS;
@@ -296,6 +301,14 @@ export function galaxyRows(
     S = mul2(S, Rm(cph, f(-sph)));
     M0 = mul2(S, M0);
   }
+  let qx = v.qx;
+  let qy = v.qy;
+  if (X.view.lens) {
+    const li = lensImage(X.view.lens, qx, qy);
+    M0 = mul2(li.m, M0);
+    qx = li.x;
+    qy = li.y;
+  }
   const rows: { m: M2; x: number; y: number; ps: number; drawing: number }[] = [];
   if (arms) {
     const na = g.na;
@@ -303,14 +316,90 @@ export function galaxyRows(
       const ang = f(f(f(TAU * a) / na));
       rows.push({
         m: mul2(M0, Rm(cosF(ang), sinF(ang))),
-        x: v.qx,
-        y: v.qy,
+        x: qx,
+        y: qy,
         ps: f(0.42),
         drawing,
       });
     }
-  } else rows.push({ m: M0, x: v.qx, y: v.qy, ps: f(0.42), drawing });
+  } else rows.push({ m: M0, x: qx, y: qy, ps: f(0.42), drawing });
   return rows;
+}
+
+/** The Newton steps and the floor on |det A| of `lensImage`; sky.wgsl `lens_image` carries the same. */
+export const LENS_STEPS = 5;
+export const LENS_DET_MIN = 0.15;
+const LENS_STEP_MAX = 0.4;
+const LENS_H = 0.01;
+
+/**
+ * The primary image of the plate point (px, py) seen through the lens (ADR 0097): the point is
+ * a source β, its image θ solves θ − α(θ) = β by damped Newton steps from θ = β + α(β), and a
+ * shape at the source is stretched by A⁻¹ there. `m` is the plate-space map (column-major) taking
+ * a shape at the source to its image; the position is where the image sits.
+ */
+export function lensImage(
+  L: SkyLens,
+  px: number,
+  py: number,
+  withMap = true,
+): { x: number; y: number; m: M2 } {
+  const d = L.desc;
+  const cw = L.cos;
+  const sw = L.sin;
+  const dx = f(f(px - PLATE / 2) / L.scale);
+  const dy = f(f(py - PLATE / 2) / L.scale);
+  const bx = f(f(dx * cw) + f(dy * sw));
+  const by = f(f(f(-dx) * sw) + f(dy * cw));
+  const a0 = deflectF(d, bx, by);
+  let tx = f(bx + a0[0]);
+  let ty = f(by + a0[1]);
+  const jac = (x: number, y: number) => {
+    const a = deflectF(d, x, y);
+    const ax = deflectF(d, f(x + LENS_H), y);
+    const ay = deflectF(d, x, f(y + LENS_H));
+    return {
+      a,
+      A11: f(1 - f(f(ax[0] - a[0]) / LENS_H)),
+      A12: f(-f(f(ay[0] - a[0]) / LENS_H)),
+      A21: f(-f(f(ax[1] - a[1]) / LENS_H)),
+      A22: f(1 - f(f(ay[1] - a[1]) / LENS_H)),
+    };
+  };
+  for (let i = 0; i < LENS_STEPS; i++) {
+    const J = jac(tx, ty);
+    const rx = f(f(tx - J.a[0]) - bx);
+    const ry = f(f(ty - J.a[1]) - by);
+    let det = f(f(J.A11 * J.A22) - f(J.A12 * J.A21));
+    if (Math.abs(det) < LENS_DET_MIN) det = det < 0 ? -LENS_DET_MIN : LENS_DET_MIN;
+    let sx = f(f(f(J.A22 * rx) - f(J.A12 * ry)) / det);
+    let sy = f(f(f(-f(J.A21 * rx)) + f(J.A11 * ry)) / det);
+    const sl = sqrt(f(f(sx * sx) + f(sy * sy)));
+    if (sl > LENS_STEP_MAX) {
+      const k = f(LENS_STEP_MAX / sl);
+      sx = f(sx * k);
+      sy = f(sy * k);
+    }
+    tx = f(tx - sx);
+    ty = f(ty - sy);
+  }
+  const at: [number, number] = [
+    f(PLATE / 2 + f(L.scale * f(f(tx * cw) - f(ty * sw)))),
+    f(PLATE / 2 + f(L.scale * f(f(tx * sw) + f(ty * cw)))),
+  ];
+  if (!withMap) return { x: at[0], y: at[1], m: [1, 0, 0, 1] };
+  const J = jac(tx, ty);
+  let det = f(f(J.A11 * J.A22) - f(J.A12 * J.A21));
+  if (Math.abs(det) < LENS_DET_MIN) det = det < 0 ? -LENS_DET_MIN : LENS_DET_MIN;
+  const M11 = f(J.A22 / det);
+  const M12 = f(-J.A12 / det);
+  const M21 = f(-J.A21 / det);
+  const M22 = f(J.A11 / det);
+  const S11 = f(f(cw * f(f(M11 * cw) - f(M12 * sw))) - f(sw * f(f(M21 * cw) - f(M22 * sw))));
+  const S12 = f(f(cw * f(f(M11 * sw) + f(M12 * cw))) - f(sw * f(f(M21 * sw) + f(M22 * cw))));
+  const S21 = f(f(sw * f(f(M11 * cw) - f(M12 * sw))) + f(cw * f(f(M21 * cw) - f(M22 * sw))));
+  const S22 = f(f(sw * f(f(M11 * sw) + f(M12 * cw))) + f(cw * f(f(M21 * sw) + f(M22 * cw))));
+  return { x: at[0], y: at[1], m: [S11, S21, S12, S22] };
 }
 
 /** 4. Foreground star `i`: its sprite into `outF/outU` at `at`, or false when it is not drawn. */

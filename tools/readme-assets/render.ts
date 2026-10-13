@@ -53,6 +53,7 @@ const PAGE_FEATURES: Partial<Params> = {
   coreAuto: 1,
   mergeAuto: 1,
   shellAuto: 1,
+  lensField: 1,
 };
 
 export interface Rule {

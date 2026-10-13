@@ -22,6 +22,7 @@ import { wobbleAmplitude } from '../view/warp';
 import { packNoise } from '../core/noise';
 import { viewDesc, type Camera } from '../view/camera';
 import { skyBound, skyInputs } from '../fallback/kernels/sky';
+import { HALO_WORDS, skyLens } from '../sim/lens';
 import { CLASS_COUNT } from '../model/classes';
 import type { InkLayer } from './layers';
 import { GpuVectors } from './vectors';
@@ -54,12 +55,36 @@ export const SKY_UNIFORM_LAYOUT: StructLayout = {
   })),
 };
 
+/** The `LensZ` uniform of sky.wgsl: 16 + 16 + 16 bytes, then at most 12 halos of three vec4. */
+const LENS_Z_WORDS = 12 + 36 * 4;
+const LENS_Z_MAX_HALOS = 12;
+
+/** The deep field's lens as the uniform (all zero when `lensField` is off). */
+export function packLensZ(L: ReturnType<typeof skyLens>): Float32Array<ArrayBuffer> {
+  const out = new Float32Array(LENS_Z_WORDS);
+  if (!L) return out;
+  const u = new Uint32Array(out.buffer);
+  const n = Math.min(L.desc.nHalo, LENS_Z_MAX_HALOS);
+  u[0] = 1;
+  u[1] = n;
+  out[4] = L.desc.f;
+  out[5] = L.desc.shear[0];
+  out[6] = L.desc.shear[1];
+  out[7] = L.desc.shear[2];
+  out[8] = L.cos;
+  out[9] = L.sin;
+  out[10] = L.scale;
+  out.set(L.desc.halos.subarray(0, n * HALO_WORDS), 12);
+  return out;
+}
+
 type Entry = 'sky_cull' | 'sky_dots' | 'rows_sky' | 'sky_fg';
 
 interface Model {
   S: SkyDesc;
   own: GPUBuffer[];
   uniform: GPUBuffer;
+  lens: GPUBuffer;
   scan: GPUBuffer;
   groups: Record<Entry, GPUBindGroup>;
   scanGroups: { local: GPUBindGroup; blocks: GPUBindGroup; scatter: GPUBindGroup };
@@ -158,6 +183,11 @@ export class GpuSky {
       GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
       'sky uniform',
     );
+    const lens = buf(
+      LENS_Z_WORDS * 4,
+      GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      'sky lens',
+    );
     const bg = keep(bufferWithData(d, S.bgBuf, STORAGE, 'sky catalogue'));
     const fg = keep(bufferWithData(d, S.fgBuf, STORAGE, 'foreground stars'));
     const items = keep(bufferWithData(d, S.items, STORAGE, 'sky drawings'));
@@ -213,6 +243,7 @@ export class GpuSky {
       S,
       own,
       uniform,
+      lens,
       scan,
       blocks,
       dots,
@@ -240,6 +271,7 @@ export class GpuSky {
           [9, vis],
           [10, args],
           [11, dots],
+          [14, lens],
           [30, noise],
         ]),
         rows_sky: group(P2.rows_sky, [
@@ -250,6 +282,7 @@ export class GpuSky {
           [9, vis],
           [10, args],
           [13, inst],
+          [14, lens],
         ]),
         sky_fg: group(P2.sky_fg, [
           [0, view],
@@ -305,6 +338,7 @@ export class GpuSky {
       ),
     );
     m.bound = bound;
+    this.device.queue.writeBuffer(m.lens, 0, packLensZ(skyLens(P, cam)));
     this.device.queue.writeBuffer(
       m.uniform,
       0,

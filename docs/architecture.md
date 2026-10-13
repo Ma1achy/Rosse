@@ -81,6 +81,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0094](adr/0094-an-elliptical-is-a-spheroid-in-the-scene.md) | _Proposed:_ with `bulgeAuto` an elliptical is a prolate spheroid in the scene, and an explicit Sérsic index is a 3D spheroid, so the camera moves around them |
 | [0095](adr/0095-shells-are-in-the-scene.md) | _Proposed:_ with `shellAuto` a shell galaxy's stars are drawn in the scene through the galaxy's camera and each shell gains its rim, so orbiting turns them |
 | [0096](adr/0096-a-merging-galaxy-has-a-dark-halo.md) | _Proposed:_ with `mergeAuto` each merging galaxy has an isothermal dark halo that its test stars feel, so discs rotate on a flat curve |
+| [0097](adr/0097-the-lens-bends-the-deep-field.md) | _Proposed:_ with `lensField` the deep field's dots and drawings are placed at their primary image through the lens and stretched by its magnification, so background galaxies arc |
 
 ## Modules
 

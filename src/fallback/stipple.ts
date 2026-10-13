@@ -36,6 +36,7 @@ import { packStarJobs, starJobs } from '../model/stars';
 import { runStarMarks } from './kernels/star-marks';
 import { wobbleAmplitude } from '../view/warp';
 import { runSky, skyInputs, type SkyOut } from './kernels/sky';
+import { skyLens } from '../sim/lens';
 import type { PackedVectors } from '../marks/vector';
 import { Cls } from '../model/classes';
 import { classCapacity, compact } from './kernels/scan';
@@ -341,6 +342,7 @@ export class CpuStipple {
             wobble: wobbleAmplitude(P.distort),
             nDotPool: galaxy.g.n_dot_pool,
             massive: sky.massive,
+            lens: skyLens(P, cam),
           },
           galaxy.pool,
           galaxy.dotBase,

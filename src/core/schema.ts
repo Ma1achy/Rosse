@@ -222,6 +222,7 @@ export const SCHEMA: { readonly [K in ParamKey]: ParamSpec } = {
   coreAuto: choice('Core behind the disc', ONOFF),
   mergeAuto: choice('Merger keeps its galaxies’ character', ONOFF),
   shellAuto: choice('Shells in 3D', ONOFF),
+  lensField: choice('Lens bends the deep field', ONOFF),
   occlAuto: choice('Natural star occlusion', ONOFF),
   lensLock: choice('Lensed source follows the orbit', [0, 1, 2]),
   depthAuto: choice('Depth', [0, 1, 2], { tier: 'view' }),

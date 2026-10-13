@@ -693,6 +693,7 @@ async function start(): Promise<void> {
                 coreAuto: 1,
                 mergeAuto: 1,
                 shellAuto: 1,
+                lensField: 1,
                 // v21's torn library drawings are straight dashes and zigzags once the tides carry them;
                 // the page leaves them to the preset that is about them
                 mWarp: name === 'Sketches, torn apart' ? 1 : 0,

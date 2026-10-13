@@ -90,6 +90,7 @@ export const KEY_FEATURE: Partial<Record<ParamKey, FeatureName>> = Object.fromEn
     'lensCore',
     'lensCluster',
     'lensDouble',
+    'lensField',
   ).map((k) => [k, 'lens']),
 ]) as Partial<Record<ParamKey, FeatureName>>;
 
@@ -303,6 +304,7 @@ export const COMPONENTS: readonly Component[] = [
       'lensQ',
       'lensAngle',
       'lensCore',
+      'lensField',
     ],
     summary: (P) =>
       `${P.lensCluster ? 'a galaxy cluster' : P.lensSource === 'quasar' ? 'a lensed quasar' : P.lensDouble ? 'two sources behind' : 'a galaxy behind'}, Einstein radius ${P.lensR.toFixed(1)}`,
@@ -455,6 +457,7 @@ export const OPTION_LABELS: Partial<Record<ParamKey, Record<string, string>>> = 
   coreAuto: ONOFF,
   mergeAuto: ONOFF,
   shellAuto: ONOFF,
+  lensField: ONOFF,
   lensLock: { '0': 'fully (v21)', '1': 'not at all', '2': 'a little' },
   depthAuto: { '0': 'flat', '1': 'marks shrink with distance', '2': 'full perspective' },
   mWarp: ONOFF,

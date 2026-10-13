@@ -81,6 +81,7 @@ describe('the 42 real galaxies', () => {
         coreAuto: undefined,
         mergeAuto: undefined,
         shellAuto: undefined,
+        lensField: undefined,
       };
       if (home) expect(rec.params, c.name).toEqual(want);
       else expect({ ...rec.params, az: 0, incl: 0 }, c.name).toEqual({ ...want, az: 0, incl: 0 });
