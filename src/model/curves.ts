@@ -537,8 +537,9 @@ function jetStrands(P: Params, at: (i: number) => Draws, pick: Pick): Curve[] {
   const out: Curve[] = [];
   for (let l = 0; l < 2; l++) {
     const sgn = l === 0 ? 1 : -1;
-    const len = Lg * (l === 0 ? 1 : 0.65);
-    const n = Math.max(5, Math.round((l === 0 ? 22 : 15) * (0.4 + 0.6 * P.jet)));
+    // the counter-jet is the same jet seen less boosted: nearly as long, and as dense (ADR 0097)
+    const len = Lg * (l === 0 ? 1 : 0.85);
+    const n = Math.max(5, Math.round((l === 0 ? 22 : 19) * (0.4 + 0.6 * P.jet)));
     for (let i = 0; i <= n; i++) {
       const r = at(CurveIndex.jet + 16 * l + i);
       const spine = i === 0;
@@ -551,9 +552,10 @@ function jetStrands(P: Params, at: (i: number) => Draws, pick: Pick): Curve[] {
       const pts: Vec3[] = [];
       for (let j = 0; j <= 28; j++) {
         const t = (j / 28) * reach;
-        // a cone that opens, with a slow helix and a little unevenness along the strand
-        const rho = 0.05 + 0.32 * Math.pow(t, 1.05);
-        const a = phase + twist * TAU * t * 0.5;
+        // a narrow, collimated beam that flares into a lobe at the end (ADR 0097), with a slow
+        // helix and a little unevenness along the strand
+        const rho = 0.03 + 0.1 * t + 0.16 * Math.pow(t, 6);
+        const a = phase + twist * TAU * t * 0.35;
         const k = rad * rho * len * (1 + 0.12 * Math.sin(TAU * 2.3 * t + phase));
         const x = sgn * d[0] * t * len + (e1[0] * Math.cos(a) + e2[0] * Math.sin(a)) * k;
         const y = sgn * d[1] * t * len + (e1[1] * Math.cos(a) + e2[1] * Math.sin(a)) * k;
