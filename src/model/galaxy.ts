@@ -52,6 +52,8 @@ export const GalaxyFlag = {
   starsSmooth: 16,
   thinDisc: 32,
   popAuto: 64,
+  /** an elliptical (bulge ≥ 0.95) is a prolate spheroid: both short axes take `bulge_flat` (ADR 0094) */
+  prolate: 128,
 } as const;
 
 /** The fields of the `Galaxy` uniform of stipple.wgsl, in order: scalars only. */
@@ -246,8 +248,12 @@ export function describeGalaxy(
   const wring = P.ring * 0.34 * (1 - P.bulge);
   const wd = Math.max(0, 1 - wb - wh - wbar - wring);
   const armsOn = P.arms >= 1 && P.bulge < 0.98;
-  const sersic = P.sersicN > 0 && P.bulge >= 0.95;
-  const bulgeSersic = bulgeIsSersic(P);
+  const smooth = P.sersicN > 0 && P.bulge >= 0.95;
+  // ADR 0094: with `bulgeAuto` a smooth galaxy (round, cigar-shaped) is a spheroid in the scene,
+  // the deprojected Sérsic of the bulges, not v21's flat 2D draw that ignores the camera
+  const smooth3d = smooth && P.bulgeAuto > 0;
+  const sersic = smooth && !smooth3d;
+  const bulgeSersic = bulgeIsSersic(P) || smooth3d;
   const nB = bulgeSersic ? bulgeIndex(P) : P.sersicN;
   const barred = P.bar > 0.05;
   const penDot = penWeights(P.pen).dot;
@@ -268,6 +274,7 @@ export function describeGalaxy(
       (sersic ? GalaxyFlag.sersic : 0) |
       (bulgeSersic ? GalaxyFlag.bulgeSersic : 0) |
       (bulgeSersic && barred && P.peanut > 0 ? GalaxyFlag.bulgePeanut : 0) |
+      (P.bulgeAuto > 0 && P.bulge >= 0.95 ? GalaxyFlag.prolate : 0) |
       (P.starsAuto > 0 ? GalaxyFlag.starsSmooth : 0) |
       (P.thinAuto > 0 ? GalaxyFlag.thinDisc : 0) |
       (P.popAuto > 0 ? GalaxyFlag.popAuto : 0),
@@ -278,7 +285,8 @@ export function describeGalaxy(
     c_bar: f(wb + wh + wbar),
     c_ring: f(wb + wh + wbar + wring),
     tot: f(wb + wh + wbar + wring + wd),
-    bulge_a: f(0.22 * P.bulgeSize),
+    // the spheroid's 3D half-mass radius is 1.33 of its effective radius; the kernel's is 1.788 a
+    bulge_a: f(smooth3d ? (1.33 * P.re) / 1.788 : 0.22 * P.bulgeSize),
     bulge_flat: f(P.bulgeFlat),
     bar_len: f(P.barLen),
     ring_r: f(P.ringR),

@@ -273,6 +273,21 @@ describe('overlay artefacts stay on the screen; star satellites are in the scene
     expect(half(2) / half(0.5)).toBeCloseTo(4, 4);
   });
 
+  it('a subject trail and cosmic rays stay on the screen with depthAuto', () => {
+    for (const name of ['Artefact: satellite trail', 'Artefact: cosmic rays']) {
+      const P = presetParams(name, 7, { ...NO_SKY, depthAuto: 1 });
+      const home = orientationOf(cameraOf(P));
+      const D = buildScene(P, META, { home }).stars;
+      if (!D) throw new Error('no stars');
+      const at = (zoom: number) =>
+        starJobs(D, P, { ...cameraOf(P), zoom }, home)
+          .jobs.filter((j) => j.kind >= 6)
+          .map((j) => ({ ...j, first: 0 }));
+      expect(at(0.5).length).toBeGreaterThan(0);
+      expect(at(2)).toEqual(at(0.5));
+    }
+  });
+
   describe.each([
     ['a subject star', 'Star: bright, with spikes', 0],
     ['an overlay star', 'Layered: spiral beside a bright star', 1],

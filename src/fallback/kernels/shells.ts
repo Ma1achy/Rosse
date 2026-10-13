@@ -16,6 +16,7 @@ import {
   type ShellArc,
   type ShellParams,
 } from '../../sim/shells';
+import { rotationOf, type Camera } from '../../view/camera';
 import { INSTANCE_WORDS } from './project';
 
 const f = Math.fround;
@@ -23,7 +24,7 @@ const f = Math.fround;
 /** The `SSim` uniform of shells.wgsl. */
 export const SSIM_LAYOUT: StructLayout = {
   name: 'SSim',
-  size: 64,
+  size: 80,
   align: 4,
   fields: [
     ['seed', 'u32'],
@@ -38,10 +39,15 @@ export const SSIM_LAYOUT: StructLayout = {
     ['cy', 'f32'],
     ['scale', 'f32'],
     ['n_dot_pool', 'u32'],
+    // ADR 0095: 1 draws the stars in the scene, through the camera below
+    ['mode', 'u32'],
+    ['cos_i', 'f32'],
+    ['sin_i', 'f32'],
+    ['cos_az', 'f32'],
+    ['sin_az', 'f32'],
+    ['cos_pa', 'f32'],
+    ['sin_pa', 'f32'],
     ['pad0', 'u32'],
-    ['pad1', 'u32'],
-    ['pad2', 'u32'],
-    ['pad3', 'u32'],
   ].map(([name, type], i) => ({
     name: name as string,
     type: type as 'u32' | 'f32',
@@ -58,7 +64,10 @@ export function ssimUniform(
   st1: number,
   scale: number,
   nDotPool: number,
+  /** the camera, for shells in the scene (ADR 0095); without it the stars are v21's flat image */
+  cam?: Camera,
 ): Record<string, number> {
+  const R = cam ? rotationOf(cam) : null;
   const ax = (p.shellAxis * Math.PI) / 180;
   return {
     seed: key >>> 0,
@@ -73,10 +82,14 @@ export function ssimUniform(
     cy: 400,
     scale: f(scale),
     n_dot_pool: nDotPool,
+    mode: R ? 1 : 0,
+    cos_i: f(R?.ci ?? 1),
+    sin_i: f(R?.si ?? 0),
+    cos_az: f(R?.cz ?? 1),
+    sin_az: f(R?.sz ?? 0),
+    cos_pa: f(R?.cp ?? 1),
+    sin_pa: f(R?.sp ?? 0),
     pad0: 0,
-    pad1: 0,
-    pad2: 0,
-    pad3: 0,
   };
 }
 
@@ -153,7 +166,13 @@ export class CpuShells {
    * `dots`: every star as a dots instance (8 words), from x and y only, turned by the infall axis
    * and placed with `scale` plate px per unit (app23.js:L741–747).
    */
-  dots(pool: ArrayLike<number>, dotBase: ArrayLike<number>, scale: number): Float32Array {
+  dots(
+    pool: ArrayLike<number>,
+    dotBase: ArrayLike<number>,
+    scale: number,
+    cam?: Camera,
+  ): Float32Array {
+    const R = cam ? rotationOf(cam) : null;
     const out = new Float32Array(this.n * INSTANCE_WORDS);
     const u = new Uint32Array(out.buffer);
     const ax = (this.p.shellAxis * Math.PI) / 180;
@@ -169,8 +188,20 @@ export class CpuShells {
       const c = cosF(rot);
       const s = sinF(rot);
       const o = i * INSTANCE_WORDS;
-      out[o] = f(400 + f(f(f(x * ca) - f(y * sn)) * f(scale)));
-      out[o + 1] = f(400 + f(f(f(x * sn) + f(y * ca)) * f(scale)));
+      if (R) {
+        // in the scene: turned by the infall axis about z, then the galaxy's own camera
+        const z = this.xs[i * 4 + 2] as number;
+        const gx = f(f(x * ca) - f(y * sn));
+        const gy = f(f(x * sn) + f(y * ca));
+        const X = f(f(gx * f(R.cz)) - f(gy * f(R.sz)));
+        const ya = f(f(gx * f(R.sz)) + f(gy * f(R.cz)));
+        const Y = f(f(ya * f(R.ci)) - f(z * f(R.si)));
+        out[o] = f(400 + f(f(f(X * f(R.cp)) - f(Y * f(R.sp))) * f(scale)));
+        out[o + 1] = f(400 + f(f(f(X * f(R.sp)) + f(Y * f(R.cp))) * f(scale)));
+      } else {
+        out[o] = f(400 + f(f(f(x * ca) - f(y * sn)) * f(scale)));
+        out[o + 1] = f(400 + f(f(f(x * sn) + f(y * ca)) * f(scale)));
+      }
       u[o + 2] = t;
       out[o + 3] = 1;
       out[o + 4] = f(c * size);

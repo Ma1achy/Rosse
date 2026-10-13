@@ -141,3 +141,53 @@ describe('shells against v21', () => {
     });
   }
 });
+
+describe('shells in the scene (ADR 0095)', () => {
+  const P = presetParams('Shell galaxy', 7, { shellStars: 1500, shellTime: 60 });
+  const sim = new CpuShells(shellParamsOf(P));
+  sim.run();
+  const pool = Array.from({ length: 64 }, (_, i) => (i * 7) % META.dots.size.length);
+  const base = Array.from(META.dots.size);
+  const spread = (d: Float32Array) => {
+    let sx = 0;
+    let sy = 0;
+    for (let i = 0; i < sim.n; i++) {
+      sx += Math.abs((d[i * 8] as number) - 400);
+      sy += Math.abs((d[i * 8 + 1] as number) - 400);
+    }
+    return [sx / sim.n, sy / sim.n] as const;
+  };
+  const cam = (az: number, incl: number) => ({ incl, az, pa: 0, winding: 1, zoom: 1 });
+
+  it('is v21’s flat image without a camera, whatever the azimuth', () => {
+    expect(sim.dots(pool, base, 84)).toEqual(sim.dots(pool, base, 84, undefined));
+  });
+
+  it('face-on (incl 0, az 0) is the flat image', () => {
+    const flat = sim.dots(pool, base, 84);
+    const face = sim.dots(pool, base, 84, cam(0, 0));
+    for (let i = 0; i < sim.n * 8; i += 8) {
+      expect(face[i]).toBeCloseTo(flat[i] as number, 3);
+      expect(face[i + 1]).toBeCloseTo(flat[i + 1] as number, 3);
+    }
+  });
+
+  it('turns with the camera: the stars of an infall along x are a different picture from the side and end-on', () => {
+    const a = spread(sim.dots(pool, base, 84, cam(0, 70)));
+    const b = spread(sim.dots(pool, base, 84, cam(90, 70)));
+    expect(Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1])).toBeGreaterThan(5);
+  });
+
+  it('adds the rim of each shell as a second curve', () => {
+    const arcs = [{ R: 2.5, side: 1 as const, open: 0.6 }];
+    const flat = shellCurves(arcs, shellParamsOf(P), META.strokes, undefined, false);
+    const scene = shellCurves(arcs, shellParamsOf(P), META.strokes, undefined, true);
+    expect(scene.length).toBe(2 * flat.length);
+    expect(scene[0]).toEqual(flat[0]);
+    // the rim is a circle about the infall axis: constant distance from the axis
+    const axis = (shellParamsOf(P).shellAxis * Math.PI) / 180;
+    const rim = scene[1]?.pts ?? [];
+    const d = rim.map(([x, y, z]) => Math.hypot(-Math.sin(axis) * x + Math.cos(axis) * y, z));
+    expect(Math.max(...d) - Math.min(...d)).toBeLessThan(1e-9);
+  });
+});

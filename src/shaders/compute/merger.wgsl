@@ -43,6 +43,12 @@ struct MSim {
   m1: f32,
   a0sq: f32,
   a1sq: f32,
+  // the dark halos' squared circular speeds and their core radius squared (ADR 0096)
+  h0: f32,
+  h1: f32,
+  hrc2: f32,
+  // the gas's relaxation rate in orbital rates (ADR 0098); 0 is v21's collisionless stars
+  gas: f32,
 }
 
 // MGAL_LAYOUT: n = spin axis, w = type (0 spiral, 1 lenticular, 2 elliptical); e1.w = rd;
@@ -92,6 +98,8 @@ const KIND_CHOSEN: u32 = 1u;
 const KIND_SNAP2: u32 = 2u;
 const KIND_HORIZON: u32 = 3u;
 const TRIES: u32 = 40u;
+// the share of a disc's test stars that is gas (ADR 0098); MERGER_GAS_FRAC in src/sim/merger.ts
+const GAS_FRAC: f32 = 0.3;
 
 @group(0) @binding(0) var<uniform> sim: MSim;
 @group(0) @binding(1) var<uniform> gal: array<MGal, 2>;
@@ -121,9 +129,14 @@ fn gauss(i: u32, d: u32) -> f32 {
 }
 
 // The Plummer circular speed at radius R about a core of mass M and softening A.
-fn circular(m: f32, r: f32, a: f32) -> f32 {
+// With a dark halo (h > 0, ADR 0096) its isothermal sphere adds h r^2 / (r^2 + rc^2) to the square.
+fn circular(m: f32, r: f32, a: f32, h: f32) -> f32 {
   let q = r * r + a * a;
-  return sqrt(m * r * r / (q * sqrt(q)));
+  var v2 = m * r * r / (q * sqrt(q));
+  if (h > 0.0) {
+    v2 = v2 + h * (r * r) / (r * r + sim.hrc2);
+  }
+  return sqrt(v2);
 }
 
 @compute @workgroup_size(64)
@@ -142,6 +155,10 @@ fn init_stars(@builtin(global_invocation_id) id: vec3<u32>) {
   let rmax = G.e2.w;
   let mass = G.c.w;
   let soft = G.v.w;
+  var halo = sim.h0;
+  if (g == 1u) {
+    halo = sim.h1;
+  }
   if (ty == 2u) {
     // a hot ball of stars: random orbits, no disc (L320-325)
     let u0 = sqrt(min(u01(i, 200u), 0.97));
@@ -150,7 +167,7 @@ fn init_stars(@builtin(global_invocation_id) id: vec3<u32>) {
     let t = u01(i, 202u) * 6.28318;
     let q = sqrt(1.0 - z * z);
     let dv = vec3<f32>(q * cos_f(t), q * sin_f(t), z);
-    let vcE = circular(mass, Re, soft);
+    let vcE = circular(mass, Re, soft, halo);
     let vv = vec3<f32>(gauss(i, 203u), gauss(i, 205u), gauss(i, 207u));
     xs[i] = vec4<f32>(G.c.xyz + Re * dv, 0.0);
     vs[i] = vec4<f32>(G.v.xyz + vv * vcE * 0.55, 0.0);
@@ -181,7 +198,7 @@ fn init_stars(@builtin(global_invocation_id) id: vec3<u32>) {
     }
     th = base + gauss(i, 108u) * 0.12;
   }
-  let vc = circular(mass, R, soft);
+  let vc = circular(mass, R, soft, halo);
   let c = cos_f(th);
   let sn = sin_f(th);
   var thick = 0.02;
@@ -203,7 +220,14 @@ fn accel(x: vec3<f32>, p0: vec3<f32>, p1: vec3<f32>) -> vec3<f32> {
   let d1 = p1 - x;
   let q1 = d1.x * d1.x + d1.y * d1.y + d1.z * d1.z + sim.a1sq;
   let i1 = sim.m1 / (q1 * sqrt(q1));
-  return d0 * i0 + d1 * i1;
+  var a = d0 * i0 + d1 * i1;
+  if (sim.h0 > 0.0) {
+    // the dark halos: an isothermal sphere's pull, h d / (d^2 + rc^2) (ADR 0096)
+    let j0 = sim.h0 / (dot(d0, d0) + sim.hrc2);
+    let j1 = sim.h1 / (dot(d1, d1) + sim.hrc2);
+    a = a + d0 * j0 + d1 * j1;
+  }
+  return a;
 }
 
 fn core_at(k: u32, g: u32) -> vec3<f32> {
@@ -223,6 +247,43 @@ fn write_snap(row: u32, i: u32, x: vec3<f32>, k: u32) {
     rel = db;
   }
   snap[row * sim.n + i] = vec2<u32>(pack2x16float(rel.xy), pack2x16float(vec2<f32>(rel.z, which)));
+}
+
+// The gas's relaxation (ADR 0098), after kick k: toward the circular motion about the nearer core
+// in that core's own plane, at sim.gas times the local orbital rate, fading out past the disc's edge;
+// the semi-implicit step v = (v + h kappa vt) / (1 + h kappa). CPU twin: `relax`.
+fn gas_relax(x: vec3<f32>, v: vec3<f32>, k: u32, h: f32) -> vec3<f32> {
+  let c0 = core_at(k, 0u);
+  let c1 = core_at(k, 1u);
+  let d0 = x - c0;
+  let d1 = x - c1;
+  var g = 0u;
+  var c = c0;
+  if (dot(d1, d1) < dot(d0, d0)) {
+    g = 1u;
+    c = c1;
+  }
+  let G = gal[g];
+  let n = G.n.xyz;
+  let d = x - c;
+  let pl = d - dot(d, n) * n;
+  let r = sqrt(dot(pl, pl));
+  let rmax = G.e2.w;
+  let t = clamp((r - rmax) / (0.6 * rmax), 0.0, 1.0);
+  let w = 1.0 - t * t * (3.0 - 2.0 * t);
+  if (!(w > 0.0) || !(r > 0.02)) {
+    return v;
+  }
+  var halo = sim.h0;
+  if (g == 1u) {
+    halo = sim.h1;
+  }
+  let vc = circular(G.c.w, r, G.v.w, halo);
+  let u = pl / r;
+  let tang = cross(n, u);
+  let vt = (c - core_at(k - 1u, g)) * (1.0 / sim.dt) + vc * tang;
+  let a = h * (sim.gas * w * vc / r);
+  return (v + a * vt) / (1.0 + a);
 }
 
 @compute @workgroup_size(64)
@@ -247,6 +308,14 @@ fn integrate(@builtin(global_invocation_id) id: vec3<u32>) {
   var x = xs[i].xyz;
   var v = vs[i].xyz;
   let dt = sim.dt;
+  var is_gas = false;
+  if (sim.gas > 0.0) {
+    var gi = 0u;
+    if (i >= sim.n0) {
+      gi = 1u;
+    }
+    is_gas = u32(gal[gi].n.w) != 2u && u01(i, 220u) < GAS_FRAC;
+  }
   for (var st = job.st0; st < job.st1; st++) {
     if (st > 0u && st % job.every == 0u) {
       var row = st / job.every;
@@ -261,6 +330,9 @@ fn integrate(@builtin(global_invocation_id) id: vec3<u32>) {
       h = dt * 0.5;
     }
     v = v + accel(x, core_at(st + 1u, 0u), core_at(st + 1u, 1u)) * h;
+    if (is_gas) {
+      v = gas_relax(x, v, st + 1u, h);
+    }
   }
   xs[i] = vec4<f32>(x, 0.0);
   vs[i] = vec4<f32>(v, 0.0);

@@ -39,7 +39,7 @@ type Entry = (typeof ENTRIES)[number];
 const USES: Record<Entry, number[]> = {
   init_stars: [0, 1, 3, 4, 5],
   start_phase: [0, 2, 3, 4, 6, 7],
-  integrate: [0, 2, 3, 4, 6, 7],
+  integrate: [0, 1, 2, 3, 4, 6, 7],
   finish_phase: [0, 3, 8],
   blend: [0, 6, 9, 10, 11, 12, 13, 14],
   radii: [0, 14, 15, 16],

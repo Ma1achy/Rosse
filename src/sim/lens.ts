@@ -891,3 +891,28 @@ export function weakLensing(
   // column-major, as every 2 × 2 here: out = c + S·(q − c)
   return [S11, S21, S12, S22];
 }
+
+/**
+ * The lens as the deep field sees it (`lensField`, ADR 0097): the main plane's model at v21's 1.3
+ * strength for the field behind it, and the view that turns a plate point into lens units.
+ */
+export interface SkyLens {
+  desc: SolverDesc;
+  /** cos and sin of the position angle */
+  cos: number;
+  sin: number;
+  /** pixels per lens unit */
+  scale: number;
+}
+
+/** The field's lens, or undefined when `lensField` or `lensOn` is off. */
+export function skyLens(P: Params, cam: Camera): SkyLens | undefined {
+  if (!P.lensOn || !(P.lensField > 0)) return undefined;
+  const pa = cam.pa * DEG;
+  return {
+    desc: solverDesc(lensModel(P, 1.3), 1, 1),
+    cos: f(Math.cos(pa)),
+    sin: f(Math.sin(pa)),
+    scale: f(viewScale(cam.zoom)),
+  };
+}

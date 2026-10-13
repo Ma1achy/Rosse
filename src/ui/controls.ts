@@ -272,6 +272,12 @@ export class ControlPanel {
   private readonly adds = new Map<TabId, HTMLElement>();
   /** the value a part had when it was taken out, to put back */
   private readonly stash = new Map<ParamKey, number | string>();
+  /**
+   * The parts whose own controls the user has touched: a part stays on the panel, however low its
+   * sliders go, until the user takes it out (or loads another galaxy). A slider at zero is a value,
+   * not a deletion.
+   */
+  private readonly kept = new Set<string>();
   private current: TabId;
   private last: Params | null = null;
   private readonly host: PanelHost;
@@ -360,6 +366,7 @@ export class ControlPanel {
         const on = c.on;
         if (!on) return;
         this.stash.set(on.key, host.get()[on.key]);
+        this.kept.delete(c.id);
         host.set(on.key, on.offVal);
         // the card has gone: the way back is the Add button for it
         this.adds.get(c.tab)?.querySelector<HTMLElement>(`[data-add="${c.id}"]`)?.focus();
@@ -369,11 +376,18 @@ export class ControlPanel {
     root.append(top, body);
 
     const controls: Control[] = [];
+    const cardHost: PanelHost = {
+      ...host,
+      set: (k, v) => {
+        this.kept.add(c.id);
+        host.set(k, v);
+      },
+    };
     let inner: HTMLFieldSetElement | null = null;
     let hint: HTMLElement | null = null;
     let into: HTMLElement = body;
     c.main.forEach((key, i) => {
-      const ctl = controlFor(key, host);
+      const ctl = controlFor(key, cardHost);
       controls.push(ctl);
       if (c.gate && i === 0) {
         body.append(ctl.root);
@@ -398,7 +412,7 @@ export class ControlPanel {
         wrap.hidden = !open;
       });
       for (const key of c.more) {
-        const ctl = controlFor(key, host);
+        const ctl = controlFor(key, cardHost);
         controls.push(ctl);
         wrap.append(ctl.root);
       }
@@ -443,6 +457,16 @@ export class ControlPanel {
     this.select(next, true);
   }
 
+  /** Whether a part is on the panel: in the picture, or kept by the user's own hand. */
+  private present(c: Component, P: Params): boolean {
+    return isOn(c, P) || this.kept.has(c.id);
+  }
+
+  /** A new galaxy or preset: what the user kept no longer holds. */
+  reset(): void {
+    this.kept.clear();
+  }
+
   /** Brings every control to these parameters. */
   sync(P: Params): void {
     this.last = P;
@@ -451,7 +475,7 @@ export class ControlPanel {
       for (const ctl of card.controls) ctl.sync(P);
       setText(card.summary, c.summary(P));
       const shown = c.show ? c.show(P) : true;
-      card.root.hidden = !shown || (!c.gate && !isOn(c, P));
+      card.root.hidden = !shown || (!c.gate && !this.present(c, P));
       if (card.take) card.take.hidden = false;
       if (card.inner) card.inner.disabled = !isOn(c, P);
       if (card.hint) card.hint.hidden = isOn(c, P);
@@ -468,7 +492,7 @@ export class ControlPanel {
           k.comp.on &&
           !k.comp.gate &&
           (k.comp.show?.(P) ?? true) &&
-          !isOn(k.comp, P),
+          !this.present(k.comp, P),
       );
       const key = off.map((k) => k.comp.id).join();
       if (add.dataset.key === key) continue;

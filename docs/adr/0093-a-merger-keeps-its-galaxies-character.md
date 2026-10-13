@@ -15,21 +15,22 @@ Mergers read as the same two blobs and a jumble: a spiral meeting an elliptical 
 With `mergeAuto`:
 
 1. **Crisper progenitors.** A spiral's initial stars: three quarters sit on the arms (v21: half), 0.16 rad wide (v21: 0.25), and it is drawn with contrast at least 0.95, 0.7 of the usual arm width, knots at least 0.5 and 1.5 times the stars. `GalaxyIC.crisp` (0 or 1) reaches both kernels as `MGal.p.w`; the sim's key includes `mergeAuto`.
-2. **A disc holds its inner stars.** In the sprite kernel a disc galaxy's star is blended between where the tides put it and where it started (the core plus its initial offset in the disc's frame), the hold being 0.92 inside 0.25 of the truncation radius, fading out to 0.7, and fading as the cores come together (`stage`, their separation in radii, smoothstepped over 0.12 to 0.6). The tidal map reads the blended plate positions, so the line-work follows. The tail test and the tail knots still use the raw tidal position.
+2. **Nothing is pinned.** An earlier version blended a disc's inner stars toward where they started, so its arms stayed fixed while the rest of the merger evolved and then rearranged as the hold let go. That is not what a merger does and it was removed: every star is drawn where the simulation puts it, so the discs rotate and the tides tear them.
 3. **An elliptical is a soft glow.** Its dots are 0.55 to 1 of their size (smallest at the centre) and 1.5 times as many are kept.
 4. **Dust lanes that travel.** A disc star whose initial angle lies on the trailing edge of an arm (0.22 rad behind it, 0.09 wide) is dropped with probability 0.85 times the lane strength (`P.dust`, plus 0.35 with `dustAuto`, cap 0.8; 0.6 of that for a lenticular). The lanes are carried with the stars, so they stretch into the tails. A bridge: stars within a tube about the line between the cores (0.1 of its length, between 0.12 and 0.88 along it) are thinned while the galaxies are still apart.
 5. **Tails and star formation.** Tail knots are 3 times as likely, a fifth of them are tidal dwarfs (11 tight, larger knots), and where a disc lies inside 0.9 of the other galaxy's radius it forms knots 1.6 times as often as the outer disc.
 6. **Strokes taper out.** In the tidal map (header word 9) ribbon segments and capsules thin from 1.05 times their length to a sixth of their width at the tear (1.8), instead of ending in a dash.
 7. **A thicker disc.** The initial thickness of a disc is 2.5 times v21's, so a tilted one has depth along its normal.
+8. **A more extended disc.** The scale length is 0.37 √M (v21: 0.32) and the truncation radius 2.3 √M (v21: 1.7), so the outer disc, which the tides pull the tails and the bridge from, holds more stars. `GalaxyIC.rd` and `rmax` carry it to every kernel. Tail knots are twice v21's (not three times).
 
 Without it nothing changes.
 
 ## Not done
 
-- The sim's physics (tidal strength, framing) is v21's. A late merger holds less (the hold lets go as the cores meet), and shells and a stellar bridge of their own (more stars, not fewer) are not drawn.
-- The whole-drawing and ribbon arms still follow the tidal map; only the stars hold.
-- Stage cues are the hold's and the bridge's fade, not a separate set per stage.
+- The sim's physics (tidal strength, framing) is v21's. Shells and a stellar bridge of their own (more stars, not fewer) are not drawn.
+- Stage cues are the bridge's and the lanes' fade, not a separate set per stage.
 
 ## Consequences
 
 - A spiral progenitor reads as a spiral through the first pass, an elliptical as a smooth halo, and dust lanes stretch with the tails. The merger kernel's uniform grows by six `vec4` and two scalars; the tidal map's header by one word (10).
+- The page also sets `mWarp` to 0 (except for the preset about it): v21 tears whole library drawings with the tides, and the pieces read as straight dashes and zigzags in the outskirts. It is a page override, not a flag; the core's default stays v21's.

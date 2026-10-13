@@ -28,6 +28,22 @@ import { randF32 } from '../core/rng';
 export const MERGER_DT = 0.012;
 /** The most steps up to the chosen moment (app23.js:L360). */
 export const MERGER_MAX_STEPS = 1400;
+/**
+ * ADR 0096: with `mergeAuto` each galaxy has a dark halo, an isothermal sphere of circular speed
+ * √(MERGER_HALO · M) and core radius √MERGER_HALO_RC2, felt by the test stars (and the stars' starting
+ * rotation), so a disc's rotation curve is flat, as real ones are, instead of falling as a point
+ * mass's does. The cores' own orbit stays v21's.
+ */
+export const MERGER_HALO = 0.3;
+export const MERGER_HALO_RC2 = 0.5;
+/**
+ * ADR 0098: with `mergeAuto` a share of each disc's test stars is gas: it relaxes toward the
+ * circular motion about the nearer core at this fraction of the local orbital rate (so a disc in
+ * equilibrium feels nothing and a perturbed one settles and sinks), and `MERGER_GAS_FRAC` of a disc
+ * is gas.
+ */
+export const MERGER_GAS = 0.25;
+export const MERGER_GAS_FRAC = 0.3;
 /** The core softening squared (app23.js:L346, `+ 0.02`). */
 export const CORE_SOFT2 = 0.02;
 /** The true anomaly the cores start from (app23.js:L307). */
@@ -469,6 +485,10 @@ export interface GalaxyIC {
   bar: boolean;
   /** 0 is v21's half of the stars on the arms, 0.25 rad wide; 1 is three quarters, 0.16 wide */
   crisp: number;
+  /** the squared circular speed of the dark halo, per unit mass (ADR 0096); 0 is v21's point mass alone */
+  halo: number;
+  /** the gas's relaxation rate in units of the local orbital rate (ADR 0098); 0 is v21's collisionless stars */
+  gas: number;
   n: [number, number, number];
   e1: [number, number, number];
   e2: [number, number, number];
@@ -497,12 +517,21 @@ export function galaxyICs(
       count: n[g] as number,
       mass: M,
       soft: track.A[g] as number,
-      rd: 0.32 * Math.sqrt(M) * (SZ[g] as number),
-      rmax: 1.7 * Math.sqrt(M) * (SZ[g] as number),
+      // ADR 0093: with mergeAuto the disc reaches further out, where the tides pull the tails from
+      rd:
+        (p.mergeAuto ?? 0) > 0
+          ? 0.37 * Math.sqrt(M) * (SZ[g] as number)
+          : 0.32 * Math.sqrt(M) * (SZ[g] as number),
+      rmax:
+        (p.mergeAuto ?? 0) > 0
+          ? 2.3 * Math.sqrt(M) * (SZ[g] as number)
+          : 1.7 * Math.sqrt(M) * (SZ[g] as number),
       arms: ARM[g] as number,
       pitch,
       bar: !!BAR[g],
       crisp: (p.mergeAuto ?? 0) > 0 ? 1 : 0,
+      halo: (p.mergeAuto ?? 0) > 0 ? MERGER_HALO : 0,
+      gas: (p.mergeAuto ?? 0) > 0 ? MERGER_GAS : 0,
       n: fr.n,
       e1: fr.e1,
       e2: fr.e2,

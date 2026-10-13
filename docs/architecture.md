@@ -77,7 +77,12 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0090](adr/0090-stellar-populations.md) | _Proposed:_ with `popAuto`, mark character by population, clustering, halo globular clusters and a wider brightness spread. |
 | [0091](adr/0091-a-stars-colour-follows-the-galaxy.md) | _Proposed:_ the colour plate has a fifteen-ink ramp per surface, and a dot's colour follows its place in the galaxy (temperature, radius, arms, dust edges, patches). |
 | [0092](adr/0092-the-core-is-drawn-behind-the-disc.md) | _Proposed:_ with `coreAuto` the drawn core and nuclear spiral are drawn first, still opaque, under the disc's marks (v21 draws them last) |
-| [0093](adr/0093-a-merger-keeps-its-galaxies-character.md) | _Proposed:_ with `mergeAuto` a merging disc holds its inner stars, an elliptical is a soft glow, dust lanes and a bridge travel with the stars, tails carry tidal dwarfs, strokes taper at the tear, and discs are thicker |
+| [0093](adr/0093-a-merger-keeps-its-galaxies-character.md) | _Proposed:_ with `mergeAuto` a merging disc has crisper arms and dust lanes, an elliptical is a soft glow, dust lanes and a bridge travel with the stars, tails carry tidal dwarfs, strokes taper at the tear, and discs are thicker |
+| [0094](adr/0094-an-elliptical-is-a-spheroid-in-the-scene.md) | _Proposed:_ with `bulgeAuto` an elliptical is a prolate spheroid in the scene, and an explicit Sérsic index is a 3D spheroid, so the camera moves around them |
+| [0095](adr/0095-shells-are-in-the-scene.md) | _Proposed:_ with `shellAuto` a shell galaxy's stars are drawn in the scene through the galaxy's camera and each shell gains its rim, so orbiting turns them |
+| [0096](adr/0096-a-merging-galaxy-has-a-dark-halo.md) | _Proposed:_ with `mergeAuto` each merging galaxy has an isothermal dark halo that its test stars feel, so discs rotate on a flat curve |
+| [0097](adr/0097-the-lens-bends-the-deep-field.md) | _Proposed:_ with `lensField` the deep field's dots and drawings are placed at their primary image through the lens and stretched by its magnification, so background galaxies arc |
+| [0098](adr/0098-a-merging-disc-has-gas.md) | _Proposed:_ with `mergeAuto` 30% of a merging disc's stars are gas that dissipates toward the nearer core and lights up there as a nuclear starburst |
 
 ## Modules
 
