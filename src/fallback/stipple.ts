@@ -350,7 +350,17 @@ export class CpuStipple {
         ),
       );
       const sv = dynView(P, sky.spec, skyOut.rows, skyOut.nRows, galaxy.g.key, galaxy.g.n_dot_pool);
-      skyVec = runVectors(vectorInputs(VD.lib, sv, galaxy.pool, galaxy.dotBase, galaxy.noise));
+      skyVec = runVectors(
+        vectorInputs(
+          VD.lib,
+          sv,
+          galaxy.pool,
+          galaxy.dotBase,
+          galaxy.noise,
+          undefined,
+          skyLens(P, cam),
+        ),
+      );
       if (skyOut.nDots)
         bgLayers.push({
           kind: 'sprites',

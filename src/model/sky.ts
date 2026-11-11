@@ -288,7 +288,9 @@ export function describeSky(
         { fgstars: fgTiles, companions: meta.vectors?.companions?.n ?? 0 },
         key,
       );
-  const strides = sheetStrides(lib, SKY_SHEETS);
+  // a lensed deep field's drawings are cut into pieces and put through the lens vertex by vertex
+  // (WarpKind.lens, ADR 0101)
+  const strides = sheetStrides(lib, SKY_SHEETS, P.lensField > 0 && !!P.lensOn);
   const visCap = visibleCapacity(cat.bg.length);
   return {
     catalogue: cat,

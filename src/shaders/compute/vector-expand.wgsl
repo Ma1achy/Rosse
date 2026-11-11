@@ -35,6 +35,7 @@
 // #import "common/rng.wgsl"
 // #import "common/tide.wgsl"
 // #import "common/warp.wgsl"
+// #import "common/lens-sky.wgsl"
 
 // VEC_LAYOUT in src/model/vectors.ts
 struct Vec {
@@ -90,6 +91,7 @@ const WARP_REWIND: u32 = 1u;
 const WARP_POST: u32 = 2u;
 const WARP_TIDE: u32 = 3u;
 const WARP_TIDE_SCREEN: u32 = 4u;
+const WARP_LENS: u32 = 5u;
 const KNOT_POOL: u32 = 24u;
 const DRAWING_WORDS: u32 = 8u;
 const DROP: u32 = 0xffffffffu;
@@ -119,6 +121,8 @@ const MODE_CAPS: u32 = 0u;
 @group(0) @binding(19) var<storage, read_write> args: array<u32>;
 @group(0) @binding(20) var<storage, read_write> caps: array<Capsule>;
 @group(0) @binding(21) var<storage, read_write> marks: array<Instance>;
+// the deep field's lens, for WARP_LENS (all zero when there is none)
+@group(0) @binding(32) var<uniform> lensz: LensZ;
 
 // The last instance whose first slot (field 0: capsule, 1: dot, 2: blob) is at or before i.
 fn inst_of(i: u32, field: u32) -> u32 {
@@ -159,6 +163,16 @@ fn rewind(p: vec2<f32>, dk: f32, flip: bool) -> vec2<f32> {
   return vec2<f32>(x * c - y * s, x * s + y * c);
 }
 
+// A 2 x 2 product, column-major (the twin of the CPU's `mul2`).
+fn mul2(A: vec4<f32>, B: vec4<f32>) -> vec4<f32> {
+  return vec4<f32>(
+    A.x * B.x + A.z * B.y,
+    A.y * B.x + A.w * B.y,
+    A.x * B.z + A.z * B.w,
+    A.y * B.z + A.w * B.w,
+  );
+}
+
 // The matrix: tile -> plate, before the wobble.
 fn place(I: VInst, p: vec2<f32>) -> vec2<f32> {
   return vec2<f32>((I.t.x + I.m.x * p.x) + I.m.z * p.y, (I.t.y + I.m.y * p.x) + I.m.w * p.y);
@@ -183,6 +197,11 @@ fn tf(I: VInst, p: vec2<f32>) -> vec2<f32> {
   if (I.warp == WARP_TIDE) {
     // a merging galaxy's mark carried by its tides (L1195): the grid, after the matrix
     return sm_warp(tide_post(u32(I.w.x), place(I, p), I.w.y).xy, vu.wobble);
+  }
+  if (I.warp == WARP_LENS) {
+    // a deep-field drawing seen through the lens (ADR 0101): every vertex is its own source, put at
+    // its own primary image, so a long drawing bends into an arc rather than only being stretched
+    return sm_warp(lens_pos(place(I, p)), vu.wobble);
   }
   if (I.warp == WARP_TIDE_SCREEN) {
     // mWarp's whole drawing (L1196): the tidal map itself, on the raw drawing coordinates
@@ -219,7 +238,11 @@ fn expand_caps(@builtin(global_invocation_id) id: vec3<u32>) {
   let I = inst[inst_of(i, 0u)];
   let k = i - I.cap_first;
   let o = I.drawing * DRAWING_WORDS;
-  if (I.drawing == INACTIVE || (I.warp == WARP_NONE && k >= table[o + 1u])) {
+  if (
+    I.drawing == INACTIVE ||
+    (I.warp == WARP_NONE && k >= table[o + 1u]) ||
+    (I.warp != WARP_NONE && k >= table[o + 7u])
+  ) {
     caps_raw[i] = Capsule(vec2<f32>(0.0), vec2<f32>(0.0), 0.0, 0.0, 0.0, 0.0);
     keys[i] = DROP;
     return;
@@ -320,7 +343,11 @@ fn expand_blobs(@builtin(global_invocation_id) id: vec3<u32>) {
   let sy = max((2.0 * b0.w) * 0.85, lim);
   let c = b1.x;
   let s = b1.y;
-  let m = I.m;
+  var m = I.m;
+  if (I.warp == WARP_LENS) {
+    // the lens stretches the blob by A^-1 where it lands
+    m = mul2(lens_image(place(I, b0.xy)).m, m);
+  }
   let r0 = m.x * c + m.z * s;
   let r1 = m.y * c + m.w * s;
   let r2 = m.z * c - m.x * s;

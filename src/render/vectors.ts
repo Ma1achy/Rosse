@@ -31,6 +31,8 @@ import type { InkLayer } from './layers';
 
 const STORAGE = GPUBufferUsage.STORAGE;
 const SCAN_BLOCK = 256;
+/** The `LensZ` uniform of common/lens-sky.wgsl: 48 bytes, then 12 halos of three vec4. */
+const LENS_Z_BYTES = (12 + 36 * 4) * 4;
 
 const ENTRIES = [
   'expand_caps',
@@ -46,9 +48,9 @@ type Entry = (typeof ENTRIES)[number];
 
 /** Which bindings of vector-expand.wgsl each entry point uses (its auto layout). */
 const USES: Record<Entry, number[]> = {
-  expand_caps: [0, 1, 2, 3, 4, 9, 10, 30, 31],
-  expand_dots: [0, 1, 2, 5, 7, 8, 11, 30, 31],
-  expand_blobs: [0, 1, 2, 6, 7, 12, 30, 31],
+  expand_caps: [0, 1, 2, 3, 4, 9, 10, 30, 31, 32],
+  expand_dots: [0, 1, 2, 5, 7, 8, 11, 30, 31, 32],
+  expand_blobs: [0, 1, 2, 6, 7, 12, 30, 31, 32],
   stream_marks: [0, 7, 8, 10, 13, 14, 30],
   scan_local: [10, 15, 16, 17],
   scan_blocks: [15, 17, 18, 19],
@@ -152,7 +154,8 @@ export class GpuVectors {
 
   /**
    * Model tier: buffers for these placed drawings, reading the galaxy's pools and noise field, and
-   * (a merging galaxy's, M8) the tidal map's words, which the tide warps read at binding 31.
+   * (a merging galaxy's, M8) the tidal map's words, which the tide warps read at binding 31, and
+   * (the deep field's, ADR 0101) the `LensZ` uniform of the lens warp at binding 32.
    */
   load(
     D: VectorDesc,
@@ -160,6 +163,7 @@ export class GpuVectors {
     dotBase: GPUBuffer,
     noise: GPUBuffer,
     tide?: GPUBuffer,
+    lens?: GPUBuffer,
   ): void {
     this.unload();
     const d = this.device;
@@ -223,6 +227,8 @@ export class GpuVectors {
       21: buf(2 * markCap * INSTANCE_LAYOUT.size, src, 'stream dots and knots'),
       30: noise,
       31: tide ?? buf(16, STORAGE, 'no tides'),
+      // the deep field's lens (WarpKind.lens): the sky's own uniform, or all zero
+      32: lens ?? buf(LENS_Z_BYTES, GPUBufferUsage.UNIFORM, 'no lens'),
     };
     const dotArgs = keep(
       res.init(

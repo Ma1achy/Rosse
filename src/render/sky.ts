@@ -230,7 +230,7 @@ export class GpuSky {
       ),
     );
     if (S.spec.rows && S.spec.strideCaps)
-      this.vectors.load(dynDesc(lib, P, S.spec), pool, dotBase, noise);
+      this.vectors.load(dynDesc(lib, P, S.spec), pool, dotBase, noise, undefined, lens);
     const inst =
       S.spec.rows && S.spec.strideCaps ? this.vectors.instances : buf(256, STORAGE, 'no rows');
     const group = (p: GPUComputePipeline, entries: [number, GPUBuffer][]) =>

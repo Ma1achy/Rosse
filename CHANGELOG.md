@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- A lensed drawing bends (ADR 0101, proposed): with `lensField` each vertex of a deep-field drawing is put at its own primary image through the lens, not only stretched by one matrix, so a long source near the ring is an arc and not a straight line, in both engines; a drawing takes a slot per densified piece, and the lens solve is shared by the sky and vector shaders.
 - Every star is live (ADR 0100, proposed), with `nbody`: the test stars carry 35% of their galaxy's mass and pull on one another and on the cores, on the GPU by a tiled direct sum and on the CPU by a Barnes–Hut tree (monopole plus softened quadrupole, θ 0.7), held over blocks of four steps with every fourth star as a source; discs start on the circular speed of the enclosed mass.
 - The cores' orbit comes from a live N-body (ADR 0099, proposed), with `nbody` ("Live N-body cores", 0 in the core, 1 on the page): each galaxy is a softened core plus 60–400 massive tracer particles that pull on one another by direct summation, so the discs' self-gravity, tides and wakes bend the cores' orbit instead of v21's two point masses and made-up friction; momentum is conserved and the test stars follow the new track in both engines.
 - A merging disc has gas (ADR 0098, proposed), with `mergeAuto`: 30% of a disc's test stars are gas that relaxes toward the circular motion about the nearer core (so it sinks into the nuclei as the discs pass) and lights up there as a nuclear starburst, in both engines.
