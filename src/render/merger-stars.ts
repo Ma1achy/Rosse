@@ -14,6 +14,7 @@
 import mergerWgsl from '../shaders/compute/merger.wgsl';
 import { bufferWithData, packStruct } from '../gpu/buffers';
 import { readBuffer } from '../gpu/readback';
+import { MERGER_SELF_STEPS } from '../sim/merger';
 import {
   CHUNK_STEPS,
   MJOB_LAYOUT,
@@ -27,6 +28,7 @@ import type { MergerDesc, SnapSelect } from '../sim/merger';
 
 const ENTRIES = [
   'init_stars',
+  'self_gravity',
   'start_phase',
   'integrate',
   'finish_phase',
@@ -38,8 +40,9 @@ type Entry = (typeof ENTRIES)[number];
 /** Which bindings of merger.wgsl each entry point uses (its auto layout). */
 const USES: Record<Entry, number[]> = {
   init_stars: [0, 1, 3, 4, 5],
-  start_phase: [0, 2, 3, 4, 6, 7],
-  integrate: [0, 1, 2, 3, 4, 6, 7],
+  self_gravity: [0, 3, 17],
+  start_phase: [0, 2, 3, 4, 6, 7, 17],
+  integrate: [0, 1, 2, 3, 4, 6, 7, 17],
   finish_phase: [0, 3, 8],
   blend: [0, 6, 9, 10, 11, 12, 13, 14],
   radii: [0, 14, 15, 16],
@@ -132,6 +135,7 @@ export class GpuMergerStars {
     make('chosen', N * 16, STORAGE | SRC);
     make('horizon', N * 16, STORAGE | SRC);
     make('cur', N * 16, STORAGE | SRC);
+    make('ae', N * 16, STORAGE | SRC);
     make('radii', Math.ceil(N / 5) * 4, STORAGE | SRC);
     this.buffers.cores = bufferWithData(dev, d.cores, STORAGE | SRC, 'merger cores');
     this.buffers.sim = bufferWithData(
@@ -176,6 +180,7 @@ export class GpuMergerStars {
       14: 'cur',
       15: 'radii',
       16: 'centre',
+      17: 'ae',
     };
     g = this.device.createBindGroup({
       label: `merger ${key}`,
@@ -229,6 +234,9 @@ export class GpuMergerStars {
     yieldTo: () => Promise<void> = () => this.device.queue.onSubmittedWorkDone(),
   ): Promise<void> {
     const d = this.description;
+    const live = d.gals[0].live > 0;
+    // with live stars the steps go in blocks of `MERGER_SELF_STEPS`, the stars' pull refreshed before each
+    const block = live ? MERGER_SELF_STEPS : CHUNK_STEPS;
     this.dispatch('init_stars', this.group('init_stars', 'all'));
     for (const future of [false, true]) {
       const ph = future ? d.track.future : d.track.chosen;
@@ -236,13 +244,19 @@ export class GpuMergerStars {
       const tag = future ? 'p2' : 'p1';
       const table = future ? 'snap2' : 'snap1';
       this.writeJob(0, 0, future);
+      if (live) this.dispatch('self_gravity', this.group('self_gravity', 'all'));
       this.dispatch('start_phase', this.group('start_phase', tag, table));
-      for (let st = 0; st < steps; st += CHUNK_STEPS) {
-        const st1 = Math.min(steps, st + CHUNK_STEPS);
+      let reported = 0;
+      for (let st = 0; st < steps; st += block) {
+        const st1 = Math.min(steps, st + block);
+        if (live && st > 0) this.dispatch('self_gravity', this.group('self_gravity', 'all'));
         this.writeJob(st, st1, future);
         this.dispatch('integrate', this.group('integrate', tag, table));
-        onProgress?.({ phase: future ? 'future' : 'timeline', done: st1, of: steps });
-        await yieldTo();
+        if (st1 - reported >= CHUNK_STEPS || st1 === steps) {
+          reported = st1;
+          onProgress?.({ phase: future ? 'future' : 'timeline', done: st1, of: steps });
+          await yieldTo();
+        }
       }
       this.dispatch(
         'finish_phase',
@@ -274,6 +288,16 @@ export class GpuMergerStars {
     this.dispatch('radii', this.group('radii', 'all'), Math.ceil(d.total / 5));
     const n = Math.ceil(d.total / 5);
     return new Float32Array(await readBuffer(this.device, this.buf('radii'), n * 4));
+  }
+
+  /** Tests: the stars' initial state and their pull on one another at it (ADR 0100), 4 words per star. */
+  async selfField(): Promise<{ xs: Float32Array; ae: Float32Array }> {
+    const N = this.description.total;
+    this.dispatch('init_stars', this.group('init_stars', 'all'));
+    this.dispatch('self_gravity', this.group('self_gravity', 'all'));
+    const r = async (name: string) =>
+      new Float32Array(await readBuffer(this.device, this.buf(name), N * 16));
+    return { xs: await r('xs'), ae: await r('ae') };
   }
 
   /** Tests: positions and velocities, 4 words per star. */

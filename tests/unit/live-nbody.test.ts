@@ -3,12 +3,18 @@
  * untouched; 1 integrates each galaxy's core and massive tracers together, so momentum is conserved,
  * a lone disc stays a disc and the track is reproducible.
  */
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DEF } from '../../src/core/params';
 import { presetParams } from '../../src/core/presets';
 import { SCHEMA } from '../../src/core/schema';
 import { LiveSystem, liveCount, type LiveGalaxy } from '../../src/sim/live';
+import { buildMergerScene } from '../../src/model/merger';
+import { CpuMergerStars, circularSpeed, simUniform } from '../../src/fallback/kernels/merger';
 import { coreTrack, mergerParamsOf } from '../../src/sim/merger';
+import { GoldenNode } from '../golden/compare/node';
+
+const node = new GoldenNode(resolve(import.meta.dirname, '../..'));
 
 const gal = (core: number[]): LiveGalaxy => ({
   mass: 1,
@@ -103,5 +109,66 @@ describe('the live system', () => {
     expect(Array.from(a.x)).toEqual(Array.from(b.x));
     expect(liveCount(100)).toBe(400);
     expect(liveCount(1e7)).toBe(60);
+  });
+});
+
+describe('live stars (ADR 0100)', () => {
+  const merger = (extra: object, exact = false) => {
+    const P = presetParams('Merger: the Mice', 7, { mStars: 1500, nbody: 1, ...extra });
+    const d = buildMergerScene(P, node.cpu.meta, node.referenceOptions(P, 1).merger).desc;
+    const s = new CpuMergerStars(d);
+    s.exactSelf = exact;
+    return { d, s };
+  };
+
+  it('gives the stars the rest of the mass, and the core the rest', () => {
+    const { d } = merger({});
+    const u = simUniform(d);
+    expect(u.live).toBe(1);
+    // core mass plus all the stars' = the galaxy's
+    expect((u.m0 as number) + (u.ms0 as number) * d.n[0]).toBeCloseTo(d.track.M[0], 3);
+    expect((u.m1 as number) + (u.ms1 as number) * d.n[1]).toBeCloseTo(d.track.M[1], 3);
+    const off = simUniform(merger({ nbody: 0 }).d);
+    expect(off.live).toBe(0);
+    expect(off.m0).toBe(d.track.M[0]);
+  });
+
+  it('starts the disc on the speed its enclosed mass gives: as fast outside as the point mass', () => {
+    const live = merger({}).d.gals[0];
+    const off = merger({ nbody: 0 }).d.gals[0];
+    const far = circularSpeed(live, 6 * live.rd) / circularSpeed(off, 6 * live.rd);
+    expect(far).toBeGreaterThan(0.9);
+    expect(far).toBeLessThan(1.15);
+  });
+
+  it('follows the tree to a fraction of a galaxy radius, against the exact sum', () => {
+    const a = merger({}, true);
+    const b = merger({}, false);
+    a.s.run();
+    b.s.run();
+    const r: number[] = [];
+    for (let i = 0; i < a.d.total; i++)
+      r.push(
+        Math.hypot(
+          (a.s.horizon[i * 4] ?? 0) - (b.s.horizon[i * 4] ?? 0),
+          (a.s.horizon[i * 4 + 1] ?? 0) - (b.s.horizon[i * 4 + 1] ?? 0),
+          (a.s.horizon[i * 4 + 2] ?? 0) - (b.s.horizon[i * 4 + 2] ?? 0),
+        ),
+      );
+    r.sort((x, y) => x - y);
+    const med = r[Math.floor(r.length / 2)] ?? 0;
+    const ext: number[] = [];
+    for (let i = 0; i < a.d.total; i++)
+      ext.push(
+        Math.hypot(
+          a.s.horizon[i * 4] ?? 0,
+          a.s.horizon[i * 4 + 1] ?? 0,
+          a.s.horizon[i * 4 + 2] ?? 0,
+        ),
+      );
+    ext.sort((x, y) => x - y);
+    // a few percent of the system's extent after the whole (chaotic) run
+    expect(med).toBeLessThan(0.08 * (ext[Math.floor(ext.length / 2)] ?? 1));
+    expect(a.s.horizon.every(Number.isFinite)).toBe(true);
   });
 });

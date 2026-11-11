@@ -49,6 +49,11 @@ struct MSim {
   hrc2: f32,
   // the gas's relaxation rate in orbital rates (ADR 0098); 0 is v21's collisionless stars
   gas: f32,
+  // every star live (ADR 0100): the flag, each galaxy's star mass, the stars' softening squared
+  live: u32,
+  ms0: f32,
+  ms1: f32,
+  eps2: f32,
 }
 
 // MGAL_LAYOUT: n = spin axis, w = type (0 spiral, 1 lenticular, 2 elliptical); e1.w = rd;
@@ -100,6 +105,10 @@ const KIND_HORIZON: u32 = 3u;
 const TRIES: u32 = 40u;
 // the share of a disc's test stars that is gas (ADR 0098); MERGER_GAS_FRAC in src/sim/merger.ts
 const GAS_FRAC: f32 = 0.3;
+// ADR 0100 (src/sim/live.ts LIVE_DISC, src/sim/merger.ts MERGER_SELF_STRIDE, MERGER_DISC_BOOST)
+const LIVE_DISC: f32 = 0.35;
+const DISC_BOOST: f32 = 1.25;
+const SELF_STRIDE: u32 = 4u;
 
 @group(0) @binding(0) var<uniform> sim: MSim;
 @group(0) @binding(1) var<uniform> gal: array<MGal, 2>;
@@ -119,6 +128,8 @@ const GAS_FRAC: f32 = 0.3;
 @group(0) @binding(14) var<storage, read_write> cur: array<vec4<f32>>;
 @group(0) @binding(15) var<storage, read_write> radii_out: array<f32>;
 @group(0) @binding(16) var<uniform> centre: vec4<f32>;
+// each star's pull from the other stars, constant over a block of steps (ADR 0100)
+@group(0) @binding(17) var<storage, read_write> ae: array<vec4<f32>>;
 
 fn u01(i: u32, d: u32) -> f32 {
   return rand_f32(sim.seed, STREAM_MERGER_INIT, i, d);
@@ -128,13 +139,38 @@ fn gauss(i: u32, d: u32) -> f32 {
   return rand_gauss_f(sim.seed, STREAM_MERGER_INIT, i, d);
 }
 
-// The Plummer circular speed at radius R about a core of mass M and softening A.
-// With a dark halo (h > 0, ADR 0096) its isothermal sphere adds h r^2 / (r^2 + rc^2) to the square.
-fn circular(m: f32, r: f32, a: f32, h: f32) -> f32 {
-  let q = r * r + a * a;
-  var v2 = m * r * r / (q * sqrt(q));
-  if (h > 0.0) {
-    v2 = v2 + h * (r * r) / (r * r + sim.hrc2);
+// The circular speed at radius r of galaxy g: the Plummer core and the dark halo's isothermal
+// sphere (h r^2 / (r^2 + rc^2), ADR 0096) and, with live stars (ADR 0100), the core's mass less
+// theirs plus their enclosed mass, as a spheroid or an exponential disc (thin discs pull harder).
+// CPU twin: `circularSpeed`.
+fn circular(g: u32, r: f32) -> f32 {
+  let G = gal[g];
+  let mass = G.c.w;
+  let soft = G.v.w;
+  var halo = sim.h0;
+  if (g == 1u) {
+    halo = sim.h1;
+  }
+  var fd = 0.0;
+  if (sim.live != 0u) {
+    fd = LIVE_DISC;
+  }
+  let q = r * r + soft * soft;
+  let rr = r * r;
+  var v2 = mass * (1.0 - fd) * r * r / (q * sqrt(q));
+  if (fd > 0.0) {
+    var frac = 0.0;
+    if (u32(G.n.w) == 2u) {
+      let t = r / (r + 0.45 * G.e1.w);
+      frac = t * t;
+    } else {
+      let x = r / G.e1.w;
+      frac = 1.0 - (1.0 + x) * exp(-x);
+    }
+    v2 = v2 + mass * fd * DISC_BOOST * frac / r;
+  }
+  if (halo > 0.0) {
+    v2 = v2 + halo * rr / (rr + sim.hrc2);
   }
   return sqrt(v2);
 }
@@ -167,7 +203,7 @@ fn init_stars(@builtin(global_invocation_id) id: vec3<u32>) {
     let t = u01(i, 202u) * 6.28318;
     let q = sqrt(1.0 - z * z);
     let dv = vec3<f32>(q * cos_f(t), q * sin_f(t), z);
-    let vcE = circular(mass, Re, soft, halo);
+    let vcE = circular(g, Re);
     let vv = vec3<f32>(gauss(i, 203u), gauss(i, 205u), gauss(i, 207u));
     xs[i] = vec4<f32>(G.c.xyz + Re * dv, 0.0);
     vs[i] = vec4<f32>(G.v.xyz + vv * vcE * 0.55, 0.0);
@@ -198,7 +234,7 @@ fn init_stars(@builtin(global_invocation_id) id: vec3<u32>) {
     }
     th = base + gauss(i, 108u) * 0.12;
   }
-  let vc = circular(mass, R, soft, halo);
+  let vc = circular(g, R);
   let c = cos_f(th);
   let sn = sin_f(th);
   var thick = 0.02;
@@ -278,12 +314,61 @@ fn gas_relax(x: vec3<f32>, v: vec3<f32>, k: u32, h: f32) -> vec3<f32> {
   if (g == 1u) {
     halo = sim.h1;
   }
-  let vc = circular(G.c.w, r, G.v.w, halo);
+  let vc = circular(g, r);
   let u = pl / r;
   let tang = cross(n, u);
   let vt = (c - core_at(k - 1u, g)) * (1.0 / sim.dt) + vc * tang;
   let a = h * (sim.gas * w * vc / r);
   return (v + a * vt) / (1.0 + a);
+}
+
+// The stars' pull on one another (ADR 0100): every star is a target; every SELF_STRIDE-th is a
+// source carrying that many stars' mass, a tile of 64 sources at a time through shared memory.
+// a_i = sum_j w_j (x_j - x_i) / (|x_j - x_i|^2 + eps^2)^(3/2), a source never pulling on itself.
+// CPU twin: `selfGravityDirect` (the page's CPU engine walks a tree instead, to about a percent).
+var<workgroup> tile: array<vec4<f32>, 64>;
+
+@compute @workgroup_size(64)
+fn self_gravity(
+  @builtin(global_invocation_id) id: vec3<u32>,
+  @builtin(local_invocation_index) li: u32,
+) {
+  let i = id.x;
+  let valid = i < sim.n;
+  var xi = vec3<f32>(0.0);
+  if (valid) {
+    xi = xs[i].xyz;
+  }
+  let nsrc = (sim.n + SELF_STRIDE - 1u) / SELF_STRIDE;
+  var a = vec3<f32>(0.0);
+  for (var t = 0u; t < nsrc; t += 64u) {
+    let sidx = t + li;
+    var src = vec4<f32>(0.0);
+    if (sidx < nsrc) {
+      let j = sidx * SELF_STRIDE;
+      var ms = sim.ms0;
+      if (j >= sim.n0) {
+        ms = sim.ms1;
+      }
+      src = vec4<f32>(xs[j].xyz, ms * f32(SELF_STRIDE));
+    }
+    tile[li] = src;
+    workgroupBarrier();
+    let cnt = min(64u, nsrc - t);
+    for (var k = 0u; k < cnt; k++) {
+      let j = (t + k) * SELF_STRIDE;
+      if (valid && j != i) {
+        let d = tile[k].xyz - xi;
+        let d2 = dot(d, d) + sim.eps2;
+        let kk = tile[k].w / (d2 * sqrt(d2));
+        a = a + d * kk;
+      }
+    }
+    workgroupBarrier();
+  }
+  if (valid) {
+    ae[i] = vec4<f32>(a, 0.0);
+  }
 }
 
 @compute @workgroup_size(64)
@@ -296,7 +381,8 @@ fn start_phase(@builtin(global_invocation_id) id: vec3<u32>) {
   if ((job.flags & 1u) == 0u) {
     write_snap(0u, i, x, 0u);
   }
-  vs[i] = vec4<f32>(vs[i].xyz + accel(x, core_at(0u, 0u), core_at(0u, 1u)) * (sim.dt * 0.5), 0.0);
+  let a0 = accel(x, core_at(0u, 0u), core_at(0u, 1u)) + ae[i].xyz;
+  vs[i] = vec4<f32>(vs[i].xyz + a0 * (sim.dt * 0.5), 0.0);
 }
 
 @compute @workgroup_size(64)
@@ -308,6 +394,7 @@ fn integrate(@builtin(global_invocation_id) id: vec3<u32>) {
   var x = xs[i].xyz;
   var v = vs[i].xyz;
   let dt = sim.dt;
+  let aei = ae[i].xyz;
   var is_gas = false;
   if (sim.gas > 0.0) {
     var gi = 0u;
@@ -329,7 +416,7 @@ fn integrate(@builtin(global_invocation_id) id: vec3<u32>) {
     if (st + 1u == job.steps) {
       h = dt * 0.5;
     }
-    v = v + accel(x, core_at(st + 1u, 0u), core_at(st + 1u, 1u)) * h;
+    v = v + (accel(x, core_at(st + 1u, 0u), core_at(st + 1u, 1u)) + aei) * h;
     if (is_gas) {
       v = gas_relax(x, v, st + 1u, h);
     }

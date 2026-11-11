@@ -13,7 +13,18 @@ import { randF32 } from '../../core/rng';
 import { Stream } from '../../core/streams';
 import type { StructLayout } from '../../marks/instance';
 import type { MergerDesc, SnapSelect } from '../../sim/merger';
-import { MERGER_DT, MERGER_GAS_FRAC, MERGER_HALO_RC2 } from '../../sim/merger';
+import {
+  MERGER_DISC_BOOST,
+  MERGER_DT,
+  MERGER_GAS_FRAC,
+  MERGER_HALO_RC2,
+  MERGER_SELF_SOFT2,
+  MERGER_SELF_STEPS,
+  MERGER_SELF_STRIDE,
+} from '../../sim/merger';
+import { LIVE_DISC } from '../../sim/live';
+import type { GalaxyIC } from '../../sim/merger';
+import { SelfTree, selfGravityDirect, type SelfGravity } from './selfgrav';
 
 const f = Math.fround;
 
@@ -49,6 +60,11 @@ export const MSIM_LAYOUT = layout('MSim', [
   ['hrc2', 'f32'],
   // the gas's relaxation rate (ADR 0098)
   ['gas', 'f32'],
+  // every star live (ADR 0100): the flag, each galaxy's star mass, the stars' softening squared
+  ['live', 'u32'],
+  ['ms0', 'f32'],
+  ['ms1', 'f32'],
+  ['eps2', 'f32'],
 ]);
 
 /** The `MGal` uniform, one per galaxy. */
@@ -91,23 +107,58 @@ export const SnapKind = { snap1: 0, chosen: 1, snap2: 2, horizon: 3 } as const;
 /** Steps per dispatch (ADR 0009: "chunks of about 200 steps"). */
 export const CHUNK_STEPS = 200;
 
+/**
+ * The circular speed at radius `r` of a galaxy (point mass and halo, as v21; ADR 0096), with live
+ * stars (ADR 0100) the core's mass plus the stars' enclosed mass, which the spheroid or the
+ * exponential disc gives. Twin of `circular` in merger.wgsl.
+ */
+export function circularSpeed(G: GalaxyIC, r: number): number {
+  const mass = f(G.mass);
+  const soft = f(G.soft);
+  const hh = f(f(G.halo) * mass);
+  const fd = G.live ? f(LIVE_DISC) : 0;
+  const q = f(f(r * r) + f(soft * soft));
+  const rr = f(r * r);
+  let v2 = f(f(f(f(mass * f(1 - fd)) * r) * r) / f(q * f(Math.sqrt(q))));
+  if (fd > 0) {
+    const rd = f(G.rd);
+    let frac: number;
+    if (G.type === 'elliptical') {
+      const t = f(r / f(r + f(f(0.45) * rd)));
+      frac = f(t * t);
+    } else {
+      const x = f(r / rd);
+      frac = f(1 - f(f(1 + x) * f(Math.exp(f(-x)))));
+    }
+    v2 = f(v2 + f(f(f(f(mass * fd) * f(MERGER_DISC_BOOST)) * frac) / r));
+  }
+  if (hh > 0) v2 = f(v2 + f(f(hh * rr) / f(rr + f(MERGER_HALO_RC2))));
+  return f(Math.sqrt(v2));
+}
+
 const GALAXY_TYPE = { spiral: 0, lenticular: 1, elliptical: 2 } as const;
 
 /** The `MSim` values of a description. */
 export function simUniform(d: MergerDesc): Record<string, number> {
+  // with live stars the core keeps the rest of the mass (ADR 0100)
+  const fd = d.gals[0].live ? f(LIVE_DISC) : 0;
   return {
     seed: d.key,
     n: d.total,
     n0: d.n[0],
     dt: f(MERGER_DT),
-    m0: f(d.track.M[0]),
-    m1: f(d.track.M[1]),
+    m0: f(f(d.track.M[0]) * f(1 - fd)),
+    m1: f(f(d.track.M[1]) * f(1 - fd)),
     a0sq: f(f(d.track.A[0]) * f(d.track.A[0])),
     a1sq: f(f(d.track.A[1]) * f(d.track.A[1])),
     h0: f(f(d.gals[0].halo) * f(d.gals[0].mass)),
     h1: f(f(d.gals[1].halo) * f(d.gals[1].mass)),
     hrc2: f(MERGER_HALO_RC2),
     gas: f(Math.max(d.gals[0].gas, d.gals[1].gas)),
+    live: d.gals[0].live,
+    ms0: f(d.gals[0].starMass),
+    ms1: f(d.gals[1].starMass),
+    eps2: f(MERGER_SELF_SOFT2),
   };
 }
 
@@ -174,6 +225,11 @@ export class CpuMergerStars {
   readonly chosen: Float32Array;
   readonly horizon: Float32Array;
   private readonly s: Record<string, number>;
+  /** each star's pull from the other stars, refreshed every `MERGER_SELF_STEPS` steps (ADR 0100) */
+  readonly ae: Float32Array;
+  private readonly tree = new SelfTree();
+  /** sum the stars' pull exactly, as the GPU does, instead of by the tree (tests: minutes for a full merger) */
+  exactSelf = false;
   /** the last `accel` */
   private ax = 0;
   private ay = 0;
@@ -185,6 +241,7 @@ export class CpuMergerStars {
     this.xs = new Float32Array(this.n * 4);
     this.vs = new Float32Array(this.n * 4);
     this.ic = new Float32Array(this.n * 4);
+    this.ae = new Float32Array(this.n * 4);
     this.snap1 = new Uint32Array(Math.max(1, d.rows[0] * this.n * 2));
     this.snap2 = new Uint32Array(Math.max(1, d.rows[1] * this.n * 2));
     this.chosen = new Float32Array(this.n * 4);
@@ -206,21 +263,9 @@ export class CpuMergerStars {
     const gauss = (k: number) => randGaussF(seed, Stream.mergerInit, i, k);
     const rd = f(G.rd);
     const rmax = f(G.rmax);
-    const mass = f(G.mass);
-    const soft = f(G.soft);
     const c0 = G.core.slice(0, 3).map(f);
     const v0 = G.core.slice(3, 6).map(f);
-    const hh = f(f(G.halo) * mass);
-    const circular = (r: number) => {
-      const q = f(f(f(r * r) + f(soft * soft)));
-      const rr = f(r * r);
-      // the point mass's, and the dark halo's (an isothermal sphere: h r² / (r² + rc²), ADR 0096)
-      const v2 = f(
-        f(f(f(mass * r) * r) / f(q * f(Math.sqrt(q)))) +
-          (hh > 0 ? f(f(hh * rr) / f(rr + f(MERGER_HALO_RC2))) : 0),
-      );
-      return f(Math.sqrt(v2));
-    };
+    const circular = (r: number) => circularSpeed(G, r);
     const o = i * 4;
     if (G.type === 'elliptical') {
       const u0 = f(Math.sqrt(Math.min(u01(200), f(0.97))));
@@ -286,7 +331,7 @@ export class CpuMergerStars {
   }
 
   /** `accel` (merger.wgsl): the acceleration of a test star in the field of both cores, into ax, ay, az. */
-  private accel(x: number, y: number, z: number, k: number, off: number): void {
+  private accel(x: number, y: number, z: number, k: number, off: number, i: number): void {
     const s = this.s;
     const c = this.d.cores;
     const o0 = (off + k * 2) * 4;
@@ -312,6 +357,12 @@ export class CpuMergerStars {
       ax = f(ax + f(f(d0x * j0) + f(d1x * j1)));
       ay = f(ay + f(f(d0y * j0) + f(d1y * j1)));
       az = f(az + f(f(d0z * j0) + f(d1z * j1)));
+    }
+    if (this.d.gals[0].live) {
+      // the other stars' pull, constant over the block (ADR 0100)
+      ax = f(ax + (this.ae[i * 4] as number));
+      ay = f(ay + (this.ae[i * 4 + 1] as number));
+      az = f(az + (this.ae[i * 4 + 2] as number));
     }
     this.ax = ax;
     this.ay = ay;
@@ -370,17 +421,7 @@ export class CpuMergerStars {
     const t = Math.min(Math.max(f(f(r - rmax) / f(f(0.6) * rmax)), 0), 1);
     const w = f(1 - f(f(t * t) * f(3 - f(2 * t))));
     if (!(w > 0) || !(r > f(0.02))) return;
-    const hh = f(f(G.halo) * f(G.mass));
-    const rr = f(r * r);
-    const qq = f(rr + f(f(G.soft) * f(G.soft)));
-    const vc = f(
-      Math.sqrt(
-        f(
-          f(f(f(f(G.mass) * r) * r) / f(qq * f(Math.sqrt(qq)))) +
-            (hh > 0 ? f(f(hh * rr) / f(rr + f(MERGER_HALO_RC2))) : 0),
-        ),
-      ),
-    );
+    const vc = circularSpeed(G, r);
     const idt = f(1 / f(MERGER_DT));
     // the tangent n × (in-plane radial)
     const ux = f(px / r);
@@ -446,7 +487,7 @@ export class CpuMergerStars {
       const y = this.xs[o + 1] as number;
       const z = this.xs[o + 2] as number;
       if (!future) this.writeSnap(this.snap1, 0, i, x, y, z, p0, p1);
-      this.accel(x, y, z, 0, off);
+      this.accel(x, y, z, 0, off, i);
       this.vs[o] = f((this.vs[o] as number) + f(this.ax * half));
       this.vs[o + 1] = f((this.vs[o + 1] as number) + f(this.ay * half));
       this.vs[o + 2] = f((this.vs[o + 2] as number) + f(this.az * half));
@@ -481,7 +522,7 @@ export class CpuMergerStars {
         y = f(y + f(vy * dt));
         z = f(z + f(vz * dt));
         const h = st + 1 === steps ? dth : dt;
-        this.accel(x, y, z, st + 1, off);
+        this.accel(x, y, z, st + 1, off, i);
         vx = f(vx + f(this.ax * h));
         vy = f(vy + f(this.ay * h));
         vz = f(vz + f(this.az * h));
@@ -512,16 +553,48 @@ export class CpuMergerStars {
   /** The whole simulation, in chunks of `CHUNK_STEPS`, calling `onChunk` between them. */
   run(onChunk?: (phase: 'timeline' | 'future', done: number, of: number) => void): void {
     this.init();
+    const live = this.d.gals[0].live > 0;
+    // with live stars the steps go in blocks of `MERGER_SELF_STEPS`, the field refreshed between
+    const block = live ? MERGER_SELF_STEPS : CHUNK_STEPS;
     for (const future of [false, true]) {
       const ph = future ? this.d.track.future : this.d.track.chosen;
       const steps = Math.max(ph.steps, 0);
+      if (live) this.refresh();
       this.startPhase(future);
-      for (let st = 0; st < steps; st += CHUNK_STEPS) {
-        this.integrate(future, st, Math.min(steps, st + CHUNK_STEPS));
-        onChunk?.(future ? 'future' : 'timeline', Math.min(steps, st + CHUNK_STEPS), steps);
+      let reported = 0;
+      for (let st = 0; st < steps; st += block) {
+        if (live && st > 0) this.refresh();
+        const st1 = Math.min(steps, st + block);
+        this.integrate(future, st, st1);
+        if (st1 - reported >= CHUNK_STEPS || st1 === steps) {
+          reported = st1;
+          onChunk?.(future ? 'future' : 'timeline', st1, steps);
+        }
       }
       this.finishPhase(future);
     }
+  }
+
+  /** The stars' pull on one another from the current positions (ADR 0100): `ae`, by the tree. */
+  refresh(): void {
+    const d = this.d;
+    (this.exactSelf
+      ? (x: Float32Array, S: SelfGravity, o: Float32Array) => {
+          selfGravityDirect(x, S, o);
+        }
+      : (x: Float32Array, S: SelfGravity, o: Float32Array) => {
+          this.tree.field(x, S, o);
+        })(
+      this.xs,
+      {
+        n: this.n,
+        n0: d.n[0],
+        stride: MERGER_SELF_STRIDE,
+        ms: [d.gals[0].starMass, d.gals[1].starMass],
+        eps2: MERGER_SELF_SOFT2,
+      },
+      this.ae,
+    );
   }
 
   /** One star at one snapshot of a source: f16 row plus its core, or the f32 closing position. */

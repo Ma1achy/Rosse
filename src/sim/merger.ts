@@ -22,7 +22,7 @@
  */
 import type { Params } from '../core/params';
 import { Stream } from '../core/streams';
-import { LiveSystem, liveCount, type LiveGalaxy } from './live';
+import { LIVE_DISC, LiveSystem, liveCount, type LiveGalaxy } from './live';
 import { randF32 } from '../core/rng';
 
 /** The leapfrog step (`dt`, app23.js:L360). */
@@ -45,6 +45,17 @@ export const MERGER_HALO_RC2 = 0.5;
  */
 export const MERGER_GAS = 0.25;
 export const MERGER_GAS_FRAC = 0.3;
+/**
+ * ADR 0100: with `nbody` every star is live. Its pull on the others is refreshed every
+ * `MERGER_SELF_STEPS` steps (a constant acceleration between refreshes) from every
+ * `MERGER_SELF_STRIDE`th star as a source, each carrying that many stars' mass, softened by
+ * `MERGER_SELF_SOFT2`; the stars carry `LIVE_DISC` of their galaxy's mass and the core the rest.
+ */
+export const MERGER_SELF_STEPS = 4;
+export const MERGER_SELF_STRIDE = 4;
+export const MERGER_SELF_SOFT2 = 0.012;
+/** a thin disc pulls harder than the sphere of the same enclosed mass: the factor on the disc's term of `circular` */
+export const MERGER_DISC_BOOST = 1.25;
 /** The core softening squared (app23.js:L346, `+ 0.02`). */
 export const CORE_SOFT2 = 0.02;
 /** The true anomaly the cores start from (app23.js:L307). */
@@ -577,6 +588,9 @@ export interface GalaxyIC {
   halo: number;
   /** the gas's relaxation rate in units of the local orbital rate (ADR 0098); 0 is v21's collisionless stars */
   gas: number;
+  /** 1 when every star is live (ADR 0100): the stars carry `LIVE_DISC` of the mass, `starMass` each */
+  live: number;
+  starMass: number;
   n: [number, number, number];
   e1: [number, number, number];
   e2: [number, number, number];
@@ -620,6 +634,8 @@ export function galaxyICs(
       crisp: (p.mergeAuto ?? 0) > 0 ? 1 : 0,
       halo: (p.mergeAuto ?? 0) > 0 ? MERGER_HALO : 0,
       gas: (p.mergeAuto ?? 0) > 0 ? MERGER_GAS : 0,
+      live: (p.nbody ?? 0) > 0 ? 1 : 0,
+      starMass: (p.nbody ?? 0) > 0 ? (LIVE_DISC * M) / (n[g] as number) : 0,
       n: fr.n,
       e1: fr.e1,
       e2: fr.e2,

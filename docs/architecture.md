@@ -84,6 +84,7 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0097](adr/0097-the-lens-bends-the-deep-field.md) | _Proposed:_ with `lensField` the deep field's dots and drawings are placed at their primary image through the lens and stretched by its magnification, so background galaxies arc |
 | [0098](adr/0098-a-merging-disc-has-gas.md) | _Proposed:_ with `mergeAuto` 30% of a merging disc's stars are gas that dissipates toward the nearer core and lights up there as a nuclear starburst |
 | [0099](adr/0099-the-cores-orbit-from-a-live-n-body.md) | _Proposed:_ with `nbody` each galaxy is a core plus massive tracers summed directly, and their pull makes the cores' orbit |
+| [0100](adr/0100-every-star-is-live.md) | _Proposed:_ with `nbody` every star pulls on every other (GPU direct sum, CPU Barnes–Hut tree), in blocks of four steps |
 
 ## Modules
 
