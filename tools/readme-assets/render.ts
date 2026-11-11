@@ -54,6 +54,7 @@ const PAGE_FEATURES: Partial<Params> = {
   mergeAuto: 1,
   shellAuto: 1,
   lensField: 1,
+  nbody: 1,
 };
 
 export interface Rule {

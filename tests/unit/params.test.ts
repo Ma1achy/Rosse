@@ -48,6 +48,7 @@ const EXTRA_KEYS = {
   mergeAuto: 0,
   shellAuto: 0,
   lensField: 0,
+  nbody: 0,
 };
 
 describe('DEF', () => {

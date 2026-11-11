@@ -271,6 +271,7 @@ export const COMPONENTS: readonly Component[] = [
       'mType2',
       'mWarp',
       'mergeAuto',
+      'nbody',
     ],
     summary: (P) =>
       P.merger
@@ -458,6 +459,7 @@ export const OPTION_LABELS: Partial<Record<ParamKey, Record<string, string>>> = 
   mergeAuto: ONOFF,
   shellAuto: ONOFF,
   lensField: ONOFF,
+  nbody: ONOFF,
   lensLock: { '0': 'fully (v21)', '1': 'not at all', '2': 'a little' },
   depthAuto: { '0': 'flat', '1': 'marks shrink with distance', '2': 'full perspective' },
   mWarp: ONOFF,

@@ -22,6 +22,7 @@
  */
 import type { Params } from '../core/params';
 import { Stream } from '../core/streams';
+import { LiveSystem, liveCount, type LiveGalaxy } from './live';
 import { randF32 } from '../core/rng';
 
 /** The leapfrog step (`dt`, app23.js:L360). */
@@ -55,6 +56,8 @@ export type MergerType = 'spiral' | 'lenticular' | 'elliptical';
 export interface MergerParams {
   /** crisper arms in a spiral's initial stars (ADR 0093); absent is v21's */
   mergeAuto?: number;
+  /** the cores' orbit from a live N-body of massive tracers (ADR 0099); absent is v21's two point masses */
+  nbody?: number;
   seed: number;
   mRatio: number;
   mPeri: number;
@@ -100,6 +103,7 @@ export function mergerParamsOf(P: Params | MergerParams): MergerParams {
     mEcc: P.mEcc,
     mHorizon: P.mHorizon,
     ...('mergeAuto' in P && P.mergeAuto > 0 ? { mergeAuto: P.mergeAuto } : {}),
+    ...('nbody' in P && P.nbody && P.nbody > 0 ? { nbody: P.nbody } : {}),
   };
 }
 
@@ -178,7 +182,30 @@ export interface CoreTrack {
  * v21's two-core integration (app23.js:L306–314 for the start, L340–376 for the steps), in f64,
  * operation for operation. The test stars take no part: they are test particles.
  */
-export function coreTrack(p: MergerParams, stride: readonly [number, number] = [1, 1]): CoreTrack {
+const liveTracks = new Map<string, CoreTrack>();
+
+export function coreTrack(
+  p: MergerParams,
+  stride: readonly [number, number] = [1, 1],
+  picks?: MergerPicks,
+): CoreTrack {
+  // a live track costs about a second: the last few are kept (the thinned and the union frame reuse them)
+  if ((p.nbody ?? 0) <= 0) return coreTrackOf(p, stride, picks);
+  const key = JSON.stringify([mergerKey(p), stride, picks]);
+  let t = liveTracks.get(key);
+  if (!t) {
+    t = coreTrackOf(p, stride, picks);
+    if (liveTracks.size >= 4) liveTracks.delete(liveTracks.keys().next().value as string);
+    liveTracks.set(key, t);
+  }
+  return t;
+}
+
+function coreTrackOf(
+  p: MergerParams,
+  stride: readonly [number, number],
+  picks: MergerPicks | undefined,
+): CoreTrack {
   const q = p.mRatio;
   const M: [number, number] = [1, q];
   const Mt = 1 + q;
@@ -244,7 +271,22 @@ export function coreTrack(p: MergerParams, stride: readonly [number, number] = [
     }
     return out;
   };
+  let L: LiveSystem | null = null;
+  /** the live system's cores back into `C` */
+  const sync = () => {
+    if (!L) return;
+    for (let g = 0; g < 2; g++)
+      for (let d = 0; d < 3; d++) {
+        (C[g] as number[])[d] = L.x[3 * g + d] as number;
+        (C[g] as number[])[d + 3] = L.v[3 * g + d] as number;
+      }
+  };
   const kick = (h2: number) => {
+    if (L) {
+      L.kick(h2);
+      sync();
+      return;
+    }
     const a = acc();
     for (let g = 0; g < 2; g++)
       for (let d = 0; d < 3; d++) {
@@ -253,6 +295,11 @@ export function coreTrack(p: MergerParams, stride: readonly [number, number] = [
       }
   };
   const drift = () => {
+    if (L) {
+      L.drift(dt);
+      sync();
+      return;
+    }
     for (let g = 0; g < 2; g++)
       for (let d = 0; d < 3; d++) {
         const c = C[g] as number[];
@@ -298,12 +345,13 @@ export function coreTrack(p: MergerParams, stride: readonly [number, number] = [
   };
 
   // the snapshot at the start is taken before the opening kick (app23.js:L358)
-  const every = Math.max(1, Math.floor(steps / 90)) * stride[0];
-  const chosen = phase(steps, every, true);
-  const Cc = copy();
   const HZ = Math.max(2, Math.min(30, p.mHorizon || 2));
   const FUT = 5.0 * (HZ - 1);
   const steps2 = Math.ceil(FUT / dt);
+  if ((p.nbody ?? 0) > 0) L = liveSystemOf(p, C, steps + steps2, fr, picks);
+  const every = Math.max(1, Math.floor(steps / 90)) * stride[0];
+  const chosen = phase(steps, every, true);
+  const Cc = copy();
   const every2 = Math.max(1, Math.ceil(steps2 / Math.min(420, 90 * (HZ - 1)))) * stride[1];
   const future = phase(steps2, every2, false);
   const track: CoreTrack = {
@@ -318,8 +366,48 @@ export function coreTrack(p: MergerParams, stride: readonly [number, number] = [
     dt,
   };
   // a thinned track keeps the reference's union frame
-  track.union = unionFrame(stride[0] === 1 && stride[1] === 1 ? track : coreTrack(p));
+  track.union = unionFrame(
+    stride[0] === 1 && stride[1] === 1 ? track : coreTrack(p, [1, 1], picks),
+  );
   return track;
+}
+
+/** The live system of a merger (ADR 0099): both galaxies' cores and tracers, from the cores' start `C`. */
+function liveSystemOf(
+  p: MergerParams,
+  C: readonly CoreState[],
+  steps: number,
+  friction: number,
+  picks?: MergerPicks,
+): LiveSystem {
+  const { M, A } = coreMasses(p);
+  const SZ = [p.mSize1 || 1, p.mSize2 || 1];
+  const TY = [typeOf(p.mType1), typeOf(p.mType2)];
+  const SP = [p.mSpin1, p.mSpin2];
+  const auto = (p.mergeAuto ?? 0) > 0;
+  const gals = [0, 1].map((g): LiveGalaxy => {
+    const fr = discFrame(SP[g] as number, icPicks(p.seed, g, picks).az);
+    const m = M[g] as number;
+    return {
+      mass: m,
+      soft: A[g] as number,
+      rd: (auto ? 0.37 : 0.32) * Math.sqrt(m) * (SZ[g] as number),
+      rmax: (auto ? 2.3 : 1.7) * Math.sqrt(m) * (SZ[g] as number),
+      halo: auto ? MERGER_HALO : 0,
+      elliptical: TY[g] === 'elliptical',
+      n: fr.n,
+      e1: fr.e1,
+      e2: fr.e2,
+      core: C[g] as CoreState,
+    };
+  });
+  return new LiveSystem(gals, liveCount(steps), {
+    seed: p.seed,
+    haloRc2: MERGER_HALO_RC2,
+    coreSoft2: CORE_SOFT2,
+    friction,
+    steps,
+  });
 }
 
 /** The cores' positions at snapshot `s` of a phase (6 numbers: core 0 then core 1). */
@@ -893,11 +981,11 @@ export function describeMerger(
   key?: number,
 ): MergerDesc {
   const p = mergerParamsOf(P);
-  const ref = coreTrack(p);
+  const ref = coreTrack(p, [1, 1], picks);
   const { n, total } = starCounts(p);
   const budget = snapshotBudget(total, ref);
   const track =
-    budget.stride[0] === 1 && budget.stride[1] === 1 ? ref : coreTrack(p, budget.stride);
+    budget.stride[0] === 1 && budget.stride[1] === 1 ? ref : coreTrack(p, budget.stride, picks);
   const gals = galaxyICs(p, track, picks);
   const rows: [number, number] = [track.chosen.nSnaps - 1, track.future.nSnaps - 1];
   const k1 = Math.max(track.chosen.steps, 0) + 1;
