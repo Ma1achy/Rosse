@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -37,7 +37,7 @@ jobs:
   gpu:
     # WebGPU on SwiftShader in headless Chromium: the RNG vectors on the GPU, the one-mark
     # render test (CPU raster = GPU raster within 1/255) and the surface check against CSS.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
