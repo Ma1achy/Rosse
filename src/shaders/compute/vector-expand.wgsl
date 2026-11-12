@@ -199,7 +199,7 @@ fn tf(I: VInst, p: vec2<f32>) -> vec2<f32> {
   if (I.warp == WARP_LENS) {
     // a deep-field drawing seen through the lens (ADR 0101): every vertex is its own source, put at
     // its own primary image, so a long drawing bends into an arc rather than only being stretched
-    return sm_warp(lens_pos(place(I, p)), vu.wobble);
+    return sm_warp(lens_pos(place(I, p), I.w.x), vu.wobble);
   }
   if (I.warp == WARP_TIDE_SCREEN) {
     // mWarp's whole drawing (L1196): the tidal map itself, on the raw drawing coordinates
@@ -344,7 +344,7 @@ fn expand_blobs(@builtin(global_invocation_id) id: vec3<u32>) {
   var m = I.m;
   if (I.warp == WARP_LENS) {
     // the lens stretches the blob by A^-1 where it lands
-    m = mul2(lens_image(place(I, b0.xy)).m, m);
+    m = mul2(lens_image(place(I, b0.xy), I.w.x).m, m);
   }
   let r0 = m.x * c + m.z * s;
   let r1 = m.y * c + m.w * s;

@@ -213,7 +213,7 @@ fn sky_dots(@builtin(global_invocation_id) id: vec3<u32>) {
   let rot = rand_f32(su.key, STREAM_SKY_DOTS, idx, 11u) * 6.28;
   var pl = pq;
   if (lensz.on != 0u) {
-    pl = lens_pos(pq);
+    pl = lens_pos(pq, lens_depth_k(pv.z));
   }
   let p = sm_warp(pl, su.wobble);
   let c = cos_f(rot);
@@ -320,6 +320,8 @@ fn rows_sky(@builtin(global_invocation_id) id: vec3<u32>) {
       let at = V.pos;
       if (lensz.on != 0u) {
         I.warp = WARP_LENS;
+        // the depth of the galaxy's own centre sets how much of the lens it feels
+        I.w = vec4<f32>(lens_depth_k(to_view(bg[b * 3u].xyz).z), 0.0, 0.0, 0.0);
       }
       var M = M0;
       if (arms) {
@@ -366,7 +368,12 @@ fn sky_fg(@builtin(global_invocation_id) id: vec3<u32>) {
     alpha = 1.0 - 0.45 * ((t * t) * (3.0 - 2.0 * t));
   }
   let rot = f1.x;
-  let p = sm_warp(q, su.wobble);
+  var pf = q;
+  if (lensz.on != 0u) {
+    // a star behind the lens plane is bent by it, in front it is not (ADR 0102)
+    pf = lens_pos(q, lens_depth_k(v.z));
+  }
+  let p = sm_warp(pf, su.wobble);
   let c = cos_f(rot);
   let s = sin_f(rot);
   fg_out[i] = Instance(p, bitcast<u32>(f1.y), alpha, vec4<f32>(c * size, s * size, -(s * size), c * size));

@@ -28,21 +28,27 @@ export function lensImage(
   px: number,
   py: number,
   withMap = true,
+  kz = 1,
 ): { x: number; y: number; m: M2 } {
   const d = L.desc;
+  // the deflection, scaled for the object's depth (`lensDepthK`); twin of `sky_deflect`'s `* kz`
+  const defl = (x: number, y: number): [number, number] => {
+    const a = deflectF(d, x, y);
+    return kz === 1 ? a : [f(a[0] * kz), f(a[1] * kz)];
+  };
   const cw = L.cos;
   const sw = L.sin;
   const dx = f(f(px - PLATE / 2) / L.scale);
   const dy = f(f(py - PLATE / 2) / L.scale);
   const bx = f(f(dx * cw) + f(dy * sw));
   const by = f(f(f(-dx) * sw) + f(dy * cw));
-  const a0 = deflectF(d, bx, by);
+  const a0 = defl(bx, by);
   let tx = f(bx + a0[0]);
   let ty = f(by + a0[1]);
   const jac = (x: number, y: number) => {
-    const a = deflectF(d, x, y);
-    const ax = deflectF(d, f(x + LENS_H), y);
-    const ay = deflectF(d, x, f(y + LENS_H));
+    const a = defl(x, y);
+    const ax = defl(f(x + LENS_H), y);
+    const ay = defl(x, f(y + LENS_H));
     return {
       a,
       A11: f(1 - f(f(ax[0] - a[0]) / LENS_H)),
@@ -85,4 +91,23 @@ export function lensImage(
   const S21 = f(f(sw * f(f(M11 * cw) - f(M12 * sw))) + f(cw * f(f(M21 * cw) - f(M22 * sw))));
   const S22 = f(f(sw * f(f(M11 * sw) + f(M12 * cw))) + f(cw * f(f(M21 * sw) + f(M22 * cw))));
   return { x: at[0], y: at[1], m: [S11, S21, S12, S22] };
+}
+
+/** The camera's distance to the lens plane, and the far field's depth (`CAM`, `SKY_RMAX`). */
+const CAM_D = 30;
+const FAR_Z = 240;
+
+/**
+ * How much of the lens an object at view depth `z` feels (ADR 0102): the lens plane is z = 0, the
+ * camera is CAM in front of it and smaller z is farther behind. The physical ratio of the
+ * lens-to-source to the camera-to-source distance, D_ls / D_s = -z / (CAM - z), over its value for
+ * the far field (z = -SKY_RMAX): the far field keeps the strength it had, a nearer source feels
+ * less, and one at or in front of the lens plane none. Twin of `lens_depth_k` in
+ * common/lens-sky.wgsl.
+ */
+export function lensDepthK(z: number): number {
+  if (z >= 0) return 0;
+  const s = f(f(-z) / f(CAM_D - z));
+  const sFar = f(FAR_Z / (CAM_D + FAR_Z));
+  return Math.min(f(s / sFar), 1);
 }

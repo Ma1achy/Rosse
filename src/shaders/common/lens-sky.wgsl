@@ -31,7 +31,8 @@ const LENS_DET_MIN: f32 = 0.15;
 const LENS_STEP_MAX: f32 = 0.4;
 const LENS_H: f32 = 0.01;
 
-fn sky_deflect(x: f32, y: f32) -> vec2<f32> {
+// `kz` scales the lens for the object's depth (`lens_depth_k`, ADR 0102)
+fn sky_deflect(x: f32, y: f32, kz: f32) -> vec2<f32> {
   var ax = 0.0;
   var ay = 0.0;
   for (var k = 0u; k < lensz.n; k++) {
@@ -57,13 +58,13 @@ fn sky_deflect(x: f32, y: f32) -> vec2<f32> {
   }
   ax = ax + lensz.g * (lensz.c2 * x + lensz.s2 * y);
   ay = ay + lensz.g * (lensz.s2 * x - lensz.c2 * y);
-  return vec2<f32>(ax * lensz.f, ay * lensz.f);
+  return vec2<f32>(ax * lensz.f * kz, ay * lensz.f * kz);
 }
 
 // 1 - d alpha at (x, y), as (A11, A12, A21, A22), by finite differences
-fn lens_jac(x: f32, y: f32, a: vec2<f32>) -> vec4<f32> {
-  let ax = sky_deflect(x + LENS_H, y);
-  let ay = sky_deflect(x, y + LENS_H);
+fn lens_jac(x: f32, y: f32, a: vec2<f32>, kz: f32) -> vec4<f32> {
+  let ax = sky_deflect(x + LENS_H, y, kz);
+  let ay = sky_deflect(x, y + LENS_H, kz);
   return vec4<f32>(
     1.0 - (ax.x - a.x) / LENS_H,
     -((ay.x - a.x) / LENS_H),
@@ -83,6 +84,21 @@ fn lens_det(A: vec4<f32>) -> f32 {
   return d;
 }
 
+// How much of the lens an object at view depth z (the lens plane is z = 0; the camera is at
+// CAM_DISTANCE; smaller z is farther behind) feels: the ratio of the lens-source to the camera-source
+// distance, D_ls / D_s = -z / (CAM_DISTANCE - z), over its value for the far field (z = -SKY_RMAX), so
+// the far field keeps the strength it had, a nearer source feels less, and one in front of the lens
+// plane none (ADR 0102). Twin of `lensDepthK` in src/fallback/kernels/lens-sky.ts.
+const LENS_FAR_Z: f32 = 240.0;
+fn lens_depth_k(z: f32) -> f32 {
+  if (z >= 0.0) {
+    return 0.0;
+  }
+  let s = -z / (30.0 - z);
+  let s_far = LENS_FAR_Z / (30.0 + LENS_FAR_Z);
+  return min(s / s_far, 1.0);
+}
+
 // the primary image of a plate point: xy its place, and the plate-space map (column-major) that
 // takes a shape at the source to its image
 struct LensImg {
@@ -91,18 +107,18 @@ struct LensImg {
 }
 
 // the primary image of a plate point in lens units: theta, and beta
-fn lens_solve(p: vec2<f32>) -> vec4<f32> {
+fn lens_solve(p: vec2<f32>, kz: f32) -> vec4<f32> {
   let cw = lensz.cs.x;
   let sw = lensz.cs.y;
   let sc = lensz.cs.z;
   let dx = (p.x - PLATE_HALF) / sc;
   let dy = (p.y - PLATE_HALF) / sc;
   let b = vec2<f32>(dx * cw + dy * sw, -dx * sw + dy * cw);
-  let a0 = sky_deflect(b.x, b.y);
+  let a0 = sky_deflect(b.x, b.y, kz);
   var t = b + a0;
   for (var i = 0u; i < LENS_STEPS; i++) {
-    let a = sky_deflect(t.x, t.y);
-    let A = lens_jac(t.x, t.y, a);
+    let a = sky_deflect(t.x, t.y, kz);
+    let A = lens_jac(t.x, t.y, a, kz);
     let r = t - a - b;
     let det = lens_det(A);
     var st = vec2<f32>(A.w * r.x - A.y * r.y, -(A.z * r.x) + A.x * r.y) / det;
@@ -123,15 +139,15 @@ fn lens_place(t: vec2<f32>) -> vec2<f32> {
 }
 
 // where a plate point's primary image sits (the dots)
-fn lens_pos(p: vec2<f32>) -> vec2<f32> {
-  return lens_place(lens_solve(p).xy);
+fn lens_pos(p: vec2<f32>, kz: f32) -> vec2<f32> {
+  return lens_place(lens_solve(p, kz).xy);
 }
 
-fn lens_image(p: vec2<f32>) -> LensImg {
+fn lens_image(p: vec2<f32>, kz: f32) -> LensImg {
   let cw = lensz.cs.x;
   let sw = lensz.cs.y;
-  let t = lens_solve(p).xy;
-  let A = lens_jac(t.x, t.y, sky_deflect(t.x, t.y));
+  let t = lens_solve(p, kz).xy;
+  let A = lens_jac(t.x, t.y, sky_deflect(t.x, t.y, kz), kz);
   let det = lens_det(A);
   let M11 = A.w / det;
   let M12 = -A.y / det;

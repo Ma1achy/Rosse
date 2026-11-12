@@ -198,7 +198,7 @@ function tf(X: VectorInputs, I: Inst, x: number, y: number): [number, number] {
     if (!X.lens) throw new Error('a lens warp needs the lens');
     // every vertex is its own source, put at its own primary image (ADR 0101)
     const p = place(I, x, y);
-    const l = lensImage(X.lens, p[0], p[1], false);
+    const l = lensImage(X.lens, p[0], p[1], false, I.w[0]);
     q = [l.x, l.y];
   } else q = place(I, x, y);
   return smWarp(q[0], q[1], wob, X.noise);
@@ -326,7 +326,7 @@ export function expandBlob(X: VectorInputs, i: number, outF: Float32Array, outU:
   if (I.warp === WarpKind.lens && X.lens) {
     // the lens stretches the blob by A^-1 where it lands
     const p = place(I, B[b] ?? 0, B[b + 1] ?? 0);
-    m = mul2(lensImage(X.lens, p[0], p[1]).m, m);
+    m = mul2(lensImage(X.lens, p[0], p[1], true, I.w[0]).m, m);
   }
   const r0 = f(f(m[0] * c) + f(m[2] * s));
   const r1 = f(f(m[1] * c) + f(m[3] * s));

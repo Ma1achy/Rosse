@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { packNoise } from '../../src/core/noise';
 import { presetParams } from '../../src/core/presets';
 import { expandCap, vectorInputs } from '../../src/fallback/kernels/vector';
-import { lensImage } from '../../src/fallback/kernels/lens-sky';
+import { lensDepthK, lensImage } from '../../src/fallback/kernels/lens-sky';
 import { writeRow } from '../../src/model/dynvec';
 import { skyLens } from '../../src/sim/lens';
 import { DRAWING_WORDS } from '../../src/marks/vector';
@@ -37,9 +37,10 @@ function place(x: number, y: number, size: number) {
   const run = (warp: number) => {
     const fl = new Float32Array(VINST_WORDS);
     const u = new Uint32Array(fl.buffer);
-    writeRow(fl, u, 0, spec, { m: [size, 0, 0, size], x, y, ps: 0.42, drawing: BIG, warp });
-    // the post hook as the identity: the drawing as placed, before any lens
-    fl.set([0, 0, 0, 0], 8);
+    writeRow(fl, u, 0, spec, { m: [size, 0, 0, size], x, y, ps: 0.42, drawing: BIG, warp, k: 1 });
+    // the post hook as the identity: the drawing as placed, before any lens; the lens warp feels the
+    // whole lens (k = 1)
+    fl.set(warp === WarpKind.lens ? [1, 0, 0, 0] : [0, 0, 0, 0], 8);
     fl.set([1, 0, 0, 1], 12);
     const X = vectorInputs(
       lib,
@@ -92,5 +93,38 @@ describe('WarpKind.lens', () => {
     expect(near.worst).toBeGreaterThan(8);
     // ... and by far fewer where the lens is weak
     expect(far.worst).toBeLessThan(near.worst / 3);
+  });
+});
+
+describe('the lens by depth (ADR 0102)', () => {
+  it('is none at and in front of the lens plane, and the far field keeps its strength', () => {
+    expect(lensDepthK(0)).toBe(0);
+    expect(lensDepthK(12)).toBe(0);
+    expect(lensDepthK(-240)).toBeCloseTo(1, 6);
+    expect(lensDepthK(-900)).toBe(1);
+  });
+
+  it('grows the farther a source lies behind the lens', () => {
+    const ks = [-1, -5, -20, -60, -120, -240].map(lensDepthK);
+    for (let i = 1; i < ks.length; i++)
+      expect(ks[i] as number).toBeGreaterThan(ks[i - 1] as number);
+  });
+
+  it('puts a source in front of the lens where it was, and one behind where the lens puts it', () => {
+    const P = presetParams('Lens: Einstein ring', 7, { lensField: 1 });
+    const L = skyLens(P, cameraOf(P));
+    if (!L) throw new Error('no lens');
+    const x = PLATE / 2 + 120;
+    const y = PLATE / 2 + 10;
+    const front = lensImage(L, x, y, false, lensDepthK(8));
+    expect(front.x).toBeCloseTo(x, 3);
+    expect(front.y).toBeCloseTo(y, 3);
+    const far = lensImage(L, x, y, false, lensDepthK(-240));
+    const mid = lensImage(L, x, y, false, lensDepthK(-30));
+    const shift = (a: { x: number; y: number }) => Math.hypot(a.x - x, a.y - y);
+    expect(shift(far)).toBeGreaterThan(5);
+    // a nearer source is pushed less than the far field
+    expect(shift(mid)).toBeLessThan(shift(far));
+    expect(shift(mid)).toBeGreaterThan(0);
   });
 });

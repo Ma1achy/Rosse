@@ -290,6 +290,7 @@ export class GpuSky {
           [3, fg],
           [12, fgOut],
           [30, noise],
+          [32, lens],
         ]),
       },
       scanGroups: {
