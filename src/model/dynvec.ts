@@ -33,6 +33,7 @@ export interface DynSpec {
 export function sheetStrides(
   lib: PackedVectors,
   sheets: readonly VectorAtlas[],
+  warped = false,
 ): Pick<DynSpec, 'strideCaps' | 'strideDots' | 'strideBlobs'> {
   const order = Object.entries(lib.first).sort((a, b) => a[1] - b[1]);
   let caps = 0;
@@ -44,7 +45,8 @@ export function sheetStrides(
     const end = order[at + 1]?.[1] ?? lib.nDrawings;
     for (let d = first; d < end; d++) {
       const o = d * DRAWING_WORDS;
-      caps = Math.max(caps, lib.table[o + 1] ?? 0);
+      // a warped drawing is cut into pieces (app23.js:L1202), so it takes a slot per piece
+      caps = Math.max(caps, lib.table[o + (warped ? 7 : 1)] ?? 0);
       dots = Math.max(dots, lib.table[o + 3] ?? 0);
       blobs = Math.max(blobs, lib.table[o + 5] ?? 0);
     }
@@ -108,6 +110,8 @@ export interface DynRow {
   ps: number;
   /** the drawing (index into the library's table), or INACTIVE */
   drawing: number;
+  /** a `WarpKind` (0 when absent) */
+  warp?: number;
 }
 
 /** Writes row `k` of an instance table (VINST_LAYOUT) at the set's strides. */
@@ -128,7 +132,7 @@ export function writeRow(
     fl[o + 7] = f(Math.sqrt(Math.abs(f(f(row.m[0] * row.m[3]) - f(row.m[1] * row.m[2])))));
   }
   u[o + 16] = row ? row.drawing : INACTIVE;
-  u[o + 17] = 0;
+  u[o + 17] = row?.warp ?? 0;
   u[o + 18] = k * spec.strideCaps;
   u[o + 19] = k * spec.strideDots;
   u[o + 20] = k * spec.strideBlobs;

@@ -556,7 +556,12 @@ export function starJobs(
       return f(Math.max(Math.exp(-(tau + discTau(g, toViewer))), DISC_KEEP_FLOOR));
     };
     const pk = ctx.picks;
-    const UA = ctx.overlay ? U1 : U;
+    // a trail or cosmic rays are on the lens, not in the scene: an overlay's always, and a subject
+    // artefact's with depthAuto (v21 grew them with the zoom). A ghost belongs to its star, which
+    // zooms
+    const onLens =
+      ctx.overlay || (P.depthAuto > 0 && ctx.subject === 'artefact' && ctx.artefact !== 'ghost');
+    const UA = onLens ? U1 : U;
     // the stars: at the plate centre plus their offset, or (an overlay) at the scene point
     pk.stars.forEach((s, i) => {
       let x = cx0 + s.ux * U;

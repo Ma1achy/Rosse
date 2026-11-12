@@ -71,7 +71,13 @@ export function shellRibbons(scene: ShellScene, arcs: readonly ShellArc[]): Ribb
     pa: 0,
     winding: 1,
   };
-  const extra = shellCurves(arcs, scene.p, scene.meta.strokes, scene.opts.strokes);
+  const extra = shellCurves(
+    arcs,
+    scene.p,
+    scene.meta.strokes,
+    scene.opts.strokes,
+    scene.P.shellAuto > 0,
+  );
   return describeRibbons(
     P,
     scene.variation,

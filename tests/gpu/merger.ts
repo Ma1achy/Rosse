@@ -24,6 +24,8 @@
 import { presetParams } from '../../src/core/presets';
 import type { Params } from '../../src/core/params';
 import { CpuMergerStars } from '../../src/fallback/kernels/merger';
+import { selfGravityDirect } from '../../src/fallback/kernels/selfgrav';
+import { MERGER_SELF_SOFT2, MERGER_SELF_STRIDE } from '../../src/sim/merger';
 import { describeMerger, snapSelect, type MergerDesc } from '../../src/sim/merger';
 import { GpuMergerStars } from '../../src/render/merger-stars';
 import { adapterName, device, run } from './harness';
@@ -50,7 +52,19 @@ const CASES: [string, Params][] = [
     presetParams('Merger: spiral meets elliptical', 7, { mergeAuto: 1 }),
   ],
   ['the Mice, horizon 6 s7', presetParams('Merger: the Mice', 7, { mHorizon: 6 })],
+  // every star live (ADR 0100): the GPU sums directly, the CPU walks a tree
+  [
+    'the Mice s7, nbody (live stars)',
+    presetParams('Merger: the Mice', 7, { nbody: 1, mergeAuto: 1 }),
+  ],
 ];
+
+/** Cases whose stars pull on one another: the engines' sums differ by the tree's opening error. */
+const LIVE = new Set(['the Mice s7, nbody (live stars)']);
+/** their gates: the stars' pull at the start agrees to this fraction, and the drift at the chosen moment is bounded in plate px */
+const LIVE_FIELD = 2e-4;
+const LIVE_MEDIAN_PX = 2;
+const LIVE_P99_PX = 100;
 
 interface Drift {
   n: number;
@@ -115,6 +129,37 @@ run('merger test stars (GPU = CPU twin, L1)', async () => {
   const worst = { chosen: 0, horizon: 0, tail: 0 };
   for (const [name, P] of CASES) {
     const d = describeMerger(P);
+    if (LIVE.has(name)) {
+      // the sum itself, at the start: GPU against the CPU's exact f32 twin
+      gpu.load(d);
+      const sf = await gpu.selfField();
+      const c0 = new CpuMergerStars(d);
+      c0.init();
+      const want = new Float32Array(d.total * 4);
+      selfGravityDirect(
+        c0.xs,
+        {
+          n: d.total,
+          n0: d.n[0],
+          stride: MERGER_SELF_STRIDE,
+          ms: [d.gals[0].starMass, d.gals[1].starMass],
+          eps2: MERGER_SELF_SOFT2,
+        },
+        want,
+      );
+      let num = 0;
+      let den = 0;
+      for (let k = 0; k < d.total; k++)
+        for (let a = 0; a < 3; a++) {
+          num += ((sf.ae[k * 4 + a] ?? 0) - (want[k * 4 + a] ?? 0)) ** 2;
+          den += (want[k * 4 + a] ?? 0) ** 2;
+        }
+      const rel = Math.sqrt(num / den);
+      lines.push(
+        `${name}: the stars' pull at the start, GPU against the exact twin: rms ${rel.toExponential(1)}`,
+      );
+      if (!(rel < LIVE_FIELD)) pass = false;
+    }
     const t0 = performance.now();
     const cpu = new CpuMergerStars(d);
     cpu.run();
@@ -148,7 +193,7 @@ run('merger test stars (GPU = CPU twin, L1)', async () => {
       const cb = cpu.blend(sel);
       const b = drift(gb, cb, N, 4);
       blends.push(`t=${String(t)} p99.9 ${(b.p999 * PX).toExponential(1)} px`);
-      if (b.p999 * PX > (t > 1 ? 0.5 : 0.1) && !CHAOTIC.has(name)) pass = false;
+      if (b.p999 * PX > (t > 1 ? 0.5 : 0.1) && !CHAOTIC.has(name) && !LIVE.has(name)) pass = false;
     }
     // the framing's distances: every fifth star of the chosen state, from the cores' midpoint
     gpu.blend(snapSelect(d.track, 1));
@@ -164,8 +209,14 @@ run('merger test stars (GPU = CPU twin, L1)', async () => {
     worst.chosen = Math.max(worst.chosen, ch.p999 * PX);
     worst.horizon = Math.max(worst.horizon, hz.p999 * PX);
     worst.tail = Math.max(worst.tail, tail.p999 * PX);
-    if (ic.max * PX > 1e-3 || ch.within < 0.99 || ch.max * PX > 1) pass = false;
-    if (!CHAOTIC.has(name) && hz.within < 0.99) pass = false;
+    if (LIVE.has(name)) {
+      // the tree's opening error grows with the encounter: bound the distribution, not the tail
+      if (ic.max * PX > 1e-3 || ch.median * PX > LIVE_MEDIAN_PX || ch.p999 * PX > LIVE_P99_PX)
+        pass = false;
+    } else {
+      if (ic.max * PX > 1e-3 || ch.within < 0.99 || ch.max * PX > 1) pass = false;
+      if (!CHAOTIC.has(name) && hz.within < 0.99) pass = false;
+    }
     lines.push(
       `${name}: ${String(N)} stars, ${String(d.track.chosen.steps)} + ${String(d.track.future.steps)} steps (GPU ${tGpu.toFixed(0)} ms, CPU ${tCpu.toFixed(0)} ms)`,
       `      disc coordinates: ${fmt(ic)}`,

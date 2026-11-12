@@ -28,6 +28,8 @@ import { CAPSULE_WORDS } from '../../model/ribbons';
 import { INACTIVE } from '../../model/dynvec';
 import { STREAM_SEG_WORDS, VINST_WORDS, WarpKind, type VectorView } from '../../model/vectors';
 import { smWarp } from '../../view/warp';
+import type { SkyLens } from '../../sim/lens';
+import { lensImage } from './lens-sky';
 import { INSTANCE_WORDS } from './project';
 import type { TideData } from './tide';
 
@@ -51,6 +53,8 @@ export interface VectorInputs {
   noise: NoiseField;
   /** a merging galaxy's tidal map (M8), for the tide warps */
   tide?: TideData;
+  /** the deep field's lens, for `WarpKind.lens` (ADR 0101) */
+  lens?: SkyLens;
 }
 
 export function vectorInputs(
@@ -60,6 +64,7 @@ export function vectorInputs(
   dotBase: Float32Array,
   noise: NoiseField,
   tide?: TideData,
+  lens?: SkyLens,
 ): VectorInputs {
   return {
     lib,
@@ -72,6 +77,7 @@ export function vectorInputs(
     dotBase,
     noise,
     ...(tide ? { tide } : {}),
+    ...(lens ? { lens } : {}),
   };
 }
 
@@ -163,6 +169,14 @@ function post(I: Inst, q: [number, number]): [number, number] {
   ];
 }
 
+type M2 = [number, number, number, number];
+const mul2 = (A: M2, B: M2): M2 => [
+  f(f(A[0] * B[0]) + f(A[2] * B[1])),
+  f(f(A[1] * B[0]) + f(A[3] * B[1])),
+  f(f(A[0] * B[2]) + f(A[2] * B[3])),
+  f(f(A[1] * B[2]) + f(A[3] * B[3])),
+];
+
 /** expandVector's tf (app23.js:L1194–1198): the warp, the matrix, the wobble. */
 function tf(X: VectorInputs, I: Inst, x: number, y: number): [number, number] {
   const wob = X.vu.wobble ?? 0;
@@ -180,6 +194,12 @@ function tf(X: VectorInputs, I: Inst, x: number, y: number): [number, number] {
     if (!X.tide) throw new Error('a tide warp needs the tidal map');
     const w = X.tide.nn(I.w[0], I.w[1] !== 0 ? -x : x, y);
     q = [w[0], w[1]];
+  } else if (I.warp === WarpKind.lens) {
+    if (!X.lens) throw new Error('a lens warp needs the lens');
+    // every vertex is its own source, put at its own primary image (ADR 0101)
+    const p = place(I, x, y);
+    const l = lensImage(X.lens, p[0], p[1], false);
+    q = [l.x, l.y];
   } else q = place(I, x, y);
   return smWarp(q[0], q[1], wob, X.noise);
 }
@@ -190,7 +210,11 @@ export function expandCap(X: VectorInputs, i: number, out: Float32Array): number
   const k = i - I.capFirst;
   const T = X.lib.table;
   const o = I.drawing * DRAWING_WORDS;
-  if (I.drawing === INACTIVE || (I.warp === WarpKind.none && k >= (T[o + 1] ?? 0))) {
+  if (
+    I.drawing === INACTIVE ||
+    (I.warp === WarpKind.none && k >= (T[o + 1] ?? 0)) ||
+    (I.warp !== WarpKind.none && k >= (T[o + 7] ?? 0))
+  ) {
     out.fill(0, i * CAPSULE_WORDS, (i + 1) * CAPSULE_WORDS);
     return 1;
   }
@@ -298,7 +322,12 @@ export function expandBlob(X: VectorInputs, i: number, outF: Float32Array, outU:
   const sy = Math.max(f(f(f(2) * (B[b + 3] ?? 0)) * f(0.85)), lim);
   const c = B[b + 4] ?? 1;
   const s = B[b + 5] ?? 0;
-  const m = I.m;
+  let m = I.m;
+  if (I.warp === WarpKind.lens && X.lens) {
+    // the lens stretches the blob by A^-1 where it lands
+    const p = place(I, B[b] ?? 0, B[b + 1] ?? 0);
+    m = mul2(lensImage(X.lens, p[0], p[1]).m, m);
+  }
   const r0 = f(f(m[0] * c) + f(m[2] * s));
   const r1 = f(f(m[1] * c) + f(m[3] * s));
   const r2 = f(f(m[2] * c) - f(m[0] * s));

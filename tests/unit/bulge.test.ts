@@ -54,11 +54,20 @@ describe('bulgeAuto is off in the core', () => {
     }
   });
 
-  it('sets it with 1 for a bulge, and not for a smooth galaxy, which has its own law', () => {
+  it('sets it with 1 for a bulge, and for a smooth galaxy as a 3D spheroid (ADR 0094)', () => {
     const grand = presetParams('Grand design', 7, { bulgeAuto: 1 });
     expect(buildScene(grand, META).galaxy.g.flags & GalaxyFlag.bulgeSersic).not.toBe(0);
     const smooth = presetParams('Smooth, round', 7, { bulgeAuto: 1, bulge: 1, sersicN: 4 });
-    expect(buildScene(smooth, META).galaxy.g.flags & GalaxyFlag.bulgeSersic).toBe(0);
+    const flags = buildScene(smooth, META).galaxy.g.flags;
+    expect(flags & GalaxyFlag.bulgeSersic).not.toBe(0);
+    expect(flags & GalaxyFlag.sersic).toBe(0);
+  });
+
+  it('leaves a smooth galaxy on its own 2D law without it', () => {
+    const smooth = presetParams('Smooth, round', 7, { bulgeAuto: 0, bulge: 1, sersicN: 4 });
+    const flags = buildScene(smooth, META).galaxy.g.flags;
+    expect(flags & GalaxyFlag.bulgeSersic).toBe(0);
+    expect(flags & GalaxyFlag.sersic).not.toBe(0);
   });
 });
 

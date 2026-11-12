@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -27,7 +27,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.cargo/bin/naga
-          key: naga-cli-30.0.1-${{ runner.os }}
+          key: naga-cli-30.0.1-ubuntu-24.04
       - name: Install naga
         if: steps.naga.outputs.cache-hit != 'true'
         run: cargo install naga-cli --version 30.0.1 --locked
@@ -37,7 +37,7 @@ jobs:
   gpu:
     # WebGPU on SwiftShader in headless Chromium: the RNG vectors on the GPU, the one-mark
     # render test (CPU raster = GPU raster within 1/255) and the surface check against CSS.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5

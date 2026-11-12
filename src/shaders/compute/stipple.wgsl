@@ -102,6 +102,7 @@ const FLAG_BULGE_PEANUT: u32 = 8u;
 const FLAG_STARS_SMOOTH: u32 = 16u;
 const FLAG_THIN_DISC: u32 = 32u;
 const FLAG_POP: u32 = 64u;
+const FLAG_PROLATE: u32 = 128u;
 
 // noise salts (NoiseSalt in src/core/noise.ts)
 const SALT_FLOCC: u32 = 1u;
@@ -465,6 +466,10 @@ fn sample(i: u32) {
     let ph = TAU * next();
     let sz = sqrt(1.0 - cz * cz);
     p = vec3<f32>((rr * sz) * cos_f(ph), (rr * sz) * sin_f(ph), (rr * cz) * galaxy.bulge_flat);
+    // a smooth galaxy is a cigar, not a disc: both short axes are the flat ones (ADR 0094)
+    if ((flags & FLAG_PROLATE) != 0u) {
+      p.y = p.y * galaxy.bulge_flat;
+    }
     if ((flags & FLAG_BULGE_PEANUT) != 0u) {
       // the bulge of a barred galaxy is boxy-peanut (ADR 0076): longer along the bar, thinner across
       // it, and taller either side of the centre than at it

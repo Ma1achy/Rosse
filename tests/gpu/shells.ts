@@ -12,12 +12,13 @@ import { buildShellScene } from '../../src/model/shells';
 import { makeVariation } from '../../src/model/variation';
 import { GpuShells } from '../../src/render/shells';
 import { VECTOR_ATLASES, type VectorLibrary } from '../../src/marks/vector';
+import type { Camera } from '../../src/view/camera';
 import { adapterName, device, run } from './harness';
 
 /** Plate px per galaxy unit at zoom 1. */
 const PX = 84;
 
-const CASES: [string, ReturnType<typeof presetParams>][] = [
+const CASES: [string, ReturnType<typeof presetParams>, Camera?][] = [
   ['Shell galaxy s7', presetParams('Shell galaxy', 7)],
   ['Shell galaxy s4242', presetParams('Shell galaxy', 4242)],
   [
@@ -27,6 +28,12 @@ const CASES: [string, ReturnType<typeof presetParams>][] = [
   [
     '12,000 stars, long, other axis',
     presetParams('Shell galaxy', 3, { shellTime: 120, shellAxis: 80, shellStars: 12000 }),
+  ],
+  // the shells in the scene (ADR 0095): through the galaxy's camera, turned and tilted
+  [
+    'in the scene, az 40 incl 60',
+    presetParams('Shell galaxy', 7, { shellAuto: 1 }),
+    { incl: 60, az: 40, pa: 20, winding: 1, zoom: 1 },
   ],
 ];
 
@@ -56,7 +63,7 @@ run('shell galaxy (GPU = CPU twin, L1)', async () => {
   const gpu = GpuShells.create(dev);
   const lines = [`adapter: ${adapterName(adapter)}`];
   let pass = true;
-  for (const [name, P] of CASES) {
+  for (const [name, P, cam] of CASES) {
     const scene = buildShellScene(P, meta, makeVariation(P, meta));
     const t0 = performance.now();
     const cpu = new CpuShells(scene.p, scene.key);
@@ -64,7 +71,7 @@ run('shell galaxy (GPU = CPU twin, L1)', async () => {
     const tCpu = performance.now() - t0;
     const t1 = performance.now();
     const arcs = await gpu.build(scene);
-    gpu.view(1);
+    gpu.view(1, cam);
     const tGpu = performance.now() - t1;
     const g = await gpu.readPositions();
     const n = scene.p.shellStars;
@@ -91,7 +98,7 @@ run('shell galaxy (GPU = CPU twin, L1)', async () => {
       );
     // the dots: tiles and turns exactly, places within the drift
     const gd = await gpu.readDots();
-    const cd = cpu.dots(scene.pool, scene.dotBase, PX);
+    const cd = cpu.dots(scene.pool, scene.dotBase, PX, scene.P.shellAuto > 0 ? cam : undefined);
     const gu = new Uint32Array(gd.buffer);
     const cu = new Uint32Array(cd.buffer);
     let tiles = 0;
