@@ -29,7 +29,7 @@ import type { NoiseField } from '../../core/noise';
 import { CAM, PLATE } from '../../view/camera';
 import { smWarp } from '../../view/warp';
 import type { SkyLens } from '../../sim/lens';
-import { lensImage } from './lens-sky';
+import { lensDepthK, lensImage } from './lens-sky';
 
 export { lensImage };
 import { writeRow } from '../../model/dynvec';
@@ -227,7 +227,7 @@ export function skyDot(
   const k = f(f(0.62) * Math.max(f(0.6), Math.min(f(1.3), zf)));
   const size = f((X.dotBase[t] ?? 0) * k);
   const rot = f(r(11) * f(6.28));
-  const lp = X.view.lens ? lensImage(X.view.lens, pq[0], pq[1], false) : null;
+  const lp = X.view.lens ? lensImage(X.view.lens, pq[0], pq[1], false, lensDepthK(pv[2])) : null;
   const [px, py] = smWarp(lp ? lp.x : pq[0], lp ? lp.y : pq[1], X.view.wobble, X.noise);
   const c = cosF(rot);
   const s = sinF(rot);
@@ -283,7 +283,7 @@ export function orientF(
 export function galaxyRows(
   X: SkyInputs,
   v: Visible,
-): { m: M2; x: number; y: number; ps: number; drawing: number; warp: number }[] {
+): { m: M2; x: number; y: number; ps: number; drawing: number; warp: number; k: number }[] {
   const V = X.view.V;
   const g = bg(X, v.b);
   const item = X.items[g.item] ?? 0;
@@ -309,7 +309,17 @@ export function galaxyRows(
   // with the lens on the row keeps its source-plane matrix and place, and the vector kernel puts
   // every vertex at its own primary image (WarpKind.lens, ADR 0101)
   const warp = X.view.lens ? WarpKind.lens : 0;
-  const rows: { m: M2; x: number; y: number; ps: number; drawing: number; warp: number }[] = [];
+  // the depth of the galaxy's own centre sets how much of the lens it feels (ADR 0102)
+  const kz = X.view.lens ? lensDepthK(toViewF(V, g.w[0], g.w[1], g.w[2])[2]) : 0;
+  const rows: {
+    m: M2;
+    x: number;
+    y: number;
+    ps: number;
+    drawing: number;
+    warp: number;
+    k: number;
+  }[] = [];
   if (arms) {
     const na = g.na;
     for (let a = 0; a < na; a++) {
@@ -321,9 +331,10 @@ export function galaxyRows(
         ps: f(0.42),
         drawing,
         warp,
+        k: kz,
       });
     }
-  } else rows.push({ m: M0, x: qx, y: qy, ps: f(0.42), drawing, warp });
+  } else rows.push({ m: M0, x: qx, y: qy, ps: f(0.42), drawing, warp, k: kz });
   return rows;
 }
 
@@ -351,7 +362,9 @@ export function fgStar(
   const tt = out ? Math.min(1, Math.max(0, f(f(near - f(1.1)) / f(1.3)))) : 0;
   const alpha = out ? f(1 - f(f(0.45) * f(f(tt * tt) * f(3 - f(2 * tt))))) : 1;
   const rot = F[o + 4] ?? 0;
-  const [px, py] = smWarp(q[0], q[1], X.view.wobble, X.noise);
+  // a star behind the lens plane is bent by it, in front it is not (ADR 0102)
+  const lq = X.view.lens ? lensImage(X.view.lens, q[0], q[1], false, lensDepthK(v[2])) : null;
+  const [px, py] = smWarp(lq ? lq.x : q[0], lq ? lq.y : q[1], X.view.wobble, X.noise);
   const c = cosF(rot);
   const s = sinF(rot);
   const at8 = at * INSTANCE_WORDS;

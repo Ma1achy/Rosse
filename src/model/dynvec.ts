@@ -112,6 +112,8 @@ export interface DynRow {
   drawing: number;
   /** a `WarpKind` (0 when absent) */
   warp?: number;
+  /** the lens warp's depth factor (`lensDepthK`, ADR 0102), in `w.x` */
+  k?: number;
 }
 
 /** Writes row `k` of an instance table (VINST_LAYOUT) at the set's strides. */
@@ -130,6 +132,7 @@ export function writeRow(
     fl[o + 5] = f(row.y);
     fl[o + 6] = f(row.ps);
     fl[o + 7] = f(Math.sqrt(Math.abs(f(f(row.m[0] * row.m[3]) - f(row.m[1] * row.m[2])))));
+    fl[o + 8] = f(row.k ?? 0);
   }
   u[o + 16] = row ? row.drawing : INACTIVE;
   u[o + 17] = row?.warp ?? 0;
