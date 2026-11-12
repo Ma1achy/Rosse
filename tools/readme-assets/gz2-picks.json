@@ -173,7 +173,10 @@
    "occlAuto": 0,
    "peanut": 0,
    "coreAuto": 0,
-   "mergeAuto": 0
+   "mergeAuto": 0,
+   "shellAuto": 0,
+   "lensField": 0,
+   "nbody": 0
   }
  },
  {
@@ -350,7 +353,10 @@
    "occlAuto": 0,
    "peanut": 0,
    "coreAuto": 0,
-   "mergeAuto": 0
+   "mergeAuto": 0,
+   "shellAuto": 0,
+   "lensField": 0,
+   "nbody": 0
   }
  },
  {
@@ -527,7 +533,10 @@
    "occlAuto": 0,
    "peanut": 0,
    "coreAuto": 0,
-   "mergeAuto": 0
+   "mergeAuto": 0,
+   "shellAuto": 0,
+   "lensField": 0,
+   "nbody": 0
   }
  },
  {
@@ -704,7 +713,10 @@
    "occlAuto": 0,
    "peanut": 0,
    "coreAuto": 0,
-   "mergeAuto": 0
+   "mergeAuto": 0,
+   "shellAuto": 0,
+   "lensField": 0,
+   "nbody": 0
   }
  },
  {
@@ -881,7 +893,10 @@
    "occlAuto": 0,
    "peanut": 0,
    "coreAuto": 0,
-   "mergeAuto": 0
+   "mergeAuto": 0,
+   "shellAuto": 0,
+   "lensField": 0,
+   "nbody": 0
   }
  },
  {
@@ -1058,7 +1073,10 @@
    "occlAuto": 0,
    "peanut": 0,
    "coreAuto": 0,
-   "mergeAuto": 0
+   "mergeAuto": 0,
+   "shellAuto": 0,
+   "lensField": 0,
+   "nbody": 0
   }
  },
  {
@@ -1235,7 +1253,10 @@
    "occlAuto": 0,
    "peanut": 0,
    "coreAuto": 0,
-   "mergeAuto": 0
+   "mergeAuto": 0,
+   "shellAuto": 0,
+   "lensField": 0,
+   "nbody": 0
   }
  },
  {
@@ -1413,7 +1434,10 @@
    "occlAuto": 0,
    "peanut": 0,
    "coreAuto": 0,
-   "mergeAuto": 0
+   "mergeAuto": 0,
+   "shellAuto": 0,
+   "lensField": 0,
+   "nbody": 0
   }
  },
  {
@@ -1590,7 +1614,10 @@
    "occlAuto": 0,
    "peanut": 0,
    "coreAuto": 0,
-   "mergeAuto": 0
+   "mergeAuto": 0,
+   "shellAuto": 0,
+   "lensField": 0,
+   "nbody": 0
   }
  },
  {
@@ -1767,7 +1794,10 @@
    "occlAuto": 0,
    "peanut": 0,
    "coreAuto": 0,
-   "mergeAuto": 0
+   "mergeAuto": 0,
+   "shellAuto": 0,
+   "lensField": 0,
+   "nbody": 0
   }
  }
 ]

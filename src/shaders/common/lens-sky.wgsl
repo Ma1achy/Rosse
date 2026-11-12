@@ -1,8 +1,8 @@
 // The deep field's lens (`lensField`, ADR 0097): the halos as the lens passes pack them, the damped
 // Newton solve of the lens equation, and the primary image of a plate point. Shared by
 // compute/sky.wgsl (the dots, and the drawings' rows) and compute/vector-expand.wgsl (a lensed
-// drawing's every vertex, `WARP_LENS`, ADR 0101). The includer declares
-//   @group(0) @binding(N) var<uniform> lensz: LensZ;
+// drawing's every vertex, `WARP_LENS`, ADR 0101). The uniform is declared here, at binding 32 of
+// every shader that imports this file.
 // CPU twin: src/fallback/kernels/sky.ts `lensImage`.
 
 const PLATE_HALF: f32 = 400.0;
@@ -23,6 +23,8 @@ struct LensZ {
   cs: vec4<f32>,
   halos: array<vec4<f32>, 36>,
 }
+
+@group(0) @binding(32) var<uniform> lensz: LensZ;
 
 const LENS_STEPS: u32 = 5u;
 const LENS_DET_MIN: f32 = 0.15;

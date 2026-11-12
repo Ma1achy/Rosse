@@ -75,7 +75,6 @@ const PLATE_W: f32 = 800.0;
 @group(0) @binding(11) var<storage, read_write> dots_out: array<Instance>;
 @group(0) @binding(12) var<storage, read_write> fg_out: array<Instance>;
 @group(0) @binding(13) var<storage, read_write> inst: array<VInst>;
-@group(0) @binding(14) var<uniform> lensz: LensZ;
 
 // toView (app23.js:L859): the orbit and tilt without the mirror
 fn to_view(w: vec3<f32>) -> vec3<f32> {

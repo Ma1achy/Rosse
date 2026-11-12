@@ -121,8 +121,6 @@ const MODE_CAPS: u32 = 0u;
 @group(0) @binding(19) var<storage, read_write> args: array<u32>;
 @group(0) @binding(20) var<storage, read_write> caps: array<Capsule>;
 @group(0) @binding(21) var<storage, read_write> marks: array<Instance>;
-// the deep field's lens, for WARP_LENS (all zero when there is none)
-@group(0) @binding(32) var<uniform> lensz: LensZ;
 
 // The last instance whose first slot (field 0: capsule, 1: dot, 2: blob) is at or before i.
 fn inst_of(i: u32, field: u32) -> u32 {

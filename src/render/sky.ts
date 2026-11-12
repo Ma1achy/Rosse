@@ -271,7 +271,7 @@ export class GpuSky {
           [9, vis],
           [10, args],
           [11, dots],
-          [14, lens],
+          [32, lens],
           [30, noise],
         ]),
         rows_sky: group(P2.rows_sky, [
@@ -282,7 +282,7 @@ export class GpuSky {
           [9, vis],
           [10, args],
           [13, inst],
-          [14, lens],
+          [32, lens],
         ]),
         sky_fg: group(P2.sky_fg, [
           [0, view],
