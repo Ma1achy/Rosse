@@ -14,11 +14,11 @@
     },
     "layered": {
       "file": "docs/img/figures/layered.jpg",
-      "bytes": 381217
+      "bytes": 390159
     },
     "sky": {
       "file": "docs/img/figures/sky.jpg",
-      "bytes": 353559
+      "bytes": 281648
     },
     "foreground": {
       "file": "docs/img/figures/foreground.jpg",
@@ -30,31 +30,31 @@
     },
     "kinds": {
       "file": "docs/img/figures/kinds.jpg",
-      "bytes": 460585
+      "bytes": 398061
     },
     "hand": {
       "file": "docs/img/figures/hand.jpg",
-      "bytes": 503213
+      "bytes": 470607
     },
     "lenses": {
       "file": "docs/img/figures/lenses.jpg",
-      "bytes": 540820
+      "bytes": 357854
     },
     "lens-offset": {
       "file": "docs/img/figures/lens-offset.jpg",
-      "bytes": 287307
+      "bytes": 195798
     },
     "mergers": {
       "file": "docs/img/figures/mergers.jpg",
-      "bytes": 483958
+      "bytes": 576619
     },
     "merger-sequence": {
       "file": "docs/img/figures/merger-sequence.jpg",
-      "bytes": 271698
+      "bytes": 325184
     },
     "shells": {
       "file": "docs/img/figures/shells.jpg",
-      "bytes": 303950
+      "bytes": 243337
     },
     "pen": {
       "file": "docs/img/figures/pen.jpg",
@@ -62,7 +62,7 @@
     },
     "presets": {
       "file": "docs/img/figures/presets.jpg",
-      "bytes": 785083
+      "bytes": 725976
     },
     "anatomy": {
       "file": "docs/img/figures/anatomy.jpg",
@@ -79,10 +79,10 @@
     },
     "merger-mice": {
       "file": "docs/img/gifs/merger-mice.gif",
-      "bytes": 2482710,
+      "bytes": 2445918,
       "frames": 110,
       "fps": 15,
-      "encoded": "420 px, 24 colours"
+      "encoded": "357 px, 16 colours"
     },
     "anatomy": {
       "file": "docs/img/gifs/anatomy.gif",
@@ -107,38 +107,38 @@
     },
     "merger-tails": {
       "file": "docs/img/gifs/merger-tails.gif",
-      "bytes": 1985403,
+      "bytes": 2214499,
       "frames": 110,
       "fps": 15,
-      "encoded": "420 px, 32 colours"
+      "encoded": "378 px, 24 colours"
     },
     "merger-polar": {
       "file": "docs/img/gifs/merger-polar.gif",
-      "bytes": 1916113,
+      "bytes": 2448753,
       "frames": 110,
       "fps": 15,
       "encoded": "420 px, 32 colours"
     },
     "merger-torn": {
       "file": "docs/img/gifs/merger-torn.gif",
-      "bytes": 2349788,
+      "bytes": 2333736,
       "frames": 110,
       "fps": 15,
-      "encoded": "420 px, 24 colours"
+      "encoded": "357 px, 16 colours"
     },
     "lens-ring": {
       "file": "docs/img/gifs/lens-ring.gif",
-      "bytes": 2057540,
+      "bytes": 2449421,
       "frames": 90,
       "fps": 15,
-      "encoded": "252 px, 12 colours"
+      "encoded": "315 px, 16 colours"
     },
     "lens-quasar": {
       "file": "docs/img/gifs/lens-quasar.gif",
-      "bytes": 2540502,
+      "bytes": 2311803,
       "frames": 90,
       "fps": 15,
-      "encoded": "286 px, 16 colours"
+      "encoded": "357 px, 16 colours"
     },
     "lens-sketch": {
       "file": "docs/img/gifs/lens-sketch.gif",
@@ -156,17 +156,17 @@
     },
     "shells": {
       "file": "docs/img/gifs/shells.gif",
-      "bytes": 2457311,
+      "bytes": 2369408,
       "frames": 104,
       "fps": 15,
-      "encoded": "378 px, 24 colours"
+      "encoded": "315 px, 16 colours"
     },
     "deep-field": {
       "file": "docs/img/gifs/deep-field.gif",
-      "bytes": 1829714,
+      "bytes": 2299122,
       "frames": 90,
       "fps": 15,
-      "encoded": "252 px, 12 colours"
+      "encoded": "357 px, 16 colours"
     },
     "star-dive": {
       "file": "docs/img/gifs/star-dive.gif",
@@ -191,10 +191,10 @@
     },
     "lens-double": {
       "file": "docs/img/gifs/lens-double.gif",
-      "bytes": 2355194,
+      "bytes": 2474106,
       "frames": 75,
       "fps": 15,
-      "encoded": "286 px, 16 colours"
+      "encoded": "357 px, 16 colours"
     }
   },
   "gz2": {
@@ -207,7 +207,7 @@
       "matches": 39506,
       "cutout": null,
       "file": "docs/img/gz2/smooth.jpg",
-      "bytes": 283886
+      "bytes": 243841
     },
     "spiral": {
       "objid": "587722981742084144",
@@ -251,7 +251,7 @@
       "matches": 1215,
       "cutout": null,
       "file": "docs/img/gz2/merger.jpg",
-      "bytes": 223228
+      "bytes": 238844
     },
     "ring": {
       "objid": "587722982285312179",
@@ -310,7 +310,7 @@
     },
     "overview": {
       "file": "docs/img/gz2/overview.jpg",
-      "bytes": 276542
+      "bytes": 272593
     }
   },
   "real": {
@@ -388,7 +388,7 @@
       "category": "merger",
       "seed": 4572,
       "file": "docs/img/real/34.jpg",
-      "bytes": 142007
+      "bytes": 158464
     },
     "37": {
       "objid": "587735662619263234",
@@ -406,11 +406,11 @@
     },
     "00": {
       "file": "docs/img/real/00.jpg",
-      "bytes": 204578
+      "bytes": 172905
     },
     "03": {
       "file": "docs/img/real/03.jpg",
-      "bytes": 151017
+      "bytes": 130946
     },
     "06": {
       "file": "docs/img/real/06.jpg",

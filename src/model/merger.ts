@@ -353,19 +353,12 @@ export function mergerViewUniform(
   const sep =
     Math.hypot(c0[0] - c1[0], c0[1] - c1[1], c0[2] - c1[2]) /
     Math.max(1e-6, desc.gals[0].rmax + desc.gals[1].rmax);
-  const smooth = (a: number, b: number, x: number) => {
-    const t = Math.min(Math.max((x - a) / (b - a), 0), 1);
-    return t * t * (3 - 2 * t);
-  };
   const frame = (g: number) => {
     const G = desc.gals[g as 0 | 1];
     const disc = G.type !== 'elliptical';
-    const hold = mauto && disc ? f(0.92 * smooth(0.12, 0.6, sep)) : 0;
     const dust = Math.min(0.8, P.dust * 1.2 + (P.dustAuto > 0 ? 0.35 : 0));
     const lane = mauto && disc ? f(dust * (G.type === 'lenticular' ? 0.6 : 1)) : 0;
     return {
-      ea: [...G.e1.map(f), hold],
-      eb: [...G.e2.map(f), 0],
       pa: [f(G.arms), f(G.pitch), lane, mauto && G.type === 'elliptical' ? 1 : 0],
     };
   };
@@ -374,11 +367,7 @@ export function mergerViewUniform(
   return {
     c0: core(0),
     c1: core(1),
-    ea0: F0.ea,
-    eb0: F0.eb,
     pa0: F0.pa,
-    ea1: F1.ea,
-    eb1: F1.eb,
     pa1: F1.pa,
     mauto: mauto ? 1 : 0,
     stage: f(sep),

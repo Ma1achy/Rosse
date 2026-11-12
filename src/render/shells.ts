@@ -178,16 +178,26 @@ export class GpuShells {
   }
 
   /** The view tier at a zoom: the dots placed, the arcs expanded. */
-  view(zoom: number): void {
+  view(zoom: number, galaxyCam?: Camera): void {
     const scene = this.scene;
     if (!scene) throw new Error('build the shells first');
+    // ADR 0095: in the scene, through the galaxy's camera; v21's flat image otherwise
+    const three = scene.P.shellAuto > 0 ? galaxyCam : undefined;
     const d = this.device;
     d.queue.writeBuffer(
       this.buffers[0] as GPUBuffer,
       0,
       packStruct(
         SSIM_LAYOUT,
-        ssimUniform(scene.p, scene.key, 0, 0, UNIT_SCALE * zoom, scene.variation.dotPool.length),
+        ssimUniform(
+          scene.p,
+          scene.key,
+          0,
+          0,
+          UNIT_SCALE * zoom,
+          scene.variation.dotPool.length,
+          three,
+        ),
       ),
     );
     const enc = d.createCommandEncoder({ label: 'shells view' });
@@ -196,7 +206,7 @@ export class GpuShells {
     pass.setBindGroup(0, this.groups.get('dots'));
     pass.dispatchWorkgroups(Math.ceil(scene.p.shellStars / 64));
     if (this.ribbonsOn) {
-      this.cam = { incl: 0, az: 0, pa: 0, winding: 1, zoom };
+      this.cam = three ?? { incl: 0, az: 0, pa: 0, winding: 1, zoom };
       d.queue.writeBuffer(this.buffers[9] as GPUBuffer, 0, packView(viewDesc(this.cam, 0, 0, 0)));
       this.ribbons.setView(this.cam, scene.P, scene.variation.dotPool.length);
       this.ribbons.encodeProject(pass);

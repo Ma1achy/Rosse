@@ -379,6 +379,13 @@ export async function uiSmokeCheck(browser, url) {
 
     // ---- a merger draws two galaxies, a single galaxy one; the timeline changes the picture
     await open('&preset=Merger%3A+long+tails&seed=7');
+    // the plate must show the merger (its live integration can outlast the first frame)
+    await page.waitForFunction(
+      () => window.__rosse?.preset === 'Merger: long tails',
+      undefined,
+      BIG,
+    );
+    await idle();
     const two = await blobs();
     if (two < 2)
       fail(`${label}: a merger drew ${String(two)} concentration(s) of ink, want 2 or more`);

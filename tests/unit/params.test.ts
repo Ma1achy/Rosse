@@ -46,6 +46,9 @@ const EXTRA_KEYS = {
   peanut: 0,
   coreAuto: 0,
   mergeAuto: 0,
+  shellAuto: 0,
+  lensField: 0,
+  nbody: 0,
 };
 
 describe('DEF', () => {

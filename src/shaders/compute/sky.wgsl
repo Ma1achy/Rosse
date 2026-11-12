@@ -18,8 +18,10 @@
 //              when `massive`, an `arms` drawing copied na times: L901-904), for compute/vector-expand;
 //   sky_fg     one foreground star: a sprite, or a zero instance when it is culled (L908-912).
 //
-// Weak lensing of the field (v21 LENSWL, L1273-1278) is M9's: `weak_lens` is where it acts on a
-// row; it is the identity today.
+// The lens (`lensField`, ADR 0097): with it on, `lens_image` puts a plate point at its primary
+// image through the main plane's lens (damped Newton on the lens equation) and gives the map that
+// stretches a shape there by A^-1; the dots and the drawings' rows go through it. v21 only sheared
+// the drawings (LENSWL, L1273-1278). CPU twin: src/fallback/kernels/sky.ts `lensImage`.
 
 // #import "common/camera.wgsl"
 // #import "common/instance.wgsl"
@@ -28,6 +30,7 @@
 // #import "common/math.wgsl"
 // #import "common/noise-table.wgsl"
 // #import "common/warp.wgsl"
+// #import "common/lens-sky.wgsl"
 
 struct SkyU {
   n_bg: u32,
@@ -46,6 +49,7 @@ struct SkyU {
   pad1: u32,
 }
 
+const WARP_LENS: u32 = 5u;
 const STREAM_SKY_DOTS: u32 = 17u;
 const KNOT_POOL: u32 = 24u;
 const DOTS_PER_GALAXY: u32 = 150u;
@@ -53,7 +57,6 @@ const DOT_STRIDE: u32 = 256u;
 const ARMS_FLAG: u32 = 0x80000000u;
 const CLS_KEEP: u32 = 0u;
 const CLS_DROP: u32 = 255u;
-const PLATE_HALF: f32 = 400.0;
 const PLATE_W: f32 = 800.0;
 
 @group(0) @binding(0) var<uniform> view: View;
@@ -208,7 +211,11 @@ fn sky_dots(@builtin(global_invocation_id) id: vec3<u32>) {
   let k = 0.62 * max(0.6, min(1.3, zf));
   let size = dot_base[t] * k;
   let rot = rand_f32(su.key, STREAM_SKY_DOTS, idx, 11u) * 6.28;
-  let p = sm_warp(pq, su.wobble);
+  var pl = pq;
+  if (lensz.on != 0u) {
+    pl = lens_pos(pq);
+  }
+  let p = sm_warp(pl, su.wobble);
   let c = cos_f(rot);
   let sn = sin_f(rot);
   dots_out[s] = Instance(p, t, 1.0, vec4<f32>(c * size, sn * size, -(sn * size), c * size));
@@ -248,11 +255,6 @@ fn orient(n: vec3<f32>, size: f32, spin: f32) -> vec4<f32> {
   }
   M = mul2(M, vec4<f32>(mir, 0.0, 0.0, 1.0));
   return mul2(M, rm2(cos_f(spin), sin_f(spin)));
-}
-
-// where weak lensing of the field acts on a row (M9); the identity today
-fn weak_lens(row: VInst) -> VInst {
-  return row;
 }
 
 @compute @workgroup_size(64)
@@ -313,19 +315,25 @@ fn rows_sky(@builtin(global_invocation_id) id: vec3<u32>) {
         S = mul2(S, rm2(cph, -sph));
         M0 = mul2(S, M0);
       }
+      // with the lens on, the drawing keeps its source-plane matrix and place and every vertex is put
+      // at its own primary image (WARP_LENS, ADR 0101)
+      let at = V.pos;
+      if (lensz.on != 0u) {
+        I.warp = WARP_LENS;
+      }
       var M = M0;
       if (arms) {
         let ang = (6.28318530717959 * f32(a)) / g2.y;
         M = mul2(M0, rm2(cos_f(ang), sin_f(ang)));
       }
       I.m = M;
-      I.t = V.pos;
+      I.t = at;
       I.ps = 0.42;
       I.sc = sqrt(abs(M.x * M.w - M.y * M.z));
       I.drawing = item & ~ARMS_FLAG;
     }
   }
-  inst[r] = weak_lens(I);
+  inst[r] = I;
 }
 
 @compute @workgroup_size(64)

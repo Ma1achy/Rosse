@@ -72,6 +72,12 @@ export const WarpKind = {
    * the drawing's own coordinates, mirrored for an S-wise drawing; dropped only past 22 px.
    */
   tideScreen: 4,
+  /**
+   * A deep-field drawing seen through the lens (ADR 0101): the instance keeps its source-plane matrix
+   * and place, and every vertex is put at its own primary image (`lens_pos`), so the drawing bends
+   * into an arc; dropped only past 22 px. Reads the sky's lens uniform (binding 32).
+   */
+  lens: 5,
 } as const;
 
 /** One placed drawing: the `VInst` struct of vector-expand.wgsl (96 bytes). */

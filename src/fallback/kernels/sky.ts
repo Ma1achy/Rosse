@@ -28,7 +28,12 @@ import { Stream } from '../../core/streams';
 import type { NoiseField } from '../../core/noise';
 import { CAM, PLATE } from '../../view/camera';
 import { smWarp } from '../../view/warp';
+import type { SkyLens } from '../../sim/lens';
+import { lensImage } from './lens-sky';
+
+export { lensImage };
 import { writeRow } from '../../model/dynvec';
+import { WarpKind } from '../../model/vectors';
 import {
   ARMS_FLAG,
   BG_WORDS,
@@ -56,6 +61,8 @@ export interface SkyView {
   wobble: number;
   nDotPool: number;
   massive: boolean;
+  /** the lens the deep field is seen through (`lensField`, ADR 0097) */
+  lens?: SkyLens | undefined;
 }
 
 export interface SkyInputs {
@@ -220,7 +227,8 @@ export function skyDot(
   const k = f(f(0.62) * Math.max(f(0.6), Math.min(f(1.3), zf)));
   const size = f((X.dotBase[t] ?? 0) * k);
   const rot = f(r(11) * f(6.28));
-  const [px, py] = smWarp(pq[0], pq[1], X.view.wobble, X.noise);
+  const lp = X.view.lens ? lensImage(X.view.lens, pq[0], pq[1], false) : null;
+  const [px, py] = smWarp(lp ? lp.x : pq[0], lp ? lp.y : pq[1], X.view.wobble, X.noise);
   const c = cosF(rot);
   const s = sinF(rot);
   const o = at * INSTANCE_WORDS;
@@ -275,7 +283,7 @@ export function orientF(
 export function galaxyRows(
   X: SkyInputs,
   v: Visible,
-): { m: M2; x: number; y: number; ps: number; drawing: number }[] {
+): { m: M2; x: number; y: number; ps: number; drawing: number; warp: number }[] {
   const V = X.view.V;
   const g = bg(X, v.b);
   const item = X.items[g.item] ?? 0;
@@ -296,20 +304,26 @@ export function galaxyRows(
     S = mul2(S, Rm(cph, f(-sph)));
     M0 = mul2(S, M0);
   }
-  const rows: { m: M2; x: number; y: number; ps: number; drawing: number }[] = [];
+  const qx = v.qx;
+  const qy = v.qy;
+  // with the lens on the row keeps its source-plane matrix and place, and the vector kernel puts
+  // every vertex at its own primary image (WarpKind.lens, ADR 0101)
+  const warp = X.view.lens ? WarpKind.lens : 0;
+  const rows: { m: M2; x: number; y: number; ps: number; drawing: number; warp: number }[] = [];
   if (arms) {
     const na = g.na;
     for (let a = 0; a < na; a++) {
       const ang = f(f(f(TAU * a) / na));
       rows.push({
         m: mul2(M0, Rm(cosF(ang), sinF(ang))),
-        x: v.qx,
-        y: v.qy,
+        x: qx,
+        y: qy,
         ps: f(0.42),
         drawing,
+        warp,
       });
     }
-  } else rows.push({ m: M0, x: v.qx, y: v.qy, ps: f(0.42), drawing });
+  } else rows.push({ m: M0, x: qx, y: qy, ps: f(0.42), drawing, warp });
   return rows;
 }
 

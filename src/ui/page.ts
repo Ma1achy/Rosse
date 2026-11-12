@@ -206,6 +206,7 @@ export function mountPage(opts: PageOptions): Page {
   let tlFrame = 0;
 
   const commit = (kind: ChangeKind, next: PageState) => {
+    if (next.preset !== st.preset || next.from !== st.from) panel.reset();
     st = next;
     panel.sync(st.P);
     syncChrome();

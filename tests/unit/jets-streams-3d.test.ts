@@ -2,13 +2,18 @@
  * Jets and stellar streams in 3D (ADR 0085): with `lineWorld` the jet runs along the galaxy's
  * own axis and the streams lie on orbits tilted out of its plane, both projected by the camera.
  */
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { presetParams } from '../../src/core/presets';
+import { curves } from '../../src/model/curves';
 import { describeParts, streamTilt, vectorRows } from '../../src/model/parts';
 import { streamSegments } from '../../src/model/vectors';
 import { cameraOf } from '../../src/view/camera';
 import { v21Variation } from '../golden/compare/v21';
+import { GoldenNode } from '../golden/compare/node';
 import { META } from './support/vectors';
+
+const node = new GoldenNode(resolve(import.meta.dirname, '../..'));
 
 const jetRows = (over: object, incl: number) => {
   const P = presetParams('Radio jet', 7, { ...over, incl });
@@ -28,11 +33,16 @@ describe('the jet', () => {
     expect(a.map((r) => len(r))).toEqual(b.map((r) => len(r)));
   });
 
-  it('with lineWorld points along the galaxy axis: long edge-on, a short blob face-on', () => {
-    const face = jetRows({ lineWorld: 1 }, 0);
-    const edge = jetRows({ lineWorld: 1 }, 88);
-    expect(edge).toHaveLength(2);
-    expect(len(edge[0] as { m: number[] })).toBeGreaterThan(2 * len(face[0] as { m: number[] }));
+  it('with lineWorld is a bundle of strokes in the scene, not a sprite pair, even with lines at 0', () => {
+    for (const lines of [0, 0.7]) {
+      expect(jetRows({ lineWorld: 1, lines }, 88)).toHaveLength(0);
+      const P = presetParams('Radio jet', 7, { lineWorld: 1, lines });
+      const C = curves(P, v21Variation(P, node.cpu.meta), node.cpu.meta.strokes, P.incl);
+      const jet = C.filter((c) => c.role === 'jet');
+      expect(jet.length).toBeGreaterThan(20);
+      // the rest of the line-work stays off with lines at 0
+      if (lines === 0) expect(C.length).toBe(jet.length);
+    }
   });
 });
 

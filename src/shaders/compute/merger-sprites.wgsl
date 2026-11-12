@@ -30,12 +30,8 @@ struct MView {
   // the cores at this moment (xyz, w = the truncation radius rmax)
   c0: vec4<f32>,
   c1: vec4<f32>,
-  // each disc's frame: e1 (w = hold), e2, and (arms, pitch, lane strength, smooth halo)
-  ea0: vec4<f32>,
-  eb0: vec4<f32>,
+  // each disc's (arms, pitch, lane strength, smooth halo)
   pa0: vec4<f32>,
-  ea1: vec4<f32>,
-  eb1: vec4<f32>,
   pa1: vec4<f32>,
   cos_i: f32,
   sin_i: f32,
@@ -76,6 +72,9 @@ struct MView {
 
 const STREAM_MERGER_SPRITES: u32 = 41u;
 const SLOTS: u32 = 12u;
+const STREAM_MERGER_INIT: u32 = 10u;
+// the share of a disc's test stars that is gas (src/sim/merger.ts MERGER_GAS_FRAC, ADR 0098)
+const GAS_FRAC: f32 = 0.3;
 const KNOT_POOL: u32 = 24u;
 const CLS_OLD: u32 = 0u;
 const CLS_DISC: u32 = 1u;
@@ -149,30 +148,18 @@ fn sprites(@builtin(global_invocation_id) id: vec3<u32>) {
     second = true;
   }
   var core = mv.c0;
-  var ea = mv.ea0;
-  var eb = mv.eb0;
   var pa = mv.pa0;
   var hot = mv.hot0 != 0u;
   var g = 0u;
   if (second) {
     g = 1u;
     core = mv.c1;
-    ea = mv.ea1;
-    eb = mv.eb1;
     pa = mv.pa1;
     hot = mv.hot1 != 0u;
   }
   let mauto = mv.mauto != 0.0;
   let rn = ic[i].z;
-  // ADR 0093: a disc keeps its inner stars where they started; the hold lets go as the cores meet
-  var p3 = raw;
-  if (mauto && ea.w > 0.0) {
-    let w = 1.0 - ea.w * (1.0 - smoothstep(0.25, 0.7, rn));
-    let ax = ic[i].x * core.w;
-    let ay = ic[i].y * core.w;
-    let gp = core.xyz + (ax * ea.xyz + ay * eb.xyz);
-    p3 = gp + w * (raw - gp);
-  }
+  let p3 = raw;
   let xr = p3.x * mv.cos_az - p3.y * mv.sin_az;
   let yr = p3.x * mv.sin_az + p3.y * mv.cos_az;
   let yy = yr * mv.cos_i - p3.z * mv.sin_i;
@@ -247,7 +234,7 @@ fn sprites(@builtin(global_invocation_id) id: vec3<u32>) {
   // a knot of new stars in a tidal tail
   var tail_k = 1.0;
   if (mauto) {
-    tail_k = 3.0;
+    tail_k = 2.0;
   }
   if (in_tail && roll < (0.012 * tail_k) * (0.4 + mv.knots)) {
     // a tidal dwarf: a tight, brighter clump of new stars
@@ -278,6 +265,20 @@ fn sprites(@builtin(global_invocation_id) id: vec3<u32>) {
   }
   let od = raw - oc.xyz;
   let comp = mauto && !hot && sqrt(dot(od, od)) < 0.9 * oc.w;
+  // the gas the merger has driven into a nucleus lights up: a nuclear starburst, fiercest when the
+  // discs have overlapped (ADR 0098)
+  if (mauto && !hot && pa.w == 0.0 && rand_f32(mv.key, STREAM_MERGER_INIT, i, 220u) < GAS_FRAC) {
+    let dn = min(dcore / core.w, sqrt(dot(od, od)) / oc.w);
+    let burst = 1.0 - smoothstep(0.3, 1.2, mv.stage);
+    let gp = 0.55 * (1.0 - smoothstep(0.12, 0.8, dn)) * (0.25 + 0.75 * burst);
+    if (u01(i, 215u) < gp) {
+      if (u01(i, 171u) < mv.keep_knots) {
+        let t = pool[u32(floor(u01(i, 216u) * f32(mv.n_knot_pool)))];
+        put(o, CLS_KNOT, p, t, 1.0, simple((3.0 + 4.0 * u01(i, 217u)) * pen, u01(i, 218u) * 6.28));
+      }
+      return;
+    }
+  }
   let knot_p = 0.035 * (0.4 + mv.knots);
   if (!hot && ((outer && roll < knot_p) || (comp && roll < knot_p * 1.6))) {
     if (u01(i, 171u) < mv.keep_knots) {

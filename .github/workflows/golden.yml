@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
     inputs:
       runner:
-        description: 'Runner label: ubuntu-latest (SwiftShader) or gpu (self-hosted, hardware adapter)'
-        default: ubuntu-latest
+        description: 'Runner label: ubuntu-24.04 (SwiftShader) or gpu (self-hosted, hardware adapter)'
+        default: ubuntu-24.04
       update_hashes:
         description: 'Write tests/golden/engine-hashes.json from this runner and upload it (the hashes are bytes, so they must come from the runner that checks them)'
         type: boolean
@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   golden:
-    runs-on: ${{ inputs.runner || 'ubuntu-latest' }}
+    runs-on: ${{ inputs.runner || 'ubuntu-24.04' }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5

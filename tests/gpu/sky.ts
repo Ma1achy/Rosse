@@ -27,6 +27,11 @@ import { cameraOf } from '../../src/view/camera';
 import { adapterName, device, halfToFloat, readTexture, run } from './harness';
 
 const POS_TOL = 0.05;
+// A lensed point is a root of the lens equation: where a view sits next to a caustic the GPU's and
+// the CPU's transcendentals can settle on different roots, so a few dots land elsewhere (ADR 0097).
+// The lens cases are held to: nearly every dot within POS_TOL, and the mean raster error small.
+const LENS_FRACTION = 0.05;
+const LENS_RASTER_MEAN = 5e-4;
 
 const BASE: [string, Params][] = [
   ['Deep field s7 (massive)', presetParams('Deep field', 7)],
@@ -39,6 +44,9 @@ const BASE: [string, Params][] = [
     presetParams('Grand design', 7, { field: 1, fgstars: 0.8, companions: 1 }),
   ],
   ['Hand wobble s11, field 0.6', presetParams('Hand wobble', 11, { field: 0.6 })],
+  // the deep field seen through the lens (ADR 0097)
+  ['Einstein ring s7, lensField', presetParams('Lens: Einstein ring', 7, { lensField: 1 })],
+  ['Cluster s7, lensField', presetParams('Lens: galaxy cluster', 7, { lensField: 1, field: 1 })],
 ];
 
 run('deep field and foreground stars (GPU = CPU, L1)', async () => {
@@ -107,6 +115,9 @@ run('deep field and foreground stars (GPU = CPU, L1)', async () => {
       const c = cv.sky;
       const bad: string[] = [];
       let maxPos = 0;
+      let off = 0;
+      let nCmp = 0;
+      const lensy = P.lensField > 0 && P.lensOn > 0;
       if (!c) throw new Error('no sky');
       if (g.nVis !== c.visible.length)
         bad.push(`visible galaxies ${String(g.nVis)} ≠ ${String(c.visible.length)}`);
@@ -120,8 +131,10 @@ run('deep field and foreground stars (GPU = CPU, L1)', async () => {
               (g.dots[og] ?? 0) - (c.dots[oc] ?? 0),
               (g.dots[og + 1] ?? 0) - (c.dots[oc + 1] ?? 0),
             );
-            maxPos = Math.max(maxPos, d);
-            if (!(d <= POS_TOL) && bad.length < 3)
+            nCmp++;
+            if (!(d <= POS_TOL)) off++;
+            if (!lensy || d < 1) maxPos = Math.max(maxPos, d);
+            if (!lensy && !(d <= POS_TOL) && bad.length < 3)
               bad.push(`dot ${String(k)}.${String(j)} off by ${d.toFixed(3)}`);
             if (g.dotsU[og + 2] !== c.dotsU[oc + 2] && bad.length < 3)
               bad.push(`dot ${String(k)}.${String(j)} drawing`);
@@ -147,16 +160,23 @@ run('deep field and foreground stars (GPU = CPU, L1)', async () => {
         if (!cvd) bad.push('no drawings');
         else if (gv.nCaps !== cvd.nCaps)
           bad.push(`capsules ${String(gv.nCaps)} ≠ ${String(cvd.nCaps)}`);
-        else
+        else {
+          let capOff = 0;
           for (let k = 0; k < cvd.nCaps * CAPSULE_WORDS; k++) {
             if (k % CAPSULE_WORDS > 4) continue;
             const d = Math.abs((gv.caps[k] ?? 0) - (cvd.caps[k] ?? 0));
-            maxPos = Math.max(maxPos, d);
+            if (!lensy || d < 1) maxPos = Math.max(maxPos, d);
             if (!(d <= POS_TOL)) {
-              bad.push(`capsule word ${String(k)}`);
-              break;
+              capOff++;
+              if (!lensy) {
+                bad.push(`capsule word ${String(k)}`);
+                break;
+              }
             }
           }
+          if (lensy && capOff > 2 * LENS_FRACTION * cvd.nCaps * 5)
+            bad.push(`${String(capOff)} capsule words off`);
+        }
         totals.caps += cvd?.nCaps ?? 0;
       }
       // the inked background and foreground
@@ -166,22 +186,30 @@ run('deep field and foreground stars (GPU = CPU, L1)', async () => {
       cpuR.drawInk();
       const half = new Uint16Array((await readTexture(dev, gpuR.ink, 8)).buffer);
       let maxPx = 0;
+      let sumPx = 0;
       let inked = 0;
       for (let i = 0; i < half.length; i++) {
         const d = Math.abs(halfToFloat(half[i] ?? 0) - (cpuR.ink.data[i] ?? 0));
         maxPx = Math.max(maxPx, d);
+        sumPx += d;
         if (i % 4 === 3 && (cpuR.ink.data[i] ?? 0) > 0) inked++;
       }
-      if (maxPx > 1 / 255) bad.push(`raster: max |Δ| ${maxPx.toFixed(4)} > 1/255`);
-      worstPos = Math.max(worstPos, maxPos);
-      worstPx = Math.max(worstPx, maxPx);
+      if (lensy) {
+        if (off > LENS_FRACTION * nCmp) bad.push(`${String(off)} of ${String(nCmp)} dots off`);
+        if (sumPx / half.length > LENS_RASTER_MEAN)
+          bad.push(`raster: mean |Δ| ${(sumPx / half.length).toExponential(2)}`);
+      } else if (maxPx > 1 / 255) bad.push(`raster: max |Δ| ${maxPx.toFixed(4)} > 1/255`);
+      if (!lensy) {
+        worstPos = Math.max(worstPos, maxPos);
+        worstPx = Math.max(worstPx, maxPx);
+      }
       totals.galaxies += c.visible.length;
       totals.dots += c.nDots;
       totals.fg += c.nFg;
       const ok = bad.length === 0;
       if (!ok) pass = false;
       lines.push(
-        `${ok ? 'ok  ' : 'FAIL'} ${label}: ${String(c.visible.length)} galaxies, ${String(c.nDots)} dots, ${String(cv.skyDrawings?.nCaps ?? 0)} capsules, ${String(c.nFg)} foreground stars; view ${gpuMs.toFixed(0)} ms (GPU), ${cpuMs.toFixed(0)} ms (CPU); max |Δ| ${maxPos.toExponential(2)} px; raster max |Δ| ${maxPx.toFixed(5)} over ${String(inked)} inked px${ok ? '' : `; ${bad.slice(0, 4).join('; ')}`}`,
+        `${ok ? 'ok  ' : 'FAIL'} ${label}: ${String(c.visible.length)} galaxies, ${String(c.nDots)} dots, ${String(cv.skyDrawings?.nCaps ?? 0)} capsules, ${String(c.nFg)} foreground stars; view ${gpuMs.toFixed(0)} ms (GPU), ${cpuMs.toFixed(0)} ms (CPU); max |Δ| ${maxPos.toExponential(2)} px${lensy ? ` (${String(off)} of ${String(nCmp)} dots over ${String(POS_TOL)})` : ''}; raster max |Δ| ${maxPx.toFixed(5)} over ${String(inked)} inked px${ok ? '' : `; ${bad.slice(0, 4).join('; ')}`}`,
       );
       data[label] = { maxPos, maxPx, bad, inked, gpuMs, cpuMs };
     }

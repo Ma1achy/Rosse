@@ -28,11 +28,13 @@ export class CpuShellScene {
   }
 
   /** The arcs' ribbons, then the dots, for a zoom. */
-  view(zoom: number): { layers: InkLayer[]; dots: number } {
+  view(zoom: number, galaxyCam?: Camera): { layers: InkLayer[]; dots: number } {
     const { scene, sim } = this;
+    // ADR 0095: in the scene, through the galaxy's camera; v21's flat image otherwise
+    const three = scene.P.shellAuto > 0 ? galaxyCam : undefined;
     const out: InkLayer[] = [];
     if (this.lines) {
-      const cam: Camera = { incl: 0, az: 0, pa: 0, winding: 1, zoom };
+      const cam: Camera = three ?? { incl: 0, az: 0, pa: 0, winding: 1, zoom };
       const R = this.lines.R;
       const rv = runRibbons(
         this.lines,
@@ -41,7 +43,7 @@ export class CpuShellScene {
       );
       out.push(...lineLayers(rv, this.lines));
     }
-    const f = sim.dots(scene.pool, scene.dotBase, UNIT_SCALE * zoom);
+    const f = sim.dots(scene.pool, scene.dotBase, UNIT_SCALE * zoom, three);
     out.push({
       kind: 'sprites',
       atlas: 'dots',

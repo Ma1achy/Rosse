@@ -89,10 +89,23 @@ export function shellCurves(
   p: ShellParams,
   strokes: StrokesMeta | undefined,
   picks?: readonly number[],
+  /** ADR 0095: the shells as caps of spheres in the scene, for a camera that turns round them */
+  scene3d = false,
 ): Curve[] {
   const pools = strokePools(strokes?.kind ?? []);
   const ax = (p.shellAxis * Math.PI) / 180;
-  return arcs.map((a, i) => {
+  const curve = (pts: [number, number, number][], k: number): Curve => ({
+    pts,
+    w: 0.7,
+    k,
+    a: 1,
+    taper: false,
+    stretch: false,
+    edgeAlpha: false,
+    role: 'shell',
+  });
+  const out: Curve[] = [];
+  arcs.forEach((a, i) => {
     const pts: [number, number, number][] = [];
     const c0 = a.side > 0 ? 0 : Math.PI;
     for (let j = 0; j <= 40; j++) {
@@ -100,17 +113,26 @@ export function shellCurves(
       pts.push([a.R * Math.cos(t + ax), a.R * Math.sin(t + ax), 0]);
     }
     const u = new Draws(p.seed >>> 0, Stream.shells, 1000 + i).f32();
-    return {
-      pts,
-      w: 0.7,
-      k: picks?.[i] ?? strokeIndex('faint', pools, u),
-      a: 1,
-      taper: false,
-      stretch: false,
-      edgeAlpha: false,
-      role: 'shell',
-    };
+    out.push(curve(pts, picks?.[i] ?? strokeIndex('faint', pools, u)));
+    if (scene3d) {
+      // the rim of the cap, a circle round the infall axis at the shell's opening angle
+      const rim: [number, number, number][] = [];
+      const x0 = (a.side > 0 ? 1 : -1) * a.R * Math.cos(a.open);
+      const rr = a.R * Math.sin(a.open);
+      for (let j = 0; j <= 48; j++) {
+        const ph = (2 * Math.PI * j) / 48;
+        const y = rr * Math.cos(ph);
+        rim.push([
+          x0 * Math.cos(ax) - y * Math.sin(ax),
+          x0 * Math.sin(ax) + y * Math.cos(ax),
+          rr * Math.sin(ph),
+        ]);
+      }
+      const v = new Draws(p.seed >>> 0, Stream.shells, 1100 + i).f32();
+      out.push(curve(rim, strokeIndex('faint', pools, v)));
+    }
   });
+  return out;
 }
 
 /**
