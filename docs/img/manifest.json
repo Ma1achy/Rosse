@@ -79,10 +79,10 @@
     },
     "merger-mice": {
       "file": "docs/img/gifs/merger-mice.gif",
-      "bytes": 2482710,
+      "bytes": 2445918,
       "frames": 110,
       "fps": 15,
-      "encoded": "420 px, 24 colours"
+      "encoded": "357 px, 16 colours"
     },
     "anatomy": {
       "file": "docs/img/gifs/anatomy.gif",
@@ -107,38 +107,38 @@
     },
     "merger-tails": {
       "file": "docs/img/gifs/merger-tails.gif",
-      "bytes": 1985403,
+      "bytes": 2214499,
       "frames": 110,
       "fps": 15,
-      "encoded": "420 px, 32 colours"
+      "encoded": "378 px, 24 colours"
     },
     "merger-polar": {
       "file": "docs/img/gifs/merger-polar.gif",
-      "bytes": 1916113,
+      "bytes": 2448753,
       "frames": 110,
       "fps": 15,
       "encoded": "420 px, 32 colours"
     },
     "merger-torn": {
       "file": "docs/img/gifs/merger-torn.gif",
-      "bytes": 2349788,
+      "bytes": 2333736,
       "frames": 110,
       "fps": 15,
-      "encoded": "420 px, 24 colours"
+      "encoded": "357 px, 16 colours"
     },
     "lens-ring": {
       "file": "docs/img/gifs/lens-ring.gif",
-      "bytes": 2057540,
+      "bytes": 2449421,
       "frames": 90,
       "fps": 15,
-      "encoded": "252 px, 12 colours"
+      "encoded": "315 px, 16 colours"
     },
     "lens-quasar": {
       "file": "docs/img/gifs/lens-quasar.gif",
-      "bytes": 2540502,
+      "bytes": 2311803,
       "frames": 90,
       "fps": 15,
-      "encoded": "286 px, 16 colours"
+      "encoded": "357 px, 16 colours"
     },
     "lens-sketch": {
       "file": "docs/img/gifs/lens-sketch.gif",
@@ -156,17 +156,17 @@
     },
     "shells": {
       "file": "docs/img/gifs/shells.gif",
-      "bytes": 2457311,
+      "bytes": 2369408,
       "frames": 104,
       "fps": 15,
-      "encoded": "378 px, 24 colours"
+      "encoded": "315 px, 16 colours"
     },
     "deep-field": {
       "file": "docs/img/gifs/deep-field.gif",
-      "bytes": 1829714,
+      "bytes": 2299122,
       "frames": 90,
       "fps": 15,
-      "encoded": "252 px, 12 colours"
+      "encoded": "357 px, 16 colours"
     },
     "star-dive": {
       "file": "docs/img/gifs/star-dive.gif",
@@ -191,10 +191,10 @@
     },
     "lens-double": {
       "file": "docs/img/gifs/lens-double.gif",
-      "bytes": 2355194,
+      "bytes": 2474106,
       "frames": 75,
       "fps": 15,
-      "encoded": "286 px, 16 colours"
+      "encoded": "357 px, 16 colours"
     }
   },
   "gz2": {
