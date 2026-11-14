@@ -92,6 +92,11 @@ const WARP_POST: u32 = 2u;
 const WARP_TIDE: u32 = 3u;
 const WARP_TIDE_SCREEN: u32 = 4u;
 const WARP_LENS: u32 = 5u;
+const WARP_LENS_COUNTER: u32 = 6u;
+
+// whether the last `tf` found its point's image: false for a counter-image warp where the source has
+// none (ADR 0103)
+var<private> tf_ok: bool = true;
 const KNOT_POOL: u32 = 24u;
 const DRAWING_WORDS: u32 = 8u;
 const DROP: u32 = 0xffffffffu;
@@ -186,6 +191,7 @@ fn post(I: VInst, q: vec2<f32>) -> vec2<f32> {
 
 // expandVector's tf (app23.js:L1194-1198): the warp, the matrix, the wobble.
 fn tf(I: VInst, p: vec2<f32>) -> vec2<f32> {
+  tf_ok = true;
   if (I.warp == WARP_REWIND) {
     return sm_warp(place(I, rewind(p, I.w.x, I.w.y != 0.0)), vu.wobble);
   }
@@ -200,6 +206,12 @@ fn tf(I: VInst, p: vec2<f32>) -> vec2<f32> {
     // a deep-field drawing seen through the lens (ADR 0101): every vertex is its own source, put at
     // its own primary image, so a long drawing bends into an arc rather than only being stretched
     return sm_warp(lens_pos(place(I, p), I.w.x), vu.wobble);
+  }
+  if (I.warp == WARP_LENS_COUNTER) {
+    // the same drawing at its counter-image, mirrored by the negative parity (ADR 0103)
+    let c = lens_counter(place(I, p), I.w.x);
+    tf_ok = c.z > 0.5;
+    return sm_warp(lens_place(c.xy), vu.wobble);
   }
   if (I.warp == WARP_TIDE_SCREEN) {
     // mWarp's whole drawing (L1196): the tidal map itself, on the raw drawing coordinates
@@ -265,8 +277,12 @@ fn expand_caps(@builtin(global_invocation_id) id: vec3<u32>) {
     rb = g.xy + d * ((m + 1.0) / n);
   }
   a = tf(I, ra);
+  let a_ok = tf_ok;
   b = tf(I, rb);
   var key = 0u;
+  if (!(a_ok && tf_ok)) {
+    key = DROP;
+  }
   if (I.warp != WARP_NONE) {
     let dx = b.x - a.x;
     let dy = b.y - a.y;
@@ -309,6 +325,10 @@ fn expand_dots(@builtin(global_invocation_id) id: vec3<u32>) {
   }
   let d = vdots[table[I.drawing * DRAWING_WORDS + 2u] + i - I.dot_first];
   let p = tf(I, d.xy);
+  if (!tf_ok) {
+    dots_out[i] = Instance(vec2<f32>(0.0), 0u, 0.0, vec4<f32>(0.0));
+    return;
+  }
   let t = pool[KNOT_POOL + u32(d.w) % max(1u, vu.n_dot_pool)];
   let k0 = clamp((((2.0 * d.z) * I.sc) * 0.42) / 2.6, 0.8, 1.6);
   let k = k0 * max(0.55, I.ps);
@@ -335,6 +355,10 @@ fn expand_blobs(@builtin(global_invocation_id) id: vec3<u32>) {
   let b0 = vblobs[o];
   let b1 = vblobs[o + 1u];
   let p = tf(I, b0.xy);
+  if (!tf_ok) {
+    blobs_out[i] = Instance(vec2<f32>(0.0), 0u, 0.0, vec4<f32>(0.0));
+    return;
+  }
   let t = pool[u32(b1.z) % KNOT_POOL];
   let lim = 3.0 / I.sc;
   let sx = max((2.0 * b0.z) * 0.85, lim);
@@ -345,6 +369,9 @@ fn expand_blobs(@builtin(global_invocation_id) id: vec3<u32>) {
   if (I.warp == WARP_LENS) {
     // the lens stretches the blob by A^-1 where it lands
     m = mul2(lens_image(place(I, b0.xy), I.w.x).m, m);
+  }
+  if (I.warp == WARP_LENS_COUNTER) {
+    m = mul2(lens_image_at(lens_counter(place(I, b0.xy), I.w.x).xy, I.w.x).m, m);
   }
   let r0 = m.x * c + m.z * s;
   let r1 = m.y * c + m.w * s;

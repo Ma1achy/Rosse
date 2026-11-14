@@ -78,6 +78,11 @@ export const WarpKind = {
    * into an arc; dropped only past 22 px. Reads the sky's lens uniform (binding 32).
    */
   lens: 5,
+  /**
+   * The same, at the drawing's counter-image (ADR 0103): every vertex through the lens's second root,
+   * dropped where the source has none, mirrored by the image's negative parity.
+   */
+  lensCounter: 6,
 } as const;
 
 /** One placed drawing: the `VInst` struct of vector-expand.wgsl (96 bytes). */
@@ -249,7 +254,14 @@ export function describeVectors(
   let nBlob = 0;
   for (const r of rows) {
     const d = drawingOf(lib, r);
-    const w = tide !== undefined ? WarpKind.tide : r.warp ? WarpKind.rewind : WarpKind.none;
+    const w =
+      tide !== undefined
+        ? WarpKind.tide
+        : r.lensK !== undefined
+          ? WarpKind.lens
+          : r.warp
+            ? WarpKind.rewind
+            : WarpKind.none;
     drawings.push(d);
     warps.push(w);
     capFirst.push(nCap);
@@ -415,6 +427,9 @@ export function vectorView(
       // the tides: the galaxy and R2, the plate px the grid spans
       fl[o + 8] = D.tide;
       fl[o + 9] = f(r2);
+    } else if (r.lensK !== undefined) {
+      // the lens warp's share of the lens (ADR 0102)
+      fl[o + 8] = f(r.lensK);
     } else if (r.warp) {
       fl[o + 8] = f(r.warp.dk);
       fl[o + 9] = r.warp.flip ? 1 : 0;

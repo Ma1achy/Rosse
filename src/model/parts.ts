@@ -51,6 +51,7 @@ import {
 } from '../view/camera';
 import type { CompanionPick } from './sky';
 import { smWarp, wobbleAmplitude } from '../view/warp';
+import { lensDepthK } from '../sim/lens';
 import { armPhaseCpu } from './curves';
 import { effectiveDust } from './dust';
 import type { DrawingsMeta, Variation } from './variation';
@@ -167,6 +168,8 @@ export interface VectorRow {
   alpha: number;
   /** a warp (row[9]) */
   warp?: { kind: 'rewind'; dk: number; flip: boolean };
+  /** the lens's share for this row's depth (`lensDepthK`, ADR 0102): set, the drawing is lensed (ADR 0104) */
+  lensK?: number;
 }
 
 /** v21's `drawingFlip(w)` (app23.js:L841): unknown winding counts as Z-wise. */
@@ -606,6 +609,8 @@ export function vectorRows(
         ps: 1,
         tile: c.tile,
         m: orient(c.n, sc * c.scale * k, c.spin, 0.35, cam, R),
+        // with the lens on, a companion behind the lens plane is bent by it, one in front is not
+        ...(P.lensField > 0 && P.lensOn ? { lensK: lensDepthK(v[2]) } : {}),
       });
     }
   }

@@ -56,7 +56,7 @@ export const SKY_UNIFORM_LAYOUT: StructLayout = {
 };
 
 /** The `LensZ` uniform of sky.wgsl: 16 + 16 + 16 bytes, then at most 12 halos of three vec4. */
-const LENS_Z_WORDS = 12 + 36 * 4;
+export const LENS_Z_WORDS = 12 + 36 * 4;
 const LENS_Z_MAX_HALOS = 12;
 
 /** The deep field's lens as the uniform (all zero when `lensField` is off). */
@@ -206,7 +206,7 @@ export class GpuSky {
     const offsets = buf(blocks * BLOCK_STRIDE * 4, STORAGE, 'sky block offsets');
     const args = buf(CLASS_COUNT * 16, STORAGE | GPUBufferUsage.COPY_SRC, 'sky args');
     const vis = buf(cap * ib, STORAGE | GPUBufferUsage.COPY_SRC, 'visible galaxies');
-    const nDotSlots = S.visCap * SKY_DOTS_PER_GALAXY;
+    const nDotSlots = S.visCap * SKY_DOTS_PER_GALAXY * S.nImg;
     const dots = buf(nDotSlots * ib, STORAGE | GPUBufferUsage.COPY_SRC, 'deep field dots');
     const fgOut = buf(
       Math.max(1, S.nFg) * ib,
@@ -365,12 +365,12 @@ export class GpuSky {
         nStreamSegs: 0,
         nStreamSlots: 0,
         streamSegs: new ArrayBuffer(0),
-        uniform: dynUniform(P, S.spec, bound * SKY_ROWS_PER_GALAXY, m.key, m.nDotPool),
+        uniform: dynUniform(P, S.spec, bound * SKY_ROWS_PER_GALAXY * S.nImg, m.key, m.nDotPool),
       });
     this.device.queue.writeBuffer(
       m.dotArgs,
       0,
-      new Uint32Array([4, bound * SKY_DOTS_PER_GALAXY, 0, 0]),
+      new Uint32Array([4, bound * SKY_DOTS_PER_GALAXY * S.nImg, 0, 0]),
     );
   }
 
@@ -397,9 +397,9 @@ export class GpuSky {
     pass.setPipeline(this.scanPipes.scatter);
     pass.setBindGroup(0, m.scanGroups.scatter);
     pass.dispatchWorkgroups(Math.ceil(S.nBg / 64));
-    run('sky_dots', m.bound * SKY_DOTS_PER_GALAXY);
+    run('sky_dots', m.bound * SKY_DOTS_PER_GALAXY * S.nImg);
     if (S.spec.rows && S.spec.strideCaps) {
-      run('rows_sky', m.bound * SKY_ROWS_PER_GALAXY);
+      run('rows_sky', m.bound * SKY_ROWS_PER_GALAXY * S.nImg);
       this.vectors.encode(pass);
     }
   }
@@ -419,7 +419,7 @@ export class GpuSky {
           buffer: m.dots,
           offset: 0,
           // the capacity, not this view's bound: the binding must not move with the camera (ADR 0070)
-          size: Math.max(16, S.visCap * SKY_DOTS_PER_GALAXY * ib),
+          size: Math.max(16, S.visCap * SKY_DOTS_PER_GALAXY * S.nImg * ib),
           indirect: m.dotArgs,
           indirectOffset: 0,
         },
@@ -476,7 +476,7 @@ export class GpuSky {
       return copy;
     };
     const ib = INSTANCE_LAYOUT.size;
-    const dots = await read(m.dots, m.S.visCap * SKY_DOTS_PER_GALAXY * ib);
+    const dots = await read(m.dots, m.S.visCap * SKY_DOTS_PER_GALAXY * m.S.nImg * ib);
     const fg = await read(m.fg, Math.max(1, m.S.nFg) * ib);
     const args = new Uint32Array(await read(m.args, 16));
     return {

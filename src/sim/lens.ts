@@ -916,3 +916,22 @@ export function skyLens(P: Params, cam: Camera): SkyLens | undefined {
     scale: f(viewScale(cam.zoom)),
   };
 }
+
+/** The camera's distance to the lens plane, and the far field's depth (`CAM`, `SKY_RMAX`). */
+const CAM_D = 30;
+const FAR_Z = 240;
+
+/**
+ * How much of the lens an object at view depth `z` feels (ADR 0102): the lens plane is z = 0, the
+ * camera is CAM in front of it and smaller z is farther behind. The physical ratio of the
+ * lens-to-source to the camera-to-source distance, D_ls / D_s = -z / (CAM - z), over its value for
+ * the far field (z = -SKY_RMAX): the far field keeps the strength it had, a nearer source feels
+ * less, and one at or in front of the lens plane none. Twin of `lens_depth_k` in
+ * common/lens-sky.wgsl.
+ */
+export function lensDepthK(z: number): number {
+  if (z >= 0) return 0;
+  const s = f(f(-z) / f(CAM_D - z));
+  const sFar = f(FAR_Z / (CAM_D + FAR_Z));
+  return Math.min(f(s / sFar), 1);
+}

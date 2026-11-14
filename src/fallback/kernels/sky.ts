@@ -29,7 +29,7 @@ import type { NoiseField } from '../../core/noise';
 import { CAM, PLATE } from '../../view/camera';
 import { smWarp } from '../../view/warp';
 import type { SkyLens } from '../../sim/lens';
-import { lensDepthK, lensImage } from './lens-sky';
+import { lensCounter, lensDepthK, lensImage } from './lens-sky';
 
 export { lensImage };
 import { writeRow } from '../../model/dynvec';
@@ -180,7 +180,8 @@ export function skyDot(
   outF: Float32Array,
   outU: Uint32Array,
   at: number,
-): void {
+  counter = false,
+): boolean {
   const V = X.view.V;
   const g = bg(X, v.b);
   const idx = (v.b * SKY_DOT_STRIDE + j) >>> 0;
@@ -227,7 +228,14 @@ export function skyDot(
   const k = f(f(0.62) * Math.max(f(0.6), Math.min(f(1.3), zf)));
   const size = f((X.dotBase[t] ?? 0) * k);
   const rot = f(r(11) * f(6.28));
-  const lp = X.view.lens ? lensImage(X.view.lens, pq[0], pq[1], false, lensDepthK(pv[2])) : null;
+  const kz = X.view.lens ? lensDepthK(pv[2]) : 1;
+  // with the lens on, the primary image, or (`counter`) the second one, when the source has it
+  const lp = !X.view.lens
+    ? null
+    : counter
+      ? lensCounter(X.view.lens, pq[0], pq[1], false, kz)
+      : lensImage(X.view.lens, pq[0], pq[1], false, kz);
+  if (counter && !lp) return false;
   const [px, py] = smWarp(lp ? lp.x : pq[0], lp ? lp.y : pq[1], X.view.wobble, X.noise);
   const c = cosF(rot);
   const s = sinF(rot);
@@ -240,6 +248,7 @@ export function skyDot(
   outF[o + 5] = f(s * size);
   outF[o + 6] = f(-f(s * size));
   outF[o + 7] = f(c * size);
+  return true;
 }
 
 type M2 = [number, number, number, number];
@@ -283,6 +292,7 @@ export function orientF(
 export function galaxyRows(
   X: SkyInputs,
   v: Visible,
+  counter = false,
 ): { m: M2; x: number; y: number; ps: number; drawing: number; warp: number; k: number }[] {
   const V = X.view.V;
   const g = bg(X, v.b);
@@ -308,7 +318,7 @@ export function galaxyRows(
   const qy = v.qy;
   // with the lens on the row keeps its source-plane matrix and place, and the vector kernel puts
   // every vertex at its own primary image (WarpKind.lens, ADR 0101)
-  const warp = X.view.lens ? WarpKind.lens : 0;
+  const warp = X.view.lens ? (counter ? WarpKind.lensCounter : WarpKind.lens) : 0;
   // the depth of the galaxy's own centre sets how much of the lens it feels (ADR 0102)
   const kz = X.view.lens ? lensDepthK(toViewF(V, g.w[0], g.w[1], g.w[2])[2]) : 0;
   const rows: {
@@ -437,7 +447,9 @@ export function runSky(X: SkyInputs): SkyOut {
   }
   let nDots = 0;
   for (const v of visible) nDots += v.np;
-  const dbuf = new ArrayBuffer(Math.max(1, nDots) * INSTANCE_WORDS * 4);
+  // with the lens on, a second pass of dots and rows is the counter-images' (ADR 0103)
+  const nImg = X.view.lens ? 2 : 1;
+  const dbuf = new ArrayBuffer(Math.max(1, nDots * nImg) * INSTANCE_WORDS * 4);
   const dots = new Float32Array(dbuf);
   const dotsU = new Uint32Array(dbuf);
   let at = 0;
@@ -446,6 +458,11 @@ export function runSky(X: SkyInputs): SkyOut {
     for (let j = 0; j < v.np; j++) skyDot(X, v, j, dots, dotsU, at++);
     all.push(...galaxyRows(X, v));
   }
+  if (X.view.lens)
+    for (const v of visible) {
+      for (let j = 0; j < v.np; j++) if (skyDot(X, v, j, dots, dotsU, at, true)) at++;
+      all.push(...galaxyRows(X, v, true));
+    }
   const spec = S.spec;
   const rows = new ArrayBuffer(Math.max(1, all.length) * 96);
   const rf = new Float32Array(rows);
@@ -458,5 +475,5 @@ export function runSky(X: SkyInputs): SkyOut {
   const fgU = new Uint32Array(fb);
   let nFg = 0;
   for (let i = 0; i < S.nFg; i++) if (fgStar(X, i, fg, fgU, nFg)) nFg++;
-  return { visible, dots, dotsU, nDots, rows, nRows: all.length, fg, fgU, nFg };
+  return { visible, dots, dotsU, nDots: at, rows, nRows: all.length, fg, fgU, nFg };
 }

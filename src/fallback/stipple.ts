@@ -308,8 +308,9 @@ export class CpuStipple {
       T?.r2 ?? 0,
       T ? hatchRows(R, cam) : [],
     );
+    // a companion behind the lens plane is lensed (ADR 0104): the main set reads the field's lens
     const vo = runVectors(
-      vectorInputs(VD.lib, vv, galaxy.pool, galaxy.dotBase, galaxy.noise, T?.data),
+      vectorInputs(VD.lib, vv, galaxy.pool, galaxy.dotBase, galaxy.noise, T?.data, skyLens(P, cam)),
     );
     // the drawn stars, one `sstars` drawing per compacted `rstar` (M7)
     const spec = this.scene.rstars;
