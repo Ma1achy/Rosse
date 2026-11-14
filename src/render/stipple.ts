@@ -28,7 +28,8 @@ import { GpuRibbons } from './ribbons';
 import { GpuTide } from './tide';
 import { GpuVectors } from './vectors';
 import { GpuStarSet } from './star-set';
-import { GpuSky } from './sky';
+import { GpuSky, LENS_Z_WORDS, packLensZ } from './sky';
+import { skyLens } from '../sim/lens';
 import { GpuLens } from './lens';
 import { hatchRows, vectorView } from '../model/vectors';
 import { coreInstances } from '../model/parts';
@@ -83,6 +84,8 @@ interface ModelBuffers {
   samples: GPUBuffer;
   view: GPUBuffer;
   culls: GPUBuffer;
+  /** the field's lens for the main set's lensed companions (ADR 0104), rewritten each view */
+  setLens: GPUBuffer;
   scan: GPUBuffer;
   projected: GPUBuffer;
   classes: GPUBuffer;
@@ -280,7 +283,12 @@ export class GpuStipple {
     const view = buf(64, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'view');
     const culls = buf(CULLS_LAYOUT.size, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST, 'culls');
     this.ribbons.load(scene.ribbons, view, pool, dotBase, noise);
-    this.vectors.load(scene.vectors, pool, dotBase, noise, this.tide?.buffer);
+    const setLens = buf(
+      LENS_Z_WORDS * 4,
+      GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      'companion lens',
+    );
+    this.vectors.load(scene.vectors, pool, dotBase, noise, this.tide?.buffer, setLens);
     // rewritten each view (the sample count, M7's star slots): a scratch buffer, not a shared upload
     const scan = res.init(new Uint32Array([n, cap, blocks, 0]), GPUBufferUsage.UNIFORM, 'scan');
     const projected = buf(
@@ -370,6 +378,7 @@ export class GpuStipple {
       samples,
       view,
       culls,
+      setLens,
       scan,
       projected,
       classes,
@@ -576,6 +585,7 @@ export class GpuStipple {
       packStruct(CULLS_LAYOUT, cullsUniform(this.scene.ribbons, cam, params, galaxy.g.key)),
     );
     this.ribbons.setView(cam, params, galaxy.g.n_dot_pool);
+    d.queue.writeBuffer(m.setLens, 0, packLensZ(skyLens(params, cam)));
     const { variation, meta } = this.scene;
     this.vectors.setView(
       vectorView(

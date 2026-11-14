@@ -6,13 +6,16 @@ import { describe, expect, it } from 'vitest';
 import { packNoise } from '../../src/core/noise';
 import { presetParams } from '../../src/core/presets';
 import { expandCap, vectorInputs } from '../../src/fallback/kernels/vector';
-import { lensDepthK, lensImage } from '../../src/fallback/kernels/lens-sky';
+import { lensCounter, lensDepthK, lensImage } from '../../src/fallback/kernels/lens-sky';
+import { deflection, lensModel } from '../../src/sim/lens';
 import { writeRow } from '../../src/model/dynvec';
 import { skyLens } from '../../src/sim/lens';
 import { DRAWING_WORDS } from '../../src/marks/vector';
 import { VINST_WORDS, WarpKind, packedLibrary } from '../../src/model/vectors';
 import { cameraOf, PLATE } from '../../src/view/camera';
 import { META } from './support/vectors';
+import { describeParts, vectorRows } from '../../src/model/parts';
+import { makeVariation } from '../../src/model/variation';
 
 const lib = packedLibrary(META.vectors);
 /** the drawing with the most strokes of the library: a long one bends the most */
@@ -126,5 +129,73 @@ describe('the lens by depth (ADR 0102)', () => {
     // a nearer source is pushed less than the far field
     expect(shift(mid)).toBeLessThan(shift(far));
     expect(shift(mid)).toBeGreaterThan(0);
+  });
+});
+
+describe('the counter-image (ADR 0103)', () => {
+  const setup = () => {
+    const P = presetParams('Lens: Einstein ring', 7, { lensField: 1 });
+    const L = skyLens(P, cameraOf(P));
+    if (!L) throw new Error('no lens');
+    return { P, L };
+  };
+
+  it('has none for a source far outside the ring, and one for a source near the centre', () => {
+    const { L } = setup();
+    expect(lensCounter(L, PLATE / 2 + 380, PLATE / 2 + 40)).toBeNull();
+    const near = lensCounter(L, PLATE / 2 + 18, PLATE / 2 + 9);
+    expect(near).not.toBeNull();
+  });
+
+  it('solves the lens equation, on the far side of the lens, with negative parity', () => {
+    const { P, L } = setup();
+    const M = lensModel(P, 1.3);
+    const sx0 = PLATE / 2 + 18;
+    const sy0 = PLATE / 2 + 9;
+    const c = lensCounter(L, sx0, sy0);
+    const p = lensImage(L, sx0, sy0);
+    if (!c) throw new Error('no counter-image');
+    // β = θ − α(θ) at the counter-image
+    const dx = (c.x - PLATE / 2) / L.scale;
+    const dy = (c.y - PLATE / 2) / L.scale;
+    const tx = dx * L.cos + dy * L.sin;
+    const ty = -dx * L.sin + dy * L.cos;
+    const a = deflection(M, tx, ty);
+    const bx = ((sx0 - PLATE / 2) / L.scale) * L.cos + ((sy0 - PLATE / 2) / L.scale) * L.sin;
+    const by = -((sx0 - PLATE / 2) / L.scale) * L.sin + ((sy0 - PLATE / 2) / L.scale) * L.cos;
+    expect(Math.hypot(tx - a[0] - bx, ty - a[1] - by)).toBeLessThan(0.02);
+    // opposite sides of the centre, and the map has a negative determinant: a mirror image
+    expect(
+      (c.x - PLATE / 2) * (p.x - PLATE / 2) + (c.y - PLATE / 2) * (p.y - PLATE / 2),
+    ).toBeLessThan(0);
+    expect(c.m[0] * c.m[3] - c.m[1] * c.m[2]).toBeLessThan(0);
+    expect(p.m[0] * p.m[3] - p.m[1] * p.m[2]).toBeGreaterThan(0);
+  });
+});
+
+describe('a lensed companion (ADR 0104)', () => {
+  const rowsOf = (over: object) => {
+    const P = presetParams('Lens: Einstein ring', 7, { companions: 1, ...over });
+    const V = makeVariation(P, META);
+    const parts = describeParts(P, V, META, P.incl);
+    const pick = (i: number, z: number) => ({
+      w: [3 + i, 1, z] as [number, number, number],
+      n: [0, 0, 1] as [number, number, number],
+      tile: 0,
+      scale: 1,
+      spin: 0,
+    });
+    // one companion behind the lens plane (z < 0 in the view), one in front
+    const cam = cameraOf(P);
+    return vectorRows(P, V, META, parts, cam, [pick(0, -3), pick(1, 3)]).filter(
+      (r) => r.atlas === 'companions',
+    );
+  };
+
+  it('carries a share of the lens only with the lens on', () => {
+    expect(rowsOf({ lensField: 0 }).every((r) => r.lensK === undefined)).toBe(true);
+    const on = rowsOf({ lensField: 1 });
+    expect(on.length).toBe(2);
+    expect(on.every((r) => r.lensK !== undefined && r.lensK >= 0 && r.lensK <= 1)).toBe(true);
   });
 });

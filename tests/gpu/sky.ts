@@ -47,6 +47,11 @@ const BASE: [string, Params][] = [
   // the deep field seen through the lens (ADR 0097)
   ['Einstein ring s7, lensField', presetParams('Lens: Einstein ring', 7, { lensField: 1 })],
   ['Cluster s7, lensField', presetParams('Lens: galaxy cluster', 7, { lensField: 1, field: 1 })],
+  // companions behind the lens plane are lensed too (ADR 0104)
+  [
+    'Einstein ring s7, lensField, companions',
+    presetParams('Lens: Einstein ring', 7, { lensField: 1, companions: 1, field: 1 }),
+  ],
 ];
 
 run('deep field and foreground stars (GPU = CPU, L1)', async () => {

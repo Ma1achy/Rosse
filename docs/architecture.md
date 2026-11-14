@@ -87,6 +87,8 @@ The CPU turns parameters into a **scene description**: a few kilobytes of number
 | [0100](adr/0100-every-star-is-live.md) | _Proposed:_ with `nbody` every star pulls on every other (GPU direct sum, CPU Barnes–Hut tree), in blocks of four steps |
 | [0101](adr/0101-a-lensed-drawing-bends.md) | _Proposed:_ with `lensField` every vertex of a deep-field drawing goes through the lens, so a drawing bends into an arc |
 | [0102](adr/0102-the-lens-acts-by-depth.md) | _Proposed:_ with `lensField` each object of the sky feels the lens by its depth behind the lens plane, and the foreground stars are lensed |
+| [0103](adr/0103-a-source-inside-the-caustic-has-a-counter-image.md) | _Proposed:_ with `lensField` a deep-field dot or drawing is also drawn at its counter-image, mirrored, where the source has one |
+| [0104](adr/0104-companions-are-lensed-by-depth.md) | _Proposed:_ with `lensField` a companion behind the lens plane is bent by the field's lens, by its depth |
 
 ## Modules
 

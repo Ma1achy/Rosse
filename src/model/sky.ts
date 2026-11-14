@@ -203,6 +203,8 @@ export interface SkyDesc {
   spec: DynSpec;
   /** the most galaxies the buffers of one view hold */
   visCap: number;
+  /** images per source: 2 with the lens on (the primary and the counter-image, ADR 0103), else 1 */
+  nImg: number;
   /** shears the drawings round a mass (`massive`, L879): a bulge, a lens, a merger, a Sérsic galaxy */
   massive: boolean;
   /** foreground star tiles in the atlas */
@@ -290,7 +292,9 @@ export function describeSky(
       );
   // a lensed deep field's drawings are cut into pieces and put through the lens vertex by vertex
   // (WarpKind.lens, ADR 0101)
-  const strides = sheetStrides(lib, SKY_SHEETS, P.lensField > 0 && !!P.lensOn);
+  const lensed = P.lensField > 0 && !!P.lensOn;
+  const nImg = lensed ? 2 : 1;
+  const strides = sheetStrides(lib, SKY_SHEETS, lensed);
   const visCap = visibleCapacity(cat.bg.length);
   return {
     catalogue: cat,
@@ -299,8 +303,9 @@ export function describeSky(
     fgBuf: packFg(cat.fg),
     nBg: cat.bg.length,
     nFg: cat.fg.length,
-    spec: { rows: visCap * SKY_ROWS_PER_GALAXY, ...strides },
+    spec: { rows: visCap * SKY_ROWS_PER_GALAXY * nImg, ...strides },
     visCap,
+    nImg,
     massive: P.bulge > 0.5 || !!P.lensOn || !!P.merger || P.sersicN > 0,
     fgTiles,
   };

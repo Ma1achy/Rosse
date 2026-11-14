@@ -29,7 +29,7 @@ import { INACTIVE } from '../../model/dynvec';
 import { STREAM_SEG_WORDS, VINST_WORDS, WarpKind, type VectorView } from '../../model/vectors';
 import { smWarp } from '../../view/warp';
 import type { SkyLens } from '../../sim/lens';
-import { lensImage } from './lens-sky';
+import { lensCounter, lensImage } from './lens-sky';
 import { INSTANCE_WORDS } from './project';
 import type { TideData } from './tide';
 
@@ -177,10 +177,14 @@ const mul2 = (A: M2, B: M2): M2 => [
   f(f(A[1] * B[2]) + f(A[3] * B[3])),
 ];
 
+/** Whether the last `tf` found its point's image: false for a counter-image warp with none (ADR 0103). */
+let tfOk = true;
+
 /** expandVector's tf (app23.js:L1194–1198): the warp, the matrix, the wobble. */
 function tf(X: VectorInputs, I: Inst, x: number, y: number): [number, number] {
   const wob = X.vu.wobble ?? 0;
   let q: [number, number];
+  tfOk = true;
   if (I.warp === WarpKind.rewind) {
     const r = rewindF(x, y, I.w[0], I.w[1] !== 0);
     q = place(I, r[0], r[1]);
@@ -200,6 +204,12 @@ function tf(X: VectorInputs, I: Inst, x: number, y: number): [number, number] {
     const p = place(I, x, y);
     const l = lensImage(X.lens, p[0], p[1], false, I.w[0]);
     q = [l.x, l.y];
+  } else if (I.warp === WarpKind.lensCounter) {
+    if (!X.lens) throw new Error('a lens warp needs the lens');
+    const p = place(I, x, y);
+    const l = lensCounter(X.lens, p[0], p[1], false, I.w[0]);
+    tfOk = l !== null;
+    q = l ? [l.x, l.y] : [0, 0];
   } else q = place(I, x, y);
   return smWarp(q[0], q[1], wob, X.noise);
 }
@@ -241,8 +251,10 @@ export function expandCap(X: VectorInputs, i: number, out: Float32Array): number
     rb = [f(ax + f(dx * fb)), f(ay + f(dy * fb))];
   }
   const a = tf(X, I, ra[0], ra[1]);
+  const aOk = tfOk;
   const b = tf(X, I, rb[0], rb[1]);
   let key = 0;
+  if (!(aOk && tfOk)) key = 1;
   if (I.warp !== WarpKind.none) {
     const dx = f(b[0] - a[0]);
     const dy = f(b[1] - a[1]);
@@ -285,6 +297,11 @@ export function expandDot(X: VectorInputs, i: number, outF: Float32Array, outU: 
   const d = ((X.lib.table[I.drawing * DRAWING_WORDS + 2] ?? 0) + i - I.dotFirst) * 4;
   const D = X.lib.dots;
   const [px, py] = tf(X, I, D[d] ?? 0, D[d + 1] ?? 0);
+  if (!tfOk) {
+    outF.fill(0, i * INSTANCE_WORDS, (i + 1) * INSTANCE_WORDS);
+    outU[i * INSTANCE_WORDS + 2] = 0;
+    return;
+  }
   const nPool = Math.max(1, X.vu.n_dot_pool ?? 1);
   const t = X.pool[KNOT_POOL + ((D[d + 3] ?? 0) % nPool)] ?? 0;
   const k0 = clamp(f(f(f(f(f(2) * (D[d + 2] ?? 0)) * I.sc) * f(0.42)) / f(2.6)), f(0.8), f(1.6));
@@ -316,6 +333,11 @@ export function expandBlob(X: VectorInputs, i: number, outF: Float32Array, outU:
   const b = ((X.lib.table[I.drawing * DRAWING_WORDS + 4] ?? 0) + i - I.blobFirst) * 8;
   const B = X.lib.blobs;
   const [px, py] = tf(X, I, B[b] ?? 0, B[b + 1] ?? 0);
+  if (!tfOk) {
+    outF.fill(0, i * INSTANCE_WORDS, (i + 1) * INSTANCE_WORDS);
+    outU[i * INSTANCE_WORDS + 2] = 0;
+    return;
+  }
   const t = X.pool[(B[b + 6] ?? 0) % KNOT_POOL] ?? 0;
   const lim = f(f(3) / I.sc);
   const sx = Math.max(f(f(f(2) * (B[b + 2] ?? 0)) * f(0.85)), lim);
@@ -327,6 +349,11 @@ export function expandBlob(X: VectorInputs, i: number, outF: Float32Array, outU:
     // the lens stretches the blob by A^-1 where it lands
     const p = place(I, B[b] ?? 0, B[b + 1] ?? 0);
     m = mul2(lensImage(X.lens, p[0], p[1], true, I.w[0]).m, m);
+  }
+  if (I.warp === WarpKind.lensCounter && X.lens) {
+    const p = place(I, B[b] ?? 0, B[b + 1] ?? 0);
+    const c = lensCounter(X.lens, p[0], p[1], true, I.w[0]);
+    if (c) m = mul2(c.m, m);
   }
   const r0 = f(f(m[0] * c) + f(m[2] * s));
   const r1 = f(f(m[1] * c) + f(m[3] * s));

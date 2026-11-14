@@ -50,6 +50,7 @@ struct SkyU {
 }
 
 const WARP_LENS: u32 = 5u;
+const WARP_LENS_COUNTER: u32 = 6u;
 const STREAM_SKY_DOTS: u32 = 17u;
 const KNOT_POOL: u32 = 24u;
 const DOTS_PER_GALAXY: u32 = 150u;
@@ -149,12 +150,20 @@ fn plane_basis(n: vec3<f32>, e1: ptr<function, vec3<f32>>, e2: ptr<function, vec
 @compute @workgroup_size(64)
 fn sky_dots(@builtin(global_invocation_id) id: vec3<u32>) {
   let s = id.x;
-  if (s >= su.vis_cap * DOTS_PER_GALAXY) {
+  // with the lens on a second half of slots holds the counter-images (ADR 0103)
+  let nd = su.vis_cap * DOTS_PER_GALAXY;
+  var n_img = 1u;
+  if (lensz.on != 0u) {
+    n_img = 2u;
+  }
+  if (s >= nd * n_img) {
     return;
   }
   dots_out[s] = Instance(vec2<f32>(0.0), 0u, 0.0, vec4<f32>(0.0));
-  let g = s / DOTS_PER_GALAXY;
-  let j = s % DOTS_PER_GALAXY;
+  let counter = s >= nd;
+  let sg = s % nd;
+  let g = sg / DOTS_PER_GALAXY;
+  let j = sg % DOTS_PER_GALAXY;
   if (g >= min(vargs[1], su.vis_cap)) {
     return;
   }
@@ -213,7 +222,17 @@ fn sky_dots(@builtin(global_invocation_id) id: vec3<u32>) {
   let rot = rand_f32(su.key, STREAM_SKY_DOTS, idx, 11u) * 6.28;
   var pl = pq;
   if (lensz.on != 0u) {
-    pl = lens_pos(pq, lens_depth_k(pv.z));
+    let kz = lens_depth_k(pv.z);
+    if (counter) {
+      // the second image, when the source has one
+      let c = lens_counter(pq, kz);
+      if (c.z < 0.5) {
+        return;
+      }
+      pl = lens_place(c.xy);
+    } else {
+      pl = lens_pos(pq, kz);
+    }
   }
   let p = sm_warp(pl, su.wobble);
   let c = cos_f(rot);
@@ -260,9 +279,16 @@ fn orient(n: vec3<f32>, size: f32, spin: f32) -> vec4<f32> {
 @compute @workgroup_size(64)
 fn rows_sky(@builtin(global_invocation_id) id: vec3<u32>) {
   let r = id.x;
-  if (r >= su.vis_cap * 3u) {
+  // with the lens on a second half of rows holds the counter-images' drawings (ADR 0103)
+  let nr = su.vis_cap * 3u;
+  var n_img = 1u;
+  if (lensz.on != 0u) {
+    n_img = 2u;
+  }
+  if (r >= nr * n_img) {
     return;
   }
+  let counter = r >= nr;
   var I = VInst(
     vec4<f32>(0.0),
     vec2<f32>(0.0),
@@ -279,8 +305,9 @@ fn rows_sky(@builtin(global_invocation_id) id: vec3<u32>) {
     0u,
     0u,
   );
-  let g = r / 3u;
-  let a = r % 3u;
+  let rr = r % nr;
+  let g = rr / 3u;
+  let a = rr % 3u;
   if (g < min(vargs[1], su.vis_cap)) {
     let V = vis[g];
     let b = V.layer;
@@ -320,6 +347,9 @@ fn rows_sky(@builtin(global_invocation_id) id: vec3<u32>) {
       let at = V.pos;
       if (lensz.on != 0u) {
         I.warp = WARP_LENS;
+        if (counter) {
+          I.warp = WARP_LENS_COUNTER;
+        }
         // the depth of the galaxy's own centre sets how much of the lens it feels
         I.w = vec4<f32>(lens_depth_k(to_view(bg[b * 3u].xyz).z), 0.0, 0.0, 0.0);
       }

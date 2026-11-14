@@ -30,6 +30,8 @@ const LENS_STEPS: u32 = 5u;
 const LENS_DET_MIN: f32 = 0.15;
 const LENS_STEP_MAX: f32 = 0.4;
 const LENS_H: f32 = 0.01;
+const LENS_CONV: f32 = 0.005;
+const LENS_SEP: f32 = 0.05;
 
 // `kz` scales the lens for the object's depth (`lens_depth_k`, ADR 0102)
 fn sky_deflect(x: f32, y: f32, kz: f32) -> vec2<f32> {
@@ -106,16 +108,19 @@ struct LensImg {
   m: vec4<f32>,
 }
 
-// the primary image of a plate point in lens units: theta, and beta
-fn lens_solve(p: vec2<f32>, kz: f32) -> vec4<f32> {
+// the source of a plate point in lens units
+fn lens_beta(p: vec2<f32>) -> vec2<f32> {
   let cw = lensz.cs.x;
   let sw = lensz.cs.y;
   let sc = lensz.cs.z;
   let dx = (p.x - PLATE_HALF) / sc;
   let dy = (p.y - PLATE_HALF) / sc;
-  let b = vec2<f32>(dx * cw + dy * sw, -dx * sw + dy * cw);
-  let a0 = sky_deflect(b.x, b.y, kz);
-  var t = b + a0;
+  return vec2<f32>(dx * cw + dy * sw, -dx * sw + dy * cw);
+}
+
+// damped Newton steps on theta - alpha(theta) = beta from t0 (twin of `newton`)
+fn lens_newton(b: vec2<f32>, t0: vec2<f32>, kz: f32) -> vec2<f32> {
+  var t = t0;
   for (var i = 0u; i < LENS_STEPS; i++) {
     let a = sky_deflect(t.x, t.y, kz);
     let A = lens_jac(t.x, t.y, a, kz);
@@ -128,7 +133,31 @@ fn lens_solve(p: vec2<f32>, kz: f32) -> vec4<f32> {
     }
     t = t - st;
   }
-  return vec4<f32>(t, b);
+  return t;
+}
+
+// the primary image of a plate point in lens units: theta, and beta
+fn lens_solve(p: vec2<f32>, kz: f32) -> vec4<f32> {
+  let b = lens_beta(p);
+  let a0 = sky_deflect(b.x, b.y, kz);
+  return vec4<f32>(lens_newton(b, b + a0, kz), b);
+}
+
+// the counter-image of a plate point (ADR 0103): xy its theta, z 1 when there is one (the lens
+// equation holds to LENS_CONV and it is LENS_SEP away from the primary image), else 0
+fn lens_counter(p: vec2<f32>, kz: f32) -> vec3<f32> {
+  let b = lens_beta(p);
+  let a0 = sky_deflect(b.x, b.y, kz);
+  let prim = lens_newton(b, b + a0, kz);
+  let t = lens_newton(b, b - a0, kz);
+  let a = sky_deflect(t.x, t.y, kz);
+  let res = length(t - a - b);
+  let sep = length(t - prim);
+  var ok = 0.0;
+  if (res < LENS_CONV && sep > LENS_SEP) {
+    ok = 1.0;
+  }
+  return vec3<f32>(t, ok);
 }
 
 fn lens_place(t: vec2<f32>) -> vec2<f32> {
@@ -144,9 +173,13 @@ fn lens_pos(p: vec2<f32>, kz: f32) -> vec2<f32> {
 }
 
 fn lens_image(p: vec2<f32>, kz: f32) -> LensImg {
+  return lens_image_at(lens_solve(p, kz).xy, kz);
+}
+
+// the image at theta t: its plate place and the map A^-1
+fn lens_image_at(t: vec2<f32>, kz: f32) -> LensImg {
   let cw = lensz.cs.x;
   let sw = lensz.cs.y;
-  let t = lens_solve(p, kz).xy;
   let A = lens_jac(t.x, t.y, sky_deflect(t.x, t.y, kz), kz);
   let det = lens_det(A);
   let M11 = A.w / det;
